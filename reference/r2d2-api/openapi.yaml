@@ -34,6 +34,12 @@ paths:
                 type: array
                 items:
                   $ref: ../common/models/roomprice.v1.yaml
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
         '400':
           description: Bad Request
           content:
@@ -73,24 +79,287 @@ paths:
       description: Get Room Prices collection
       security:
         - Header API Key: []
+      parameters:
+        - schema:
+            type: number
+            default: '0'
+          in: query
+          name: page_number
+        - schema:
+            type: number
+            maximum: 1000
+          in: query
+          name: page_size
     put:
-      summary: Room Prices Bulk Update
+      summary: Room Prices bulk update
       tags:
         - pricing
         - rooms
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../common/models/roomprice.v1.yaml
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: ../common/models/roomprice.v1.yaml
+        description: Colletction of Room Prices
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+          in: query
+          name: response_type
+      security:
+        - Header API Key: []
+      description: Room Prices bulk update
     patch:
-      summary: 'Room Prices Bulk Partial Update  '
+      summary: Room Prices bulk partial update
       tags:
         - pricing
         - rooms
       responses: {}
+      description: Room Prices bulk partial update
+      security:
+        - Header API Key: []
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+            maxLength: 0
+          in: query
+          name: response_type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: ../common/models/patch.v1.yaml
+        description: Colletction of Patches
     post:
-      summary: Room Prices Bulk Creation
+      summary: Room Prices bulk creation
       tags:
         - pricing
         - rooms
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../common/models/roomprice.v1.yaml
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+      description: Room Prices bulk creation
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+            maxLength: 0
+          in: query
+          name: response_type
+          description: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: ../common/models/roomprice.v1.yaml
+        description: Colletction of Room Prices
+      security:
+        - Header API Key: []
+    delete:
+      summary: Room Prices bulk delete
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../common/models/roomprice.v1.yaml
+        '201':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+      description: Room Prices bulk delete
+      security:
+        - Header API Key: []
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+          in: header
+          name: response_type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+        description: Array of Room Prices uuids
 components:
   schemas: {}
   securitySchemes:

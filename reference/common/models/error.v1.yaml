@@ -1,5 +1,7 @@
 title: Error
 type: object
+x-tags:
+  - auxiliar
 properties:
   uuid:
     type: string
