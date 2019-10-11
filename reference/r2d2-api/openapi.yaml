@@ -13,13 +13,8 @@ servers:
   - url: 'http://localhost:3000'
     description: api-mock
 paths:
-  '/room_prices/{room_external_id}':
-    parameters:
-      - schema:
-          type: string
-        name: room_external_id
-        in: path
-        required: true
+  /room_prices:
+    parameters: []
     get:
       summary: Get Room Prices collection
       tags:
@@ -90,6 +85,14 @@ paths:
             maximum: 1000
           in: query
           name: page_size
+        - schema:
+            type: string
+          in: query
+          name: experience_id
+        - schema:
+            type: string
+          in: query
+          name: room_external_id
     put:
       summary: Room Prices bulk update
       tags:
@@ -161,7 +164,7 @@ paths:
               type: array
               items:
                 $ref: ../common/models/roomprice.v1.yaml
-        description: Colletction of Room Prices
+        description: Collection of Room Prices
       parameters:
         - schema:
             type: string
@@ -171,6 +174,10 @@ paths:
             default: full
           in: query
           name: response_type
+        - schema:
+            type: string
+          in: query
+          name: room_external_id
       security:
         - Header API Key: []
       description: Room Prices bulk update
@@ -193,6 +200,10 @@ paths:
             maxLength: 0
           in: query
           name: response_type
+        - schema:
+            type: string
+          in: query
+          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -200,7 +211,7 @@ paths:
               type: array
               items:
                 $ref: ../common/models/patch.v1.yaml
-        description: Colletction of Patches
+        description: Collection of Patches
     post:
       summary: Room Prices bulk creation
       tags:
@@ -269,6 +280,10 @@ paths:
           in: query
           name: response_type
           description: ''
+        - schema:
+            type: string
+          in: query
+          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -276,7 +291,7 @@ paths:
               type: array
               items:
                 $ref: ../common/models/roomprice.v1.yaml
-        description: Colletction of Room Prices
+        description: Collection of Room Prices
       security:
         - Header API Key: []
     delete:
@@ -346,8 +361,12 @@ paths:
               - simple
               - full
             default: full
-          in: header
+          in: query
           name: response_type
+        - schema:
+            type: string
+          in: query
+          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -360,6 +379,372 @@ paths:
               type: object
               properties: {}
         description: Array of Room Prices uuids
+  /room_availabilities:
+    parameters: []
+    get:
+      summary: Get Room Availabilities collection
+      tags:
+        - availability
+        - rooms
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../common/models/roomavailability.v1.yaml
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+      description: Get Room Availabilities collection
+      security:
+        - Header API Key: []
+      parameters:
+        - schema:
+            type: number
+            default: '0'
+          in: query
+          name: page_number
+        - schema:
+            type: number
+            maximum: 1000
+          in: query
+          name: page_size
+        - schema:
+            type: string
+          in: query
+          name: experience_id
+        - schema:
+            type: string
+          in: query
+          name: room_external_id
+    put:
+      summary: Room Availabilities bulk update
+      tags:
+        - availability
+        - rooms
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../common/models/roomavailability.v1.yaml
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: ../common/models/roomavailability.v1.yaml
+        description: Collection of Room Availabilities
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+          in: query
+          name: response_type
+        - schema:
+            type: string
+          in: query
+          name: room_external_id
+      security:
+        - Header API Key: []
+      description: Room Availabilities bulk update
+    patch:
+      summary: Room Availabilities bulk partial update
+      tags:
+        - pricing
+        - rooms
+      responses: {}
+      description: Room Availabilities bulk partial update
+      security:
+        - Header API Key: []
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+            maxLength: 0
+          in: query
+          name: response_type
+        - schema:
+            type: string
+          in: query
+          name: room_external_id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: ../common/models/patch.v1.yaml
+        description: Collection of Patches
+    post:
+      summary: Room Availabilities bulk creation
+      tags:
+        - pricing
+        - rooms
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../common/models/roomavailability.v1.yaml
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+      description: Room Availabilities bulk creation
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+            maxLength: 0
+          in: query
+          name: response_type
+          description: ''
+        - schema:
+            type: string
+          in: query
+          name: room_external_id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: ../common/models/roomavailability.v1.yaml
+        description: Collection of Room Availabilities
+      security:
+        - Header API Key: []
+    delete:
+      summary: Room Availabilities bulk delete
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../common/models/roomavailability.v1.yaml
+        '201':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+      description: Room Availabilities bulk delete
+      security:
+        - Header API Key: []
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+          in: header
+          name: response_type
+        - schema:
+            type: string
+          in: query
+          name: room_external_id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+        description: Array of Room Availabilities uuids
 components:
   schemas: {}
   securitySchemes:
