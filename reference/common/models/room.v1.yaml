@@ -1,0 +1,41 @@
+title: Room
+type: object
+x-tags:
+  - rooms
+properties:
+  uuid:
+    type: string
+    format: uuid
+  external_id:
+    type: string
+  partner_uuid:
+    type: string
+    format: uuid
+  name:
+    type: string
+  description:
+    type: string
+  inventory:
+    type: integer
+  is_sellable:
+    type: boolean
+  status:
+    type: string
+    enum:
+      - enabled
+      - disabled
+  created_at:
+    type: string
+    format: date-time
+  updated_at:
+    type: string
+required:
+  - uuid
+  - external_id
+  - partner_uuid
+  - name
+  - inventory
+  - is_sellable
+  - status
+  - created_at
+description: Rooms are reservable accomodations for partners

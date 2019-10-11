@@ -1,0 +1,17 @@
+title: Error
+type: object
+properties:
+  uuid:
+    type: string
+    format: uuid
+  code:
+    type: string
+  endpoint:
+    type: string
+  description:
+    type: string
+required:
+  - uuid
+  - code
+  - endpoint
+  - description

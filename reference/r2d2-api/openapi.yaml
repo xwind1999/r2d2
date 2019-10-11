@@ -1,0 +1,100 @@
+openapi: 3.0.0
+info:
+  title: r2-d2-api
+  version: 0.0.1
+  description: "R2-D2 is an API service to enrich and provide A&P to upstream services, such as JarvisBooking. It's also responsible to receive bookings from upstream services, enrich and route them to downstream services, such as CMHub."
+  contact:
+    name: Bruno Ricardo Siqueira
+    url: 'https://smartbox.atlassian.net/wiki/spaces/MF/overview'
+    email: bruno.siqueira@smartbox.com
+  license:
+    name: Copyrigh (c) Smartbox 2019
+servers:
+  - url: 'http://localhost:3000'
+    description: api-mock
+paths:
+  '/room_prices/{room_external_id}':
+    parameters:
+      - schema:
+          type: string
+        name: room_external_id
+        in: path
+        required: true
+    get:
+      summary: Get Room Prices collection
+      tags:
+        - pricing
+        - rooms
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../common/models/roomprice.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+      description: Get Room Prices collection
+      security:
+        - Header API Key: []
+    put:
+      summary: Room Prices Bulk Update
+      tags:
+        - pricing
+        - rooms
+      responses: {}
+    patch:
+      summary: 'Room Prices Bulk Partial Update  '
+      tags:
+        - pricing
+        - rooms
+      responses: {}
+    post:
+      summary: Room Prices Bulk Creation
+      tags:
+        - pricing
+        - rooms
+      responses: {}
+components:
+  schemas: {}
+  securitySchemes:
+    Header API Key:
+      name: API Key
+      type: apiKey
+      in: header
