@@ -1,9 +1,9 @@
-title: RoomPrice
+title: RoomAvailability
 type: object
 x-tags:
+  - availability
   - rooms
-  - pricing
-description: Room Prices are the sellable price for a room in a specific date
+description: Room Prices are the stock and availability type for a room in a specific date
 properties:
   uuid:
     type: string
@@ -16,7 +16,10 @@ properties:
   date:
     type: string
     format: date
-  price:
+  stock:
+    type: integer
+    maximum: 0
+  type:
     type: integer
     maximum: 0
   created_at:
@@ -30,6 +33,7 @@ required:
   - room_uuid
   - room_external_id
   - date
-  - price
+  - stock
+  - type
   - created_at
   - updated_at

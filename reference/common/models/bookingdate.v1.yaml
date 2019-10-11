@@ -1,9 +1,8 @@
-title: RoomPrice
-type: object
 x-tags:
-  - rooms
-  - pricing
-description: Room Prices are the sellable price for a room in a specific date
+  - bookings
+type: object
+title: BookingDate
+description: 'Booking Dates are '
 properties:
   uuid:
     type: string
@@ -17,19 +16,14 @@ properties:
     type: string
     format: date
   price:
+    type: string
+  guests:
     type: integer
-    maximum: 0
-  created_at:
-    type: string
-    format: date-time
-  updated_at:
-    type: string
-    format: date-time
+    minimum: 1
 required:
   - uuid
   - room_uuid
   - room_external_id
   - date
   - price
-  - created_at
-  - updated_at
+  - guests

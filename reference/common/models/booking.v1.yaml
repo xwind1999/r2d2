@@ -1,0 +1,51 @@
+title: Booking
+type: object
+x-tags:
+  - bookings
+description: Bookings are reservations that affect the availability
+properties:
+  uuid:
+    type: string
+  external_id:
+    type: string
+  room_uuid:
+    type: string
+  room_external_id:
+    type: string
+  customer_external_id:
+    type: string
+  customer_name:
+    type: string
+  customer_phone:
+    type: string
+  customer_email:
+    type: string
+  start_date:
+    type: string
+    format: date
+  end_date:
+    type: string
+    format: date
+  status:
+    type: string
+  type:
+    type: string
+  dates:
+    type:
+      - string
+      - array
+    items:
+      $ref: ./bookingdate.v1.yaml
+  experience:
+    type: string
+required:
+  - uuid
+  - external_id
+  - room_uuid
+  - room_external_id
+  - customer_name
+  - start_date
+  - end_date
+  - status
+  - type
+  - dates

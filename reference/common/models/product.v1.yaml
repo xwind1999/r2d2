@@ -1,0 +1,10 @@
+title: Product
+type: object
+x-tags:
+  - products
+properties:
+  uuid:
+    type: string
+  external_id:
+    type: string
+description: Products are generic entities with a lot of meaning in Smartbox

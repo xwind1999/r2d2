@@ -1,0 +1,43 @@
+title: ProductRelationship
+type: object
+x-tags:
+  - products
+  - boxes
+  - experiences
+  - components
+description: Products Relationships are explicity relations between different products
+properties:
+  uuid:
+    type: string
+  parent_product:
+    $ref: ./product.v1.yaml
+  child_product:
+    $ref: ./product.v1.yaml
+  sort_order:
+    type: integer
+  is_enabled:
+    type: boolean
+  relationship_type:
+    type: string
+    enum:
+      - Box-Experience
+      - Experience-Component
+      - Concept
+      - Kit
+  print_type:
+    type: string
+    enum:
+      - Booklet
+      - Digital
+      - Specimen
+  child_count:
+    type: integer
+  child_quantity:
+    type: integer
+required:
+  - uuid
+  - parent_product
+  - child_product
+  - sort_order
+  - is_enabled
+  - relationship_type
