@@ -1,0 +1,25 @@
+title: Patch
+type: object
+x-tags:
+  - auxiliar
+properties:
+  resource_uuid:
+    type: string
+  resource_name:
+    type: string
+    enum:
+      - room
+      - roomprice
+  partial:
+    type: object
+required:
+  - resource_uuid
+  - resource_name
+  - partial
+x-examples:
+  ad930a46-06b0-4372-b07b-d5d03d374e7b:
+    value:
+      resource_id: ad930a46-06b0-4372-b07b-d5d03d374e7b
+      resource_name: Booking
+      partial:
+        field: new_data

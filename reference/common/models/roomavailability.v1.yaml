@@ -4,6 +4,17 @@ x-tags:
   - availability
   - rooms
 description: Room Prices are the stock and availability type for a room in a specific date
+x-examples:
+  8d543a0b-2d26-40fc-aba4-c7b346c4cdd9:
+    value:
+      uui: 8d543a0b-2d26-40fc-aba4-c7b346c4cdd9
+      room_id: edd4691a-dac6-46c6-bd07-f9392720ba81
+      room_external_id: '123456789'
+      date: 14-10-2019
+      stock: 1
+      type: instant
+      created_at: 14-10-2019
+      updated_at: 14-10-2019
 properties:
   uuid:
     type: string
@@ -35,5 +46,3 @@ required:
   - date
   - stock
   - type
-  - created_at
-  - updated_at

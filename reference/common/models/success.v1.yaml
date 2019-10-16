@@ -1,26 +1,29 @@
-title: Error
+title: Success
 type: object
 x-tags:
   - auxiliar
 properties:
   uuid:
     type: string
-    format: uuid
   code:
     type: string
   endpoint:
     type: string
   description:
     type: string
+  count:
+    type: string
 required:
   - uuid
   - code
   - endpoint
   - description
+  - count
 x-examples:
-  8e7796ee-87b5-4bb7-b57d-07719397a8ae:
+  e4072ad9-d4e3-4bd1-8678-0f21468f6819:
     value:
-      uuid: 8e7796ee-87b5-4bb7-b57d-07719397a8ae
-      code: '501'
+      uuid: e4072ad9-d4e3-4bd1-8678-0f21468f6819
+      code: '200'
       endpoint: /example
-      description: not implemented
+      description: Example success
+      count: 123

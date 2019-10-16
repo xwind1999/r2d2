@@ -2,6 +2,21 @@ title: Room
 type: object
 x-tags:
   - rooms
+description: Rooms are reservable accomodations for partners
+x-examples:
+  edd4691a-dac6-46c6-bd07-f9392720ba81:
+    value:
+      uuid: edd4691a-dac6-46c6-bd07-f9392720ba81
+      external_id: '123456789'
+      partner_uuid: ''
+      date: 14-10-2019
+      name: Room name example
+      description: Room description example
+      inventory: 12300
+      is_sellable: true
+      status: enabled
+      created_at: 14-10-2019
+      updated_at: 14-10-2019
 properties:
   uuid:
     type: string
@@ -37,5 +52,3 @@ required:
   - inventory
   - is_sellable
   - status
-  - created_at
-description: Rooms are reservable accomodations for partners

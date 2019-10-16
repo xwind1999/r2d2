@@ -403,6 +403,9 @@ paths:
                 type: array
                 items:
                   $ref: ../common/models/roomavailability.v1.yaml
+              examples:
+                one item:
+                  value: {}
         '201':
           description: Created
           content:
@@ -837,6 +840,7 @@ paths:
             default: full
           in: query
           name: response_type
+    parameters: []
   /bookings:
     parameters: []
     get:
@@ -931,7 +935,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: customer_name
+          name: customer_external_id
       requestBody: {}
     put:
       summary: Room Prices bulk update
