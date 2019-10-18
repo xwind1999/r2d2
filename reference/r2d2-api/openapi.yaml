@@ -792,7 +792,7 @@ paths:
               type: object
               properties: {}
         description: Collection of Room Availabilities uuids
-  /product_relationships:
+  /broadcast_listener/product_relationships:
     post:
       summary: Create or Update Product Relationships
       tags:
@@ -869,6 +869,11 @@ paths:
           in: query
           name: response_type
     parameters: []
+  /broadcast_listener/products:
+    post:
+      summary: Create or Update products
+      tags: []
+      responses: {}
   /bookings:
     parameters: []
     get:
