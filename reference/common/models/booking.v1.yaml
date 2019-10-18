@@ -96,11 +96,11 @@ properties:
     format: date
 required:
   - external_id
-  - room_external_id
-  - customer_external_id
-  - dates
   - experience_id
+  - room_external_id
   - type
   - status
   - end_date
   - start_date
+  - dates
+  - customer_external_id
