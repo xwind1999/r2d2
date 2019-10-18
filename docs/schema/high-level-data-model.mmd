@@ -1,0 +1,9 @@
+graph LR
+Booking ---|"1..N - 1..N"| Room
+Booking ---|"1 - 1"| Experience
+Experience ---|"1..N - 1"| Box
+Experience ---|"1 - 1..N"| Room
+Room ---|"1 - 1..N"| RoomPrice
+Room ---|"1 - 1..N"| RoomAvailability
+RoomAvailability ---|"1..N - 1"| RateBand
+RoomPrice ---|"1..N - 1"| RateBand
