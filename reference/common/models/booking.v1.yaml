@@ -56,18 +56,12 @@ properties:
     type: string
   experience_id:
     type: string
-  room_uuid:
-    type: string
-  room_external_id:
-    type: string
-  rate_band_uuid:
-    type: string
-  rate_band_external_id:
-    type: string
   type:
     type: string
   status:
     type: string
+  total_price:
+    type: integer
   start_date:
     type: string
     format: date

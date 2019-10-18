@@ -19,19 +19,26 @@ properties:
   uuid:
     type: string
     format: uuid
+  booking_uuid:
+    type: string
+    format: uuid
   room_uuid:
     type: string
     format: uuid
   room_external_id:
     type: string
+  rate_band_uuid:
+    type: string
+  rate_band_external_id:
+    type: string
   date:
     type: string
     format: date
   price:
-    type: string
+    type: integer
   is_upsell:
     type: boolean
-  guests:
+  guests_count:
     type: integer
     minimum: 1
   created_at:
@@ -45,4 +52,4 @@ required:
   - date
   - price
   - is_upsell
-  - guests
+  - guests_count
