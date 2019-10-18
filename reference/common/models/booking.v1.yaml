@@ -54,17 +54,19 @@ properties:
     type: string
   external_id:
     type: string
+  experience_id:
+    type: string
   room_uuid:
     type: string
   room_external_id:
     type: string
-  customer_external_id:
+  rate_band_uuid:
     type: string
-  customer_name:
+  rate_band_external_id:
     type: string
-  customer_phone:
+  type:
     type: string
-  customer_email:
+  status:
     type: string
   start_date:
     type: string
@@ -72,17 +74,19 @@ properties:
   end_date:
     type: string
     format: date
-  status:
-    type: string
-  type:
-    type: string
   dates:
     type:
       - string
       - array
     items:
       $ref: ./bookingdate.v1.yaml
-  experience_id:
+  customer_external_id:
+    type: string
+  customer_name:
+    type: string
+  customer_email:
+    type: string
+  customer_phone:
     type: string
   created_at:
     type: string
@@ -94,10 +98,9 @@ required:
   - external_id
   - room_external_id
   - customer_external_id
-  - customer_name
-  - start_date
-  - end_date
-  - status
-  - type
   - dates
   - experience_id
+  - type
+  - status
+  - end_date
+  - start_date
