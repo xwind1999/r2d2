@@ -6,40 +6,6 @@ x-tags:
   - experiences
   - components
 description: Products Relationships are explicity relations between different products
-properties:
-  uuid:
-    type: string
-  parent_product:
-    $ref: ./product.v1.yaml
-  child_product:
-    $ref: ./product.v1.yaml
-  sort_order:
-    type: integer
-  is_enabled:
-    type: boolean
-  relationship_type:
-    type: string
-    enum:
-      - Box-Experience
-      - Experience-Component
-      - Concept
-      - Kit
-  print_type:
-    type: string
-    enum:
-      - Booklet
-      - Digital
-      - Specimen
-  child_count:
-    type: integer
-  child_quantity:
-    type: integer
-  created_at:
-    type: string
-    format: date
-  updated_at:
-    type: string
-    format: date
 x-examples:
   0eb4e8f6-fa23-4c8f-a4e3-6414ced6b7f2:
     value:
@@ -62,10 +28,30 @@ x-examples:
       child_quantity: 2
       created_at: '2019-08-26 14:31:23'
       update_at: '2019-08-26 14:31:23'
+properties:
+  uuid:
+    type: string
+  parent_product:
+    $ref: ./product.v1.yaml
+  child_product:
+    $ref: ./product.v1.yaml
+  is_enabled:
+    type: boolean
+  relationship_type:
+    type: string
+    enum:
+      - Box-Experience
+      - Experience-Component
+      - Concept
+      - Kit
+  created_at:
+    type: string
+    format: date
+  updated_at:
+    type: string
+    format: date
 required:
-  - uuid
   - parent_product
   - child_product
-  - sort_order
   - is_enabled
   - relationship_type

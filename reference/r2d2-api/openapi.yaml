@@ -29,12 +29,6 @@ paths:
                 type: array
                 items:
                   $ref: ../common/models/roomprice.v1.yaml
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/success.v1.yaml
         '400':
           description: Bad Request
           content:
@@ -100,6 +94,10 @@ paths:
         - schema:
             type: string
           in: query
+          name: partner_external_id
+        - schema:
+            type: string
+          in: query
           name: room_external_id
     put:
       summary: Room Prices bulk update
@@ -116,7 +114,7 @@ paths:
                 items:
                   $ref: ../common/models/roomprice.v1.yaml
         '201':
-          description: Created
+          description: Updated
           content:
             application/json:
               schema:
@@ -182,10 +180,6 @@ paths:
             default: full
           in: query
           name: response_type
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       security:
         - Header API Key: []
       description: Room Prices bulk update
@@ -194,7 +188,65 @@ paths:
       tags:
         - pricing
         - rooms
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../common/models/roomprice.v1.yaml
+        '201':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
       description: Room Prices bulk partial update
       security:
         - Header API Key: []
@@ -208,10 +260,6 @@ paths:
             maxLength: 0
           in: query
           name: response_type
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -288,10 +336,6 @@ paths:
           in: query
           name: response_type
           description: ''
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -371,10 +415,6 @@ paths:
             default: full
           in: query
           name: response_type
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -386,7 +426,7 @@ paths:
             schema:
               type: object
               properties: {}
-        description: Array of Room Prices uuids
+        description: Collection of Room Prices uuids
   /room_availabilities:
     parameters: []
     get:
@@ -477,6 +517,10 @@ paths:
         - schema:
             type: string
           in: query
+          name: partner_external_id
+        - schema:
+            type: string
+          in: query
           name: room_external_id
     put:
       summary: Room Availabilities bulk update
@@ -559,10 +603,6 @@ paths:
             default: full
           in: query
           name: response_type
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       security:
         - Header API Key: []
       description: Room Availabilities bulk update
@@ -585,10 +625,6 @@ paths:
             maxLength: 0
           in: query
           name: response_type
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -665,10 +701,6 @@ paths:
           in: query
           name: response_type
           description: ''
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -748,10 +780,6 @@ paths:
             default: full
           in: header
           name: response_type
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -763,7 +791,7 @@ paths:
             schema:
               type: object
               properties: {}
-        description: Array of Room Availabilities uuids
+        description: Collection of Room Availabilities uuids
   /product_relationships:
     post:
       summary: Create or Update Product Relationships
@@ -781,7 +809,7 @@ paths:
               schema:
                 $ref: ../common/models/productrelationship.v1.yaml
         '201':
-          description: Created
+          description: Saved
           content:
             application/json:
               schema:
@@ -856,12 +884,6 @@ paths:
                 type: array
                 items:
                   $ref: ../common/models/booking.v1.yaml
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/success.v1.yaml
         '400':
           description: Bad Request
           content:
@@ -898,7 +920,7 @@ paths:
             application/json:
               schema:
                 $ref: ../common/models/error.v1.yaml
-      description: Get Room Prices collection
+      description: Get Bookings collection
       security:
         - Header API Key: []
       parameters:
@@ -918,12 +940,17 @@ paths:
         - schema:
             type: number
             maximum: 1000
+            default: '100'
           in: query
           name: page_size
         - schema:
             type: string
           in: query
           name: experience_id
+        - schema:
+            type: string
+          in: query
+          name: partner_external_id
         - schema:
             type: string
           in: query
@@ -950,9 +977,9 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/roomprice.v1.yaml
+                  $ref: ../common/models/booking.v1.yaml
         '201':
-          description: Created
+          description: Updated
           content:
             application/json:
               schema:
@@ -1008,7 +1035,7 @@ paths:
               type: array
               items:
                 $ref: ../common/models/roomprice.v1.yaml
-        description: Collection of Room Prices
+        description: Collection of Bookings
       parameters:
         - schema:
             type: string
@@ -1018,20 +1045,74 @@ paths:
             default: full
           in: query
           name: response_type
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       security:
         - Header API Key: []
-      description: Room Prices bulk update
+      description: Bookings bulk update
     patch:
       summary: Room Prices bulk partial update
       tags:
         - pricing
         - rooms
-      responses: {}
-      description: Room Prices bulk partial update
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../common/models/booking.v1.yaml
+        '201':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+      description: Bookings bulk partial update
       security:
         - Header API Key: []
       parameters:
@@ -1044,10 +1125,6 @@ paths:
             maxLength: 0
           in: query
           name: response_type
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -1055,7 +1132,7 @@ paths:
               type: array
               items:
                 $ref: ../common/models/patch.v1.yaml
-        description: Collection of Patches
+        description: Collection of Bookings patches
     post:
       summary: Room Prices bulk creation
       tags:
@@ -1069,7 +1146,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/roomprice.v1.yaml
+                  $ref: ../common/models/booking.v1.yaml
         '201':
           description: Created
           content:
@@ -1112,7 +1189,7 @@ paths:
             application/json:
               schema:
                 $ref: ../common/models/error.v1.yaml
-      description: Room Prices bulk creation
+      description: Bookings bulk creation
       parameters:
         - schema:
             type: string
@@ -1124,10 +1201,6 @@ paths:
           in: query
           name: response_type
           description: ''
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -1135,7 +1208,7 @@ paths:
               type: array
               items:
                 $ref: ../common/models/roomprice.v1.yaml
-        description: Collection of Room Prices
+        description: Collection of Bookings
       security:
         - Header API Key: []
     delete:
@@ -1195,7 +1268,7 @@ paths:
             application/json:
               schema:
                 $ref: ../common/models/error.v1.yaml
-      description: Room Prices bulk delete
+      description: Bookings bulk delete
       security:
         - Header API Key: []
       parameters:
@@ -1207,10 +1280,6 @@ paths:
             default: full
           in: query
           name: response_type
-        - schema:
-            type: string
-          in: query
-          name: room_external_id
       requestBody:
         content:
           application/json:
@@ -1222,7 +1291,7 @@ paths:
             schema:
               type: object
               properties: {}
-        description: Array of Room Prices uuids
+        description: Collection of Bookings uuids
 components:
   schemas: {}
   securitySchemes:
