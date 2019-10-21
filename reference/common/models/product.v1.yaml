@@ -2,17 +2,7 @@ title: Product
 type: object
 x-tags:
   - products
-properties:
-  uuid:
-    type: string
-  external_id:
-    type: string
-  created_at:
-    type: string
-    format: date
-  updated_at:
-    type: string
-    format: date
+description: Products are generic entities with a lot of meaning in Smartbox
 x-examples:
   41b65e0f-99e2-4608-b9fd-86b57cfe09e5:
     value:
@@ -20,4 +10,32 @@ x-examples:
       external_id: '667834762'
       created_at: '2019-08-26 14:31:23'
       update_at: '2019-08-26 14:31:23'
-description: Products are generic entities with a lot of meaning in Smartbox
+properties:
+  uuid:
+    type: string
+  external_id:
+    type: string
+  name:
+    type: string
+  description:
+    type: string
+  universe:
+    type: string
+  is_sellable:
+    type: boolean
+  is_reservable:
+    type: boolean
+  partner_external_id:
+    type: string
+  created_at:
+    type: string
+    format: date
+  updated_at:
+    type: string
+    format: date
+required:
+  - external_id
+  - name
+  - universe
+  - is_sellable
+  - is_reservable

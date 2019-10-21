@@ -873,7 +873,64 @@ paths:
     post:
       summary: Create or Update products
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/product.v1.yaml
+        '201':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+      description: Create or Update Products
+      security:
+        - Header API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ../common/models/product.v1.yaml
+        description: Product
   /bookings:
     parameters: []
     get:
