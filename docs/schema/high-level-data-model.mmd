@@ -1,9 +1,13 @@
 graph LR
-Booking ---|"1..N - 1..N"| Room
-Booking ---|"1 - 1"| Experience
-Experience ---|"1..N - 1"| Box
-Experience ---|"1 - 1..N"| Room
-Room ---|"1 - 1..N"| RoomPrice
-Room ---|"1 - 1..N"| RoomAvailability
-RoomAvailability ---|"1..N - 1"| RateBand
-RoomPrice ---|"1..N - 1"| RateBand
+bookings ---|"1 - 1..N"| booking_dates
+bookings ---|"1..N - 1"| experiences
+experiences ---|"1..N - 1"| boxes
+experiences ---|"1..N - 1"| partners
+partners ---|"1 - 1..N"| rate_bands
+partners ---|"1 - 1..N"| rooms
+rate_bands  ---|"1 - 1..N"| booking_dates
+rate_bands  ---|"1 - 1..N"| room_availabilities
+rate_bands  ---|"1 - 1..N"| room_prices
+room_availabilities  ---|"1..N - 1"| rooms
+room_prices  ---|"1..N - 1"| rooms
+booking_dates ---|"1..N - 1"| rooms
