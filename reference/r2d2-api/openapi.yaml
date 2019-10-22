@@ -843,12 +843,12 @@ paths:
       tags:
         - rooms
         - room_availabilities
-  /broadcast_listener/product_relationships:
+  /broadcast_listeners/product_relationships:
     post:
       operationId: postProductRelationships
       summary: Create or Update Product Relationships
       tags:
-        - broadcasts
+        - broadcast_listerners
         - product_relationships
         - products
         - rooms
@@ -922,12 +922,12 @@ paths:
             default: full
           in: query
           name: response_type
-  /broadcast_listener/products:
+  /broadcast_listeners/products:
     post:
       operationId: postProducts
       summary: Create or Update products
       tags:
-        - broadcasts
+        - broadcast_listerners
         - products
         - rooms
         - boxes
