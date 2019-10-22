@@ -34,16 +34,16 @@ R2-D2 is part of the iResa deprecation plans. Follows bellow some external refer
 
 ## High level tasks
 
-[x] Iterate over the first R2-D2 + C3-PO solution and provide an updated design
-[x] Receive feedback updated technical proposal
-[x] Based on the feedback, evolve the new proposal by conducing workshops with impacted systems
-[x] Present the consolidated proposal impacted systems, stakeholders and IT leadership
-[x] Draft a high level data model
-[x] Draft an initial database model to cover the MVP
-[x] Draft an initial API specification and design to cover the MVP
-[ ] Receive initial feedback about the drafted data model and API design
-[ ] Present the technical solution to the Architecture Board
-[ ] Break down the implementation epics
-[ ] Raise a delivery plan with Project Management taking into account the impacted systems and dependencies
-[ ] Bootstrap a team
-[ ] ...
+- [x] Iterate over the first R2-D2 + C3-PO solution and provide an updated design
+- [x] Receive feedback updated technical proposal
+- [x] Based on the feedback, evolve the new proposal by conducing workshops with impacted systems
+- [x] Present the consolidated proposal impacted systems, stakeholders and IT leadership
+- [x] Draft a high level data model
+- [x] Draft an initial database model to cover the MVP
+- [x] Draft an initial API specification and design to cover the MVP
+- [ ] Receive initial feedback about the drafted data model and API design
+- [ ] Present the technical solution to the Architecture Board
+- [ ] Break down the implementation epics
+- [ ] Raise a delivery plan with Project Management taking into account the impacted systems and dependencies
+- [ ] Bootstrap a team
+- [ ] ...
