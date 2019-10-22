@@ -52,49 +52,66 @@ x-examples:
 properties:
   uuid:
     type: string
+    description: Booking UUID
   external_id:
     type: string
-  experience_id:
+    description: Booking external ID
+  experience_uuid:
     type: string
+    description: Experience UUID
+  experience_external_id:
+    type: string
+    description: Experience external ID
   type:
     type: string
+    description: Booking type
   status:
     type: string
+    description: Booking status
   total_price:
     type: integer
+    description: Booking total price (total price of the Booking order)
   start_date:
     type: string
     format: date
+    description: Start date of the Booking
   end_date:
     type: string
     format: date
+    description: End date of the Booking
   dates:
     type:
       - string
       - array
+    description: Booking dates
     items:
       $ref: ./bookingdate.v1.yaml
   customer_external_id:
     type: string
+    description: Customer external id
   customer_name:
     type: string
+    description: Customer name
   customer_email:
     type: string
+    description: Customer email
   customer_phone:
     type: string
+    description: Customer telephone
   created_at:
     type: string
     format: date
+    description: Date of entity creation in R2D2
   updated_at:
     type: string
     format: date
+    description: Date of entity update in R2D2
 required:
   - external_id
-  - experience_id
-  - room_external_id
+  - experience_external_id
   - type
   - status
-  - end_date
   - start_date
+  - end_date
   - dates
   - customer_external_id

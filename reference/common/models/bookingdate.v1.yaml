@@ -19,34 +19,46 @@ properties:
   uuid:
     type: string
     format: uuid
+    description: Booking Date UUID
   booking_uuid:
     type: string
     format: uuid
+    description: Booking UUID
   room_uuid:
     type: string
     format: uuid
+    description: Room UUID
   room_external_id:
     type: string
+    description: Room external ID (room component ID)
   rate_band_uuid:
     type: string
+    description: Rate Band UUID
   rate_band_external_id:
     type: string
+    description: Rate Band external ID
   date:
     type: string
     format: date
+    description: Booking Date
   price:
     type: integer
+    description: Booking Date price
   is_upsell:
     type: boolean
+    description: "If this Booking Date it's an extra night (or other upseel)"
   guests_count:
     type: integer
     minimum: 1
+    description: Number of guests for this room in this particular date
   created_at:
     type: string
     format: date
+    description: Date of entity creation in R2D2
   updated_at:
     type: string
     format: date
+    description: Date of entity update in R2D2
 required:
   - room_external_id
   - date

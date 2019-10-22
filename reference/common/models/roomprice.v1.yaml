@@ -18,23 +18,46 @@ properties:
   uuid:
     type: string
     format: uuid
+    description: Room Price UUID
+  partner_uuid:
+    type: string
+    format: uuid
+    description: Partner UUID
+  partner_external_id:
+    type: string
+    description: Partner external ID
   room_uuid:
     type: string
     format: uuid
+    description: Room UUID
   room_external_id:
     type: string
+    description: Room external ID
+  rate_band_uuid:
+    type: string
+    format: uuid
+    description: Rate Band UUID
+  rate_band_external_id:
+    type: string
+    description: Rate Band external ID
   date:
     type: string
     format: date
+    description: Room Price date
   price:
     type: integer
-    maximum: 0
+    description: Room Price amount
+  currency:
+    type: string
+    description: Room Price currency
   created_at:
     type: string
     format: date-time
+    description: Date of entity creation in R2D2
   updated_at:
     type: string
     format: date-time
+    description: Date of entity update in R2D2
 required:
   - uuid
   - room_uuid

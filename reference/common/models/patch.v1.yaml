@@ -12,15 +12,19 @@ x-examples:
 properties:
   resource_uuid:
     type: string
+    description: UUID of the resouce being patched
   resource_external_id:
     type: string
+    description: External ID of the resource being patched
   resource_name:
     type: string
     enum:
       - room
       - roomprice
+    description: Name of the resource being patched
   partial:
     type: object
+    description: Resource payload containing only the data to be updated
 required:
   - resource_name
   - partial

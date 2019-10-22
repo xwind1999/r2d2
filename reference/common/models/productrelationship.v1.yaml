@@ -31,12 +31,14 @@ x-examples:
 properties:
   uuid:
     type: string
+    description: Product Relationship UUID
   parent_product:
     $ref: ./product.v1.yaml
   child_product:
     $ref: ./product.v1.yaml
   is_enabled:
     type: boolean
+    description: Product is enabled
   relationship_type:
     type: string
     enum:
@@ -44,12 +46,15 @@ properties:
       - Experience-Component
       - Concept
       - Kit
+    description: Type of the relationship
   created_at:
     type: string
     format: date
+    description: Date of entity creation in R2D2
   updated_at:
     type: string
     format: date
+    description: Date of entity update in R2D2
 required:
   - parent_product
   - child_product

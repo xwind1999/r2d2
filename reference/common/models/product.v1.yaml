@@ -13,26 +13,36 @@ x-examples:
 properties:
   uuid:
     type: string
+    description: Product UUID
   external_id:
     type: string
+    description: Product external ID
   name:
     type: string
+    description: Product name
   description:
     type: string
+    description: Product description
   universe:
     type: string
+    description: Product universe (main category)
   is_sellable:
     type: boolean
+    description: Product is sellable (upsellable in case of room components)
   is_reservable:
     type: boolean
+    description: Product is reservable (if a component is a room component)
   partner_external_id:
     type: string
+    description: Partner external id
   created_at:
     type: string
     format: date
+    description: Date of entity creation in R2D2
   updated_at:
     type: string
     format: date
+    description: Date of entity update in R2D2
 required:
   - external_id
   - name

@@ -21,33 +21,45 @@ properties:
   uuid:
     type: string
     format: uuid
+    description: Room UUID
   external_id:
     type: string
+    description: Room component external id
   partner_uuid:
     type: string
     format: uuid
+    description: Partner UUID
+  partner_external_id:
+    type: string
+    description: Partner external ID
   name:
     type: string
+    description: Room name
   description:
     type: string
+    description: Room description
   inventory:
     type: integer
+    description: Room inventory (quantity of rooms of this type)
   is_sellable:
     type: boolean
+    description: Room is sellable (if this room is up/x sellable)
   status:
     type: string
     enum:
       - enabled
       - disabled
+    description: Status of the room
   created_at:
     type: string
     format: date-time
+    description: Date of entity creation in R2D2
   updated_at:
     type: string
+    description: Date of entity update in R2D2
 required:
   - uuid
   - external_id
-  - partner_uuid
   - name
   - inventory
   - is_sellable

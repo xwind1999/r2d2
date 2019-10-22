@@ -19,30 +19,47 @@ properties:
   uuid:
     type: string
     format: uuid
+    description: Room Availability UUID
+  partner_uuid:
+    type: string
+    format: uuid
+    description: Partner UUID
+  partner_external_id:
+    type: string
+    description: Partner external ID
   room_uuid:
     type: string
     format: uuid
+    description: Room UUID
   room_external_id:
     type: string
+    description: Room component external ID
+  rate_band_uuid:
+    type: string
+    format: uuid
+    description: Rate Band UUID
+  rate_band_external_id:
+    type: string
+    description: Rate Band external ID
   date:
     type: string
     format: date
+    description: Room Availability Date
   stock:
     type: integer
     maximum: 0
-  type:
-    type: integer
-    maximum: 0
+    description: Room Availability Stock (quantity of rooms of this type that are available)
   created_at:
     type: string
     format: date-time
+    description: Date of entity creation in R2D2
   updated_at:
     type: string
     format: date-time
+    description: Date of entity update in R2D2
 required:
   - uuid
   - room_uuid
   - room_external_id
   - date
   - stock
-  - type

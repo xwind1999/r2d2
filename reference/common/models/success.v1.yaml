@@ -2,23 +2,6 @@ title: Success
 type: object
 x-tags:
   - auxiliar
-properties:
-  uuid:
-    type: string
-  code:
-    type: string
-  endpoint:
-    type: string
-  description:
-    type: string
-  count:
-    type: string
-required:
-  - uuid
-  - code
-  - endpoint
-  - description
-  - count
 x-examples:
   e4072ad9-d4e3-4bd1-8678-0f21468f6819:
     value:
@@ -27,3 +10,25 @@ x-examples:
       endpoint: /example
       description: Example success
       count: 123
+properties:
+  uuid:
+    type: string
+    description: UUID of this success ocurrence
+  code:
+    type: string
+    description: Success HTTP code
+  endpoint:
+    type: string
+    description: Endpoint for the success request
+  description:
+    type: string
+    description: Description of the success
+  count:
+    type: string
+    description: Count of affected resouces by this successfull request
+required:
+  - uuid
+  - code
+  - endpoint
+  - description
+  - count

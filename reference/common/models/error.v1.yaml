@@ -2,21 +2,6 @@ title: Error
 type: object
 x-tags:
   - auxiliar
-properties:
-  uuid:
-    type: string
-    format: uuid
-  code:
-    type: string
-  endpoint:
-    type: string
-  description:
-    type: string
-required:
-  - uuid
-  - code
-  - endpoint
-  - description
 x-examples:
   8e7796ee-87b5-4bb7-b57d-07719397a8ae:
     value:
@@ -24,3 +9,22 @@ x-examples:
       code: '501'
       endpoint: /example
       description: not implemented
+properties:
+  uuid:
+    type: string
+    format: uuid
+    description: UUID of this error ocurrence
+  code:
+    type: string
+    description: Error HTTP code
+  endpoint:
+    type: string
+    description: Endpoint for the error request
+  description:
+    type: string
+    description: Description of the error
+required:
+  - uuid
+  - code
+  - endpoint
+  - description
