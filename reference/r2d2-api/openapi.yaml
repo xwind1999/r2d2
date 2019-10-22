@@ -14,8 +14,8 @@ servers:
     description: api-mock
 paths:
   /room_prices:
-    parameters: []
     get:
+      operationId: getRoomPrices
       summary: Get Room Prices collection
       tags:
         - rooms
@@ -100,6 +100,7 @@ paths:
           in: query
           name: room_external_id
     put:
+      operationId: putRoomPrices
       summary: Room Prices bulk update
       tags:
         - rooms
@@ -184,6 +185,7 @@ paths:
         - Header API Key: []
       description: Room Prices bulk update
     patch:
+      operationId: patchRoomPrices
       summary: Room Prices bulk partial update
       tags:
         - rooms
@@ -269,6 +271,7 @@ paths:
                 $ref: ../common/models/patch.v1.yaml
         description: Collection of Patches
     post:
+      operationId: postRoomPrices
       summary: Room Prices bulk creation
       tags:
         - rooms
@@ -347,6 +350,7 @@ paths:
       security:
         - Header API Key: []
     delete:
+      operationId: deleteRoomPrices
       summary: Room Prices bulk delete
       responses:
         '200':
@@ -415,21 +419,12 @@ paths:
             default: full
           in: query
           name: response_type
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: string
-          application/xml:
-            schema:
-              type: object
-              properties: {}
-        description: Collection of Room Prices uuids
+      tags:
+        - rooms
+        - room_prices
   /room_availabilities:
-    parameters: []
     get:
+      operationId: getRoomAvailabilities
       summary: Get Room Availabilities collection
       tags:
         - rooms
@@ -523,6 +518,7 @@ paths:
           in: query
           name: room_external_id
     put:
+      operationId: putRoomAvailabilities
       summary: Room Availabilities bulk update
       tags:
         - rooms
@@ -607,11 +603,70 @@ paths:
         - Header API Key: []
       description: Room Availabilities bulk update
     patch:
+      operationId: patchRoomAvailabilities
       summary: Room Availabilities bulk partial update
       tags:
         - rooms
         - room_availabilities
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../common/models/roomavailability.v1.yaml
+        '201':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
       description: Room Availabilities bulk partial update
       security:
         - Header API Key: []
@@ -634,6 +689,7 @@ paths:
                 $ref: ../common/models/patch.v1.yaml
         description: Collection of Patches
     post:
+      operationId: postRoomAvailabilities
       summary: Room Availabilities bulk creation
       tags:
         - rooms
@@ -712,6 +768,7 @@ paths:
       security:
         - Header API Key: []
     delete:
+      operationId: deleteRoomAvailabilities
       summary: Room Availabilities bulk delete
       responses:
         '200':
@@ -780,20 +837,12 @@ paths:
             default: full
           in: header
           name: response_type
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: string
-          application/xml:
-            schema:
-              type: object
-              properties: {}
-        description: Collection of Room Availabilities uuids
+      tags:
+        - rooms
+        - room_availabilities
   /broadcast_listener/product_relationships:
     post:
+      operationId: postProductRelationships
       summary: Create or Update Product Relationships
       tags:
         - broadcasts
@@ -870,9 +919,9 @@ paths:
             default: full
           in: query
           name: response_type
-    parameters: []
   /broadcast_listener/products:
     post:
+      operationId: postProducts
       summary: Create or Update products
       tags:
         - broadcasts
@@ -942,6 +991,7 @@ paths:
   /bookings:
     parameters: []
     get:
+      operationId: getBookings
       summary: Get Bookings collection
       tags:
         - bookings
@@ -1033,8 +1083,8 @@ paths:
             type: string
           in: query
           name: customer_external_id
-      requestBody: {}
     put:
+      operationId: putBookings
       summary: Bookings bulk update
       tags:
         - bookings
@@ -1118,6 +1168,7 @@ paths:
         - Header API Key: []
       description: Bookings bulk update
     patch:
+      operationId: patchBookings
       summary: Bookings bulk partial update
       tags:
         - bookings
@@ -1202,6 +1253,7 @@ paths:
                 $ref: ../common/models/patch.v1.yaml
         description: Collection of Bookings patches
     post:
+      operationId: postBookings
       summary: Bookings bulk creation
       tags:
         - bookings
@@ -1279,9 +1331,8 @@ paths:
       security:
         - Header API Key: []
     delete:
+      operationId: deleteBookings
       summary: Bookings bulk delete
-      tags:
-        - bookings
       responses:
         '200':
           description: OK
@@ -1349,18 +1400,8 @@ paths:
             default: full
           in: query
           name: response_type
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: string
-          application/xml:
-            schema:
-              type: object
-              properties: {}
-        description: Collection of Bookings uuids
+      tags:
+        - bookings
 components:
   schemas: {}
   securitySchemes:
