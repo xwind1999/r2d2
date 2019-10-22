@@ -18,8 +18,8 @@ paths:
     get:
       summary: Get Room Prices collection
       tags:
-        - pricing
         - rooms
+        - room_prices
       responses:
         '200':
           description: OK
@@ -102,8 +102,8 @@ paths:
     put:
       summary: Room Prices bulk update
       tags:
-        - pricing
         - rooms
+        - room_prices
       responses:
         '200':
           description: OK
@@ -186,8 +186,8 @@ paths:
     patch:
       summary: Room Prices bulk partial update
       tags:
-        - pricing
         - rooms
+        - room_prices
       responses:
         '200':
           description: OK
@@ -271,8 +271,8 @@ paths:
     post:
       summary: Room Prices bulk creation
       tags:
-        - pricing
         - rooms
+        - room_prices
       responses:
         '200':
           description: OK
@@ -432,8 +432,8 @@ paths:
     get:
       summary: Get Room Availabilities collection
       tags:
-        - availability
         - rooms
+        - room_availabilities
       responses:
         '200':
           description: OK
@@ -525,8 +525,8 @@ paths:
     put:
       summary: Room Availabilities bulk update
       tags:
-        - availability
         - rooms
+        - room_availabilities
       responses:
         '200':
           description: OK
@@ -609,8 +609,8 @@ paths:
     patch:
       summary: Room Availabilities bulk partial update
       tags:
-        - pricing
         - rooms
+        - room_availabilities
       responses: {}
       description: Room Availabilities bulk partial update
       security:
@@ -636,8 +636,8 @@ paths:
     post:
       summary: Room Availabilities bulk creation
       tags:
-        - pricing
         - rooms
+        - room_availabilities
       responses:
         '200':
           description: OK
@@ -796,6 +796,8 @@ paths:
     post:
       summary: Create or Update Product Relationships
       tags:
+        - broadcasts
+        - product_relationships
         - products
         - rooms
         - boxes
@@ -872,7 +874,13 @@ paths:
   /broadcast_listener/products:
     post:
       summary: Create or Update products
-      tags: []
+      tags:
+        - broadcasts
+        - products
+        - rooms
+        - boxes
+        - experiences
+        - components
       responses:
         '200':
           description: OK
@@ -1027,10 +1035,9 @@ paths:
           name: customer_external_id
       requestBody: {}
     put:
-      summary: Room Prices bulk update
+      summary: Bookings bulk update
       tags:
-        - pricing
-        - rooms
+        - bookings
       responses:
         '200':
           description: OK
@@ -1111,10 +1118,9 @@ paths:
         - Header API Key: []
       description: Bookings bulk update
     patch:
-      summary: Room Prices bulk partial update
+      summary: Bookings bulk partial update
       tags:
-        - pricing
-        - rooms
+        - bookings
       responses:
         '200':
           description: OK
@@ -1196,10 +1202,9 @@ paths:
                 $ref: ../common/models/patch.v1.yaml
         description: Collection of Bookings patches
     post:
-      summary: Room Prices bulk creation
+      summary: Bookings bulk creation
       tags:
-        - pricing
-        - rooms
+        - bookings
       responses:
         '200':
           description: OK
@@ -1274,7 +1279,9 @@ paths:
       security:
         - Header API Key: []
     delete:
-      summary: Room Prices bulk delete
+      summary: Bookings bulk delete
+      tags:
+        - bookings
       responses:
         '200':
           description: OK
