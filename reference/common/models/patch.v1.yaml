@@ -2,13 +2,7 @@ title: Patch
 type: object
 x-tags:
   - auxiliar
-x-examples:
-  ad930a46-06b0-4372-b07b-d5d03d374e7b:
-    value:
-      resource_id: ad930a46-06b0-4372-b07b-d5d03d374e7b
-      resource_name: Booking
-      partial:
-        field: new_data
+x-examples: {}
 properties:
   resource_uuid:
     type: string

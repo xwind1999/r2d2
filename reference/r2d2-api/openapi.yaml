@@ -29,6 +29,12 @@ paths:
                 type: array
                 items:
                   $ref: ../common/models/roomprice.v1.yaml
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
         '400':
           description: Bad Request
           content:
@@ -438,9 +444,6 @@ paths:
                 type: array
                 items:
                   $ref: ../common/models/roomavailability.v1.yaml
-              examples:
-                one item:
-                  value: {}
         '201':
           description: Created
           content:
@@ -1004,6 +1007,12 @@ paths:
                 type: array
                 items:
                   $ref: ../common/models/booking.v1.yaml
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
         '400':
           description: Bad Request
           content:

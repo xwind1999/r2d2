@@ -4,16 +4,7 @@ x-tags:
   - rooms
   - pricing
 description: Room Prices are the sellable price for a room in a specific date
-x-examples:
-  a2ff1824-78c2-4229-a162-013e6ceaa0d1:
-    value:
-      uui: a2ff1824-78c2-4229-a162-013e6ceaa0d1
-      room_uuid: edd4691a-dac6-46c6-bd07-f9392720ba81
-      room_external_id: '123456789'
-      date: 14-10-2019
-      price: 12300
-      created_at: 14-10-2019
-      updated_at: 14-10-2019
+x-examples: {}
 properties:
   uuid:
     type: string

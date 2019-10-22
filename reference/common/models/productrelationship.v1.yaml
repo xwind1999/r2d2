@@ -6,28 +6,7 @@ x-tags:
   - experiences
   - components
 description: Products Relationships are explicity relations between different products
-x-examples:
-  0eb4e8f6-fa23-4c8f-a4e3-6414ced6b7f2:
-    value:
-      uui: 0eb4e8f6-fa23-4c8f-a4e3-6414ced6b7f2
-      parent_product:
-        uuid: 49e60a98-fd4b-4e26-88c8-027818691faf
-        external_id: '667834762'
-        created_at: '2019-08-26 14:31:23'
-        update_at: '2019-08-26 14:31:23'
-      child_product:
-        uuid: 41b65e0f-99e2-4608-b9fd-86b57cfe09e5
-        external_id: '63251431'
-        created_at: '2019-08-26 14:31:23'
-        update_at: '2019-08-26 14:31:23'
-      sort_order: 10
-      is_enabled: true
-      relationship_type: Box-Experience
-      print_type: Digital
-      child_count: 1
-      child_quantity: 2
-      created_at: '2019-08-26 14:31:23'
-      update_at: '2019-08-26 14:31:23'
+x-examples: {}
 properties:
   uuid:
     type: string

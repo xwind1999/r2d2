@@ -3,13 +3,7 @@ type: object
 x-tags:
   - products
 description: Products are generic entities with a lot of meaning in Smartbox
-x-examples:
-  41b65e0f-99e2-4608-b9fd-86b57cfe09e5:
-    value:
-      uuid: 49e60a98-fd4b-4e26-88c8-027818691faf
-      external_id: '667834762'
-      created_at: '2019-08-26 14:31:23'
-      update_at: '2019-08-26 14:31:23'
+x-examples: {}
 properties:
   uuid:
     type: string

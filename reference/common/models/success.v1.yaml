@@ -2,14 +2,7 @@ title: Success
 type: object
 x-tags:
   - auxiliar
-x-examples:
-  e4072ad9-d4e3-4bd1-8678-0f21468f6819:
-    value:
-      uuid: e4072ad9-d4e3-4bd1-8678-0f21468f6819
-      code: '200'
-      endpoint: /example
-      description: Example success
-      count: 123
+x-examples: {}
 properties:
   uuid:
     type: string
