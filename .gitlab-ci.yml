@@ -5,11 +5,12 @@ pages:
   stage: Publish API reference
   script:
     - rm -rf public/
-    - mkdir public
+    - mkdir -p public/cdm/
     - cp reference/r2d2-api/openapi.yaml public/
     - cp docs/html/openapi.html public/
     - cp docs/schema/high-level-data-model.png public/
     - cp docs/schema/r2-d2-api-data-model-alpha.png public/
+    - cp -R docs/cdm/ public/cdm/
   artifacts:
     paths:
       - public

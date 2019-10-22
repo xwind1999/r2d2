@@ -54,3 +54,5 @@ R2-D2 is part of the iResa deprecation plans. Follows bellow some external refer
 * [High level data model](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/high-level-data-model.png)
 * [Data Model](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/r2-d2-api-data-model-alpha.png)
 * [API Reference](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/openapi.html)
+* [Product flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/cdm/Product.xlsx)
+* [Product Relationship flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/cdm/ProductRelationship.xlsx)
