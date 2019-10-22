@@ -1,0 +1,15 @@
+stages:
+  - Build Dependencies
+
+pages:
+  stage: Publish API reference
+  script:
+    - rm -rf public/
+    - cp reference/r2d2-api/openapi.yaml public/
+    - cp docs/html/openapi-doc.html public/
+  artifacts:
+    paths:
+      - public
+    expire_in: 7 days
+  tags:
+    - k8s
