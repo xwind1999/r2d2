@@ -1,10 +1,11 @@
 stages:
-  - Build Dependencies
+  - Publish API reference
 
 pages:
   stage: Publish API reference
   script:
     - rm -rf public/
+    - mkdir public
     - cp reference/r2d2-api/openapi.yaml public/
     - cp docs/html/openapi-doc.html public/
   artifacts:
