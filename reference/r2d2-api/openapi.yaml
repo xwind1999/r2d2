@@ -355,79 +355,6 @@ paths:
         description: Collection of Room Prices
       security:
         - Header API Key: []
-    delete:
-      operationId: deleteRoomPrices
-      summary: Room Prices bulk delete
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: ../common/models/roomprice.v1.yaml
-        '201':
-          description: Deleted
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/success.v1.yaml
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-            application/xml:
-              schema:
-                type: object
-                properties: {}
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-      description: Room Prices bulk delete
-      security:
-        - Header API Key: []
-      parameters:
-        - schema:
-            type: string
-            enum:
-              - simple
-              - full
-            default: full
-          in: query
-          name: response_type
-      tags:
-        - rooms
-        - room_prices
   /room_availabilities:
     get:
       operationId: getRoomAvailabilities
@@ -770,79 +697,6 @@ paths:
         description: Collection of Room Availabilities
       security:
         - Header API Key: []
-    delete:
-      operationId: deleteRoomAvailabilities
-      summary: Room Availabilities bulk delete
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: ../common/models/roomavailability.v1.yaml
-        '201':
-          description: Deleted
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/success.v1.yaml
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-            application/xml:
-              schema:
-                type: object
-                properties: {}
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-      description: Room Availabilities bulk delete
-      security:
-        - Header API Key: []
-      parameters:
-        - schema:
-            type: string
-            enum:
-              - simple
-              - full
-            default: full
-          in: header
-          name: response_type
-      tags:
-        - rooms
-        - room_availabilities
   /broadcast_listeners/product_relationships:
     post:
       operationId: postProductRelationships
@@ -992,7 +846,6 @@ paths:
               $ref: ../common/models/product.v1.yaml
         description: Product
   /bookings:
-    parameters: []
     get:
       operationId: getBookings
       summary: Get Bookings collection
@@ -1069,7 +922,6 @@ paths:
         - schema:
             type: number
             maximum: 1000
-            default: '100'
           in: query
           name: page_size
         - schema:
@@ -1339,78 +1191,6 @@ paths:
         description: Collection of Bookings
       security:
         - Header API Key: []
-    delete:
-      operationId: deleteBookings
-      summary: Bookings bulk delete
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: ../common/models/roomprice.v1.yaml
-        '201':
-          description: Deleted
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/success.v1.yaml
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-            application/xml:
-              schema:
-                type: object
-                properties: {}
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: ../common/models/error.v1.yaml
-      description: Bookings bulk delete
-      security:
-        - Header API Key: []
-      parameters:
-        - schema:
-            type: string
-            enum:
-              - simple
-              - full
-            default: full
-          in: query
-          name: response_type
-      tags:
-        - bookings
 components:
   schemas: {}
   securitySchemes:
