@@ -10,7 +10,8 @@ pages:
     - cp docs/html/openapi.html public/
     - cp docs/schema/high-level-data-model.png public/
     - cp docs/schema/r2-d2-api-data-model-alpha.png public/
-    - cp -R docs/cdm/ public/cdm/
+    - cp docs/cdm/Product.xlsx public/cdm/
+    - cp docs/cdm/ProductRelationship.xlsx public/cdm/
   artifacts:
     paths:
       - public
