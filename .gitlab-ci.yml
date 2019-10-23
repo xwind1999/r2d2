@@ -6,12 +6,17 @@ pages:
   script:
     - rm -rf public/
     - mkdir -p public/cdm/
+    - mdkir -p public/flow/
     - cp reference/r2d2-api/openapi.yaml public/
     - cp docs/html/openapi.html public/
     - cp docs/schema/high-level-data-model.png public/
     - cp docs/schema/r2-d2-api-data-model-alpha.png public/
-    - cp docs/cdm/Product.xlsx public/cdm/
-    - cp docs/cdm/ProductRelationship.xlsx public/cdm/
+    - cp docs/cdm/product.xlsx public/cdm/
+    - cp docs/cdm/product_relationship.xlsx public/cdm/
+    - cp docs/cdm/room_availability.xlsx public/cdm/
+    - cp docs/flow/broadcast_channel_room_availability.xlsx public/cdm/
+    - cp docs/flow/broadcast_product_information.xlsx public/cdm/
+    - cp docs/flow/broadcast_product_relationship.xlsx public/cdm/
   artifacts:
     paths:
       - public
