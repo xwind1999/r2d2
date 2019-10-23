@@ -28,49 +28,49 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/roomprice.v1.yaml
+                  $ref: ./models/roomprice.v1.yaml
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Get Room Prices collection
       security:
         - Header API Key: []
@@ -119,19 +119,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/roomprice.v1.yaml
+                  $ref: ./models/roomprice.v1.yaml
         '201':
           description: Updated
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -141,7 +141,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -151,32 +151,32 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       requestBody:
         content:
           application/json:
             schema:
               type: array
               items:
-                $ref: ../common/models/roomprice.v1.yaml
+                $ref: ./models/roomprice.v1.yaml
         description: Collection of Room Prices
       parameters:
         - schema:
@@ -204,19 +204,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/roomprice.v1.yaml
+                  $ref: ./models/roomprice.v1.yaml
         '201':
           description: Updated
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -226,7 +226,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -236,25 +236,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Room Prices bulk partial update
       security:
         - Header API Key: []
@@ -274,7 +274,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: ../common/models/patch.v1.yaml
+                $ref: ./models/patch.v1.yaml
         description: Collection of Patches
     post:
       operationId: postRoomPrices
@@ -290,49 +290,49 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/roomprice.v1.yaml
+                  $ref: ./models/roomprice.v1.yaml
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Room Prices bulk creation
       parameters:
         - schema:
@@ -351,7 +351,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: ../common/models/roomprice.v1.yaml
+                $ref: ./models/roomprice.v1.yaml
         description: Collection of Room Prices
       security:
         - Header API Key: []
@@ -370,49 +370,49 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/roomavailability.v1.yaml
+                  $ref: ./models/roomavailability.v1.yaml
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Get Room Availabilities collection
       security:
         - Header API Key: []
@@ -461,19 +461,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/roomavailability.v1.yaml
+                  $ref: ./models/roomavailability.v1.yaml
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -483,7 +483,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -493,32 +493,32 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       requestBody:
         content:
           application/json:
             schema:
               type: array
               items:
-                $ref: ../common/models/roomavailability.v1.yaml
+                $ref: ./models/roomavailability.v1.yaml
         description: Collection of Room Availabilities
       parameters:
         - schema:
@@ -546,19 +546,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/roomavailability.v1.yaml
+                  $ref: ./models/roomavailability.v1.yaml
         '201':
           description: Updated
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -568,7 +568,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -578,25 +578,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Room Availabilities bulk partial update
       security:
         - Header API Key: []
@@ -616,7 +616,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: ../common/models/patch.v1.yaml
+                $ref: ./models/patch.v1.yaml
         description: Collection of Patches
     post:
       operationId: postRoomAvailabilities
@@ -632,49 +632,49 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/roomavailability.v1.yaml
+                  $ref: ./models/roomavailability.v1.yaml
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Room Availabilities bulk creation
       parameters:
         - schema:
@@ -693,7 +693,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: ../common/models/roomavailability.v1.yaml
+                $ref: ./models/roomavailability.v1.yaml
         description: Collection of Room Availabilities
       security:
         - Header API Key: []
@@ -715,49 +715,49 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/productrelationship.v1.yaml
+                $ref: ./models/productrelationship.v1.yaml
         '201':
           description: Saved
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/productrelationship.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Create or Update Product Relationships
       security:
         - Header API Key: []
@@ -765,7 +765,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: ../common/models/productrelationship.v1.yaml
+              $ref: ./models/productrelationship.v1.yaml
         description: Product Relationship
       parameters:
         - schema:
@@ -793,49 +793,49 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/product.v1.yaml
+                $ref: ./models/product.v1.yaml
         '201':
           description: Saved
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Create or Update Products
       security:
         - Header API Key: []
@@ -843,7 +843,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: ../common/models/product.v1.yaml
+              $ref: ./models/product.v1.yaml
         description: Product
   /bookings:
     get:
@@ -859,50 +859,50 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: ../common/models/booking.v1.yaml
+                  $ref: ./models/booking.v1.yaml
                 type: array
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Get Bookings collection
       security:
         - Header API Key: []
@@ -958,19 +958,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/booking.v1.yaml
+                  $ref: ./models/booking.v1.yaml
         '201':
           description: Updated
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -980,7 +980,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -990,32 +990,32 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       requestBody:
         content:
           application/json:
             schema:
               type: array
               items:
-                $ref: ../common/models/roomprice.v1.yaml
+                $ref: ./models/roomprice.v1.yaml
         description: Collection of Bookings
       parameters:
         - schema:
@@ -1042,19 +1042,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/booking.v1.yaml
+                  $ref: ./models/booking.v1.yaml
         '201':
           description: Updated
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -1064,7 +1064,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
             application/xml:
               schema:
                 type: object
@@ -1074,25 +1074,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Bookings bulk partial update
       security:
         - Header API Key: []
@@ -1112,7 +1112,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: ../common/models/patch.v1.yaml
+                $ref: ./models/patch.v1.yaml
         description: Collection of Bookings patches
     post:
       operationId: postBookings
@@ -1127,49 +1127,49 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: ../common/models/booking.v1.yaml
+                  $ref: ./models/booking.v1.yaml
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Bookings bulk creation
       parameters:
         - schema:
@@ -1188,7 +1188,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: ../common/models/roomprice.v1.yaml
+                $ref: ./models/roomprice.v1.yaml
         description: Collection of Bookings
       security:
         - Header API Key: []
@@ -1205,49 +1205,49 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../common/models/channelroomavailability.v1.yaml
+                $ref: ./models/channelroomavailability.v1.yaml
         '201':
           description: Saved
           content:
             application/json:
               schema:
-                $ref: ../common/models/success.v1.yaml
+                $ref: ./models/success.v1.yaml
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
-                $ref: ../common/models/error.v1.yaml
+                $ref: ./models/error.v1.yaml
       description: Create or Update Products
       security:
         - Header API Key: []
@@ -1255,7 +1255,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: ../common/models/channelroomavailability.v1.yaml
+              $ref: ./models/channelroomavailability.v1.yaml
         description: Product
 components:
   schemas: {}
