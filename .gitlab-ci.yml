@@ -6,7 +6,7 @@ pages:
   script:
     - rm -rf public/
     - mkdir -p public/cdm/
-    - mdkir -p public/flow/
+    - mkdir -p public/flow/
     - cp reference/r2d2-api/openapi.yaml public/
     - cp docs/html/openapi.html public/
     - cp docs/schema/high-level-data-model.png public/
@@ -14,9 +14,9 @@ pages:
     - cp docs/cdm/product.xlsx public/cdm/
     - cp docs/cdm/product_relationship.xlsx public/cdm/
     - cp docs/cdm/room_availability.xlsx public/cdm/
-    - cp docs/flow/broadcast_channel_room_availability.xlsx public/cdm/
-    - cp docs/flow/broadcast_product_information.xlsx public/cdm/
-    - cp docs/flow/broadcast_product_relationship.xlsx public/cdm/
+    - cp docs/flow/broadcast_channel_room_availability.xlsx public/flow/
+    - cp docs/flow/broadcast_product_information.xlsx public/flow/
+    - cp docs/flow/broadcast_product_relationship.xlsx public/flow/
   artifacts:
     paths:
       - public
