@@ -21,3 +21,9 @@ properties:
     format: date
   stock:
     type: integer
+required:
+  - room_smartbox_id
+  - partner_smartbox_id
+  - start_date
+  - end_date
+  - stock

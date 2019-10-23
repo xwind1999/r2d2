@@ -18,7 +18,6 @@ properties:
     type: string
     description: Description of the error
 required:
-  - uuid
   - code
   - endpoint
   - description

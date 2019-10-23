@@ -53,3 +53,13 @@ properties:
   updated_at:
     type: string
     description: Date of entity update in R2D2
+required:
+  - smartbox_id
+  - experience_uuid
+  - type
+  - status
+  - total_price
+  - start_date
+  - end_date
+  - dates
+  - customer_smartbox_id

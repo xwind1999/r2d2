@@ -9,10 +9,6 @@ properties:
     type: string
     format: uuid
     description: Booking Date UUID
-  booking_uuid:
-    type: string
-    format: uuid
-    description: Booking UUID
   room_uuid:
     type: string
     format: uuid

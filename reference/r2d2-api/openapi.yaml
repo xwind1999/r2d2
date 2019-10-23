@@ -77,6 +77,7 @@ paths:
           application/json:
             schema:
               $ref: ./models/channelroomavailability.v1.yaml
+            examples: {}
         description: Product
   /broadcast_listeners/products:
     post:

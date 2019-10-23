@@ -49,7 +49,6 @@ properties:
     description: Date of entity update in R2D2
 required:
   - partner_smartbox_id
-  - room_uuid
   - room_smartbox_id
-  - date
   - stock
+  - date

@@ -20,7 +20,6 @@ properties:
     type: string
     description: Count of affected resouces by this successfull request
 required:
-  - uuid
   - code
   - endpoint
   - description

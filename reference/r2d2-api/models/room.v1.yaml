@@ -45,8 +45,8 @@ properties:
     type: string
     description: Date of entity update in R2D2
 required:
-  - uuid
   - smartbox_id
+  - partner_smartbox_id
   - name
   - inventory
   - is_sellable
