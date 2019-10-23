@@ -2,21 +2,17 @@ title: Booking
 type: object
 x-tags:
   - bookings
-description: Bookings are reservations that affect the availability
-x-examples: {}
 properties:
   uuid:
     type: string
+    format: uuid
     description: Booking UUID
   smartbox_id:
     type: string
-    description: Booking external ID
+    description: Smartbox ID
   experience_uuid:
     type: string
     description: Experience UUID
-  experience_smartbox_id:
-    type: string
-    description: Experience external ID
   type:
     type: string
     description: Booking type
@@ -24,49 +20,36 @@ properties:
     type: string
     description: Booking status
   total_price:
-    type: integer
-    description: Booking total price (total price of the Booking order)
+    type: string
+    description: Booking total price
   start_date:
     type: string
+    description: Booking start date
     format: date
-    description: Start date of the Booking
   end_date:
     type: string
+    description: Booking end date
     format: date
-    description: End date of the Booking
   dates:
-    type:
-      - string
-      - array
+    type: array
     description: Booking dates
     items:
       $ref: ./bookingdate.v1.yaml
   customer_smartbox_id:
     type: string
-    description: Customer external id
+    description: Main customer Smartbox ID (beneficiary ID)
   customer_name:
     type: string
-    description: Customer name
+    description: Main customer name (beneficiary name)
   customer_email:
     type: string
-    description: Customer email
+    description: Main customer email (beneficiary email)
   customer_phone:
     type: string
-    description: Customer telephone
+    description: Main customer phone (beneficiary phone)
   created_at:
     type: string
-    format: date
     description: Date of entity creation in R2D2
   updated_at:
     type: string
-    format: date
     description: Date of entity update in R2D2
-required:
-  - smartbox_id
-  - experience_smartbox_id
-  - type
-  - status
-  - start_date
-  - end_date
-  - dates
-  - customer_smartbox_id

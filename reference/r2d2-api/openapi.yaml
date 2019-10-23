@@ -13,6 +13,219 @@ servers:
   - url: 'http://localhost:3000'
     description: api-mock
 paths:
+  /broadcast_listeners/channel_room_availabilities:
+    post:
+      operationId: postChannelRoomAvailability
+      summary: Create or Update Channel Room Availabilities
+      tags:
+        - broadcast_listerners
+        - room_availabilities
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./models/channelroomavailability.v1.yaml
+        '201':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: ./models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+      description: Create or Update Products
+      security:
+        - Header API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ./models/channelroomavailability.v1.yaml
+        description: Product
+  /broadcast_listeners/products:
+    post:
+      operationId: postProducts
+      summary: Create or Update products
+      tags:
+        - broadcast_listerners
+        - products
+        - rooms
+        - boxes
+        - experiences
+        - components
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./models/product.v1.yaml
+        '201':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: ./models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+      description: Create or Update Products
+      security:
+        - Header API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ./models/product.v1.yaml
+        description: Product
+  /broadcast_listeners/product_relationships:
+    post:
+      operationId: postProductRelationships
+      summary: Create or Update Product Relationships
+      tags:
+        - broadcast_listerners
+        - product_relationships
+        - products
+        - rooms
+        - boxes
+        - experiences
+        - components
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./models/productrelationship.v1.yaml
+        '201':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: ./models/productrelationship.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+      description: Create or Update Product Relationships
+      security:
+        - Header API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ./models/productrelationship.v1.yaml
+        description: Product Relationship
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+          in: query
+          name: response_type
   /room_prices:
     get:
       operationId: getRoomPrices
@@ -104,7 +317,19 @@ paths:
         - schema:
             type: string
           in: query
+          name: rate_band_smartbox_id
+        - schema:
+            type: string
+          in: query
           name: room_smartbox_id
+        - schema:
+            type: string
+          in: query
+          name: start_date
+        - schema:
+            type: string
+          in: query
+          name: end_date
     put:
       operationId: putRoomPrices
       summary: Room Prices bulk update
@@ -446,7 +671,19 @@ paths:
         - schema:
             type: string
           in: query
+          name: rate_band_smartbox_id
+        - schema:
+            type: string
+          in: query
           name: room_smartbox_id
+        - schema:
+            type: string
+          in: query
+          name: start_date
+        - schema:
+            type: string
+          in: query
+          name: end_date
     put:
       operationId: putRoomAvailabilities
       summary: Room Availabilities bulk update
@@ -697,170 +934,20 @@ paths:
         description: Collection of Room Availabilities
       security:
         - Header API Key: []
-  /broadcast_listeners/product_relationships:
-    post:
-      operationId: postProductRelationships
-      summary: Create or Update Product Relationships
-      tags:
-        - broadcast_listerners
-        - product_relationships
-        - products
-        - rooms
-        - boxes
-        - experiences
-        - components
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: ./models/productrelationship.v1.yaml
-        '201':
-          description: Saved
-          content:
-            application/json:
-              schema:
-                $ref: ./models/productrelationship.v1.yaml
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-      description: Create or Update Product Relationships
-      security:
-        - Header API Key: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: ./models/productrelationship.v1.yaml
-        description: Product Relationship
-      parameters:
-        - schema:
-            type: string
-            enum:
-              - simple
-              - full
-            default: full
-          in: query
-          name: response_type
-  /broadcast_listeners/products:
-    post:
-      operationId: postProducts
-      summary: Create or Update products
-      tags:
-        - broadcast_listerners
-        - products
-        - rooms
-        - boxes
-        - experiences
-        - components
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: ./models/product.v1.yaml
-        '201':
-          description: Saved
-          content:
-            application/json:
-              schema:
-                $ref: ./models/success.v1.yaml
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-      description: Create or Update Products
-      security:
-        - Header API Key: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: ./models/product.v1.yaml
-        description: Product
   /bookings:
     get:
-      operationId: getBookings
       summary: Get Bookings collection
       tags:
         - bookings
-        - room_availabilities
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
+                type: array
                 items:
                   $ref: ./models/booking.v1.yaml
-                type: array
         '201':
           description: Created
           content:
@@ -904,6 +991,7 @@ paths:
               schema:
                 $ref: ./models/error.v1.yaml
       description: Get Bookings collection
+      operationId: getBookings
       security:
         - Header API Key: []
       parameters:
@@ -940,323 +1028,48 @@ paths:
         - schema:
             type: string
           in: query
-          name: booking_smartbox_id
-        - schema:
-            type: string
-          in: query
           name: customer_smartbox_id
-    put:
-      operationId: putBookings
-      summary: Bookings bulk update
-      tags:
-        - bookings
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: ./models/booking.v1.yaml
-        '201':
-          description: Updated
-          content:
-            application/json:
-              schema:
-                $ref: ./models/success.v1.yaml
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-            application/xml:
-              schema:
-                type: object
-                properties: {}
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-            application/xml:
-              schema:
-                type: object
-                properties: {}
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: ./models/roomprice.v1.yaml
-        description: Collection of Bookings
-      parameters:
         - schema:
             type: string
-            enum:
-              - simple
-              - full
-            default: full
           in: query
-          name: response_type
-      security:
-        - Header API Key: []
-      description: Bookings bulk update
-    patch:
-      operationId: patchBookings
-      summary: Bookings bulk partial update
-      tags:
-        - bookings
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: ./models/booking.v1.yaml
-        '201':
-          description: Updated
-          content:
-            application/json:
-              schema:
-                $ref: ./models/success.v1.yaml
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-            application/xml:
-              schema:
-                type: object
-                properties: {}
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-            application/xml:
-              schema:
-                type: object
-                properties: {}
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-      description: Bookings bulk partial update
-      security:
-        - Header API Key: []
-      parameters:
+          name: start_date
         - schema:
             type: string
-            enum:
-              - simple
-              - full
-            default: full
-            maxLength: 0
           in: query
-          name: response_type
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: ./models/patch.v1.yaml
-        description: Collection of Bookings patches
+          name: end_date
     post:
-      operationId: postBookings
       summary: Bookings bulk creation
       tags:
         - bookings
       responses:
         '200':
           description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: ./models/booking.v1.yaml
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: ./models/success.v1.yaml
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
       description: Bookings bulk creation
-      parameters:
-        - schema:
-            type: string
-            enum:
-              - simple
-              - full
-            default: full
-            maxLength: 0
-          in: query
-          name: response_type
-          description: ''
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: ./models/roomprice.v1.yaml
-        description: Collection of Bookings
+      operationId: postBookings
       security:
         - Header API Key: []
-  /broadcast_listeners/channel_room_availabilities:
-    post:
-      operationId: postChannelRoomAvailability
-      summary: Create or Update Channel Room Availabilities
+    put:
+      summary: Bookings bulk update
       tags:
-        - broadcast_listerners
-        - room_availabilities
+        - bookings
       responses:
         '200':
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: ./models/channelroomavailability.v1.yaml
-        '201':
-          description: Saved
-          content:
-            application/json:
-              schema:
-                $ref: ./models/success.v1.yaml
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: ./models/error.v1.yaml
-      description: Create or Update Products
+      description: Bookings bulk update
+      operationId: putBookings
       security:
         - Header API Key: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: ./models/channelroomavailability.v1.yaml
-        description: Product
+    patch:
+      summary: Bookings bulk partial update
+      tags:
+        - bookings
+      responses:
+        '200':
+          description: OK
+      description: Bookings bulk partial update
+      operationId: patchBookings
+      security:
+        - Header API Key: []
 components:
   schemas: {}
   securitySchemes:
