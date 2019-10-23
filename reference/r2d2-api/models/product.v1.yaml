@@ -3,7 +3,16 @@ type: object
 x-tags:
   - products
 description: Products are generic entities with a lot of meaning in Smartbox
-x-examples: {}
+x-examples:
+  product-01:
+    value:
+      smartbox_id: '123456789'
+      name: This is a product
+      description: This is a product description
+      universe: STAY
+      is_sellable: true
+      is_reservable: true
+      partner_smartbox_id: 123456789
 properties:
   uuid:
     type: string
@@ -39,7 +48,3 @@ properties:
     description: Date of entity update in R2D2
 required:
   - smartbox_id
-  - name
-  - universe
-  - is_sellable
-  - is_reservable

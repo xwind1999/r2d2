@@ -6,7 +6,15 @@ x-tags:
   - experiences
   - components
 description: Products Relationships are explicity relations between different products
-x-examples: {}
+x-examples:
+  product-relationship-01:
+    value:
+      uuid: dbdec460-d868-4cbd-9f25-da88946986fc
+      parent_product:
+        smartbox_id: PRODUCT 01
+      child_product:
+        smartbox_id: PRODUCT 02
+      is_enabled: true
 properties:
   uuid:
     type: string

@@ -28,7 +28,7 @@ paths:
               schema:
                 $ref: ./models/channelroomavailability.v1.yaml
               examples:
-                response-broadcast-channel-room-availabilitie-example-01:
+                response-broadcast-channel-room-availabilitie-01:
                   value:
                     rate_band_smartbox_id: RATE_BAND_01
                     room_smartbox_id: ROOM_01
@@ -43,12 +43,12 @@ paths:
               schema:
                 $ref: ./models/success.v1.yaml
               examples:
-                response-broadcast-channel-room-availabilitie-example-02:
+                response-broadcast-channel-room-availabilitie-02:
                   value:
                     uuid: c2a4c3ce-b717-45ba-b044-1ce6dd03e264
                     code: '200'
                     endpoint: /broadcast_listeners/channel_room_availabilities
-                    description: Availability Update received
+                    description: Channel Room Availability Update received
                     count: 1
         '400':
           description: Bad Request
@@ -57,7 +57,7 @@ paths:
               schema:
                 $ref: ./models/error.v1.yaml
               examples:
-                response-broadcast-channel-room-availabilitie-example-03:
+                response-broadcast-channel-room-availabilitie-03:
                   value:
                     uuid: 8c872a9e-7e1f-463a-ad71-4351dd014724
                     code: '400'
@@ -70,7 +70,7 @@ paths:
               schema:
                 $ref: ./models/error.v1.yaml
               examples:
-                response-broadcast-channel-room-availabilitie-example-04:
+                response-broadcast-channel-room-availabilitie-04:
                   value:
                     uuid: 205c1953-f20d-470f-90fb-82f635bd7906
                     code: '401'
@@ -83,7 +83,7 @@ paths:
               schema:
                 $ref: ./models/error.v1.yaml
               examples:
-                response-broadcast-channel-room-availabilitie-example-05:
+                response-broadcast-channel-room-availabilitie-05:
                   value:
                     uuid: 81c2bafc-2dd6-4cfa-b17c-1314d0722fbb
                     code: '403'
@@ -96,7 +96,7 @@ paths:
               schema:
                 $ref: ./models/error.v1.yaml
               examples:
-                request-broadcast-channel-room-availabilitie-example-06:
+                request-broadcast-channel-room-availabilitie-06:
                   value:
                     uuid: 08b680de-b932-425d-b733-548d68b74eea
                     code: '404'
@@ -109,7 +109,7 @@ paths:
               schema:
                 $ref: ./models/error.v1.yaml
               examples:
-                request-broadcast-channel-room-availabilitie-example-07:
+                request-broadcast-channel-room-availabilitie-07:
                   value:
                     uuid: 78215776-c323-465a-93d9-2a1201d4bcf9
                     code: '500'
@@ -122,7 +122,7 @@ paths:
               schema:
                 $ref: ./models/error.v1.yaml
               examples:
-                request-broadcast-channel-room-availabilitie-example-08:
+                request-broadcast-channel-room-availabilitie-08:
                   value:
                     uuid: df6bc308-3fe8-4ce7-91f0-42bda0f62f00
                     code: '501'
@@ -137,7 +137,7 @@ paths:
             schema:
               $ref: ./models/channelroomavailability.v1.yaml
             examples:
-              request-broadcast-channel-room-availabilitie-example-01:
+              request-broadcast-channel-room-availabilitie-01:
                 value:
                   rate_band_smartbox_id: RATE_BAND_01
                   room_smartbox_id: ROOM_01
@@ -164,48 +164,108 @@ paths:
             application/json:
               schema:
                 $ref: ./models/product.v1.yaml
+              examples:
+                response-broadcast-product-01:
+                  value:
+                    smartbox_id: '123456789'
+                    name: This is a product
+                    description: This is a product description
+                    universe: STAY
+                    is_sellable: true
+                    is_reservable: true
+                    partner_smartbox_id: 123456789
         '201':
           description: Saved
           content:
             application/json:
               schema:
                 $ref: ./models/success.v1.yaml
+              examples:
+                response-broadcast-product-02:
+                  value:
+                    uuid: 722586e2-0887-4204-be95-f3a69077c21a
+                    code: '200'
+                    endpoint: /broadcast_listeners/products
+                    description: Product Update received
+                    count: 1
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-product-03:
+                  value:
+                    uuid: 2f2aa35e-60a6-4d4c-93c0-85d7d815005c
+                    code: '400'
+                    endpoint: /broadcast_listeners/products
+                    description: 'Bad request, malformed payload'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-product-04:
+                  value:
+                    uuid: 96a08c1f-6d20-4219-b02c-0e74e841b9ba
+                    code: '401'
+                    endpoint: /broadcast_listeners/products
+                    description: Unauthorized
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-product-05:
+                  value:
+                    uuid: 7c2bda9e-d8d9-42e1-8d07-d68ef52817f7
+                    code: '403'
+                    endpoint: /broadcast_listeners/products
+                    description: Forbidden
         '404':
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-product-06:
+                  value:
+                    uuid: 795d5ce2-322c-4297-a30c-607a73524616
+                    code: '404'
+                    endpoint: /broadcast_listeners/products
+                    description: Not Found
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-product-07:
+                  value:
+                    uuid: 0a6e02f8-c304-402c-b637-a841ec5bfe48
+                    code: '500'
+                    endpoint: /broadcast_listeners/products
+                    description: Internal Server Error
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-product-08:
+                  value:
+                    uuid: bbe45611-b941-4846-a028-181fbf655e44
+                    code: '501'
+                    endpoint: /broadcast_listeners/products
+                    description: Not Implemented
       description: Create or Update Products
       security:
         - Header API Key: []
@@ -214,6 +274,16 @@ paths:
           application/json:
             schema:
               $ref: ./models/product.v1.yaml
+            examples:
+              request-broadcast-product-01:
+                value:
+                  smartbox_id: '123456789'
+                  name: This is a product
+                  description: This is a product description
+                  universe: STAY
+                  is_sellable: true
+                  is_reservable: true
+                  partner_smartbox_id: 123456789
         description: Product
   /broadcast_listeners/product_relationships:
     post:
@@ -234,48 +304,107 @@ paths:
             application/json:
               schema:
                 $ref: ./models/productrelationship.v1.yaml
+              examples:
+                response-broadcast-product-relationship-01:
+                  value:
+                    uuid: dbdec460-d868-4cbd-9f25-da88946986fc
+                    parent_product:
+                      smartbox_id: PRODUCT 01
+                    child_product:
+                      smartbox_id: PRODUCT 02
+                    is_enabled: true
         '201':
           description: Saved
           content:
             application/json:
               schema:
                 $ref: ./models/productrelationship.v1.yaml
+              examples:
+                response-broadcast-product-relationship-02:
+                  value:
+                    uuid: 6fc01e2a-82bd-4703-ad23-faa90671c1f1
+                    code: '201'
+                    endpoint: /broadcast_listeners/product_relationships
+                    description: Product Relationship Update received
+                    count: 1
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-product-relationship-03:
+                  value:
+                    uuid: cf3b64d9-45fb-4202-9ff3-570051bf2677
+                    code: '400'
+                    endpoint: /broadcast_listeners/product_relationships
+                    description: 'Bad request, malformed payload'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-product-relationship-04:
+                  value:
+                    uuid: 316c78be-0881-46f5-b839-58bb2e6a0bb8
+                    code: '401'
+                    endpoint: /broadcast_listeners/product_relationships
+                    description: Unauthorized
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-product-relationship-05:
+                  value:
+                    uuid: be31a063-5d37-46b3-a704-394aacd18705
+                    code: '403'
+                    endpoint: /broadcast_listeners/product_relationships
+                    description: Forbidden
         '404':
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                example-1response-broadcast-product-relationship-06:
+                  value:
+                    uuid: f9f7595e-00fb-46e7-8d4c-efe3845a5e12
+                    code: '404'
+                    endpoint: /broadcast_listeners/product_relationships
+                    description: Not Found
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-product-relationship-07:
+                  value:
+                    uuid: bbc44708-fdbd-476c-aa74-af7a1edd9d65
+                    code: '500'
+                    endpoint: /broadcast_listeners/product_relationships
+                    description: Internal Server Error
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-product-relationship-08:
+                  value:
+                    uuid: 98f04c72-19bd-480a-81d4-8da5e0e98a9e
+                    code: '501'
+                    endpoint: /broadcast_listeners/product_relationships
+                    description: Not Implemented
       description: Create or Update Product Relationships
       security:
         - Header API Key: []
@@ -284,6 +413,15 @@ paths:
           application/json:
             schema:
               $ref: ./models/productrelationship.v1.yaml
+            examples:
+              request-broadcast-product-relationship-01:
+                value:
+                  uuid: dbdec460-d868-4cbd-9f25-da88946986fc
+                  parent_product:
+                    smartbox_id: PRODUCT 01
+                  child_product:
+                    smartbox_id: PRODUCT 02
+                  is_enabled: true
         description: Product Relationship
       parameters:
         - schema:
