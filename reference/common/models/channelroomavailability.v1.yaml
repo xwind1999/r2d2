@@ -1,0 +1,23 @@
+title: ChannelRoomAvailability
+type: object
+x-tags:
+  - broadcast_listerners
+  - availability
+properties:
+  uuid:
+    type: string
+    format: uuid
+  rate_band_smartbox_id:
+    type: string
+  room_smartbox_id:
+    type: string
+  partner_smartbox_id:
+    type: string
+  start_date:
+    type: string
+    format: date
+  end_date:
+    type: string
+    format: date
+  stock:
+    type: integer

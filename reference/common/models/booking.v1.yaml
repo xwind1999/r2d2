@@ -8,13 +8,13 @@ properties:
   uuid:
     type: string
     description: Booking UUID
-  external_id:
+  smartbox_id:
     type: string
     description: Booking external ID
   experience_uuid:
     type: string
     description: Experience UUID
-  experience_external_id:
+  experience_smartbox_id:
     type: string
     description: Experience external ID
   type:
@@ -41,7 +41,7 @@ properties:
     description: Booking dates
     items:
       $ref: ./bookingdate.v1.yaml
-  customer_external_id:
+  customer_smartbox_id:
     type: string
     description: Customer external id
   customer_name:
@@ -62,11 +62,11 @@ properties:
     format: date
     description: Date of entity update in R2D2
 required:
-  - external_id
-  - experience_external_id
+  - smartbox_id
+  - experience_smartbox_id
   - type
   - status
   - start_date
   - end_date
   - dates
-  - customer_external_id
+  - customer_smartbox_id

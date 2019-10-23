@@ -14,21 +14,21 @@ properties:
     type: string
     format: uuid
     description: Partner UUID
-  partner_external_id:
+  partner_smartbox_id:
     type: string
     description: Partner external ID
   room_uuid:
     type: string
     format: uuid
     description: Room UUID
-  room_external_id:
+  room_smartbox_id:
     type: string
     description: Room component external ID
   rate_band_uuid:
     type: string
     format: uuid
     description: Rate Band UUID
-  rate_band_external_id:
+  rate_band_smartbox_id:
     type: string
     description: Rate Band external ID
   date:
@@ -48,8 +48,8 @@ properties:
     format: date-time
     description: Date of entity update in R2D2
 required:
-  - uuid
+  - partner_smartbox_id
   - room_uuid
-  - room_external_id
+  - room_smartbox_id
   - date
   - stock

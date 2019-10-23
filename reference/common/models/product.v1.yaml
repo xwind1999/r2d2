@@ -8,7 +8,7 @@ properties:
   uuid:
     type: string
     description: Product UUID
-  external_id:
+  smartbox_id:
     type: string
     description: Product external ID
   name:
@@ -26,7 +26,7 @@ properties:
   is_reservable:
     type: boolean
     description: Product is reservable (if a component is a room component)
-  partner_external_id:
+  partner_smartbox_id:
     type: string
     description: Partner external id
   created_at:
@@ -38,7 +38,7 @@ properties:
     format: date
     description: Date of entity update in R2D2
 required:
-  - external_id
+  - smartbox_id
   - name
   - universe
   - is_sellable

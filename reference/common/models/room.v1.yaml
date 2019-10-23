@@ -9,14 +9,14 @@ properties:
     type: string
     format: uuid
     description: Room UUID
-  external_id:
+  smartbox_id:
     type: string
     description: Room component external id
   partner_uuid:
     type: string
     format: uuid
     description: Partner UUID
-  partner_external_id:
+  partner_smartbox_id:
     type: string
     description: Partner external ID
   name:
@@ -46,7 +46,7 @@ properties:
     description: Date of entity update in R2D2
 required:
   - uuid
-  - external_id
+  - smartbox_id
   - name
   - inventory
   - is_sellable

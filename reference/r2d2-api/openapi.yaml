@@ -100,11 +100,11 @@ paths:
         - schema:
             type: string
           in: query
-          name: partner_external_id
+          name: partner_smartbox_id
         - schema:
             type: string
           in: query
-          name: room_external_id
+          name: room_smartbox_id
     put:
       operationId: putRoomPrices
       summary: Room Prices bulk update
@@ -442,11 +442,11 @@ paths:
         - schema:
             type: string
           in: query
-          name: partner_external_id
+          name: partner_smartbox_id
         - schema:
             type: string
           in: query
-          name: room_external_id
+          name: room_smartbox_id
     put:
       operationId: putRoomAvailabilities
       summary: Room Availabilities bulk update
@@ -851,15 +851,16 @@ paths:
       summary: Get Bookings collection
       tags:
         - bookings
+        - room_availabilities
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
                 items:
                   $ref: ../common/models/booking.v1.yaml
+                type: array
         '201':
           description: Created
           content:
@@ -931,19 +932,19 @@ paths:
         - schema:
             type: string
           in: query
-          name: partner_external_id
+          name: partner_smartbox_id
         - schema:
             type: string
           in: query
-          name: room_external_id
+          name: room_smartbox_id
         - schema:
             type: string
           in: query
-          name: booking_external_id
+          name: booking_smartbox_id
         - schema:
             type: string
           in: query
-          name: customer_external_id
+          name: customer_smartbox_id
     put:
       operationId: putBookings
       summary: Bookings bulk update
@@ -1191,6 +1192,71 @@ paths:
         description: Collection of Bookings
       security:
         - Header API Key: []
+  /broadcast_listeners/channel_room_availabilities:
+    post:
+      operationId: postChannelRoomAvailability
+      summary: Create or Update Channel Room Availabilities
+      tags:
+        - broadcast_listerners
+        - room_availabilities
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/channelroomavailability.v1.yaml
+        '201':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ../common/models/error.v1.yaml
+      description: Create or Update Products
+      security:
+        - Header API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ../common/models/channelroomavailability.v1.yaml
+        description: Product
 components:
   schemas: {}
   securitySchemes:

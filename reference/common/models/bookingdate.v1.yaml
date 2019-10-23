@@ -17,13 +17,13 @@ properties:
     type: string
     format: uuid
     description: Room UUID
-  room_external_id:
+  room_smartbox_id:
     type: string
     description: Room external ID (room component ID)
   rate_band_uuid:
     type: string
     description: Rate Band UUID
-  rate_band_external_id:
+  rate_band_smartbox_id:
     type: string
     description: Rate Band external ID
   date:
@@ -49,7 +49,7 @@ properties:
     format: date
     description: Date of entity update in R2D2
 required:
-  - room_external_id
+  - room_smartbox_id
   - date
   - price
   - is_upsell
