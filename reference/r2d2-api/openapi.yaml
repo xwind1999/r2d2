@@ -27,48 +27,107 @@ paths:
             application/json:
               schema:
                 $ref: ./models/channelroomavailability.v1.yaml
+              examples:
+                response-broadcast-channel-room-availabilitie-example-01:
+                  value:
+                    rate_band_smartbox_id: RATE_BAND_01
+                    room_smartbox_id: ROOM_01
+                    partner_smartbox_id: PARTNER_01
+                    start_date: '2019-10-23'
+                    end_date: '2019-10-24'
+                    stock: '10'
         '201':
           description: Saved
           content:
             application/json:
               schema:
                 $ref: ./models/success.v1.yaml
+              examples:
+                response-broadcast-channel-room-availabilitie-example-02:
+                  value:
+                    uuid: c2a4c3ce-b717-45ba-b044-1ce6dd03e264
+                    code: '200'
+                    endpoint: /broadcast_listeners/channel_room_availabilities
+                    description: Availability Update received
+                    count: 1
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-channel-room-availabilitie-example-03:
+                  value:
+                    uuid: 8c872a9e-7e1f-463a-ad71-4351dd014724
+                    code: '400'
+                    endpoint: /broadcast_listeners/channel_room_availabilities
+                    description: 'Bad request, malformed payload'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-channel-room-availabilitie-example-04:
+                  value:
+                    uuid: 205c1953-f20d-470f-90fb-82f635bd7906
+                    code: '401'
+                    endpoint: /broadcast_listeners/channel_room_availabilities
+                    description: Unauthorized
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-channel-room-availabilitie-example-05:
+                  value:
+                    uuid: 81c2bafc-2dd6-4cfa-b17c-1314d0722fbb
+                    code: '403'
+                    endpoint: /broadcast_listeners/channel_room_availabilities
+                    description: Forbidden
         '404':
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                request-broadcast-channel-room-availabilitie-example-06:
+                  value:
+                    uuid: 08b680de-b932-425d-b733-548d68b74eea
+                    code: '404'
+                    endpoint: /broadcast_listeners/channel_room_availabilities
+                    description: Not Found
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                request-broadcast-channel-room-availabilitie-example-07:
+                  value:
+                    uuid: 78215776-c323-465a-93d9-2a1201d4bcf9
+                    code: '500'
+                    endpoint: /broadcast_listeners/channel_room_availabilities
+                    description: Internal Server Error
         '501':
           description: Not Implemented
           content:
             application/json:
               schema:
                 $ref: ./models/error.v1.yaml
+              examples:
+                request-broadcast-channel-room-availabilitie-example-08:
+                  value:
+                    uuid: df6bc308-3fe8-4ce7-91f0-42bda0f62f00
+                    code: '501'
+                    endpoint: /broadcast_listeners/channel_room_availabilities
+                    description: Not Implemented
       description: Create or Update Products
       security:
         - Header API Key: []
@@ -77,7 +136,15 @@ paths:
           application/json:
             schema:
               $ref: ./models/channelroomavailability.v1.yaml
-            examples: {}
+            examples:
+              request-broadcast-channel-room-availabilitie-example-01:
+                value:
+                  rate_band_smartbox_id: RATE_BAND_01
+                  room_smartbox_id: ROOM_01
+                  partner_smartbox_id: PARTNER_01
+                  start_date: '2019-10-23'
+                  end_date: '2019-10-24'
+                  stock: '10'
         description: Product
   /broadcast_listeners/products:
     post:
