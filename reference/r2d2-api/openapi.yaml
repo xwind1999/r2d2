@@ -527,7 +527,6 @@ paths:
       operationId: putRoomPrices
       summary: Room Prices bulk update
       tags:
-        - rooms
         - room_prices
       responses:
         '200':
@@ -612,7 +611,6 @@ paths:
       operationId: patchRoomPrices
       summary: Room Prices bulk partial update
       tags:
-        - rooms
         - room_prices
       responses:
         '200':
@@ -697,7 +695,6 @@ paths:
       operationId: postRoomPrices
       summary: Room Prices bulk creation
       tags:
-        - rooms
         - room_prices
       responses:
         '200':
@@ -878,7 +875,6 @@ paths:
       operationId: putRoomAvailabilities
       summary: Room Availabilities bulk update
       tags:
-        - rooms
         - room_availabilities
       responses:
         '200':
@@ -963,7 +959,6 @@ paths:
       operationId: patchRoomAvailabilities
       summary: Room Availabilities bulk partial update
       tags:
-        - rooms
         - room_availabilities
       responses:
         '200':
@@ -1048,7 +1043,6 @@ paths:
       operationId: postRoomAvailabilities
       summary: Room Availabilities bulk creation
       tags:
-        - rooms
         - room_availabilities
       responses:
         '200':
