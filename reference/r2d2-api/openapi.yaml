@@ -518,6 +518,10 @@ paths:
         - schema:
             type: string
           in: query
+          name: box_smartbox_id
+        - schema:
+            type: string
+          in: query
           name: start_date
         - schema:
             type: string
@@ -863,6 +867,10 @@ paths:
             type: string
           in: query
           name: room_smartbox_id
+        - schema:
+            type: string
+          in: query
+          name: box_smartbox_id
         - schema:
             type: string
           in: query
