@@ -51,9 +51,9 @@ R2-D2 is part of the iResa deprecation plans. Follows bellow some external refer
 
 ## Technical information
 
-* [High level data model](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/high-level-data-model.png)
-* [Data Model](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/r2-d2-api-data-model-alpha.png)
-* [API Reference](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/openapi.html)
-* [Product Information flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/flow/broadcast_product_information.xlsx)
-* [Product Relationship flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/flow/broadcast_product_relationship.xlsx)
-* [Channel Room Availability flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/flow/broadcast_channel_room_availability.xlsx)
+* [High level data model](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/schema/high-level-data-model.png)
+* [Data Model](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/schema/r2-d2-api-data-model-alpha.png)
+* [API Reference](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/reference/r2d2-api/openapi.html)
+* [Product Information flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_product_information.xlsx)
+* [Product Relationship flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_product_relationship.xlsx)
+* [Channel Room Availability flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_channel_room_availability.xlsx)

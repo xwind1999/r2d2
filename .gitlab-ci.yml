@@ -5,18 +5,11 @@ pages:
   stage: Publish API reference
   script:
     - rm -rf public/
-    - mkdir -p public/cdm/
-    - mkdir -p public/flow/
-    - cp reference/r2d2-api/openapi.yaml public/
-    - cp docs/html/openapi.html public/
-    - cp docs/schema/high-level-data-model.png public/
-    - cp docs/schema/r2-d2-api-data-model-alpha.png public/
-    - cp docs/cdm/product.xlsx public/cdm/
-    - cp docs/cdm/product_relationship.xlsx public/cdm/
-    - cp docs/cdm/room_availability.xlsx public/cdm/
-    - cp docs/flow/broadcast_channel_room_availability.xlsx public/flow/
-    - cp docs/flow/broadcast_product_information.xlsx public/flow/
-    - cp docs/flow/broadcast_product_relationship.xlsx public/flow/
+    - mkdir -p public/reference/
+    - mkdir -p public/docs/
+    - cp -R reference/* public/reference/
+    - cp -R docs/* public/docs/
+    - cp docs/html/openapi.html public/reference/r2d2-api/
   artifacts:
     paths:
       - public
