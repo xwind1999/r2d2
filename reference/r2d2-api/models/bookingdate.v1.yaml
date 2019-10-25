@@ -3,7 +3,15 @@ x-tags:
 type: object
 title: BookingDate
 description: 'Booking Dates are '
-x-examples: {}
+x-examples:
+  booking-date-01:
+    value:
+      room_smartbox_id: '00123'
+      rate_band_smartbox_id: RATEBAND01
+      date: '2019-10-10'
+      price: 22200
+      is_upsell: true
+      guests_count: 10
 properties:
   uuid:
     type: string

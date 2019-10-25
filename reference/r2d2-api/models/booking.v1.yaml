@@ -2,6 +2,57 @@ title: Booking
 type: object
 x-tags:
   - bookings
+x-examples:
+  bookings-only-required-01:
+    value:
+      smartbox_id: '123456789'
+      partner_smartbox_id: '00123'
+      experience_smartbox_id: '123'
+      voucher: '123456789123'
+      request_type: confirm
+      start_date: '2019-10-10'
+      end_date: '2019-10-11'
+      dates:
+        - room_smartbox_id: '00123'
+          rate_band_smartbox_id: RATEBAND01
+          date: '2019-10-10'
+          price: 22200
+          is_upsell: true
+          guests_count: 2
+      customer_smartbox_id: '111222333'
+      placed_at: '2019-10-01'
+  bookings-all-info-02:
+    value:
+      smartbox_id: '123456789'
+      partner_smartbox_id: '00123'
+      partner_comment: Partner comment example
+      experience_smartbox_id: '123'
+      voucher: '123456789123'
+      request_type: confirm
+      total_price: 20000
+      start_date: '2019-10-10'
+      end_date: '2019-10-13'
+      dates:
+        - room_smartbox_id: '00123'
+          rate_band_smartbox_id: RATEBAND01
+          date: '2019-10-10'
+          price: 22200
+          is_upsell: true
+          guests_count: 2
+        - room_smartbox_id: '00123'
+          rate_band_smartbox_id: RATEBAND01
+          date: '2019-10-11'
+          price: 22200
+          is_upsell: true
+          guests_count: 2
+        - room_smartbox_id: '00123'
+          rate_band_smartbox_id: RATEBAND01
+          date: '2019-10-12'
+          price: 22200
+          is_upsell: true
+          guests_count: 2
+      customer_smartbox_id: '111222333'
+      placed_at: '2019-10-01'
 properties:
   uuid:
     type: string
@@ -10,15 +61,30 @@ properties:
   smartbox_id:
     type: string
     description: Smartbox ID
+  partner_uuid:
+    type: string
+    description: Partner UUID
+  partner_smartbox_id:
+    type: string
+    description: Partber Smartbox ID
+  partner_comment:
+    type: string
+    description: Partner comment
   experience_uuid:
     type: string
     description: Experience UUID
-  type:
+  experience_smartbox_id:
     type: string
-    description: Booking type
-  status:
+    description: Experience UUID
+  voucher:
     type: string
-    description: Booking status
+    description: Voucher number
+  request_type:
+    type: string
+    enum:
+      - confirm
+      - request
+    description: Request type of the booking
   total_price:
     type: string
     description: Booking total price
@@ -47,19 +113,26 @@ properties:
   customer_phone:
     type: string
     description: Main customer phone (beneficiary phone)
+  placed_at:
+    type: string
+    description: Date of booking placement in JB
+    format: date-time
   created_at:
     type: string
     description: Date of entity creation in R2D2
+    format: date-time
   updated_at:
     type: string
     description: Date of entity update in R2D2
+    format: date-time
 required:
   - smartbox_id
-  - experience_uuid
-  - type
-  - status
-  - total_price
+  - partner_smartbox_id
+  - experience_smartbox_id
+  - voucher
+  - request_type
   - start_date
   - end_date
   - dates
   - customer_smartbox_id
+  - placed_at

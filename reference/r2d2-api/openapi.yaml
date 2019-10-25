@@ -28,7 +28,7 @@ paths:
               schema:
                 $ref: ./models/channelroomavailability.v1.yaml
               examples:
-                response-broadcast-channel-room-availabilitie-01:
+                response-broadcast-channel-room-availabilities-01:
                   value:
                     rate_band_smartbox_id: RATE_BAND_01
                     room_smartbox_id: ROOM_01
@@ -137,7 +137,7 @@ paths:
             schema:
               $ref: ./models/channelroomavailability.v1.yaml
             examples:
-              request-broadcast-channel-room-availabilitie-01:
+              request-broadcast-channel-room-availabilities-01:
                 value:
                   rate_band_smartbox_id: RATE_BAND_01
                   room_smartbox_id: ROOM_01
@@ -448,6 +448,9 @@ paths:
                 type: array
                 items:
                   $ref: ./models/roomprice.v1.yaml
+              examples:
+                response-room-prices-01:
+                  value: {}
         '201':
           description: Created
           content:
@@ -1154,6 +1157,9 @@ paths:
                 type: array
                 items:
                   $ref: ./models/booking.v1.yaml
+              examples:
+                response-bookings-01:
+                  value: {}
         '201':
           description: Created
           content:
