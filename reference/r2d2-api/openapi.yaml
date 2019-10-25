@@ -144,7 +144,7 @@ paths:
                   start_date: '2019-10-23'
                   end_date: '2019-10-24'
                   stock: '10'
-        description: Product
+        description: Channel Room Availability
   /broadcast_listeners/products:
     post:
       operationId: postProducts
@@ -295,7 +295,6 @@ paths:
               examples:
                 response-broadcast-product-relationship-01:
                   value:
-                    uuid: dbdec460-d868-4cbd-9f25-da88946986fc
                     parent_product:
                       smartbox_id: PRODUCT 01
                     child_product:
@@ -310,7 +309,6 @@ paths:
               examples:
                 response-broadcast-product-relationship-02:
                   value:
-                    uuid: 6fc01e2a-82bd-4703-ad23-faa90671c1f1
                     code: '201'
                     endpoint: /broadcast_listeners/product_relationships
                     description: Product Relationship Update received
@@ -404,7 +402,6 @@ paths:
             examples:
               request-broadcast-product-relationship-01:
                 value:
-                  uuid: dbdec460-d868-4cbd-9f25-da88946986fc
                   parent_product:
                     smartbox_id: PRODUCT 01
                   child_product:
