@@ -19,7 +19,6 @@ paths:
       summary: Create or Update Channel Room Availabilities
       tags:
         - broadcast_listerners
-        - room_availabilities
       responses:
         '200':
           description: OK
@@ -152,11 +151,6 @@ paths:
       summary: Create or Update products
       tags:
         - broadcast_listerners
-        - products
-        - rooms
-        - boxes
-        - experiences
-        - components
       responses:
         '200':
           description: OK
@@ -291,12 +285,6 @@ paths:
       summary: Create or Update Product Relationships
       tags:
         - broadcast_listerners
-        - product_relationships
-        - products
-        - rooms
-        - boxes
-        - experiences
-        - components
       responses:
         '200':
           description: OK
@@ -437,7 +425,6 @@ paths:
       operationId: getRoomPrices
       summary: Get Room Prices collection
       tags:
-        - rooms
         - room_prices
       responses:
         '200':
@@ -794,7 +781,6 @@ paths:
       operationId: getRoomAvailabilities
       summary: Get Room Availabilities collection
       tags:
-        - rooms
         - room_availabilities
       responses:
         '200':
