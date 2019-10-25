@@ -4,12 +4,11 @@
 
 ## Main Responsibilities (domains):
 
-* Enriches A&P (availability and pricing) data provided to JarvisBooking;
+* Provides enriched A&P (availability and pricing) data to JarvisBooking, giving JB the ability to fetch A&P by box, experience, partner, box, room and rate band;
 * Translates A&P data from Stay Business Data Model (CMHub and CMs, based on rooms and rate bands) to Smartbox Data Model (based on experiences and boxes);
-* Enriches Bookings data provided to CMHub;
-* Adds boxes and experiences information to Bookings that might be needed by the CMs;
+* Provides enriched Booking data provided to CMHub by adding boxes and experiences information to Bookings that might be needed by the CMs;
 * Routes bookings calls;
-* Fetches A&P from CMHub when needed.
+* Receives A&P from CMHub.
 
 ## Master data for:
 
