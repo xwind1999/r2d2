@@ -44,6 +44,7 @@ properties:
   updated_at:
     type: string
     description: Date of entity update in R2D2
+    format: date-time
 required:
   - smartbox_id
   - partner_smartbox_id

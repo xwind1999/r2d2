@@ -7,6 +7,7 @@ properties:
   resource_uuid:
     type: string
     description: UUID of the resouce being patched
+    format: uuid
   resource_smartbox_id:
     type: string
     description: External ID of the resource being patched

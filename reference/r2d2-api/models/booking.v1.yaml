@@ -64,6 +64,7 @@ properties:
   partner_uuid:
     type: string
     description: Partner UUID
+    format: uuid
   partner_smartbox_id:
     type: string
     description: Partber Smartbox ID
@@ -73,6 +74,7 @@ properties:
   experience_uuid:
     type: string
     description: Experience UUID
+    format: uuid
   experience_smartbox_id:
     type: string
     description: Experience UUID

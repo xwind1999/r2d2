@@ -17,6 +17,7 @@ properties:
   uuid:
     type: string
     description: Product UUID
+    format: uuid
   smartbox_id:
     type: string
     description: Product external ID
@@ -40,11 +41,11 @@ properties:
     description: Partner external id
   created_at:
     type: string
-    format: date
     description: Date of entity creation in R2D2
+    format: date-time
   updated_at:
     type: string
-    format: date
     description: Date of entity update in R2D2
+    format: date-time
 required:
   - smartbox_id

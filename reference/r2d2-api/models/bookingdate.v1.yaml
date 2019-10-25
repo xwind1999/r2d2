@@ -27,6 +27,7 @@ properties:
   rate_band_uuid:
     type: string
     description: Rate Band UUID
+    format: uuid
   rate_band_smartbox_id:
     type: string
     description: Rate Band external ID
@@ -46,12 +47,12 @@ properties:
     description: Number of guests for this room in this particular date
   created_at:
     type: string
-    format: date
     description: Date of entity creation in R2D2
+    format: date-time
   updated_at:
     type: string
-    format: date
     description: Date of entity update in R2D2
+    format: date-time
 required:
   - room_smartbox_id
   - date

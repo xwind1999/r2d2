@@ -19,6 +19,7 @@ properties:
   uuid:
     type: string
     description: Product Relationship UUID
+    format: uuid
   parent_product:
     $ref: ./product.v1.yaml
   child_product:
@@ -36,12 +37,12 @@ properties:
     description: Type of the relationship
   created_at:
     type: string
-    format: date
     description: Date of entity creation in R2D2
+    format: date-time
   updated_at:
     type: string
-    format: date
     description: Date of entity update in R2D2
+    format: date-time
 required:
   - parent_product
   - child_product

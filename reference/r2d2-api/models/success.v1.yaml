@@ -7,6 +7,7 @@ properties:
   uuid:
     type: string
     description: UUID of this success ocurrence
+    format: uuid
   code:
     type: string
     description: Success HTTP code
