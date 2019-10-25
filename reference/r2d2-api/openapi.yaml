@@ -683,7 +683,6 @@ paths:
               - simple
               - full
             default: full
-            maxLength: 0
           in: query
           name: response_type
       requestBody:
@@ -759,7 +758,6 @@ paths:
               - simple
               - full
             default: full
-            maxLength: 0
           in: query
           name: response_type
           description: ''
@@ -1036,7 +1034,6 @@ paths:
               - simple
               - full
             default: full
-            maxLength: 0
           in: query
           name: response_type
       requestBody:
@@ -1112,7 +1109,6 @@ paths:
               - simple
               - full
             default: full
-            maxLength: 0
           in: query
           name: response_type
           description: ''
@@ -1239,10 +1235,73 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./models/booking.v1.yaml
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
       description: Bookings bulk creation
       operationId: postBookings
       security:
         - Header API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: ./models/booking.v1.yaml
+        description: Collection of Bookings
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+          in: query
+          name: response_type
     put:
       summary: Bookings bulk update
       tags:
@@ -1250,10 +1309,73 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./models/booking.v1.yaml
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
       description: Bookings bulk update
       operationId: putBookings
       security:
         - Header API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: ./models/booking.v1.yaml
+        description: Collection of Bookings
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+          in: query
+          name: response_type
     patch:
       summary: Bookings bulk partial update
       tags:
@@ -1261,10 +1383,73 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./models/patch.v1.yaml
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./models/success.v1.yaml
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
       description: Bookings bulk partial update
       operationId: patchBookings
       security:
         - Header API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: ./models/patch.v1.yaml
+        description: Collection of Patches
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - simple
+              - full
+            default: full
+          in: query
+          name: response_type
 components:
   schemas: {}
   securitySchemes:
