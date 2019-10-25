@@ -1,7 +1,7 @@
 graph LR
 bookings ---|"1 - 1..N"| booking_dates
 bookings ---|"1..N - 1"| experiences
-experiences ---|"1..N - 1"| boxes
+experiences ---|"1..N - 0..N"| boxes
 experiences ---|"1..N - 1"| partners
 partners ---|"1 - 1..N"| rate_bands
 partners ---|"1 - 1..N"| rooms
