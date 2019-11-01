@@ -1,0 +1,28 @@
+title: Partner
+type: object
+description: Partners are room owners
+properties:
+  uuid:
+    type: string
+    format: uuid
+  smartbox_id:
+    type: string
+  status:
+    type: string
+    enum:
+      - prospect
+      - new partner
+      - partner
+      - inactive partner
+      - former partner
+      - blacklist
+      - winback
+      - ceased
+  currency:
+    type: string
+x-examples:
+  partner-01:
+    value:
+      smartbox_id: '123456789'
+      status: partner
+      currency: EUR

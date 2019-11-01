@@ -145,10 +145,136 @@ paths:
                   end_date: '2019-10-24'
                   stock: '10'
         description: Channel Room Availability
+  /broadcast_listeners/partners:
+    post:
+      operationId: postPartners
+      summary: Create or Update Partners
+      tags:
+        - broadcast_listerners
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./models/partner.v1.yaml
+              examples:
+                response-broadcast-partner-01:
+                  value:
+                    smartbox_id: 123456789
+                    status: partner
+                    currency: EUR
+        '201':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: ./models/success.v1.yaml
+              examples:
+                response-broadcast-partner-02:
+                  value:
+                    uuid: 722586e2-0887-4204-be95-f3a69077c21a
+                    code: '200'
+                    endpoint: /broadcast_listeners/partners
+                    description: Partner Update received
+                    count: 1
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-partner-03:
+                  value:
+                    uuid: 2f2aa35e-60a6-4d4c-93c0-85d7d815005c
+                    code: '400'
+                    endpoint: /broadcast_listeners/partners
+                    description: 'Bad request, malformed payload'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-partner-04:
+                  value:
+                    uuid: 96a08c1f-6d20-4219-b02c-0e74e841b9ba
+                    code: '401'
+                    endpoint: /broadcast_listeners/partners
+                    description: Unauthorized
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-partner-05:
+                  value:
+                    uuid: 7c2bda9e-d8d9-42e1-8d07-d68ef52817f7
+                    code: '403'
+                    endpoint: /broadcast_listeners/partners
+                    description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-partner-06:
+                  value:
+                    uuid: 795d5ce2-322c-4297-a30c-607a73524616
+                    code: '404'
+                    endpoint: /broadcast_listeners/partners
+                    description: Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-partner-07:
+                  value:
+                    uuid: 0a6e02f8-c304-402c-b637-a841ec5bfe48
+                    code: '500'
+                    endpoint: /broadcast_listeners/partners
+                    description: Internal Server Error
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: ./models/error.v1.yaml
+              examples:
+                response-broadcast-partner-08:
+                  value:
+                    uuid: bbe45611-b941-4846-a028-181fbf655e44
+                    code: '501'
+                    endpoint: /broadcast_listeners/partners
+                    description: Not Implemented
+      description: Create or Update Partners
+      security:
+        - Header API Key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ./models/product.v1.yaml
+            examples:
+              request-broadcast-partner-01:
+                value:
+                  smartbox_id: 123456789
+                  status: partner
+                  currency: EUR
+        description: Partner
   /broadcast_listeners/products:
     post:
       operationId: postProducts
-      summary: Create or Update products
+      summary: Create or Update Products
       tags:
         - broadcast_listerners
       responses:

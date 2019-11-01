@@ -3,7 +3,16 @@ type: object
 x-tags:
   - rooms
 description: Rooms are reservable accomodations for partners
-x-examples: {}
+x-examples:
+  room-01:
+    value:
+      smartbox_id: '123123'
+      partner_smartbox_id: '00123'
+      name: Double Room
+      description: Double Room Description Example
+      inventory: 123
+      is_sellable: true
+      status: enabled
 properties:
   uuid:
     type: string
