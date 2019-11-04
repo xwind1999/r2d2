@@ -31,6 +31,16 @@ R2-D2 is part of the iResa deprecation plans. Follows bellow some external refer
 * [2019-08-21 - CMHub and R2D2 interactions](https://smartbox.atlassian.net/wiki/spaces/MF/pages/1054736799/2019-08-21+-+CMHub+and+R2D2+interactions)
 * [2019-08-21 - JarvisBooking and R2D2 interactions](https://smartbox.atlassian.net/wiki/spaces/MF/pages/1054900625/2019-08-21+-+JarvisBooking+and+R2D2+interactions)
 
+## Technical information
+
+* [High level data model](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/schema/high-level-data-model.png)
+* [Data Model](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/schema/r2-d2-api-data-model-alpha.png)
+* [API Reference](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/reference/r2d2-api/openapi.html)
+* [Channel Room Availability flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_channel_room_availability.xlsx)
+* [Partner Information flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_partner_information.xlsx)
+* [Product Information flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_product_information.xlsx)
+* [Product Relationship flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_product_relationship.xlsx)
+
 ## High level tasks
 
 - [x] Iterate over the first R2-D2 + C3-PO solution and provide an updated design
@@ -40,19 +50,10 @@ R2-D2 is part of the iResa deprecation plans. Follows bellow some external refer
 - [x] Draft a high level data model
 - [x] Draft an initial database model to cover the MVP
 - [x] Draft an initial API specification and design to cover the MVP
-- [ ] Receive initial feedback about the drafted data model and API design
-- [ ] Draft the new flow documents for Booking, Room Prices and Room Availabilities
+- [x] Receive initial feedback about the drafted data model and API design
+- [x] Draft the new flow documents for Booking, Room Prices and Room Availabilities
 - [ ] Present the technical solution to the Architecture Board
 - [ ] Break down the implementation epics
 - [ ] Raise a delivery plan with Project Management taking into account the impacted systems and dependencies
 - [ ] Bootstrap a team
 - [ ] ...
-
-## Technical information
-
-* [High level data model](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/schema/high-level-data-model.png)
-* [Data Model](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/schema/r2-d2-api-data-model-alpha.png)
-* [API Reference](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/reference/r2d2-api/openapi.html)
-* [Product Information flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_product_information.xlsx)
-* [Product Relationship flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_product_relationship.xlsx)
-* [Channel Room Availability flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_channel_room_availability.xlsx)
