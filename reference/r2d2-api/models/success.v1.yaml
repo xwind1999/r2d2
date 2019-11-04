@@ -25,3 +25,4 @@ required:
   - endpoint
   - description
   - count
+description: Success is an auxiliary model to map error messages

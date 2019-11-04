@@ -2,7 +2,7 @@ title: Product
 type: object
 x-tags:
   - products
-description: Products are generic entities with a lot of meaning in Smartbox
+description: 'Products are generic entities with a lot of meaning in Smartbox, in R2D2 they will be mapped to boxes, experiences or room components.'
 x-examples:
   product-01:
     value:

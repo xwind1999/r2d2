@@ -2,7 +2,7 @@ x-tags:
   - bookings
 type: object
 title: BookingDate
-description: 'Booking Dates are '
+description: Booking Dates are an instance of stock consumption for a room inventory in a specific date
 x-examples:
   booking-date-01:
     value:

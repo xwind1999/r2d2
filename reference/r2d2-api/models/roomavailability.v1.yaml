@@ -3,7 +3,7 @@ type: object
 x-tags:
   - availability
   - rooms
-description: Room Prices are the stock and availability type for a room in a specific date
+description: Room Availabilities are the stock and availability type for a room in a specific date
 x-examples: {}
 properties:
   uuid:

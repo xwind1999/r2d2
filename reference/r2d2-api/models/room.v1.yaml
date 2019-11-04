@@ -2,7 +2,7 @@ title: Room
 type: object
 x-tags:
   - rooms
-description: Rooms are reservable accomodations for partners
+description: Rooms are reservable accomodations for partners called Room Components in Smartrbox nomemclature
 x-examples:
   room-01:
     value:

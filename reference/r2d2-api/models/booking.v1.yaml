@@ -138,3 +138,4 @@ required:
   - dates
   - customer_smartbox_id
   - placed_at
+description: Bookings are reservations that triggers an availability change

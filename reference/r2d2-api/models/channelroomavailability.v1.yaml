@@ -36,3 +36,4 @@ x-examples:
       start_date: '2019-10-23'
       end_date: '2019-10-24'
       stock: '10'
+description: Channel Room Availability is a resource to map availability changes being broadcasted by CMHub

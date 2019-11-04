@@ -21,3 +21,4 @@ required:
   - code
   - endpoint
   - description
+description: Error is an auxiliary model to map error messages
