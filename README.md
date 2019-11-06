@@ -43,6 +43,16 @@ R2-D2 is part of the iResa deprecation plans. Follows bellow some external refer
 * [Product Information flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_product_information.xlsx)
 * [Product Relationship flow change](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/flow/broadcast_product_relationship.xlsx)
 
+## External resources and extra information
+
+* [Confluence: R2-D2 - The Availability & Pricing Engine](https://smartbox.atlassian.net/wiki/spaces/MF/pages/305464114/R2-D2+The+Availability+Pricing+Engine)
+* [Confluence: R2-D2 - Service Introduction Page](https://smartbox.atlassian.net/wiki/spaces/MF/pages/1054212836/R2-D2+-+Service+Introduction+Page)
+* [Confluence: R2-D2 - Data Model](https://smartbox.atlassian.net/wiki/spaces/MF/pages/1058701540/Data+Model)
+* [Confluence: R2-D2 - API Design](https://smartbox.atlassian.net/wiki/spaces/MF/pages/1058504999/API+Design)
+* [Confluence: CP000929 - Introduce R2D2 Availability & Pricing Engine Service](https://smartbox.atlassian.net/wiki/spaces/CHANGEHUB/pages/1081868749/CP000929+-+Introduce+R2D2+Availability+Pricing+Engine+Service)
+* [JIRA: R2-D2 - Roadmap](https://smartbox.atlassian.net/secure/Roadmap.jspa?projectKey=R2D2&rapidView=482)
+* [JIRA: R2-D2 - Board](https://smartbox.atlassian.net/jira/software/projects/MFR2D2/boards/482)
+
 ## High level tasks
 
 - [x] Iterate over the first R2-D2 + C3-PO solution and provide an updated design
