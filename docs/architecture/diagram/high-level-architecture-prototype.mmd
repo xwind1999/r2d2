@@ -1,18 +1,14 @@
 graph LR
 subgraph "R2D2-API"
-LBBE{API Load Balancer fa:fa-asterisk} --- PHP1[PHP Node 1 fa:fa-server <br>NGINX + PHP-FPM + R2D2 Code + R2D2 .env]
-LBBE --- PHP2[PHP Node 2 fa:fa-server <br>NGINX + PHP-FPM + R2D2 Code + R2D2 .env]
-PHP1 --- RC[REDIS CACHE fa:fa-cube]
+LBBE{API Load Balancer fa:fa-asterisk} --- PHP1[PHP Write Nodes fa:fa-server <br>NGINX + PHP-FPM + R2D2 Code + R2D2 .env]
+LBBE --- PHP2[PHP Read Nodes fa:fa-server <br>NGINX + PHP-FPM + R2D2 Code + R2D2 .env]
+PHP1 --- RC[Memcache fa:fa-cube]
 PHP2 --- RC
-PHPN[PHP Node N fa:fa-server] --- RC
-RC --- DBM[DB Master fa:fa-database]
+PHP1 --- DBM[DB Master fa:fa-database]
 DBM --- DBS[DB Slave fa:fa-database]
-PHP1 --- R[REDIS SESSION fa:fa-cube]
-PHP2 --- R
-PHPN --- R
-PHP1 --- RQ[REDIS QUEUE fa:fa-cube]
+PHP1 --- RQ[Queue Service fa:fa-cube <br>RabbitMQ or Kafka TBD]
 PHP2 --- RQ
-PHPN --- RQ
+PHP2 --- DBS
 end
 
 subgraph "CMHub API"
