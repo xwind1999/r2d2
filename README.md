@@ -50,8 +50,6 @@ R2-D2 is part of the iResa deprecation plans. Follows bellow some external refer
 * [Confluence: R2-D2 - Data Model](https://smartbox.atlassian.net/wiki/spaces/MF/pages/1058701540/Data+Model)
 * [Confluence: R2-D2 - API Design](https://smartbox.atlassian.net/wiki/spaces/MF/pages/1058504999/API+Design)
 * [Confluence: CP000929 - Introduce R2D2 Availability & Pricing Engine Service](https://smartbox.atlassian.net/wiki/spaces/CHANGEHUB/pages/1081868749/CP000929+-+Introduce+R2D2+Availability+Pricing+Engine+Service)
-* [JIRA: R2-D2 - Roadmap](https://smartbox.atlassian.net/secure/Roadmap.jspa?projectKey=R2D2&rapidView=482)
-* [JIRA: R2-D2 - Board](https://smartbox.atlassian.net/jira/software/projects/MFR2D2/boards/482)
 
 ## High level tasks
 
@@ -69,3 +67,7 @@ R2-D2 is part of the iResa deprecation plans. Follows bellow some external refer
 - [ ] Raise a delivery plan with Project Management taking into account the impacted systems and dependencies
 - [ ] Bootstrap a team
 - [ ] ...
+
+* [High level plan](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/roadmap/high-level-plan.png)
+* [JIRA: R2-D2 - Roadmap WIP](https://smartbox.atlassian.net/secure/Roadmap.jspa?projectKey=R2D2&rapidView=482)
+* [JIRA: R2-D2 - Board](https://smartbox.atlassian.net/jira/software/projects/MFR2D2/boards/482)
