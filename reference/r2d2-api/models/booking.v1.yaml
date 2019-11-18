@@ -81,12 +81,24 @@ properties:
   voucher:
     type: string
     description: Voucher number
+  brand:
+    type: string
+    description: Brand of the booking
+  country:
+    type: string
+    description: Country of the booking
   request_type:
     type: string
     enum:
       - confirm
       - request
     description: Request type of the booking
+  channel:
+    type: string
+    description: Booking placement channel
+  cancellation_channel:
+    type: string
+    description: Booking cancellation channel  
   total_price:
     type: string
     description: Booking total price
@@ -106,18 +118,28 @@ properties:
   customer_smartbox_id:
     type: string
     description: Main customer Smartbox ID (beneficiary ID)
-  customer_name:
+  customer_first_name:
     type: string
-    description: Main customer name (beneficiary name)
+    description: Main customer first name (beneficiary first name)
+  customer_last_name:
+    type: string
+    description: Main customer last name (beneficiary last name)
   customer_email:
     type: string
     description: Main customer email (beneficiary email)
   customer_phone:
     type: string
     description: Main customer phone (beneficiary phone)
+  customer_comment:
+    type: string
+    description: Main customer comments and additional requirements
   placed_at:
     type: string
     description: Date of booking placement in JB
+    format: date-time
+  cancelled_at:
+    type: string
+    description: Date of booking cancellation in JB
     format: date-time
   created_at:
     type: string

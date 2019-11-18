@@ -40,7 +40,7 @@ properties:
     description: Booking Date price
   is_upsell:
     type: boolean
-    description: "If this Booking Date it's an extra night (or other upseel)"
+    description: "If this Booking Date it's an extra night (or other upsell)"
   guests_count:
     type: integer
     minimum: 1
