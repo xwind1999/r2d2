@@ -129,7 +129,7 @@ paths:
                     description: Not Implemented
       description: Create or Update Products
       security:
-        - Header API Key: []
+        - apiKey: []
       requestBody:
         content:
           application/json:
@@ -258,7 +258,7 @@ paths:
                     description: Not Implemented
       description: Create or Update Partners
       security:
-        - Header API Key: []
+        - apiKey: []
       requestBody:
         content:
           application/json:
@@ -388,7 +388,7 @@ paths:
                     description: Not Implemented
       description: Create or Update Products
       security:
-        - Header API Key: []
+        - apiKey: []
       requestBody:
         content:
           application/json:
@@ -519,7 +519,7 @@ paths:
                     description: Not Implemented
       description: Create or Update Product Relationships
       security:
-        - Header API Key: []
+        - apiKey: []
       requestBody:
         content:
           application/json:
@@ -605,7 +605,7 @@ paths:
                 $ref: ./models/error.v1.yaml
       description: Get Room Prices collection
       security:
-        - Header API Key: []
+        - apiKey: []
       parameters:
         - schema:
             type: string
@@ -735,7 +735,7 @@ paths:
           in: query
           name: response_type
       security:
-        - Header API Key: []
+        - apiKey: []
       description: Room Prices bulk update
     patch:
       operationId: patchRoomPrices
@@ -803,7 +803,7 @@ paths:
                 $ref: ./models/error.v1.yaml
       description: Room Prices bulk partial update
       security:
-        - Header API Key: []
+        - apiKey: []
       parameters:
         - schema:
             type: string
@@ -897,7 +897,7 @@ paths:
                 $ref: ./models/roomprice.v1.yaml
         description: Collection of Room Prices
       security:
-        - Header API Key: []
+        - apiKey: []
   /room_availabilities:
     get:
       operationId: getRoomAvailabilities
@@ -957,7 +957,7 @@ paths:
                 $ref: ./models/error.v1.yaml
       description: Get Room Availabilities collection
       security:
-        - Header API Key: []
+        - apiKey: []
       parameters:
         - schema:
             type: string
@@ -1087,7 +1087,7 @@ paths:
           in: query
           name: response_type
       security:
-        - Header API Key: []
+        - apiKey: []
       description: Room Availabilities bulk update
     patch:
       operationId: patchRoomAvailabilities
@@ -1155,7 +1155,7 @@ paths:
                 $ref: ./models/error.v1.yaml
       description: Room Availabilities bulk partial update
       security:
-        - Header API Key: []
+        - apiKey: []
       parameters:
         - schema:
             type: string
@@ -1249,7 +1249,7 @@ paths:
                 $ref: ./models/roomavailability.v1.yaml
         description: Collection of Room Availabilities
       security:
-        - Header API Key: []
+        - apiKey: []
   /bookings:
     get:
       summary: Get Bookings collection
@@ -1266,7 +1266,24 @@ paths:
                   $ref: ./models/booking.v1.yaml
               examples:
                 response-bookings-01:
-                  value: {}
+                  value:
+                    - value:
+                        golden_id: '123456789'
+                        partner_golden_id: '00123'
+                        experience_golden_id: '123'
+                        voucher: '123456789123'
+                        request_type: confirm
+                        start_date: '2019-10-10'
+                        end_date: '2019-10-11'
+                        dates:
+                          - room_golden_id: '00123'
+                            rate_band_golden_id: RATEBAND01
+                            date: '2019-10-10'
+                            price: 22200
+                            is_upsell: true
+                            guests_count: 2
+                        customer_golden_id: '111222333'
+                        placed_at: '2019-10-01'
         '201':
           description: Created
           content:
@@ -1312,7 +1329,7 @@ paths:
       description: Get Bookings collection
       operationId: getBookings
       security:
-        - Header API Key: []
+        - apiKey: []
       parameters:
         - schema:
             type: string
@@ -1412,7 +1429,7 @@ paths:
       description: Bookings bulk creation
       operationId: postBookings
       security:
-        - Header API Key: []
+        - apiKey: []
       requestBody:
         content:
           application/json:
@@ -1486,7 +1503,7 @@ paths:
       description: Bookings bulk update
       operationId: putBookings
       security:
-        - Header API Key: []
+        - apiKey: []
       requestBody:
         content:
           application/json:
@@ -1560,7 +1577,7 @@ paths:
       description: Bookings bulk partial update
       operationId: patchBookings
       security:
-        - Header API Key: []
+        - apiKey: []
       requestBody:
         content:
           application/json:
@@ -1581,7 +1598,8 @@ paths:
 components:
   schemas: {}
   securitySchemes:
-    Header API Key:
-      name: API Key
+    apiKey:
+      name: apiKey
       type: apiKey
       in: header
+      description: API Key
