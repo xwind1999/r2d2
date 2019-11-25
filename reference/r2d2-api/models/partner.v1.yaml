@@ -5,7 +5,7 @@ properties:
   uuid:
     type: string
     format: uuid
-  smartbox_id:
+  golden_id:
     type: string
   status:
     type: string
@@ -23,6 +23,6 @@ properties:
 x-examples:
   partner-01:
     value:
-      smartbox_id: '123456789'
+      golden_id: '123456789'
       status: partner
       currency: EUR

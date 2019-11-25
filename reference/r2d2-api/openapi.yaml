@@ -29,9 +29,9 @@ paths:
               examples:
                 response-broadcast-channel-room-availabilities-01:
                   value:
-                    rate_band_smartbox_id: RATE_BAND_01
-                    room_smartbox_id: ROOM_01
-                    partner_smartbox_id: PARTNER_01
+                    rate_band_golden_id: RATE_BAND_01
+                    room_golden_id: ROOM_01
+                    partner_golden_id: PARTNER_01
                     start_date: '2019-10-23'
                     end_date: '2019-10-24'
                     stock: '10'
@@ -138,9 +138,9 @@ paths:
             examples:
               request-broadcast-channel-room-availabilities-01:
                 value:
-                  rate_band_smartbox_id: RATE_BAND_01
-                  room_smartbox_id: ROOM_01
-                  partner_smartbox_id: PARTNER_01
+                  rate_band_golden_id: RATE_BAND_01
+                  room_golden_id: ROOM_01
+                  partner_golden_id: PARTNER_01
                   start_date: '2019-10-23'
                   end_date: '2019-10-24'
                   stock: '10'
@@ -161,7 +161,7 @@ paths:
               examples:
                 response-broadcast-partner-01:
                   value:
-                    smartbox_id: 123456789
+                    golden_id: 123456789
                     status: partner
                     currency: EUR
         '201':
@@ -267,7 +267,7 @@ paths:
             examples:
               request-broadcast-partner-01:
                 value:
-                  smartbox_id: 123456789
+                  golden_id: 123456789
                   status: partner
                   currency: EUR
         description: Partner
@@ -287,13 +287,13 @@ paths:
               examples:
                 response-broadcast-product-01:
                   value:
-                    smartbox_id: '123456789'
+                    golden_id: '123456789'
                     name: This is a product
                     description: This is a product description
                     universe: STAY
                     is_sellable: true
                     is_reservable: true
-                    partner_smartbox_id: 123456789
+                    partner_golden_id: 123456789
         '201':
           description: Saved
           content:
@@ -397,13 +397,13 @@ paths:
             examples:
               request-broadcast-product-01:
                 value:
-                  smartbox_id: '123456789'
+                  golden_id: '123456789'
                   name: This is a product
                   description: This is a product description
                   universe: STAY
                   is_sellable: true
                   is_reservable: true
-                  partner_smartbox_id: 123456789
+                  partner_golden_id: 123456789
         description: Product
   /broadcast_listeners/product_relationships:
     post:
@@ -422,9 +422,9 @@ paths:
                 response-broadcast-product-relationship-01:
                   value:
                     parent_product:
-                      smartbox_id: PRODUCT 01
+                      golden_id: PRODUCT 01
                     child_product:
-                      smartbox_id: PRODUCT 02
+                      golden_id: PRODUCT 02
                     is_enabled: true
         '201':
           description: Saved
@@ -529,9 +529,9 @@ paths:
               request-broadcast-product-relationship-01:
                 value:
                   parent_product:
-                    smartbox_id: PRODUCT 01
+                    golden_id: PRODUCT 01
                   child_product:
-                    smartbox_id: PRODUCT 02
+                    golden_id: PRODUCT 02
                   is_enabled: true
         description: Product Relationship
       parameters:
@@ -632,19 +632,19 @@ paths:
         - schema:
             type: string
           in: query
-          name: partner_smartbox_id
+          name: partner_golden_id
         - schema:
             type: string
           in: query
-          name: rate_band_smartbox_id
+          name: rate_band_golden_id
         - schema:
             type: string
           in: query
-          name: room_smartbox_id
+          name: room_golden_id
         - schema:
             type: string
           in: query
-          name: box_smartbox_id
+          name: box_golden_id
         - schema:
             type: string
           in: query
@@ -984,19 +984,19 @@ paths:
         - schema:
             type: string
           in: query
-          name: partner_smartbox_id
+          name: partner_golden_id
         - schema:
             type: string
           in: query
-          name: rate_band_smartbox_id
+          name: rate_band_golden_id
         - schema:
             type: string
           in: query
-          name: room_smartbox_id
+          name: room_golden_id
         - schema:
             type: string
           in: query
-          name: box_smartbox_id
+          name: box_golden_id
         - schema:
             type: string
           in: query
@@ -1339,15 +1339,15 @@ paths:
         - schema:
             type: string
           in: query
-          name: partner_smartbox_id
+          name: partner_golden_id
         - schema:
             type: string
           in: query
-          name: room_smartbox_id
+          name: room_golden_id
         - schema:
             type: string
           in: query
-          name: customer_smartbox_id
+          name: customer_golden_id
         - schema:
             type: string
           in: query

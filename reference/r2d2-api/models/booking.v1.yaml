@@ -5,69 +5,69 @@ x-tags:
 x-examples:
   bookings-only-required-01:
     value:
-      smartbox_id: '123456789'
-      partner_smartbox_id: '00123'
-      experience_smartbox_id: '123'
+      golden_id: '123456789'
+      partner_golden_id: '00123'
+      experience_golden_id: '123'
       voucher: '123456789123'
       request_type: confirm
       start_date: '2019-10-10'
       end_date: '2019-10-11'
       dates:
-        - room_smartbox_id: '00123'
-          rate_band_smartbox_id: RATEBAND01
+        - room_golden_id: '00123'
+          rate_band_golden_id: RATEBAND01
           date: '2019-10-10'
           price: 22200
           is_upsell: true
           guests_count: 2
-      customer_smartbox_id: '111222333'
+      customer_golden_id: '111222333'
       placed_at: '2019-10-01'
   bookings-all-info-02:
     value:
-      smartbox_id: '123456789'
-      partner_smartbox_id: '00123'
+      golden_id: '123456789'
+      partner_golden_id: '00123'
       partner_comment: Partner comment example
-      experience_smartbox_id: '123'
+      experience_golden_id: '123'
       voucher: '123456789123'
       request_type: confirm
       total_price: 20000
       start_date: '2019-10-10'
       end_date: '2019-10-13'
       dates:
-        - room_smartbox_id: '00123'
-          rate_band_smartbox_id: RATEBAND01
+        - room_golden_id: '00123'
+          rate_band_golden_id: RATEBAND01
           date: '2019-10-10'
           price: 22200
           is_upsell: true
           guests_count: 2
-        - room_smartbox_id: '00123'
-          rate_band_smartbox_id: RATEBAND01
+        - room_golden_id: '00123'
+          rate_band_golden_id: RATEBAND01
           date: '2019-10-11'
           price: 22200
           is_upsell: true
           guests_count: 2
-        - room_smartbox_id: '00123'
-          rate_band_smartbox_id: RATEBAND01
+        - room_golden_id: '00123'
+          rate_band_golden_id: RATEBAND01
           date: '2019-10-12'
           price: 22200
           is_upsell: true
           guests_count: 2
-      customer_smartbox_id: '111222333'
+      customer_golden_id: '111222333'
       placed_at: '2019-10-01'
 properties:
   uuid:
     type: string
     format: uuid
     description: Booking UUID
-  smartbox_id:
+  golden_id:
     type: string
-    description: Smartbox ID
+    description: Golden ID
   partner_uuid:
     type: string
     description: Partner UUID
     format: uuid
-  partner_smartbox_id:
+  partner_golden_id:
     type: string
-    description: Partber Smartbox ID
+    description: Partber Golden ID
   partner_comment:
     type: string
     description: Partner comment
@@ -75,7 +75,7 @@ properties:
     type: string
     description: Experience UUID
     format: uuid
-  experience_smartbox_id:
+  experience_golden_id:
     type: string
     description: Experience UUID
   voucher:
@@ -115,9 +115,9 @@ properties:
     description: Booking dates
     items:
       $ref: ./bookingdate.v1.yaml
-  customer_smartbox_id:
+  customer_golden_id:
     type: string
-    description: Main customer Smartbox ID (beneficiary ID)
+    description: Main customer Golden ID (beneficiary ID)
   customer_first_name:
     type: string
     description: Main customer first name (beneficiary first name)
@@ -150,14 +150,14 @@ properties:
     description: Date of entity update in R2D2
     format: date-time
 required:
-  - smartbox_id
-  - partner_smartbox_id
-  - experience_smartbox_id
+  - golden_id
+  - partner_golden_id
+  - experience_golden_id
   - voucher
   - request_type
   - start_date
   - end_date
   - dates
-  - customer_smartbox_id
+  - customer_golden_id
   - placed_at
 description: Bookings are reservations that triggers an availability change

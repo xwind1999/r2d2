@@ -6,8 +6,8 @@ description: Rooms are reservable accomodations for partners called Room Compone
 x-examples:
   room-01:
     value:
-      smartbox_id: '123123'
-      partner_smartbox_id: '00123'
+      golden_id: '123123'
+      partner_golden_id: '00123'
       name: Double Room
       description: Double Room Description Example
       inventory: 123
@@ -18,16 +18,16 @@ properties:
     type: string
     format: uuid
     description: Room UUID
-  smartbox_id:
+  golden_id:
     type: string
-    description: Room component external id
+    description: Room component Golden ID
   partner_uuid:
     type: string
     format: uuid
     description: Partner UUID
-  partner_smartbox_id:
+  partner_golden_id:
     type: string
-    description: Partner external ID
+    description: Partner Golden ID
   name:
     type: string
     description: Room name
@@ -55,8 +55,8 @@ properties:
     description: Date of entity update in R2D2
     format: date-time
 required:
-  - smartbox_id
-  - partner_smartbox_id
+  - golden_id
+  - partner_golden_id
   - name
   - inventory
   - is_sellable

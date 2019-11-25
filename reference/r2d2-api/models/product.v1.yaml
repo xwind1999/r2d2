@@ -6,21 +6,21 @@ description: 'Products are generic entities with a lot of meaning in Smartbox, i
 x-examples:
   product-01:
     value:
-      smartbox_id: '123456789'
+      golden_id: '123456789'
       name: This is a product
       description: This is a product description
       universe: STAY
       is_sellable: true
       is_reservable: true
-      partner_smartbox_id: 123456789
+      partner_golden_id: 123456789
 properties:
   uuid:
     type: string
     description: Product UUID
     format: uuid
-  smartbox_id:
+  golden_id:
     type: string
-    description: Product external ID
+    description: Product Golden ID
   name:
     type: string
     description: Product name
@@ -36,9 +36,9 @@ properties:
   is_reservable:
     type: boolean
     description: Product is reservable (if a component is a room component)
-  partner_smartbox_id:
+  partner_golden_id:
     type: string
-    description: Partner external id
+    description: Partner Golden ID
   created_at:
     type: string
     description: Date of entity creation in R2D2
@@ -48,4 +48,4 @@ properties:
     description: Date of entity update in R2D2
     format: date-time
 required:
-  - smartbox_id
+  - golden_id

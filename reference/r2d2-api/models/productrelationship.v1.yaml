@@ -11,9 +11,9 @@ x-examples:
     value:
       uuid: dbdec460-d868-4cbd-9f25-da88946986fc
       parent_product:
-        smartbox_id: PRODUCT 01
+        golden_id: PRODUCT 01
       child_product:
-        smartbox_id: PRODUCT 02
+        golden_id: PRODUCT 02
       is_enabled: true
 properties:
   uuid:
