@@ -63,8 +63,9 @@ R2-D2 is part of the iResa deprecation plans. Follows bellow some external refer
 - [x] Receive initial feedback about the drafted data model and API design
 - [x] Draft the new flow documents for Booking, Room Prices and Room Availabilities
 - [x] Present the technical solution to the Architecture Board
+- [ ] Review data model and API design based on feedback provided by the Arch Bard.
 - [ ] Break down the implementation epics
-- [ ] Raise a delivery plan with Project Management taking into account the impacted systems and dependencies
+- [ ] Raise a delivery plan taking into account the impacted systems and dependencies
 - [ ] Bootstrap a team
 - [ ] ...
 
