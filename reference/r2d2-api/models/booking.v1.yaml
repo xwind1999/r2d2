@@ -78,6 +78,9 @@ properties:
   experience_golden_id:
     type: string
     description: Experience UUID
+  type:
+    type: string
+    description: Booking type
   voucher:
     type: string
     description: Voucher number
@@ -98,7 +101,10 @@ properties:
     description: Booking placement channel
   cancellation_channel:
     type: string
-    description: Booking cancellation channel  
+    description: Booking cancellation channel 
+  status:
+    type: string
+    description: Booking status  
   total_price:
     type: string
     description: Booking total price

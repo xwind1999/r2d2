@@ -1,6 +1,12 @@
 title: Partner
 type: object
 description: Partners are room owners
+x-examples:
+  partner-01:
+    value:
+      golden_id: '123456789'
+      status: partner
+      currency: EUR
 properties:
   uuid:
     type: string
@@ -20,9 +26,6 @@ properties:
       - ceased
   currency:
     type: string
-x-examples:
-  partner-01:
-    value:
-      golden_id: '123456789'
-      status: partner
-      currency: EUR
+  cease_date:
+    type: string
+    format: date
