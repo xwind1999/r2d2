@@ -64,6 +64,10 @@ R2-D2 is part of the iResa deprecation plans. Follows bellow some external refer
 - [x] Draft the new flow documents for Booking, Room Prices and Room Availabilities
 - [x] Present the technical solution to the Architecture Board
 - [ ] Review data model and API design based on feedback provided by the Arch Bard.
+  - [ ] Use golden_id rather than smartbox_id
+  - [ ] Add booking flow and cdm changes
+  - [ ] Expose rooms to CMHub
+  - [ ] Review impact in R2-D2 of room chaining being moved to PRM
 - [ ] Break down the implementation epics
 - [ ] Raise a delivery plan taking into account the impacted systems and dependencies
 - [ ] Bootstrap a team
