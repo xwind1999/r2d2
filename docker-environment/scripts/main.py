@@ -75,8 +75,8 @@ def install(args):
     print '==== INSTALLING ===='
     build(args)
     start(args)
-    run_php_command({'task': 'composer', 'command': ['install' ,'-n']})
-    run_php_command({'task': 'console', 'command': ['d:m:m', '-n']})
+    run_php_command({'debug': None, 'task': 'composer', 'command': ['install' ,'-n']})
+    run_php_command({'debug': None, 'task': 'console', 'command': ['d:m:m', '-n']})
     print '==== INSTALLED ===='
 
 switcher = {
