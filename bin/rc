@@ -1,0 +1,8 @@
+#!/bin/sh
+
+(
+cd $(pwd)/docker-environment;
+export USER="$(id -u):$(id -g)"
+/usr/bin/env python2.7 scripts/main.py $@
+
+)

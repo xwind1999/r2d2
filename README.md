@@ -1,3 +1,12 @@
+###### Develop branch Gitlab Status:
+![pipeline status](http://gitlab.production.smartbox.com/millenniumfalcon/r2-d2-api/badges/master/pipeline.svg)
+![coverage report](http://gitlab.production.smartbox.com/millenniumfalcon/r2-d2-api/badges/master/coverage.svg)
+
+
+###### Reports and generated documentation:
+* [Unit Tests Coverage Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/phpunit/)
+* [PHPMetrics Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/phpmetrics/)
+
 # R2D2 API
 
 > A resourceful astromech droid, R2-D2 served PadméAmidala, Anakin Skywalker and Luke Skywalker in turn, showing great bravery in rescuing his masters and their friends from many perils.
@@ -76,3 +85,40 @@ R2-D2 is part of the iResa deprecation plans. Follows bellow some external refer
 * [High level plan](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/docs/roadmap/high-level-plan.png)
 * [JIRA: R2-D2 - Roadmap WIP](https://smartbox.atlassian.net/secure/Roadmap.jspa?projectKey=R2D2&rapidView=482)
 * [JIRA: R2-D2 - Board](https://smartbox.atlassian.net/jira/software/projects/MFR2D2/boards/482)
+
+# SETTING UP
+
+## Requirements
+- docker
+- docker-compose
+- python 2.7
+
+## Instructions
+1. clone the repository
+2. execute ```bin/rc install```
+
+# Using the R2D2 CLI
+To make things easier in local environments, we have the r2d2 cli, that wraps up some commands we constantly need to run.
+
+## How to run it
+```bin/rc COMMAND EXTRA_PARAMETERS```
+
+## Available commands  
+- install
+    - Runs build, start, composer install and migrations
+- start
+    - starts the stack
+- stop
+    - stops the stack
+- composer
+    - route commands directly to the composer binary in the container
+- console
+    - route commands directly to the symfony binary in the container
+- build
+    - builds the images for using in local environment (currently only the php image)
+- phpunit
+    - runs phpunit against the codebase
+- phpstan
+    - runs phpstan with level 8
+- destroy
+    - removes all containers, networks and volumes
