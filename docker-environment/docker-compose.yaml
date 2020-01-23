@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  r2-d2-mysql:
+    container_name: 'r2-d2-mysql'
+    image: mysql:5.7
+    networks:
+      - r2-d2-network
+    ports:
+      - '3306:3306'
+    volumes:
+      - r2-d2-mysql-data:/var/lib/mysql/:cached
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: r2d2
+
+  r2-d2-nginx:
+    container_name: 'r2-d2-nginx'
+    image: nginx:1.15-alpine
+    networks:
+      - r2-d2-network
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx/app.conf:/etc/nginx/conf.d/default.conf:cached
+      - ../:/app:cached
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:cached
+
+  r2-d2-php:
+    container_name: 'r2-d2-php'
+    user: $USER
+    build:
+      context: php
+    networks:
+      - r2-d2-network
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./.composer:/composer:cached
+      - ../:/app:cached
+      - ./php/php-fpm.conf:/etc/php7/php-fpm.conf:cached
+      - ./php/www.conf:/etc/php7/php-fpm.d/www.conf:cached
+
+volumes:
+  r2-d2-mysql-data: {}
+
+networks:
+  r2-d2-network:
+    driver: bridge

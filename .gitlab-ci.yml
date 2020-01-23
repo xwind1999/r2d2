@@ -1,6 +1,126 @@
 stages:
+  - Build base image
+  - Build builder image
+  - Build
+  - Unit tests
+  - Test Coverage Analysis
+  - Static analysis
+  - Build Reports
   - API Spec Validation
-  - Publish API reference
+  - Publish Reports
+
+include:
+  - local: '/.ci/.gitlab-ci.yaml'
+
+variables:
+  GIT_DEPTH: 1
+
+composer:
+  stage: Build
+  image: ${BUILDER_FULL_IMAGE}
+  cache:
+    key:
+      files:
+        - composer.lock
+        - symfony.lock
+    paths:
+      - cache/composer
+  script:
+    - /load-key.sh "${SSH_KNOWN_HOSTS}" "${SSH_KEY}"
+    - composer config cache-dir cache/composer
+    - composer install -n --no-progress
+  artifacts:
+    expire_in: 1 days
+    paths:
+      - vendor/
+  tags:
+    - k8s
+
+phpunit:
+  stage: Unit tests
+  image: ${BUILDER_FULL_IMAGE}
+  needs:
+    - composer
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  script:
+    - phpdbg -qrr vendor/bin/phpunit --colors=never
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - report/
+  tags:
+    - k8s
+
+phpstan:
+  stage: Static analysis
+  image: ${BUILDER_FULL_IMAGE}
+  needs:
+    - composer
+  script:
+    - vendor/bin/phpstan analyse $(pwd)/src --level 8
+  tags:
+    - k8s
+
+phpmetrics:
+  stage: Build Reports
+  image: ${BUILDER_FULL_IMAGE}
+  needs:
+    - composer
+  script:
+    - vendor/bin/phpmetrics --report-html=report/html/phpmetrics src
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - report/
+  tags:
+    - k8s
+
+sonarqube-early-validation:
+  stage: Test Coverage Analysis
+  image: docker-registry.production.smartbox.com/web/sonarqube-booking:0.0.1
+  dependencies:
+    - phpunit
+  script:
+    - sonar-scanner -X -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
+  tags:
+    - k8s
+
+sonarqube-report:
+  stage: Build Reports
+  image: docker-registry.production.smartbox.com/web/sonarqube-booking:0.0.1
+  dependencies:
+    - phpunit
+  before_script:
+    - 'eval export SQ_BRANCH=$(if [ "$CI_COMMIT_TAG" != "" ]; then echo "releases"; elif [ $CI_COMMIT_REF_NAME == "master" ]; then echo "master"; else echo "branches"; fi);'
+    - 'eval export SQ_VERSION=$(if [ "$CI_COMMIT_TAG" != "" ]; then echo $CI_COMMIT_TAG; elif [ $CI_COMMIT_REF_NAME == "master" ]; then echo $CI_COMMIT_SHA; else echo $CI_COMMIT_REF_NAME; fi);'
+  script:
+    - sonar-scanner -D sonar.branch=$SQ_BRANCH -D sonar.projectVersion=$SQ_VERSION
+  tags:
+    - k8s
+
+psalm:
+  stage: Static analysis
+  image: ${BUILDER_FULL_IMAGE}
+  needs:
+    - composer
+  script:
+    - vendor/bin/psalm
+  tags:
+    - k8s
+
+infection:
+  stage: Test Coverage Analysis
+  image: ${BUILDER_FULL_IMAGE}
+  needs:
+    - phpunit
+  script:
+    - phpdbg -qrr vendor/bin/ --min-covered-msi=80 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - report/
+  tags:
+    - k8s
 
 validate-api-spec-schema:
   stage: API Spec Validation
@@ -12,10 +132,27 @@ validate-api-spec-schema:
   tags:
     - k8s
 
+#notify:
+#  stage: Publish API reference
+#  image: ${BUILDER_FULL_IMAGE}
+#  variables:
+#    BROADCAST_CHANNEL: r2-d2
+#    ENVIRONMENT_NAME: r2-d2
+#  script:
+#    - ${CI_PROJECT_DIR}/.ci/notify.sh
+#  tags:
+#    - k8s
+
 pages:
-  stage: Publish API reference
+  stage: Publish Reports
+  image: ${BUILDER_FULL_IMAGE}
+  dependencies:
+    - phpunit
+    - phpmetrics
+    - infection
   script:
     - rm -rf public/
+    - mv report/html/ public/
     - mkdir -p public/reference/
     - mkdir -p public/docs/
     - cp -R reference/* public/reference/
@@ -27,3 +164,5 @@ pages:
     expire_in: 7 days
   tags:
     - k8s
+  only:
+    - master
