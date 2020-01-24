@@ -1,6 +1,5 @@
 stages:
   - Build base image
-  - Build builder image
   - Build
   - Unit tests
   - Test Coverage Analysis
@@ -17,7 +16,7 @@ variables:
 
 composer:
   stage: Build
-  image: ${BUILDER_FULL_IMAGE}
+  image: ${BASE_FULL_IMAGE}
   cache:
     key:
       files:
@@ -38,7 +37,7 @@ composer:
 
 phpunit:
   stage: Unit tests
-  image: ${BUILDER_FULL_IMAGE}
+  image: ${BASE_FULL_IMAGE}
   needs:
     - composer
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
@@ -53,7 +52,7 @@ phpunit:
 
 phpstan:
   stage: Static analysis
-  image: ${BUILDER_FULL_IMAGE}
+  image: ${BASE_FULL_IMAGE}
   needs:
     - composer
   script:
@@ -63,7 +62,7 @@ phpstan:
 
 php-cs-fixer:
   stage: Static analysis
-  image: ${BUILDER_FULL_IMAGE}
+  image: ${BASE_FULL_IMAGE}
   needs:
     - composer
   script:
@@ -73,7 +72,7 @@ php-cs-fixer:
 
 phpmetrics:
   stage: Static analysis
-  image: ${BUILDER_FULL_IMAGE}
+  image: ${BASE_FULL_IMAGE}
   needs:
     - composer
   script:
@@ -111,7 +110,7 @@ sonarqube-report:
 
 psalm:
   stage: Static analysis
-  image: ${BUILDER_FULL_IMAGE}
+  image: ${BASE_FULL_IMAGE}
   needs:
     - composer
   script:
@@ -121,11 +120,12 @@ psalm:
 
 infection:
   stage: Test Coverage Analysis
-  image: ${BUILDER_FULL_IMAGE}
-  needs:
+  image: ${BASE_FULL_IMAGE}
+  dependencies:
     - phpunit
+    - composer
   script:
-    - phpdbg -qrr vendor/bin/ --min-covered-msi=80 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage
+    - phpdbg -qrr vendor/bin/infection --min-covered-msi=80 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage
   artifacts:
     expire_in: 3 days
     paths:
@@ -145,7 +145,7 @@ validate-api-spec-schema:
 
 #notify:
 #  stage: Publish API reference
-#  image: ${BUILDER_FULL_IMAGE}
+#  image: ${BASE_FULL_IMAGE}
 #  variables:
 #    BROADCAST_CHANNEL: r2-d2
 #    ENVIRONMENT_NAME: r2-d2
@@ -178,7 +178,7 @@ mermaid-generate-images:
 
 pages:
   stage: Publish Reports
-  image: ${BUILDER_FULL_IMAGE}
+  image: ${BASE_FULL_IMAGE}
   needs:
     - phpunit
     - phpmetrics
