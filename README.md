@@ -122,3 +122,8 @@ To make things easier in local environments, we have the r2d2 cli, that wraps up
     - runs phpstan with level 8
 - destroy
     - removes all containers, networks and volumes
+
+## How to run R2D2 stub service
+   - Navidate to R2-D2-API/stub
+   - run docker-compose up
+   - Hit http://localhost:8086/api/room_availabilities?roomId=11&startDate=2020-01-22&endDate=2020-02-09 in browser to test

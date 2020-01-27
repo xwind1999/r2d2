@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  r2d2-api-stub:
+    image: deardooley/getsandbox
+    container_name: r2d2-api-stub
+    ports:
+      - '8086:8080'
+    volumes:
+      - ./sandbox:/sandbox:cached
