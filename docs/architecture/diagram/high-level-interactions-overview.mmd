@@ -21,12 +21,11 @@ end
 subgraph "Data Owners"
 PRM -->|Partners| EAI
 PIM -->|Products| EAI
-R2D2 -->|Bookings| EAI
+R2D2 -->|Bookings| CMHub
 EAI -->|A&P| R2D2
 EAI -->|Products| R2D2
 EAI -->|Partners| R2D2
 EAI -->|Partners| CMHub
-EAI --> |Bookings| CMHub
 CMHub -->|A&P| EAI
 end
 
@@ -55,5 +54,4 @@ linkStyle 11 stroke:red,stroke-width:2px;
 linkStyle 12 stroke:purple,stroke-width:2px;
 linkStyle 13 stroke:green,stroke-width:2px;
 linkStyle 14 stroke:green,stroke-width:2px;
-linkStyle 15 stroke:blue,stroke-width:2px;
-linkStyle 16 stroke:red,stroke-width:2px;
+linkStyle 15 stroke:red,stroke-width:2px;
