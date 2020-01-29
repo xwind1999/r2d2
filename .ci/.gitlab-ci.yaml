@@ -1,17 +1,13 @@
 variables:
   BASE_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base
-  BASE_IMAGE_VERSION: 0.0.4
-  BUILDER_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-builder
-  BUILDER_IMAGE_VERSION: 0.0.5
+  BASE_IMAGE_VERSION: 0.0.11
   BASE_FULL_IMAGE: ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
-  BUILDER_FULL_IMAGE: ${BUILDER_IMAGE}:${BUILDER_IMAGE_VERSION}
 
 build-base-image:
   stage: Build base image
   image: docker:dind
   only:
     - CI-master
-    - bootstrap
   tags:
     - k8s
   script:
@@ -21,19 +17,3 @@ build-base-image:
       --tag ${BASE_IMAGE}:latest .ci/docker/base
     - docker push ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
     - docker push ${BASE_IMAGE}:latest
-
-build-builder-image:
-  stage: Build builder image
-  image: docker:dind
-  only:
-    - CI-master
-    - bootstrap
-  tags:
-    - k8s
-  script:
-    - >
-      docker build --pull
-      --tag ${BUILDER_IMAGE}:${BUILDER_IMAGE_VERSION}
-      --tag ${BUILDER_IMAGE}:latest .ci/docker/builder
-    - docker push ${BUILDER_IMAGE}:${BUILDER_IMAGE_VERSION}
-    - docker push ${BUILDER_IMAGE}:latest

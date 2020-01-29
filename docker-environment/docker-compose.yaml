@@ -22,7 +22,7 @@ services:
     ports:
       - '80:80'
     volumes:
-      - ./nginx/app.conf:/etc/nginx/conf.d/default.conf:cached
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:cached
       - ../:/app:cached
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:cached
 
@@ -33,13 +33,12 @@ services:
       context: php
     networks:
       - r2-d2-network
-    ports:
-      - '9000:9000'
     volumes:
       - ./.composer:/composer:cached
       - ../:/app:cached
       - ./php/php-fpm.conf:/etc/php7/php-fpm.conf:cached
       - ./php/www.conf:/etc/php7/php-fpm.d/www.conf:cached
+      - ./php/xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
 
 volumes:
   r2-d2-mysql-data: {}

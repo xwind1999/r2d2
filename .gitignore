@@ -3,6 +3,7 @@
 /docker-environment/.composer/*
 !/docker-environment/.composer/.gitkeep
 /report
+*.pyc
 
 
 ###> symfony/framework-bundle ###

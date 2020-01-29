@@ -18,7 +18,7 @@ RUN sed -i '/xfs/ s/33/82/g' /etc/passwd;\
     chown 33.33 /app -R;\
     chown 33.33 /home/www-data -R;
 
-RUN apk add sudo libxml2-dev icu-dev runit $PHPIZE_DEPS
+RUN apk add sudo libxml2-dev icu-dev runit $PHPIZE_DEPS openssh-client curl git bash
 
 RUN docker-php-ext-install pcntl soap pdo_mysql sockets intl
 
@@ -45,4 +45,17 @@ RUN mkdir -p /etc/php7; \
 
 COPY ./start.sh ./start_crond.sh /
 
+COPY ./nginx/default.conf /etc/nginx/conf.d
+COPY ./nginx/nginx.conf /etc/nginx
+COPY ./php/php-fpm.conf /etc/php7
+COPY ./php/www.conf /etc/php7/php-fpm.d
+COPY phpdbg-wrapper /usr/local/bin
+COPY load-key.sh /
+RUN ln -s /tmp/.ssh /root/.ssh
+
 WORKDIR /app
+
+ENV HOME="/tmp"
+
+EXPOSE 80
+

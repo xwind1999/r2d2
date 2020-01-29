@@ -2,10 +2,12 @@ import sys
 import argparse
 from distutils import spawn
 from command import Command
+from os.path import expanduser
+home = expanduser('~')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', action="store_true", help='enable debug (required for coverage test/infection)')
-parser.add_argument('task', choices=['start','stop','composer', 'console', 'build', 'phpunit', 'phpstan', 'destroy', 'install', 'psalm', 'infection'], help='tasks')
+parser.add_argument('task', choices=['start','stop','composer', 'console', 'build', 'phpunit', 'phpstan', 'destroy', 'install', 'psalm', 'infection', 'xdebug', 'phpcs'], help='tasks')
 parser.add_argument('command', nargs=argparse.REMAINDER, help='commands to run')
 args = parser.parse_args()
 
@@ -22,6 +24,15 @@ def is_running(service):
 
 def start(args):
     output = docker_compose.run(['up','-d'])
+
+    # lets set the ssh keys so composer runs without issues
+    try:
+        known_hosts=open(home + '/.ssh/known_hosts', 'r')
+        id_rsa=open(home + '/.ssh/id_rsa', 'r')
+        docker.run(['exec', '-it', php_container, '/load-key.sh', known_hosts.read(), id_rsa.read()])
+    except:
+        print 'Could not load ssh keys into the php container'
+
     return output
 
 def destroy(args):
@@ -43,8 +54,13 @@ def run_php_command(args):
     elif args['task'] == 'composer':
         php_bin = []
         command = 'composer'
+    elif args['task'] == 'xdebug':
+        php_bin = []
+        command = '/toggle-xdebug.sh'
     elif args['task'] == 'phpunit':
         command = 'vendor/bin/phpunit'
+    elif args['task'] == 'phpcs':
+        command = 'vendor/bin/php-cs-fixer'
     elif args['task'] == 'infection':
         command = 'vendor/bin/infection'
     elif args['task'] == 'psalm':
@@ -90,6 +106,8 @@ switcher = {
     'install': install,
     'psalm': run_php_command,
     'infection': run_php_command,
+    'xdebug': run_php_command,
+    'phpcs': run_php_command,
     'stop': stop,
 }
 

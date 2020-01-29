@@ -9,10 +9,12 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
+        <ini name="memory_limit" value="-1" />
         <server name="APP_ENV" value="test" force="true" />
-        <server name="SHELL_VERBOSITY" value="-1" />
+        <server name="SHELL_VERBOSITY" value="-2" />
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
         <server name="SYMFONY_PHPUNIT_VERSION" value="8.5" />
+        <server name="KERNEL_CLASS" value="App\Kernel" />
     </php>
 
     <testsuites>
@@ -24,6 +26,10 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">src</directory>
+            <exclude>
+                <directory>src/Exception</directory>
+                <file>src/Kernel.php</file>
+            </exclude>
         </whitelist>
     </filter>
 
@@ -32,7 +38,7 @@
         <log type="coverage-clover" target="report/raw/phpunit/clover/coverage-clover.xml"/>
         <log type="coverage-xml" target="report/raw/phpunit/coverage/coverage-xml/"/>
         <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>
-        <log type="junit" target="report/raw/phpunit/coverage/phpunit.junit.xml"/>
+        <log type="junit" target="report/raw/phpunit/coverage/junit.xml"/>
         <log type="testdox-html" target="report/raw/testdox.html"/>
         <log type="testdox-text" target="report/raw/testdox.txt"/>
     </logging>
