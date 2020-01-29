@@ -164,9 +164,9 @@ mermaid-generate-images:
     paths:
       - report/
   script:
-    - mkdir -p report/html/docs/imgs/
-    - cp -R docs/ report/html/docs/
-    - 'cd docs; for flow in architecture/diagram/*.mmd; do node /data/index.bundle.js -i ${flow%%.*}.mmd -o ${flow%%.*}.png; done; cd ..; mv docs/architecture/diagram/*.png report/html/docs/imgs/;'
+    - mkdir -p report/html/imgs/
+    - 'cd docs; for flow in architecture/diagram/*.mmd; do node /data/index.bundle.js -i ${flow%%.*}.mmd -o ${flow%%.*}.png; done; cd ..; mv docs/architecture/diagram/*.png report/html/imgs/;'
+    - ls -lah report/html/imgs/
   only:
     refs:
       - master
