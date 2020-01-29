@@ -50,6 +50,27 @@ phpunit:
   tags:
     - k8s
 
+Api-Tests:
+  stage: Unit tests
+  image: docker-registry.production.smartbox.com/millenniumfalcon/darth-vader-newman
+  services:
+    - name: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.11
+      alias: r2-d2-api
+      command: ["bash", "-c", 'rm -rf /app; ln -s /builds/millenniumfalcon/r2-d2-api /app; /start.sh']
+    - name: mysql:5.7
+      alias: r2-d2-mysql
+  variables:
+    MYSQL_DATABASE: r2d2
+    MYSQL_ROOT_PASSWORD: admin123
+  tags:
+    - docker
+  script:
+    - newman run tests/ApiTests/R2D2-API.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/newman-report.html
+  artifacts:
+    when: always
+    paths:
+      - report/
+
 phpstan:
   stage: Static analysis
   image: ${BASE_FULL_IMAGE}
@@ -184,6 +205,7 @@ pages:
     - phpmetrics
     - infection
     - mermaid-generate-images
+    - Api-Tests
   script:
     - rm -rf public/
     - mv report/html/ public/
