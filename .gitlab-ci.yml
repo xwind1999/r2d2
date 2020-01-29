@@ -167,10 +167,11 @@ mermaid-generate-images:
     - mkdir -p report/html/docs/imgs/
     - cp -R docs/ report/html/docs/
     - 'cd docs; for flow in architecture/diagram/*.mmd; do node /data/index.bundle.js -i ${flow%%.*}.mmd -o ${flow%%.*}.png; done; cd ..; mv docs/architecture/diagram/*.png report/html/docs/imgs/;'
-  only:
-    refs:
-      - master
-      - tags
+    - ls -lah report/html/docs/imgs/
+#  only:
+#    refs:
+#      - master
+#      - tags
   tags:
     - k8s
   except:
