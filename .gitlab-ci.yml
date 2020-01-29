@@ -183,6 +183,7 @@ pages:
     - phpunit
     - phpmetrics
     - infection
+    - mermaid-generate-images
   script:
     - rm -rf public/
     - mv report/html/ public/
