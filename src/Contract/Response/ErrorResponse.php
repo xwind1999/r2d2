@@ -6,9 +6,13 @@ namespace App\Contract\Response;
 
 class ErrorResponse
 {
-    protected string $message = 'General error';
+    public const DEFAULT_MESSAGE = 'General error';
 
-    protected int $code = 1000000;
+    public const DEFAULT_CODE = 1000000;
+
+    protected string $message = self::DEFAULT_MESSAGE;
+
+    protected int $code = self::DEFAULT_CODE;
 
     public function getMessage(): string
     {
@@ -20,9 +24,11 @@ class ErrorResponse
         return $this->code;
     }
 
-    public function setMessage(string $message): self
+    public function setMessage(?string $message): self
     {
-        $this->message = $message;
+        if (null !== $message) {
+            $this->message = $message;
+        }
 
         return $this;
     }

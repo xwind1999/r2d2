@@ -173,6 +173,9 @@
             "config/packages/prod/jms_serializer.yaml"
         ]
     },
+    "joaojacome/clogger-php": {
+        "version": "dev-master"
+    },
     "justinrainbow/json-schema": {
         "version": "5.2.9"
     },
@@ -184,6 +187,9 @@
     },
     "laminas/laminas-zendframework-bridge": {
         "version": "1.0.1"
+    },
+    "monolog/monolog": {
+        "version": "2.0.2"
     },
     "myclabs/deep-copy": {
         "version": "1.9.5"
@@ -431,6 +437,23 @@
     },
     "symfony/mime": {
         "version": "v5.0.2"
+    },
+    "symfony/monolog-bridge": {
+        "version": "v5.0.3"
+    },
+    "symfony/monolog-bundle": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "222b46a1bb02cd04bbc59700adec2f44f1a644b7"
+        },
+        "files": [
+            "config/packages/dev/monolog.yaml",
+            "config/packages/prod/monolog.yaml",
+            "config/packages/test/monolog.yaml"
+        ]
     },
     "symfony/options-resolver": {
         "version": "v5.0.3"

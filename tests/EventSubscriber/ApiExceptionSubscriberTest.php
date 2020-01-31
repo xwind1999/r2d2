@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\EventSubscriber;
 
 use App\EventSubscriber\ApiExceptionSubscriber;
-use App\Exception\Http\HttpException;
+use App\Exception\Http\ApiException;
 use App\Kernel;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class ApiExceptionSubscriberTest extends TestCase
@@ -60,6 +61,10 @@ class ApiExceptionSubscriberTest extends TestCase
     {
         yield 'random exception' => [new \Exception(), 'General error', 1000000, Response::HTTP_INTERNAL_SERVER_ERROR];
 
-        yield 'http exception' => [new HttpException(), 'Internal server error', 1000001, Response::HTTP_INTERNAL_SERVER_ERROR];
+        yield 'random exception but with string code' => [new \Exception('aaa', 1000000), 'General error', 1000000, Response::HTTP_INTERNAL_SERVER_ERROR];
+
+        yield 'http exception' => [new ApiException(), 'Internal server error', 1000001, Response::HTTP_INTERNAL_SERVER_ERROR];
+
+        yield 'symfony http exception' => [new MethodNotAllowedHttpException(['POST']), 'Method Not Allowed', Response::HTTP_METHOD_NOT_ALLOWED, Response::HTTP_METHOD_NOT_ALLOWED];
     }
 }

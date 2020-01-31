@@ -9,12 +9,21 @@ use PHPUnit\Framework\TestCase;
 
 class HelloWorldManagerTest extends TestCase
 {
-    public function testHelloWorld()
+    public function testHelloWorld(): void
     {
         $helloWorldManager = new HelloWorldManager();
         $hello = 'Hello';
         $space = ' ';
         $world = 'World';
         $this->assertEquals($hello.$space.$world, $helloWorldManager->create());
+    }
+
+    public function testConcatenate(): void
+    {
+        $helloWorldManager = new HelloWorldManager();
+        $hello = 'Hello';
+        $space = ' ';
+        $world = 'World';
+        $this->assertEquals($hello.$space.$world, $helloWorldManager->concatenate($hello, $space, $world));
     }
 }
