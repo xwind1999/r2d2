@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception\Http;
 
-class BadRequestException extends HttpException
+class BadRequestException extends ApiException
 {
     protected const MESSAGE = 'Bad request';
     protected const CODE = 1000001;

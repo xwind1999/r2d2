@@ -6,13 +6,13 @@ namespace App\Exception\Http;
 
 use App\Exception\ContextualException;
 
-class HttpException extends ContextualException
+class ApiException extends ContextualException
 {
     protected const MESSAGE = 'Internal server error';
     protected const CODE = 1000001;
     protected const HTTP_CODE = 500;
 
-    public function getHttpCode(): int
+    public function getStatusCode(): int
     {
         return static::HTTP_CODE;
     }

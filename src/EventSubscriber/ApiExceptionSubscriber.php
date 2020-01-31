@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Contract\Response\ErrorResponse;
-use App\Exception\Http\HttpException;
+use App\Exception\Http\ApiException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class ApiExceptionSubscriber implements EventSubscriberInterface
@@ -29,12 +30,20 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
 
         $errorResponse = new ErrorResponse();
         $httpCode = Response::HTTP_INTERNAL_SERVER_ERROR;
-        if ($exception instanceof HttpException) {
+
+        if ($exception instanceof ApiException || $exception instanceof HttpExceptionInterface) {
+            $httpCode = $exception->getStatusCode();
+            $code = 0 === $exception->getCode() ? $httpCode : (int) $exception->getCode();
+
+            $message = $exception->getMessage();
+            if ($exception instanceof HttpExceptionInterface) {
+                $message = Response::$statusTexts[$httpCode] ?? null;
+            }
+
             $errorResponse
-                ->setCode((int) $exception->getCode())
-                ->setMessage($exception->getMessage())
-                ;
-            $httpCode = $exception->getHttpCode();
+                ->setMessage($message)
+                ->setCode($code)
+            ;
         }
 
         $response = new JsonResponse($errorResponse->toArray(), $httpCode);

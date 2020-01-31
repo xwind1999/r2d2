@@ -10,6 +10,8 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            Psr\Log\LoggerInterface: '@Clogger\Clogger'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -33,3 +35,25 @@ services:
     App\EventSubscriber\:
         resource: '../src/EventSubscriber'
         tags: ['kernel.event_subscriber']
+
+    Clogger\Middleware\Context\ContextMiddleware:
+        class: Clogger\Middleware\Context\ContextMiddleware
+
+    Clogger\Middleware\Exception\ExceptionCodeMiddleware:
+        class: Clogger\Middleware\Exception\ExceptionCodeMiddleware
+
+    Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware:
+        class: Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware
+
+    Clogger\Middleware\Exception\StackTraceMiddleware:
+        class: Clogger\Middleware\Exception\StackTraceMiddleware
+
+    Clogger\Clogger:
+        class: Clogger\Clogger
+        arguments:
+            - '@logger'
+            - '@Clogger\Middleware\Context\ContextMiddleware'
+            - '@Clogger\Middleware\Exception\StackTraceMiddleware'
+            - '@Clogger\Middleware\Exception\ExceptionCodeMiddleware'
+            - '@Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware'
+
