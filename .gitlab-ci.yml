@@ -117,11 +117,18 @@ Api-Tests:
   tags:
     - docker
   script:
-    - newman run tests/ApiTests/R2D2-API.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/newman-report.html
+    - newman run tests/ApiTests/R2D2-API.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
   artifacts:
     when: always
     paths:
       - report/
+
+.load-Tests:
+  image: grubykarol/locust
+  script:
+    - locust -f tests/LoadTests/R2D2Locust.py  --host=http://r2-d2-api/ --no-web -c 1 -r 1 --only-summary --run-time 1m
+  tags:
+    - k8s
 
 phpstan:
   stage: Static analysis
