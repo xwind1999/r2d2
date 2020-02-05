@@ -33,6 +33,7 @@ contractTests-against-Stub:
 contractTests-against-Api:
   stage: Contract tests
   extends: .running-r2d2
+  image: docker-registry.production.smartbox.com/pact-verifier-curl:latest
   script:
     - cd /app
     - if [ -z $CI_COMMIT_TAG ] ; then PUBLISH='' ; else PUBLISH="-r --provider-app-version=${CI_COMMIT_TAG%RC*}" ; echo 'Verification is going to be published to Pact Broker' ; fi
