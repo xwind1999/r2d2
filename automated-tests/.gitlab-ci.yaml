@@ -16,8 +16,8 @@ variables:
   before_script:
     - sleep 5
     - curl -s http://r2-d2-api
-   tags:
-     - docker
+  tags:
+    - docker
 
 contractTests-against-Stub:
   stage: Contract tests
