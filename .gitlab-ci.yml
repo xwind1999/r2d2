@@ -11,10 +11,10 @@ stages:
 
 include:
   - local: '/.ci/.gitlab-ci.yaml'
+  - local: '/automated-tests/.gitlab-ci.yaml'
 
 variables:
   GIT_DEPTH: 1
-  PACT_BROKER: http://10.10.0.234:32584/
 
 composer:
   stage: Build
@@ -49,84 +49,6 @@ phpunit:
     expire_in: 3 days
     paths:
       - report/
-  tags:
-    - k8s
-
-.running-r2d2:
-  variables:
-    MYSQL_DATABASE: r2d2
-    MYSQL_ROOT_PASSWORD: admin123
-  dependencies:
-    - composer
-  services:
-    - name: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.11
-      alias: r2-d2-api
-      command: ["bash", "-c", 'rm -rf /app; ln -s /builds/millenniumfalcon/r2-d2-api /app; /start.sh']
-    - name: mysql:5.7
-      alias: r2-d2-mysql
-  before_script:
-    - sleep 5
-    - curl -s http://r2-d2-api
-
-contractTests-against-Stub:
-  stage: Contract tests
-  image: docker-registry.production.smartbox.com/pact-verifier-curl:latest
-  services:
-    - name: docker-registry.production.smartbox.com/millenniumfalcon/r2d2-stub
-      alias: r2d2-api-stub
-  script:
-    - cd /app
-    - pact-provider-verifier --provider-base-url=http://r2d2-api-stub:8080 --pact-broker-base-url=$PACT_BROKER --provider=R2D2
-  tags:
-    - docker
-
-contractTests-against-Api:
-  stage: Contract tests
-  dependencies:
-     - composer
-  image: docker-registry.production.smartbox.com/pact-verifier-curl:latest
-  services:
-    - name: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.11
-      alias: r2-d2-api
-      command: ["bash", "-c", 'rm -rf /app; ln -s /builds/millenniumfalcon/r2-d2-api /app; /start.sh']
-    - name: mysql:5.7
-      alias: r2-d2-mysql
-  variables:
-    MYSQL_DATABASE: r2d2
-    MYSQL_ROOT_PASSWORD: admin123
-  script:
-    - cd /app
-    - if [ -z $CI_COMMIT_TAG ] ; then PUBLISH='' ; else PUBLISH="-r --provider-app-version=${CI_COMMIT_TAG%RC*}" ; echo 'Verification is going to be published to Pact Broker' ; fi
-    - pact-provider-verifier --provider-base-url=http://r2-d2-api --pact-broker-base-url=$PACT_BROKER --provider=R2D2 $PUBLISH
-  tags:
-    - docker
-  allow_failure: true
-
-Api-Tests:
-  stage: Unit tests
-  image: docker-registry.production.smartbox.com/millenniumfalcon/darth-vader-newman
-  services:
-    - name: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.11
-      alias: r2-d2-api
-      command: ["bash", "-c", 'rm -rf /app; ln -s /builds/millenniumfalcon/r2-d2-api /app; /start.sh']
-    - name: mysql:5.7
-      alias: r2-d2-mysql
-  variables:
-    MYSQL_DATABASE: r2d2
-    MYSQL_ROOT_PASSWORD: admin123
-  tags:
-    - docker
-  script:
-    - newman run tests/ApiTests/R2D2-API.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
-  artifacts:
-    when: always
-    paths:
-      - report/
-
-.load-Tests:
-  image: grubykarol/locust
-  script:
-    - locust -f tests/LoadTests/R2D2Locust.py  --host=http://r2-d2-api/ --no-web -c 1 -r 1 --only-summary --run-time 1m
   tags:
     - k8s
 
