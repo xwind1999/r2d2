@@ -1,6 +1,21 @@
 variables:
   PACT_BROKER: http://10.10.0.234:32584/
 
+phpunit:
+  stage: Unit tests
+  image: ${BASE_FULL_IMAGE}
+  needs:
+    - composer
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  script:
+    - phpdbg -qrr vendor/bin/phpunit --colors=never
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - report/
+  tags:
+    - k8s
+
 .running-r2d2:
   variables:
     MYSQL_DATABASE: r2d2

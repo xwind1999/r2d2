@@ -1,0 +1,35 @@
+sonarqube-report:
+  stage: Build Reports
+  image: docker-registry.production.smartbox.com/web/sonarqube-booking:0.0.1
+  needs:
+    - phpunit
+    - sonarqube-early-validation
+  before_script:
+    - 'eval export SQ_BRANCH=$(if [ "$CI_COMMIT_TAG" != "" ]; then echo "releases"; elif [ $CI_COMMIT_REF_NAME == "master" ]; then echo "master"; else echo "branches"; fi);'
+    - 'eval export SQ_VERSION=$(if [ "$CI_COMMIT_TAG" != "" ]; then echo $CI_COMMIT_TAG; elif [ $CI_COMMIT_REF_NAME == "master" ]; then echo $CI_COMMIT_SHA; else echo $CI_COMMIT_REF_NAME; fi);'
+  script:
+    - sonar-scanner -D sonar.branch=$SQ_BRANCH -D sonar.projectVersion=$SQ_VERSION
+  tags:
+    - k8s
+
+mermaid-generate-images:
+  stage: Build Reports
+  image:
+    name: jnewland/mermaid.cli
+    entrypoint: [""]
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - report/
+  script:
+    - mkdir -p report/html/docs/architecture/diagram/
+    - 'cd docs; for flow in architecture/diagram/*.mmd; do node /data/index.bundle.js -i ${flow%%.*}.mmd -o ${flow%%.*}.png; done; cd ..; mv docs/architecture/diagram/*.png report/html/docs/architecture/diagram/;'
+    - ls -lah report/html/docs/architecture/diagram/
+  only:
+    refs:
+      - master
+      - tags
+  tags:
+    - k8s
+  except:
+    - schedules
