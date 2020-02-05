@@ -15,7 +15,6 @@ variables:
       alias: r2-d2-mysql
   before_script:
     - sleep 5
-    - curl -s http://r2-d2-api
   tags:
     - docker
 
