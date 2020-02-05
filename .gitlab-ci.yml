@@ -11,7 +11,7 @@ stages:
 
 include:
   - local: '/.ci/.gitlab-ci.yaml'
-  - local: '/automated-tests/.gitlab-ci.yaml'
+  - local: automated-tests/.gitlab-ci.yaml
 
 variables:
   GIT_DEPTH: 1
