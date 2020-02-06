@@ -2,7 +2,7 @@ variables:
   PACT_BROKER: http://10.10.0.234:32584/
 
 unitTests:
-  stage: Quality checks
+  stage: Test
   image: ${BASE_FULL_IMAGE}
   needs:
     - composer
@@ -34,7 +34,7 @@ unitTests:
     - docker
 
 contractTests-against-Stub:
-  stage: Quality checks
+  stage: Test
   image: docker-registry.production.smartbox.com/pact-verifier-curl:latest
   services:
     - name: docker-registry.production.smartbox.com/millenniumfalcon/r2d2-stub
@@ -46,7 +46,7 @@ contractTests-against-Stub:
     - docker
 
 contractTests-against-Api:
-  stage: Quality checks
+  stage: Test
   extends: .running-r2d2
   image: docker-registry.production.smartbox.com/pact-verifier-curl:latest
   script:
@@ -56,7 +56,7 @@ contractTests-against-Api:
   allow_failure: true
 
 Api-Tests:
-  stage: Quality checks
+  stage: Test
   extends: .running-r2d2
   image: docker-registry.production.smartbox.com/millenniumfalcon/darth-vader-newman
   script:
@@ -70,5 +70,15 @@ Api-Tests:
   image: grubykarol/locust
   script:
     - locust -f tests/LoadTests/R2D2Locust.py  --host=http://r2-d2-api/ --no-web -c 1 -r 1 --only-summary --run-time 1m
+  tags:
+    - k8s
+
+validate-api-spec-schema:
+  stage: Test
+  image:
+    name: docker-registry.production.smartbox.com/millenniumfalcon/bb-8-api-swagger-cli
+    entrypoint: [""]
+  script:
+    - swagger-cli validate reference/r2d2-api/openapi.yaml
   tags:
     - k8s

@@ -1,11 +1,10 @@
 stages:
   - Build base image
   - Build
-  - Quality checks
+  - Test
   - Test Coverage Analysis
   - Static analysis
   - Build Reports
-  - API Spec Validation
   - Publish Reports
 
 include:
@@ -36,16 +35,6 @@ composer:
     expire_in: 1 days
     paths:
       - vendor/
-  tags:
-    - k8s
-
-validate-api-spec-schema:
-  stage: API Spec Validation
-  image:
-    name: docker-registry.production.smartbox.com/millenniumfalcon/bb-8-api-swagger-cli
-    entrypoint: [""]
-  script:
-    - swagger-cli validate reference/r2d2-api/openapi.yaml
   tags:
     - k8s
 
