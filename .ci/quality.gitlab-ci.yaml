@@ -1,8 +1,8 @@
 variables:
   PACT_BROKER: http://10.10.0.234:32584/
 
-phpunit:
-  stage: Unit tests
+unitTests:
+  stage: Quality checks
   image: ${BASE_FULL_IMAGE}
   needs:
     - composer
@@ -34,7 +34,7 @@ phpunit:
     - docker
 
 contractTests-against-Stub:
-  stage: Contract tests
+  stage: Quality checks
   image: docker-registry.production.smartbox.com/pact-verifier-curl:latest
   services:
     - name: docker-registry.production.smartbox.com/millenniumfalcon/r2d2-stub
@@ -46,7 +46,7 @@ contractTests-against-Stub:
     - docker
 
 contractTests-against-Api:
-  stage: Contract tests
+  stage: Quality checks
   extends: .running-r2d2
   image: docker-registry.production.smartbox.com/pact-verifier-curl:latest
   script:
@@ -56,7 +56,7 @@ contractTests-against-Api:
   allow_failure: true
 
 Api-Tests:
-  stage: Unit tests
+  stage: Quality checks
   extends: .running-r2d2
   image: docker-registry.production.smartbox.com/millenniumfalcon/darth-vader-newman
   script:

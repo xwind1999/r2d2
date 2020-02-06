@@ -1,8 +1,7 @@
 stages:
   - Build base image
   - Build
-  - Unit tests
-  - Contract tests
+  - Quality checks
   - Test Coverage Analysis
   - Static analysis
   - Build Reports
