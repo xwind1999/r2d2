@@ -64,7 +64,7 @@ pages:
   stage: Publish Reports
   image: ${BASE_FULL_IMAGE}
   needs:
-    - phpunit
+    - unitTests
     - phpmetrics
     - infection
     - mermaid-generate-images

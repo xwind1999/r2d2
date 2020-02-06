@@ -2,7 +2,7 @@ sonarqube-report:
   stage: Build Reports
   image: docker-registry.production.smartbox.com/web/sonarqube-booking:0.0.1
   needs:
-    - phpunit
+    - unitTests
     - sonarqube-early-validation
   before_script:
     - 'eval export SQ_BRANCH=$(if [ "$CI_COMMIT_TAG" != "" ]; then echo "releases"; elif [ $CI_COMMIT_REF_NAME == "master" ]; then echo "master"; else echo "branches"; fi);'

@@ -2,7 +2,7 @@ sonarqube-early-validation:
   stage: Test Coverage Analysis
   image: docker-registry.production.smartbox.com/web/sonarqube-booking:0.0.1
   needs:
-    - phpunit
+    - unitTests
   script:
     - sonar-scanner -X -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
   tags:
@@ -12,7 +12,7 @@ infection:
   stage: Test Coverage Analysis
   image: ${BASE_FULL_IMAGE}
   dependencies:
-    - phpunit
+    - unitTests
     - composer
   script:
     - phpdbg -qrr vendor/bin/infection --min-covered-msi=80 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage
