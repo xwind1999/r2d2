@@ -89,7 +89,7 @@ build-R2D2-stub-image:
   image: docker:dind
   only:
      changes:
-       - stub
+       - stub/sandbox/main.js
   tags:
     - k8s
   script:
