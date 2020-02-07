@@ -1,6 +1,6 @@
 variables:
   PACT_BROKER: http://10.10.0.234:32584/
-  BASE_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-stub
+  BASE_IMAGE_Stub: docker-registry.production.smartbox.com/millenium-falcon/r2d2-stub
 
 unitTests:
   stage: Test
@@ -94,5 +94,5 @@ build-R2D2-stub-image:
     - k8s
   script:
     - >
-      --tag ${BASE_IMAGE}:latest stub/
-    - docker push ${BASE_IMAGE}:latest
+      --tag ${BASE_IMAGE_Stub}:latest stub/
+    - docker push ${BASE_IMAGE_Stub}:latest
