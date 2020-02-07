@@ -85,7 +85,7 @@ validate-api-spec-schema:
     - k8s
 
 build-R2D2-stub-image:
-  stage: Build base image
+  stage: Build
   image: docker:dind
   only:
      changes:
