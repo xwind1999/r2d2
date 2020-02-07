@@ -1,5 +1,6 @@
 variables:
   PACT_BROKER: http://10.10.0.234:32584/
+  BASE_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-stub
 
 unitTests:
   stage: Test
@@ -82,3 +83,16 @@ validate-api-spec-schema:
     - swagger-cli validate reference/r2d2-api/openapi.yaml
   tags:
     - k8s
+
+build-R2D2-stub-image:
+  stage: Test
+  image: docker:dind
+  only:
+     changes:
+       - stub
+  tags:
+    - k8s
+  script:
+    - >
+      --tag ${BASE_IMAGE}:latest stub/
+    - docker push ${BASE_IMAGE}:latest

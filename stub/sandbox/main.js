@@ -41,6 +41,93 @@ Sandbox.define('/api/room_availabilities', 'GET', function (req, res) {
     }
 });
 
+Sandbox.define('/api/broadcast_listeners/partners', 'POST', function(req, res){
+
+    // validate username is present
+    if (req.body.golden_id === undefined) {
+        return res.json(400, {
+            status: "error",
+            details: "Missing golden_id"
+        })
+    }
+
+    if (req.body.currency === undefined) {
+        return res.json(400, {
+            status: "error",
+            details: "Missing currency"
+        })
+    }
+
+    if (req.body.cease_date === undefined) {
+        return res.json(400, {
+            status: "error",
+            details: "Missing case date"
+        })
+    }
+
+    return res.json({
+        status: "ok"
+    })
+});
+
+Sandbox.define('/api/broadcast_listeners/products', 'POST', function(req, res){
+
+    // validate username is present
+    if (req.body.golden_id === undefined) {
+        return res.json(400, {
+            status: "error",
+            details: "Missing golden_id"
+        })
+    }
+
+    if (req.body.name === undefined) {
+        return res.json(400, {
+            status: "error",
+            details: "Missing name"
+        })
+    }
+
+    if (req.body.description === undefined) {
+        return res.json(400, {
+            status: "error",
+            details: "Missing description"
+        })
+    }
+
+    return res.json({
+        status: "ok"
+    })
+});
+
+Sandbox.define('/api/broadcast_listeners/channel_room_availabilities', 'POST', function(req, res){
+
+    // validate username is present
+    if (req.body.partner_golden_id === undefined) {
+        return res.json(400, {
+            status: "error",
+            details: "Missing partner_golden_id"
+        })
+    }
+
+    if (req.body.stock === undefined) {
+        return res.json(400, {
+            status: "error",
+            details: "Missing stock"
+        })
+    }
+
+    if (req.body.room_golden_id === undefined) {
+        return res.json(400, {
+            status: "error",
+            details: "Missing room_golden_id"
+        })
+    }
+
+    return res.json({
+        status: "ok"
+    })
+});
+
 Sandbox.define('/api/room_prices', 'OPTIONS', function (req, res) {
     res.set('Access-Control-Allow-Origin', '*');
 });
