@@ -127,7 +127,7 @@ Sandbox.define('/api/broadcast_listeners/channel_room_availabilities', 'POST', f
         status: "ok"
     })
 });
-
+//test build
 Sandbox.define('/api/room_prices', 'OPTIONS', function (req, res) {
     res.set('Access-Control-Allow-Origin', '*');
 });
