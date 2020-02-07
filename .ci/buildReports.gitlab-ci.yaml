@@ -11,6 +11,7 @@ sonarqube-report:
     - sonar-scanner -D sonar.branch=$SQ_BRANCH -D sonar.projectVersion=$SQ_VERSION
   tags:
     - k8s
+  allow_failure: true
 
 mermaid-generate-images:
   stage: Build Reports

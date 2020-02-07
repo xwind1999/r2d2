@@ -7,6 +7,7 @@ sonarqube-early-validation:
     - sonar-scanner -X -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
   tags:
     - k8s
+  allow_failure: true
 
 infection:
   stage: Test Coverage Analysis
