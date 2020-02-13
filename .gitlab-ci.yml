@@ -63,6 +63,7 @@ pages:
     - mkdir -p public/reference/
     - mkdir -p public/docs/
     - cp -R reference/* public/reference/
+    - cp openapi.json public/
     - cp -R docs/* public/docs/
     - cp docs/html/openapi.html public/reference/r2d2-api/
     - cp docs/html/implemented.html public/reference/r2d2-api/
