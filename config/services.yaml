@@ -57,3 +57,4 @@ services:
             - '@Clogger\Middleware\Exception\ExceptionCodeMiddleware'
             - '@Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware'
 
+    Nelmio\ApiDocBundle\ApiDocGenerator: '@nelmio_api_doc.generator.default'

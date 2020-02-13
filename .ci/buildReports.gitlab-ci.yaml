@@ -13,6 +13,22 @@ sonarqube-report:
     - k8s
   allow_failure: true
 
+generate-api-reference:
+  stage: Build Reports
+  image: ${BASE_FULL_IMAGE}
+  dependencies:
+    - composer
+  needs:
+    - unitTests
+    - composer
+  script:
+    - bin/console r2d2:api:dump > public/openapi.json
+  artifacts:
+    paths:
+      - public/openapi.json
+  tags:
+    - k8s
+
 mermaid-generate-images:
   stage: Build Reports
   image:
@@ -34,3 +50,4 @@ mermaid-generate-images:
     - k8s
   except:
     - schedules
+
