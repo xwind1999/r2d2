@@ -14,12 +14,9 @@ sonarqube-report:
   allow_failure: true
 
 generate-api-reference:
-  stage: Build Reports
+  stage: Build Api Reference
   image: ${BASE_FULL_IMAGE}
-  dependencies:
-    - composer
   needs:
-    - unitTests
     - composer
   script:
     - bin/console r2d2:api:dump > public/openapi.json
@@ -51,3 +48,20 @@ mermaid-generate-images:
   except:
     - schedules
 
+code-tests-aggregate:
+  stage: Build Reports
+  image: ${BASE_FULL_IMAGE}
+  needs:
+    - unitTests
+    - phpmetrics
+    - infection
+    - generate-api-reference
+  script:
+    - echo true
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - report/
+      - public/openapi.json
+  tags:
+    - k8s
