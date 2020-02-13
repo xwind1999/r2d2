@@ -35,7 +35,7 @@ class ApiDumpCommand extends Command
     {
         $spec = $this->generatorLocator->generate()->toArray();
 
-        $json = json_encode($spec, $input->hasParameterOption(['--no-pretty']) ? JSON_PRETTY_PRINT : 0);
+        $json = json_encode($spec, $input->hasParameterOption(['--no-pretty']) ? 0 : JSON_PRETTY_PRINT);
 
         if (!$json) {
             return 1;

@@ -4,6 +4,7 @@ stages:
   - Test
   - Test Coverage Analysis
   - Static analysis
+  - Build Api Reference
   - Build Reports
   - Publish Reports
 
@@ -52,15 +53,10 @@ composer:
 pages:
   stage: Publish Reports
   image: ${BASE_FULL_IMAGE}
-  dependencies:
-    - generate-api-reference
   needs:
-    - unitTests
-    - phpmetrics
-    - infection
     - mermaid-generate-images
     - Api-Tests
-    - generate-api-reference
+    - code-tests-aggregate
   script:
     - rm -rf public/
     - mv report/html/ public/
