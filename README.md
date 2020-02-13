@@ -28,11 +28,11 @@
 * Availability and Upsell Prices
 * Product information
 
-## Project details [details](docs/readme/projectDetails_README.md)
+## Documentation
 
-## Local development guidelines [details](docs/readme/localDevelopment_README.md)   
-
-## Test automation guidelines [details](docs/readme/testAutomation_README.md)
+* [Project details](docs/readme/projectDetails_README.md)
+* [Local development guidelines](docs/readme/localDevelopment_README.md)   
+* [Test automation guidelines](docs/readme/testAutomation_README.md)
       
    
 
