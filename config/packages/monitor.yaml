@@ -1,0 +1,10 @@
+liip_monitor:
+    # enabling the controller requires that `assets` are enabled in the framework bundle
+    enable_controller: true
+    checks:
+        php_extensions: [pdo]
+        doctrine_dbal: default
+        security_advisory:
+            lock_file: '%kernel.project_dir%/composer.lock'
+        php_version:
+            "7.4": ">="
