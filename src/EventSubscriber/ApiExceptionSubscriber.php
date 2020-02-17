@@ -6,7 +6,9 @@ namespace App\EventSubscriber;
 
 use App\Contract\Response\ErrorResponse;
 use App\Exception\Http\ApiException;
+use Clogger\ContextualInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,9 +20,12 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
 {
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger)
+    private ParameterBagInterface $parameterBag;
+
+    public function __construct(LoggerInterface $logger, ParameterBagInterface $parameterBag)
     {
         $this->logger = $logger;
+        $this->parameterBag = $parameterBag;
     }
 
     public function onKernelException(ExceptionEvent $event): void
@@ -44,6 +49,12 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
                 ->setMessage($message)
                 ->setCode($code)
             ;
+
+            if ($exception instanceof ContextualInterface && is_array($exception->getContext()['errors'])) {
+                $errorResponse->setErrorList($exception->getContext()['errors']);
+            }
+        } else if ('prod' !== $this->parameterBag->get('kernel.environment')) {
+            return;
         }
 
         $response = new JsonResponse($errorResponse->toArray(), $httpCode);
