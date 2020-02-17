@@ -14,6 +14,8 @@ class ErrorResponse
 
     protected int $code = self::DEFAULT_CODE;
 
+    protected array $errorList = [];
+
     public function getMessage(): string
     {
         return $this->message;
@@ -22,6 +24,11 @@ class ErrorResponse
     public function getCode(): int
     {
         return $this->code;
+    }
+
+    public function getErrorList(): array
+    {
+        return $this->errorList;
     }
 
     public function setMessage(?string $message): self
@@ -40,13 +47,25 @@ class ErrorResponse
         return $this;
     }
 
+    public function setErrorList(array $errorList): self
+    {
+        $this->errorList = $errorList;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
+        $errorList = [];
+        if (count($this->errorList) > 0) {
+            $errorList = ['errors' => $this->errorList];
+        }
+
         return [
-            'error' => [
+            'error' => array_merge([
                 'message' => $this->getMessage(),
                 'code' => $this->getCode(),
-            ],
+            ], $errorList),
         ];
     }
 }

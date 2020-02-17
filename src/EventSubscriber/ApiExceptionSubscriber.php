@@ -53,7 +53,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
             if ($exception instanceof ContextualInterface && is_array($exception->getContext()['errors'])) {
                 $errorResponse->setErrorList($exception->getContext()['errors']);
             }
-        } else if ('prod' !== $this->parameterBag->get('kernel.environment')) {
+        } elseif ('prod' !== $this->parameterBag->get('kernel.environment')) {
             return;
         }
 
