@@ -9,6 +9,7 @@ use App\Exception\Http\ApiException;
 use App\Kernel;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy as ObjectProphecyAlias;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,10 +18,13 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * @coversDefaultClass \App\EventSubscriber\ApiExceptionSubscriber
+ */
 class ApiExceptionSubscriberTest extends TestCase
 {
     /**
-     * @var LoggerInterface|\Prophecy\Prophecy\ObjectProphecy
+     * @var LoggerInterface|ObjectProphecyAlias
      */
     protected $logger;
 
@@ -29,6 +33,9 @@ class ApiExceptionSubscriberTest extends TestCase
         $this->logger = $this->prophesize(LoggerInterface::class);
     }
 
+    /**
+     * @covers ::getSubscribedEvents
+     */
     public function testGetSubscribedEvents(): void
     {
         $this->assertEquals([KernelEvents::EXCEPTION => 'onKernelException'], ApiExceptionSubscriber::getSubscribedEvents());
@@ -36,11 +43,14 @@ class ApiExceptionSubscriberTest extends TestCase
 
     /**
      * @dataProvider providerOnKernelException
+     *
+     * @covers ::__construct
+     * @covers ::onKernelException
      */
     public function testOnKernelException(\Exception $exception, string $message, int $code, int $httpCode): void
     {
         $event = new ExceptionEvent(
-            new Kernel('test', false),
+            new Kernel('prod', false),
             new Request(),
             1,
             $exception
@@ -52,6 +62,26 @@ class ApiExceptionSubscriberTest extends TestCase
         $apiExceptionSubscriber = new ApiExceptionSubscriber($this->logger->reveal());
         $apiExceptionSubscriber->onKernelException($event);
         $this->assertEquals($response, $event->getResponse());
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::onKernelException
+     */
+    public function testOnKernelExceptionForNonProduction(): void
+    {
+        $event = new ExceptionEvent(
+            new Kernel('dev', false),
+            new Request([], [], [], [], [], ['APP_ENV' => 'dev']),
+            1,
+            new \Exception()
+        );
+
+        $this->logger->error(Argument::type(\Exception::class))->shouldBeCalled();
+
+        $apiExceptionSubscriber = new ApiExceptionSubscriber($this->logger->reveal());
+        $apiExceptionSubscriber->onKernelException($event);
+        $this->assertNull($event->getResponse());
     }
 
     /**

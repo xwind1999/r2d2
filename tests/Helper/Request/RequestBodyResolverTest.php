@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RequestBodyResolverTest extends TestCase
@@ -100,8 +101,9 @@ class RequestBodyResolverTest extends TestCase
         $argumentMetadata = new ArgumentMetadata('test', get_class($class), false, false, null);
         $this->serializer = $this->prophesize(SerializerInterface::class);
 
+        $violation = new ConstraintViolation('this validation failed', null, [], '', 'message', 'xxx');
         $this->serializer->deserialize('aa', get_class($class), 'json')->willReturn($class)->shouldBeCalled();
-        $this->validator->validate($class)->willReturn(['this validation failed']);
+        $this->validator->validate($class)->willReturn([$violation]);
 
         $requestBodyResolver = new RequestBodyResolver($this->serializer->reveal(), $this->validator->reveal());
 

@@ -32,7 +32,7 @@ class TestControllerTest extends WebTestCase
 
         yield 'unprocessable' => [
             json_encode(['messagexxxxx' => 'abcd']),
-            json_encode(['error' => ['message' => 'Unprocessable entity', 'code' => 1000002]]),
+            json_encode(['error' => ['message' => 'Unprocessable entity', 'code' => 1000002, 'errors' => ['message' => ['This value should not be blank.']]]]),
             422,
         ];
 
