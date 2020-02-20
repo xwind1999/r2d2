@@ -5,58 +5,6 @@
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
-		{
-			"name": "createEcho",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "f3191f80-ebb5-47c8-8fbc-345472b206fb",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Sample test\");",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"message\": \"Sample test\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/api/tests/echo",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"tests",
-						"echo"
-					]
-				}
-			},
-			"response": []
-		}
 	],
 	"protocolProfileBehavior": {}
 }
