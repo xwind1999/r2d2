@@ -7,6 +7,7 @@ home = expanduser('~')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', action="store_true", help='enable debug (required for coverage test/infection)')
+parser.add_argument('--githook', action="store_true", help='disable interactive mode on docker commands (required for githooks)')
 parser.add_argument('task', choices=['start','stop','composer', 'console', 'build', 'phpunit', 'phpstan', 'destroy', 'install', 'psalm', 'infection', 'xdebug', 'phpcs'], help='tasks')
 parser.add_argument('command', nargs=argparse.REMAINDER, help='commands to run')
 args = parser.parse_args()
@@ -44,8 +45,11 @@ def run_php_command(args):
         print 'PHP is not running'
         exit(1)
     php_bin = ['php']
+    docker_args = ['-it']
     if args['debug']:
         php_bin = ['phpdbg', '-qrr']
+    if args['githook']:
+        docker_args = ['-i']
 
     command = ''
 
@@ -76,7 +80,7 @@ def run_php_command(args):
         if len(args['command']) == 0:
             args['command'] = ['analyse', '--level','8','src']
 
-    output = docker.run(['exec', '-it', php_container, ] + php_bin + [command] + args['command'])
+    output = docker.run(['exec'] + docker_args + [php_container] + php_bin + [command] + args['command'])
     return output
 
 def build(args):
