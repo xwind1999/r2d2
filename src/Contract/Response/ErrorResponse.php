@@ -10,43 +10,24 @@ class ErrorResponse
 
     public const DEFAULT_CODE = 1000000;
 
-    protected string $message = self::DEFAULT_MESSAGE;
+    public string $message = self::DEFAULT_MESSAGE;
 
-    protected int $code = self::DEFAULT_CODE;
+    public int $code = self::DEFAULT_CODE;
 
-    public function getMessage(): string
-    {
-        return $this->message;
-    }
-
-    public function getCode(): int
-    {
-        return $this->code;
-    }
-
-    public function setMessage(?string $message): self
-    {
-        if (null !== $message) {
-            $this->message = $message;
-        }
-
-        return $this;
-    }
-
-    public function setCode(int $code): self
-    {
-        $this->code = $code;
-
-        return $this;
-    }
+    public array $errorList = [];
 
     public function toArray(): array
     {
+        $errorList = [];
+        if (count($this->errorList) > 0) {
+            $errorList = ['errors' => $this->errorList];
+        }
+
         return [
-            'error' => [
-                'message' => $this->getMessage(),
-                'code' => $this->getCode(),
-            ],
+            'error' => array_merge([
+                'message' => $this->message,
+                'code' => $this->code,
+            ], $errorList),
         ];
     }
 }

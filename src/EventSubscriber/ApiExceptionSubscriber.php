@@ -6,6 +6,7 @@ namespace App\EventSubscriber;
 
 use App\Contract\Response\ErrorResponse;
 use App\Exception\Http\ApiException;
+use Clogger\ContextualInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -40,10 +41,17 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
                 $message = Response::$statusTexts[$httpCode] ?? null;
             }
 
-            $errorResponse
-                ->setMessage($message)
-                ->setCode($code)
-            ;
+            $errorResponse->message = $message;
+            $errorResponse->code = $code;
+
+            if ($exception instanceof ContextualInterface
+                && isset($exception->getContext()['errors'])
+                && is_array($exception->getContext()['errors'])
+            ) {
+                $errorResponse->errorList = $exception->getContext()['errors'];
+            }
+        } elseif ('prod' !== $event->getRequest()->server->get('APP_ENV', 'prod')) {
+            return;
         }
 
         $response = new JsonResponse($errorResponse->toArray(), $httpCode);

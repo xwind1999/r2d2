@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping\CustomIdGenerator;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\BoxRepository")
  */
 class Box
 {
@@ -22,8 +22,12 @@ class Box
      * @ORM\GeneratedValue(strategy="CUSTOM")
      *
      * @CustomIdGenerator(class="Ramsey\Uuid\Doctrine\UuidOrderedTimeGenerator")
+     *
+     * @todo remove nullable after issue is fixed on doctrine
+     *
+     * @see https://github.com/doctrine/orm/issues/7999
      */
-    public UuidInterface $uuid;
+    public ?UuidInterface $uuid;
 
     /**
      * @ORM\Column(type="string", length=45)

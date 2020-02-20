@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\EventSubscriber;
 
+use App\Contract\ResponseContract;
 use App\EventSubscriber\ActionToJsonResponse;
 use App\Kernel;
 use JMS\Serializer\SerializerInterface;
@@ -32,19 +33,37 @@ class ActionToJsonResponseTest extends TestCase
 
     public function testReturnedObjectToJsonResponse()
     {
+        $testResponse = new ResponseContract();
         $event = new ViewEvent(
-            new Kernel('test', false),
+            new Kernel('prod', false),
             new Request(),
             1,
-            'test1'
+            $testResponse
         );
         $actionToJsonResponse = new ActionToJsonResponse($this->serializer->reveal());
-        $expectedResponse = new JsonResponse('test2', JsonResponse::HTTP_OK, [], true);
+        $response = '{"message": "test2"}';
+        $expectedResponse = new JsonResponse($response, JsonResponse::HTTP_OK, [], true);
 
-        $this->serializer->serialize('test1', 'json', null)->willReturn('test2')->shouldBeCalled();
+        $this->serializer->serialize($testResponse, 'json', null)->willReturn($response)->shouldBeCalled();
 
         $actionToJsonResponse->returnedObjectToJsonResponse($event);
 
         $this->assertEquals($expectedResponse, $event->getResponse());
+    }
+
+    public function testReturnedObjectWontBeProcessed()
+    {
+        $testResponse = '';
+        $event = new ViewEvent(
+            new Kernel('prod', false),
+            new Request(),
+            1,
+            $testResponse
+        );
+        $actionToJsonResponse = new ActionToJsonResponse($this->serializer->reveal());
+
+        $actionToJsonResponse->returnedObjectToJsonResponse($event);
+
+        $this->assertEquals($testResponse, $event->getResponse());
     }
 }

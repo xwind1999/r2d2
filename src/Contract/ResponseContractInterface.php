@@ -6,4 +6,5 @@ namespace App\Contract;
 
 interface ResponseContractInterface
 {
+    public function getHttpCode(): int;
 }
