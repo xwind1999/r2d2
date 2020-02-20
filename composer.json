@@ -46,7 +46,8 @@
         "psr-4": {
             "App\\": "src/",
             "Psr\\Log\\": "src-vendor-fixes/Psr/Log",
-            "Clogger\\": "src-logger-middleware/"
+            "Clogger\\": "src-logger-middleware/",
+            "R2D2\\Hooks\\": "hooks/"
         }
     },
     "autoload-dev": {
@@ -70,7 +71,8 @@
             "security-checker security:check": "script"
         },
         "post-install-cmd": [
-            "@auto-scripts"
+            "@auto-scripts",
+            "R2D2\\Hooks\\InstallHooks::checkHooks"
         ],
         "post-update-cmd": [
             "@auto-scripts"
