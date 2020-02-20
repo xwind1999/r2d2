@@ -58,3 +58,10 @@ services:
             - '@Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware'
 
     Nelmio\ApiDocBundle\ApiDocGenerator: '@nelmio_api_doc.generator.default'
+
+    Gedmo\Timestampable\TimestampableListener:
+        class: Gedmo\Timestampable\TimestampableListener
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]

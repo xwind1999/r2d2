@@ -19,16 +19,13 @@ unitTests:
 
 .running-r2d2:
   variables:
-    MYSQL_DATABASE: r2d2
-    MYSQL_ROOT_PASSWORD: admin123
+    DATABASE_URL: "sqlite:////tmp/db.sqlite"
   dependencies:
     - composer
   services:
     - name: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.11
-      alias: r2-d2-api
-      command: ["bash", "-c", 'rm -rf /app; ln -s /builds/millenniumfalcon/r2-d2-api /app; /start.sh']
-    - name: mysql:5.7
-      alias: r2-d2-mysql
+      alias: r2-d2.localhost
+      command: ["bash", "-c", 'rm -rf /app; ln -s /builds/millenniumfalcon/r2-d2-api /app; php /builds/millenniumfalcon/r2-d2-api/bin/console doctrine:schema:update --force; chmod 777 /tmp/db.sqlite; /start.sh']
   before_script:
     - sleep 5
   tags:
@@ -61,7 +58,7 @@ Api-Tests:
   extends: .running-r2d2
   image: docker-registry.production.smartbox.com/millenniumfalcon/darth-vader-newman
   script:
-    - newman run tests/ApiTests/R2D2-API.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
+    - newman run tests/ApiTests/box.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
   artifacts:
     when: always
     paths:

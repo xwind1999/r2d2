@@ -11,6 +11,8 @@ use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RequestBodyResolver implements ArgumentValueResolverInterface
@@ -59,10 +61,24 @@ class RequestBodyResolver implements ArgumentValueResolverInterface
         try {
             $v = $this->validator->validate($data);
             if (count($v) > 0) {
-                throw new \Exception();
+                throw new ValidatorException();
             }
-        } catch (\Throwable $exception) {
-            throw new UnprocessableEntityException();
+        } catch (ValidatorException $exception) {
+            $exception = new UnprocessableEntityException();
+            if (isset($v) && count($v) > 0) {
+                $validationErrors = [];
+                /** @var ConstraintViolation $failedValidation */
+                foreach ($v as $failedValidation) {
+                    $field = $failedValidation->getPropertyPath();
+                    if (!isset($validationErrors[$field])) {
+                        $validationErrors[$field] = [];
+                    }
+                    $validationErrors[$field][] = $failedValidation->getMessage();
+                }
+                $exception->addContext(['errors' => $validationErrors]);
+            }
+
+            throw $exception;
         }
 
         return [$data];

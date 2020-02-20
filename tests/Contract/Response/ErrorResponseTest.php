@@ -20,10 +20,8 @@ class ErrorResponseTest extends TestCase
                 'code' => $code,
             ],
         ];
-        $errorResponse->setMessage($message);
-        $errorResponse->setCode($code);
-        $this->assertEquals($message, $errorResponse->getMessage());
-        $this->assertEquals($code, $errorResponse->getCode());
+        $errorResponse->message = $message;
+        $errorResponse->code = $code;
         $this->assertEquals($expected, $errorResponse->toArray());
     }
 }

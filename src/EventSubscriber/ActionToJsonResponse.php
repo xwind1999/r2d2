@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
+use App\Contract\ResponseContractInterface;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -40,12 +41,16 @@ class ActionToJsonResponse implements EventSubscriberInterface
     {
         $data = $event->getControllerResult();
 
+        if (!($data instanceof ResponseContractInterface)) {
+            return;
+        }
+
         $serializedData = $this->serializer->serialize(
             $data,
             'json',
             null
         );
 
-        $event->setResponse(new JsonResponse($serializedData, JsonResponse::HTTP_OK, [], self::IS_JSON_FORMAT));
+        $event->setResponse(new JsonResponse($serializedData, $data->getHttpCode(), [], self::IS_JSON_FORMAT));
     }
 }

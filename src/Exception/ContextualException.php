@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-class ContextualException extends \Exception
+use App\Helper\ContextualTrait;
+use Clogger\ContextualInterface;
+
+class ContextualException extends \Exception implements ContextualInterface
 {
+    use ContextualTrait;
+
     protected const MESSAGE = 'General exception';
     protected const CODE = 1000000;
 

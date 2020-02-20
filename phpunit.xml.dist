@@ -29,6 +29,7 @@
             <exclude>
                 <directory>src/Exception</directory>
                 <directory>src/Entity</directory>
+                <directory>src/Repository</directory>
                 <file>src/Kernel.php</file>
             </exclude>
         </whitelist>
