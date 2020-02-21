@@ -33,6 +33,5 @@
 * [Project details](docs/readme/projectDetails_README.md)
 * [Local development guidelines](docs/readme/localDevelopment_README.md)   
 * [Test automation guidelines](docs/readme/testAutomation_README.md)
-      
-   
+* [Initial tools and libraries](docs/readme/toolsAndLibraries_README.md)
 
