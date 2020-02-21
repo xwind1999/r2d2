@@ -71,10 +71,6 @@ def run_php_command(args):
         command = 'vendor/bin/psalm'
         if len(args['command']) == 0:
             args['command'] = ['--show-info=false']
-    elif args['task'] == 'psalm':
-        command = 'vendor/bin/psalm'
-        if len(args['command']) == 0:
-            args['command'] = ['--show-info=false']
     elif args['task'] == 'phpstan':
         command = 'vendor/bin/phpstan'
         if len(args['command']) == 0:
@@ -95,8 +91,8 @@ def install(args):
     print '==== INSTALLING ===='
     build(args)
     start(args)
-    run_php_command({'debug': None, 'task': 'composer', 'command': ['install' ,'-n']})
-    run_php_command({'debug': None, 'task': 'console', 'command': ['d:m:m', '-n']})
+    run_php_command({'githook': None, 'debug': None, 'task': 'composer', 'command': ['install' ,'-n']})
+    run_php_command({'githook': None, 'debug': None, 'task': 'console', 'command': ['d:m:m', '-n']})
     print '==== INSTALLED ===='
 
 switcher = {
