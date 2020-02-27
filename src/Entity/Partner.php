@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping\CustomIdGenerator;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\BoxRepository")
+ * @ORM\Entity()
  */
 class Partner
 {
