@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping\CustomIdGenerator;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\BoxRepository")
+ * @ORM\Entity()
  */
 class Experience
 {
@@ -33,6 +33,11 @@ class Experience
      * @ORM\Column(type="string", length=45)
      */
     public string $goldenId;
+
+    /**
+     * @ORM\Column(type="string", length=45)
+     */
+    public string $partnerGoldenId;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
