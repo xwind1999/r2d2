@@ -65,3 +65,8 @@ services:
             - { name: doctrine.event_subscriber, connection: default }
         calls:
             - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    App\Helper\Serializer\StrictIntegerHandler:
+        class: App\Helper\Serializer\StrictIntegerHandler
+        tags:
+            - { name: jms_serializer.subscribing_handler }
