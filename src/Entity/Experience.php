@@ -52,5 +52,5 @@ class Experience
     /**
      * @ORM\Column(type="integer")
      */
-    public string $duration;
+    public int $duration;
 }
