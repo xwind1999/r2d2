@@ -60,6 +60,7 @@ Api-Tests:
   script:
     - newman run tests/ApiTests/box.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
     - newman run tests/ApiTests/experience.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
+    - newman run tests/ApiTests/room.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
   artifacts:
     when: always
     paths:

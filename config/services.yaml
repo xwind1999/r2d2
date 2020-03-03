@@ -70,3 +70,8 @@ services:
         class: App\Helper\Serializer\StrictIntegerHandler
         tags:
             - { name: jms_serializer.subscribing_handler }
+
+    App\Helper\Serializer\StrictBooleanHandler:
+        class: App\Helper\Serializer\StrictBooleanHandler
+        tags:
+            - { name: jms_serializer.subscribing_handler }
