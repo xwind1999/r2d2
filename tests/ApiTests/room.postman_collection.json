@@ -1,0 +1,289 @@
+{
+	"info": {
+		"_postman_id": "9a7dbfb2-177f-45b5-83df-391cedd7dd67",
+		"name": "room",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "createRoom-success-201",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5a464622-6c13-40cc-ac54-b32752ccf91e",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"response = JSON.parse(responseBody)",
+							"pm.globals.set(\"room_uuid\", response.uuid);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c27892c7-b0e3-4fae-8ed7-ce206f4dd715",
+						"exec": [
+							"var helper = eval(pm.environment.get(\"setUpScript\"));",
+							"let room_golden_id = 'room' + Date.now();",
+							"let partner_golden_id = 'partner' + Date.now();",
+							"helper.setUpRoomData(room_golden_id, partner_golden_id, 'test room', 'this is a test room', 1, true, 'enabled')",
+							"pm.globals.set(\"room_golden_id\", room_golden_id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{room}}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/room",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"room"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateRoom-success-204",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5a464622-6c13-40cc-ac54-b32752ccf91e",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c27892c7-b0e3-4fae-8ed7-ce206f4dd715",
+						"exec": [
+							"var helper = eval(pm.environment.get(\"setUpScript\"))",
+							"let room_golden_id = pm.globals.get(\"room_golden_id\");",
+							"helper.setUpRoomData(room_golden_id, '987654', 'Updated Name', 'Updated Description', 3, false, 'disabled');",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"golden_id\": \"66665555\",\n  \"partner_golden_id\": \"987654\",\n  \"name\": \"Updated Name\",\n  \"description\": \"Updated Description\",\n  \"inventory\": 3,\n  \"is_sellable\": false,\n  \"status\": \"disabled\",\n  \"uuid\": \"{{room_uuid}}\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/room",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"room"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getRoom-success-200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5a464622-6c13-40cc-ac54-b32752ccf91e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c27892c7-b0e3-4fae-8ed7-ce206f4dd715",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/room/{{room_uuid}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"room",
+						"{{room_uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteRoom-success-204",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5a464622-6c13-40cc-ac54-b32752ccf91e",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c27892c7-b0e3-4fae-8ed7-ce206f4dd715",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/room/{{room_uuid}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"room",
+						"{{room_uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createRoom_with_string_is_sellable-Negative",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5a464622-6c13-40cc-ac54-b32752ccf91e",
+						"exec": [
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c27892c7-b0e3-4fae-8ed7-ce206f4dd715",
+						"exec": [
+							"var helper = eval(pm.environment.get(\"setUpScript\"));",
+							"let room_golden_id = 'room' + Date.now();",
+							"let partner_golden_id = 'partner' + Date.now();",
+							"helper.setUpRoomData(room_golden_id, partner_golden_id, 'test room', 'this is a test room', 1, \"false\", 'enabled')",
+							"pm.globals.set(\"room_golden_id\", room_golden_id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{room}}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/room",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"room"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "c0d3dbd1-63f7-4032-ab3e-9c4c9acd6119",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "229c74c5-f9c3-48ed-840d-7486af01e089",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "90b7f900-faf7-49f6-9acd-902d3282ca09",
+			"key": "baseUrl",
+			"value": "http://r2-d2.localhost",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
