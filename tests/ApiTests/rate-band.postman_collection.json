@@ -1,0 +1,201 @@
+{
+	"info": {
+		"_postman_id": "f877dcbf-2b0c-4b27-84d1-f0e07d4dc7fc",
+		"name": "rate-band",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "createRateBand-success-201",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "077e73ae-c0ae-44be-9529-6b7f5ced8d23",
+						"exec": [
+							"var helper = eval(pm.environment.get(\"setUpScript\"))",
+							"let partner_golden_id = 'partner' + Date.now();",
+							"let rate_band_golden_id = 'rate_band'+ Date.now();",
+							"helper.setUpRateBandData(rate_band_golden_id, partner_golden_id, \"rate_band_test_name\");",
+							"pm.globals.set(\"partner_golden_id\", partner_golden_id);",
+							"pm.globals.set(\"rate_band_golden_id\", rate_band_golden_id);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "d636015f-cba5-4373-97ed-26bb447a51df",
+						"exec": [
+							"pm.test(\"status code is correct\", function () {",
+							"    pm.response.to.have.status(201);",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"});",
+							"",
+							"response = JSON.parse(responseBody)",
+							"pm.globals.set(\"rate_band_uuid\", response.uuid);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{rate-band}}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/rate-band",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"rate-band"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateRateBand-success-204",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fb2a66e7-53b3-490a-80b7-5b8b3c6a8674",
+						"exec": [
+							"pm.test(\"status code is correct\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7ba24f51-01b1-4a54-aab4-78f250e16a74",
+						"exec": [
+							"var helper = eval(pm.environment.get(\"setUpScript\"));",
+							"let partner_golden_id = 'partner' + Date.now();",
+							"let rate_band_golden_id = 'rate_band'+ Date.now();",
+							"helper.setUpRateBandData(rate_band_golden_id, partner_golden_id, \"rate_band_updated_name\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"golden_id\": \"123456789\",\n  \"partner_golden_id\": \"987654321\",\n  \"name\": \"rate_band_updated_name\",\n  \"uuid\": \"{{rate_band_uuid}}\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/rate-band",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"rate-band"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getRateBand-success-200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "53809948-ce22-4852-ac65-b200e28f8086",
+						"exec": [
+							"pm.test(\"status code is correct\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/rate-band/{{rate_band_uuid}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"rate-band",
+						"{{rate_band_uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteRateBand-success-204",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2e798974-1282-4add-890f-dd298e98ccc2",
+						"exec": [
+							"pm.test(\"status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/rate-band/{{rate_band_uuid}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"rate-band",
+						"{{rate_band_uuid}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
