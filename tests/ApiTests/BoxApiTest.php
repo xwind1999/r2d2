@@ -65,7 +65,7 @@ class BoxApiTest extends ApiTestCase
         $payload->country = 'fr';
         $payload->status = 'created';
 
-        $this->client()->request('PUT', self::API_BASE_URL, [], [], [], $this->serialize($payload));
+        $this->client()->request('PUT', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], [], $this->serialize($payload));
         $response = json_decode($this->client()->getResponse()->getContent(), true);
         $this->assertNull($response);
         $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());

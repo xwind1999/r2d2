@@ -84,12 +84,13 @@ class PartnerControllerTest extends TestCase
      */
     public function testIfPutThrowsResourceNotFoundException()
     {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $partnerUpdateRequest = new PartnerUpdateRequest();
         $partnerManager = $this->prophesize(PartnerManager::class);
-        $partnerManager->update($partnerUpdateRequest)->willThrow(EntityNotFoundException::class);
+        $partnerManager->update($uuid, $partnerUpdateRequest)->willThrow(EntityNotFoundException::class);
         $controller = new PartnerController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->put($partnerUpdateRequest, $partnerManager->reveal());
+        $controller->put($uuid, $partnerUpdateRequest, $partnerManager->reveal());
     }
 
     /**
@@ -97,11 +98,12 @@ class PartnerControllerTest extends TestCase
      */
     public function testPut()
     {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $partnerUpdateRequest = new PartnerUpdateRequest();
         $partnerManager = $this->prophesize(PartnerManager::class);
-        $partnerManager->update($partnerUpdateRequest)->shouldBeCalled();
+        $partnerManager->update($uuid, $partnerUpdateRequest)->shouldBeCalled();
         $controller = new PartnerController();
-        $response = $controller->put($partnerUpdateRequest, $partnerManager->reveal());
+        $response = $controller->put($uuid, $partnerUpdateRequest, $partnerManager->reveal());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
     }

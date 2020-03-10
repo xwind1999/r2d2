@@ -45,8 +45,7 @@ class PartnerManagerTest extends TestCase
     {
         $manager = new PartnerManager($this->em->reveal(), $this->repository->reveal());
         $partnerUpdateRequest = new PartnerUpdateRequest();
-        $uuid = '12345678';
-        $partnerUpdateRequest->uuid = $uuid;
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $partnerUpdateRequest->goldenId = '1234';
         $partnerUpdateRequest->status = 'alive';
         $partnerUpdateRequest->currency = 'USD';
@@ -66,7 +65,7 @@ class PartnerManagerTest extends TestCase
         $this->em->persist(Argument::type(Partner::class))->shouldBeCalled();
         $this->em->flush()->shouldBeCalled();
 
-        $manager->update($partnerUpdateRequest);
+        $manager->update($uuid, $partnerUpdateRequest);
 
         $this->assertEquals('1234', $partner->goldenId);
         $this->assertEquals('alive', $partner->status);

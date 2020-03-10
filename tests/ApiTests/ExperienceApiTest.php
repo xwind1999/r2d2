@@ -65,7 +65,7 @@ class ExperienceApiTest extends ApiTestCase
         $payload->name = '98767';
         $payload->description = '1234';
         $payload->duration = 2;
-        $this->client()->request('PUT', self::API_BASE_URL, [], [], [], $this->serialize($payload));
+        $this->client()->request('PUT', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], [], $this->serialize($payload));
         $response = json_decode($this->client()->getResponse()->getContent(), true);
         $this->assertNull($response);
         $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());

@@ -110,9 +110,15 @@ class RateBandController
     }
 
     /**
-     * @Route("/api/rate-band", methods={"PUT"}, format="json")
+     * @Route("/api/rate-band/{uuid}", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="rate-band")
+     * @SWG\Parameter(
+     *     name="uuid",
+     *     in="path",
+     *     type="string",
+     *     format="uuid"
+     * )
      * @SWG\Parameter(
      *         name="body",
      *         in="body",
@@ -124,11 +130,16 @@ class RateBandController
      * )
      *
      * @throws ResourceNotFoundException
+     * @throws UnprocessableEntityException
      */
-    public function put(RateBandUpdateRequest $rateBandUpdateRequest, RateBandManager $rateBandManager): Response
+    public function put(string $uuid, RateBandUpdateRequest $rateBandUpdateRequest, RateBandManager $rateBandManager): Response
     {
+        if (!Uuid::isValid($uuid)) {
+            throw new UnprocessableEntityException();
+        }
+
         try {
-            $rateBandManager->update($rateBandUpdateRequest);
+            $rateBandManager->update($uuid, $rateBandUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }

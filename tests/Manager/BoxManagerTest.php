@@ -45,8 +45,7 @@ class BoxManagerTest extends TestCase
     {
         $manager = new BoxManager($this->em->reveal(), $this->repository->reveal());
         $boxUpdateRequest = new BoxUpdateRequest();
-        $uuid = '12345678';
-        $boxUpdateRequest->uuid = $uuid;
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $boxUpdateRequest->goldenId = '5678';
         $boxUpdateRequest->brand = 'sbx';
         $boxUpdateRequest->country = 'fr';
@@ -66,7 +65,7 @@ class BoxManagerTest extends TestCase
         $this->em->persist(Argument::type(Box::class))->shouldBeCalled();
         $this->em->flush()->shouldBeCalled();
 
-        $manager->update($boxUpdateRequest);
+        $manager->update($uuid, $boxUpdateRequest);
 
         $this->assertEquals('integrated2', $box->status);
         $this->assertEquals('sbx', $box->brand);

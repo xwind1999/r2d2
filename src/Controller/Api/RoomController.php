@@ -110,9 +110,15 @@ class RoomController
     }
 
     /**
-     * @Route("/api/room", methods={"PUT"}, format="json")
+     * @Route("/api/room/{uuid}", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="room")
+     * @SWG\Parameter(
+     *     name="uuid",
+     *     in="path",
+     *     type="string",
+     *     format="uuid"
+     * )
      * @SWG\Parameter(
      *         name="body",
      *         in="body",
@@ -124,11 +130,16 @@ class RoomController
      * )
      *
      * @throws ResourceNotFoundException
+     * @throws UnprocessableEntityException
      */
-    public function put(RoomUpdateRequest $roomUpdateRequest, RoomManager $roomManager): Response
+    public function put(string $uuid, RoomUpdateRequest $roomUpdateRequest, RoomManager $roomManager): Response
     {
+        if (!Uuid::isValid($uuid)) {
+            throw new UnprocessableEntityException();
+        }
+
         try {
-            $roomManager->update($roomUpdateRequest);
+            $roomManager->update($uuid, $roomUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }

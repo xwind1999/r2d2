@@ -110,9 +110,15 @@ class ExperienceController
     }
 
     /**
-     * @Route("/api/experience", methods={"PUT"}, format="json")
+     * @Route("/api/experience/{uuid}", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="experience")
+     * @SWG\Parameter(
+     *     name="uuid",
+     *     in="path",
+     *     type="string",
+     *     format="uuid"
+     * )
      * @SWG\Parameter(
      *         name="body",
      *         in="body",
@@ -124,11 +130,16 @@ class ExperienceController
      * )
      *
      * @throws ResourceNotFoundException
+     * @throws UnprocessableEntityException
      */
-    public function put(ExperienceUpdateRequest $experienceUpdateRequest, ExperienceManager $experienceManager): Response
+    public function put(string $uuid, ExperienceUpdateRequest $experienceUpdateRequest, ExperienceManager $experienceManager): Response
     {
+        if (!Uuid::isValid($uuid)) {
+            throw new UnprocessableEntityException();
+        }
+
         try {
-            $experienceManager->update($experienceUpdateRequest);
+            $experienceManager->update($uuid, $experienceUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }

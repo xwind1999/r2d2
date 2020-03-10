@@ -86,12 +86,13 @@ class ExperienceControllerTest extends TestCase
      */
     public function testIfPutThrowsResourceNotFoundException()
     {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $experienceUpdateRequest = new ExperienceUpdateRequest();
         $experienceManager = $this->prophesize(ExperienceManager::class);
-        $experienceManager->update($experienceUpdateRequest)->willThrow(EntityNotFoundException::class);
+        $experienceManager->update($uuid, $experienceUpdateRequest)->willThrow(EntityNotFoundException::class);
         $controller = new ExperienceController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->put($experienceUpdateRequest, $experienceManager->reveal());
+        $controller->put($uuid, $experienceUpdateRequest, $experienceManager->reveal());
     }
 
     /**
@@ -99,11 +100,12 @@ class ExperienceControllerTest extends TestCase
      */
     public function testPut()
     {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $experienceUpdateRequest = new ExperienceUpdateRequest();
         $experienceManager = $this->prophesize(ExperienceManager::class);
-        $experienceManager->update($experienceUpdateRequest)->shouldBeCalled();
+        $experienceManager->update($uuid, $experienceUpdateRequest)->shouldBeCalled();
         $controller = new ExperienceController();
-        $response = $controller->put($experienceUpdateRequest, $experienceManager->reveal());
+        $response = $controller->put($uuid, $experienceUpdateRequest, $experienceManager->reveal());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
     }

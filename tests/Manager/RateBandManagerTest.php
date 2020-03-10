@@ -45,7 +45,7 @@ class RateBandManagerTest extends TestCase
     {
         $manager = new RateBandManager($this->em->reveal(), $this->repository->reveal());
         $rateBandUpdateRequest = new RateBandUpdateRequest();
-        $uuid = '12345678';
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $rateBandUpdateRequest->uuid = $uuid;
         $rateBandUpdateRequest->goldenId = '1234';
         $rateBandUpdateRequest->partnerGoldenId = '4321';
@@ -64,7 +64,7 @@ class RateBandManagerTest extends TestCase
         $this->em->persist(Argument::type(RateBand::class))->shouldBeCalled();
         $this->em->flush()->shouldBeCalled();
 
-        $manager->update($rateBandUpdateRequest);
+        $manager->update($uuid, $rateBandUpdateRequest);
 
         $this->assertEquals('1234', $rateBand->goldenId);
         $this->assertEquals('4321', $rateBand->partnerGoldenId);

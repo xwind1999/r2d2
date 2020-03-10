@@ -12,14 +12,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RateBandUpdateRequest extends RateBandCreateRequest implements RequestBodyInterface, ValidatableRequest
 {
     /**
-     * @Assert\Uuid
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("string")
-     */
-    public string $uuid;
-
-    /**
      * @Assert\Type(type="string")
      * @Assert\Length(min="1", max="45")
      * @Assert\NotBlank
