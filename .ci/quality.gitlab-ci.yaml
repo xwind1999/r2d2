@@ -9,13 +9,26 @@ unitTests:
     - composer
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   script:
-    - phpdbg -qrr vendor/bin/phpunit --colors=never
+    - phpdbg -qrr vendor/bin/phpunit --testsuite=UnitTests --colors=never
   artifacts:
     expire_in: 3 days
     paths:
       - report/
   tags:
-    - k8s
+    - k8s-alpha
+
+Api-Tests:
+  stage: Test
+  image: ${BASE_FULL_IMAGE}
+  needs:
+    - composer
+  variables:
+    DATABASE_URL: "sqlite:////tmp/db.sqlite"
+  script:
+    - bin/console doctrine:schema:update --force
+    - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never
+  tags:
+    - k8s-alpha
 
 .running-r2d2:
   variables:
@@ -53,27 +66,12 @@ contractTests-against-Api:
     - pact-provider-verifier --provider-base-url=http://r2-d2-api --pact-broker-base-url=$PACT_BROKER --provider=R2D2 $PUBLISH
   allow_failure: true
 
-Api-Tests:
-  stage: Test
-  extends: .running-r2d2
-  image: docker-registry.production.smartbox.com/millenniumfalcon/darth-vader-newman
-  script:
-    - newman run tests/ApiTests/rate-band.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
-    - newman run tests/ApiTests/box.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
-    - newman run tests/ApiTests/experience.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
-    - newman run tests/ApiTests/room.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
-    - newman run tests/ApiTests/partner.postman_collection.json --environment=tests/ApiTests/R2D2-local.postman_environment.json --reporters cli,htmlextra --reporter-htmlextra-export report/html/newman-report.html
-  artifacts:
-    when: always
-    paths:
-      - report/
-
 .load-Tests:
   image: grubykarol/locust
   script:
     - locust -f tests/LoadTests/R2D2Locust.py  --host=http://r2-d2-api/ --no-web -c 1 -r 1 --only-summary --run-time 1m
   tags:
-    - k8s
+    - k8s-alpha
 
 validate-api-spec-schema:
   stage: Test
@@ -83,7 +81,7 @@ validate-api-spec-schema:
   script:
     - swagger-cli validate reference/r2d2-api/openapi.yaml
   tags:
-    - k8s
+    - k8s-alpha
 
 build-R2D2-stub-image:
   stage: Build

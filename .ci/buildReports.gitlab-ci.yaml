@@ -10,7 +10,7 @@ sonarqube-report:
   script:
     - sonar-scanner -D sonar.branch=$SQ_BRANCH -D sonar.projectVersion=$SQ_VERSION
   tags:
-    - k8s
+    - k8s-alpha
   allow_failure: true
 
 generate-api-reference:
@@ -24,7 +24,7 @@ generate-api-reference:
     paths:
       - openapi.json
   tags:
-    - k8s
+    - k8s-alpha
 
 mermaid-generate-images:
   stage: Build Reports
@@ -44,7 +44,7 @@ mermaid-generate-images:
       - master
       - tags
   tags:
-    - k8s
+    - k8s-alpha
   except:
     - schedules
 
@@ -64,4 +64,4 @@ code-tests-aggregate:
       - report/
       - openapi.json
   tags:
-    - k8s
+    - k8s-alpha

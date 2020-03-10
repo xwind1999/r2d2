@@ -26,7 +26,7 @@ class BoxCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("string")
      */
-    public string $brand;
+    public ?string $brand;
 
     /**
      * @Assert\Type(type="string")
@@ -34,7 +34,7 @@ class BoxCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("string")
      */
-    public string $country;
+    public ?string $country;
 
     /**
      * @Assert\Type(type="string")
@@ -42,5 +42,5 @@ class BoxCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("string")
      */
-    public string $status;
+    public ?string $status;
 }
