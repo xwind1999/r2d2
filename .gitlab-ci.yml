@@ -37,7 +37,7 @@ composer:
     paths:
       - vendor/
   tags:
-    - k8s
+    - k8s-alpha
 
 #notify:
 #  stage: Publish API reference
@@ -48,7 +48,7 @@ composer:
 #  script:
 #    - ${CI_PROJECT_DIR}/.ci/notify.sh
 #  tags:
-#    - k8s
+#    - k8s-alpha
 
 pages:
   stage: Publish Reports
@@ -72,6 +72,6 @@ pages:
       - public
     expire_in: 7 days
   tags:
-    - k8s
+    - k8s-alpha
   only:
     - master

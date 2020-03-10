@@ -6,7 +6,7 @@ phpstan:
   script:
     - vendor/bin/phpstan analyse $(pwd)/src --level 8
   tags:
-    - k8s
+    - k8s-alpha
 
 php-cs-fixer:
   stage: Static analysis
@@ -16,7 +16,7 @@ php-cs-fixer:
   script:
     - vendor/bin/php-cs-fixer fix -v --dry-run
   tags:
-    - k8s
+    - k8s-alpha
 
 phpmetrics:
   stage: Static analysis
@@ -30,7 +30,7 @@ phpmetrics:
     paths:
       - report/
   tags:
-    - k8s
+    - k8s-alpha
 
 psalm:
   stage: Static analysis
@@ -40,5 +40,5 @@ psalm:
   script:
     - vendor/bin/psalm
   tags:
-    - k8s
+    - k8s-alpha
 

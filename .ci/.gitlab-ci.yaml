@@ -9,7 +9,7 @@ build-base-image:
   only:
     - CI-master
   tags:
-    - k8s
+    - k8s-alpha
   script:
     - >
       docker build --pull

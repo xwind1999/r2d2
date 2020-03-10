@@ -4,6 +4,8 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          backupGlobals="false"
+         executionOrder="random"
+         resolveDependencies="true"
          colors="true"
          bootstrap="config/bootstrap.php"
 >
@@ -18,8 +20,12 @@
     </php>
 
     <testsuites>
-        <testsuite name="Project Test Suite">
+        <testsuite name="UnitTests">
             <directory>tests</directory>
+            <exclude>tests/ApiTests</exclude>
+        </testsuite>
+        <testsuite name="ApiTests">
+            <directory>tests/ApiTests</directory>
         </testsuite>
     </testsuites>
 

@@ -35,21 +35,21 @@ class BoxGetResponse extends ResponseContract
      *
      * @JMS\Type("string")
      */
-    public string $brand;
+    public ?string $brand;
 
     /**
      * @Assert\Length(min="2", max="2")
      *
      * @JMS\Type("string")
      */
-    public string $country;
+    public ?string $country;
 
     /**
      * @Assert\Length(min="1", max="10")
      *
      * @JMS\Type("string")
      */
-    public string $status;
+    public ?string $status;
 
     /**
      * @Assert\NotBlank

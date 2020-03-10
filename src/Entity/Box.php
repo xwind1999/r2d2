@@ -37,15 +37,15 @@ class Box
     /**
      * @ORM\Column(type="string", length=3, nullable=true)
      */
-    public string $brand;
+    public ?string $brand;
 
     /**
      * @ORM\Column(type="string", length=2, nullable=true)
      */
-    public string $country;
+    public ?string $country;
 
     /**
-     * @ORM\Column(type="string", length=30)
+     * @ORM\Column(type="string", length=30, nullable=true)
      */
-    public string $status;
+    public ?string $status;
 }

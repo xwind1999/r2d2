@@ -6,7 +6,7 @@ sonarqube-early-validation:
   script:
     - sonar-scanner -X -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
   tags:
-    - k8s
+    - k8s-alpha
   allow_failure: true
 
 infection:
@@ -16,10 +16,11 @@ infection:
     - unitTests
     - composer
   script:
-    - phpdbg -qrr vendor/bin/infection --min-covered-msi=80 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage
+    - phpdbg -qrr vendor/bin/infection --min-covered-msi=80 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage --test-framework-options="--testsuite=UnitTests "
   artifacts:
     expire_in: 3 days
     paths:
       - report/
   tags:
-    - k8s
+    - k8s-alpha
+
