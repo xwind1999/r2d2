@@ -110,9 +110,15 @@ class BoxController
     }
 
     /**
-     * @Route("/api/box", methods={"PUT"}, format="json")
+     * @Route("/api/box/{uuid}", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="box")
+     * @SWG\Parameter(
+     *     name="uuid",
+     *     in="path",
+     *     type="string",
+     *     format="uuid"
+     * )
      * @SWG\Parameter(
      *         name="body",
      *         in="body",
@@ -124,11 +130,16 @@ class BoxController
      * )
      *
      * @throws ResourceNotFoundException
+     * @throws UnprocessableEntityException
      */
-    public function put(BoxUpdateRequest $boxUpdateRequest, BoxManager $boxManager): Response
+    public function put(string $uuid, BoxUpdateRequest $boxUpdateRequest, BoxManager $boxManager): Response
     {
+        if (!Uuid::isValid($uuid)) {
+            throw new UnprocessableEntityException();
+        }
+
         try {
-            $boxManager->update($boxUpdateRequest);
+            $boxManager->update($uuid, $boxUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }

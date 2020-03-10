@@ -45,7 +45,7 @@ class RoomManagerTest extends TestCase
     {
         $manager = new RoomManager($this->em->reveal(), $this->repository->reveal());
         $roomUpdateRequest = new RoomUpdateRequest();
-        $uuid = '12345678';
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $roomUpdateRequest->uuid = $uuid;
         $roomUpdateRequest->goldenId = '1234';
         $roomUpdateRequest->partnerGoldenId = '4321';
@@ -72,7 +72,7 @@ class RoomManagerTest extends TestCase
         $this->em->persist(Argument::type(Room::class))->shouldBeCalled();
         $this->em->flush()->shouldBeCalled();
 
-        $manager->update($roomUpdateRequest);
+        $manager->update($uuid, $roomUpdateRequest);
 
         $this->assertEquals(2, $room->inventory);
         $this->assertEquals('4321', $room->partnerGoldenId);

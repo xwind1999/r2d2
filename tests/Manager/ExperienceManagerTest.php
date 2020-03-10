@@ -45,8 +45,7 @@ class ExperienceManagerTest extends TestCase
     {
         $manager = new ExperienceManager($this->em->reveal(), $this->repository->reveal());
         $experienceUpdateRequest = new ExperienceUpdateRequest();
-        $uuid = '12345678';
-        $experienceUpdateRequest->uuid = $uuid;
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $experienceUpdateRequest->goldenId = '1234';
         $experienceUpdateRequest->partnerGoldenId = '5678';
         $experienceUpdateRequest->name = 'dinner with massage';
@@ -68,7 +67,7 @@ class ExperienceManagerTest extends TestCase
         $this->em->persist(Argument::type(Experience::class))->shouldBeCalled();
         $this->em->flush()->shouldBeCalled();
 
-        $manager->update($experienceUpdateRequest);
+        $manager->update($uuid, $experienceUpdateRequest);
 
         $this->assertEquals(1, $experience->duration);
         $this->assertEquals('5678', $experience->partnerGoldenId);

@@ -62,9 +62,9 @@ class RoomManager
     /**
      * @throws EntityNotFoundException
      */
-    public function update(RoomUpdateRequest $roomUpdateRequest): void
+    public function update(string $uuid, RoomUpdateRequest $roomUpdateRequest): void
     {
-        $room = $this->get($roomUpdateRequest->uuid);
+        $room = $this->get($uuid);
 
         $room->goldenId = $roomUpdateRequest->goldenId;
         $room->partnerGoldenId = $roomUpdateRequest->partnerGoldenId;

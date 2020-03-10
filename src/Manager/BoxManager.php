@@ -58,9 +58,9 @@ class BoxManager
     /**
      * @throws EntityNotFoundException
      */
-    public function update(BoxUpdateRequest $boxUpdateRequest): void
+    public function update(string $uuid, BoxUpdateRequest $boxUpdateRequest): void
     {
-        $box = $this->get($boxUpdateRequest->uuid);
+        $box = $this->get($uuid);
 
         $box->goldenId = $boxUpdateRequest->goldenId;
         $box->brand = $boxUpdateRequest->brand;

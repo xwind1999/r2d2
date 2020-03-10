@@ -90,12 +90,13 @@ class RoomControllerTest extends TestCase
      */
     public function testIfPutThrowsResourceNotFoundException()
     {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $roomUpdateRequest = new RoomUpdateRequest();
         $roomManager = $this->prophesize(RoomManager::class);
-        $roomManager->update($roomUpdateRequest)->willThrow(EntityNotFoundException::class);
+        $roomManager->update($uuid, $roomUpdateRequest)->willThrow(EntityNotFoundException::class);
         $controller = new RoomController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->put($roomUpdateRequest, $roomManager->reveal());
+        $controller->put($uuid, $roomUpdateRequest, $roomManager->reveal());
     }
 
     /**
@@ -103,11 +104,12 @@ class RoomControllerTest extends TestCase
      */
     public function testPut()
     {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $roomUpdateRequest = new RoomUpdateRequest();
         $roomManager = $this->prophesize(RoomManager::class);
-        $roomManager->update($roomUpdateRequest)->shouldBeCalled();
+        $roomManager->update($uuid, $roomUpdateRequest)->shouldBeCalled();
         $controller = new RoomController();
-        $response = $controller->put($roomUpdateRequest, $roomManager->reveal());
+        $response = $controller->put($uuid, $roomUpdateRequest, $roomManager->reveal());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
     }

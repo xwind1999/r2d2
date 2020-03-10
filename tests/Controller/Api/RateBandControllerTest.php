@@ -82,12 +82,13 @@ class RateBandControllerTest extends TestCase
      */
     public function testIfPutThrowsResourceNotFoundException()
     {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $rateBandUpdateRequest = new RateBandUpdateRequest();
         $rateBandManager = $this->prophesize(RateBandManager::class);
-        $rateBandManager->update($rateBandUpdateRequest)->willThrow(EntityNotFoundException::class);
+        $rateBandManager->update($uuid, $rateBandUpdateRequest)->willThrow(EntityNotFoundException::class);
         $controller = new RateBandController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->put($rateBandUpdateRequest, $rateBandManager->reveal());
+        $controller->put($uuid, $rateBandUpdateRequest, $rateBandManager->reveal());
     }
 
     /**
@@ -95,11 +96,12 @@ class RateBandControllerTest extends TestCase
      */
     public function testPut()
     {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $rateBandUpdateRequest = new RateBandUpdateRequest();
         $rateBandManager = $this->prophesize(RateBandManager::class);
-        $rateBandManager->update($rateBandUpdateRequest)->shouldBeCalled();
+        $rateBandManager->update($uuid, $rateBandUpdateRequest)->shouldBeCalled();
         $controller = new RateBandController();
-        $response = $controller->put($rateBandUpdateRequest, $rateBandManager->reveal());
+        $response = $controller->put($uuid, $rateBandUpdateRequest, $rateBandManager->reveal());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
     }

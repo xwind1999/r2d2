@@ -58,9 +58,9 @@ class PartnerManager
     /**
      * @throws EntityNotFoundException
      */
-    public function update(PartnerUpdateRequest $partnerUpdateRequest): void
+    public function update(string $uuid, PartnerUpdateRequest $partnerUpdateRequest): void
     {
-        $partner = $this->get($partnerUpdateRequest->uuid);
+        $partner = $this->get($uuid);
 
         $partner->goldenId = $partnerUpdateRequest->goldenId;
         $partner->status = $partnerUpdateRequest->status;

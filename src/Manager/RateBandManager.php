@@ -57,9 +57,9 @@ class RateBandManager
     /**
      * @throws EntityNotFoundException
      */
-    public function update(RateBandUpdateRequest $rateBandUpdateRequest): void
+    public function update(string $uuid, RateBandUpdateRequest $rateBandUpdateRequest): void
     {
-        $rateBand = $this->get($rateBandUpdateRequest->uuid);
+        $rateBand = $this->get($uuid);
 
         $rateBand->goldenId = $rateBandUpdateRequest->goldenId;
         $rateBand->partnerGoldenId = $rateBandUpdateRequest->partnerGoldenId;

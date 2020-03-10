@@ -84,12 +84,13 @@ class BoxControllerTest extends TestCase
      */
     public function testIfPutThrowsResourceNotFoundException()
     {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $boxUpdateRequest = new BoxUpdateRequest();
         $boxManager = $this->prophesize(BoxManager::class);
-        $boxManager->update($boxUpdateRequest)->willThrow(EntityNotFoundException::class);
+        $boxManager->update($uuid, $boxUpdateRequest)->willThrow(EntityNotFoundException::class);
         $controller = new BoxController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->put($boxUpdateRequest, $boxManager->reveal());
+        $controller->put($uuid, $boxUpdateRequest, $boxManager->reveal());
     }
 
     /**
@@ -97,11 +98,12 @@ class BoxControllerTest extends TestCase
      */
     public function testPut()
     {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $boxUpdateRequest = new BoxUpdateRequest();
         $boxManager = $this->prophesize(BoxManager::class);
-        $boxManager->update($boxUpdateRequest)->shouldBeCalled();
+        $boxManager->update($uuid, $boxUpdateRequest)->shouldBeCalled();
         $controller = new BoxController();
-        $response = $controller->put($boxUpdateRequest, $boxManager->reveal());
+        $response = $controller->put($uuid, $boxUpdateRequest, $boxManager->reveal());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
     }

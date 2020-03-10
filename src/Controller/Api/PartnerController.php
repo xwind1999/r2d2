@@ -110,9 +110,15 @@ class PartnerController
     }
 
     /**
-     * @Route("/api/partner", methods={"PUT"}, format="json")
+     * @Route("/api/partner/{uuid}", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="partner")
+     * @SWG\Parameter(
+     *     name="uuid",
+     *     in="path",
+     *     type="string",
+     *     format="uuid"
+     * )
      * @SWG\Parameter(
      *         name="body",
      *         in="body",
@@ -124,11 +130,16 @@ class PartnerController
      * )
      *
      * @throws ResourceNotFoundException
+     * @throws UnprocessableEntityException
      */
-    public function put(PartnerUpdateRequest $partnerUpdateRequest, PartnerManager $partnerManager): Response
+    public function put(string $uuid, PartnerUpdateRequest $partnerUpdateRequest, PartnerManager $partnerManager): Response
     {
+        if (!Uuid::isValid($uuid)) {
+            throw new UnprocessableEntityException();
+        }
+
         try {
-            $partnerManager->update($partnerUpdateRequest);
+            $partnerManager->update($uuid, $partnerUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }

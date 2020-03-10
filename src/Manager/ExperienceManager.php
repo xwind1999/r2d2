@@ -60,9 +60,9 @@ class ExperienceManager
     /**
      * @throws EntityNotFoundException
      */
-    public function update(ExperienceUpdateRequest $experienceUpdateRequest): void
+    public function update(string $uuid, ExperienceUpdateRequest $experienceUpdateRequest): void
     {
-        $experience = $this->get($experienceUpdateRequest->uuid);
+        $experience = $this->get($uuid);
 
         $experience->goldenId = $experienceUpdateRequest->goldenId;
         $experience->partnerGoldenId = $experienceUpdateRequest->partnerGoldenId;
