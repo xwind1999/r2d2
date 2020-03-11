@@ -41,7 +41,7 @@ class RoomPrice
     public \DateTime $date;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", options={"unsigned"=true})
      */
     public int $price;
 }
