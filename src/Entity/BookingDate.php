@@ -26,6 +26,21 @@ class BookingDate
     public UuidInterface $uuid;
 
     /**
+     * @ORM\Column(type="string", length=45)
+     */
+    public string $bookingGoldenId;
+
+    /**
+     * @ORM\Column(type="string", length=45)
+     */
+    public string $roomGoldenId;
+
+    /**
+     * @ORM\Column(type="string", length=45, nullable=true)
+     */
+    public ?string $rateBandGoldenId;
+
+    /**
      * @ORM\Column(type="date")
      */
     public \DateTime $date;
@@ -43,5 +58,5 @@ class BookingDate
     /**
      * @ORM\Column(type="integer")
      */
-    public int $guestCount;
+    public int $guestsCount;
 }
