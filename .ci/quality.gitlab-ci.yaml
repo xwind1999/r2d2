@@ -26,7 +26,12 @@ Api-Tests:
     DATABASE_URL: "sqlite:////tmp/db.sqlite"
   script:
     - bin/console doctrine:schema:update --force
-    - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never
+    - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - report/html/api-tests/
+      - report/raw/api-tests/
   tags:
     - k8s-alpha
 

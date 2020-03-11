@@ -7,6 +7,8 @@
 * [Unit Tests Coverage Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/phpunit/)
 * [PHPMetrics Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/phpmetrics/)
 
+* [Api Tests Coverage Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/api-tests/)
+
 # R2D2 API
 
 > A resourceful astromech droid, R2-D2 served PadméAmidala, Anakin Skywalker and Luke Skywalker in turn, showing great bravery in rescuing his masters and their friends from many perils.
