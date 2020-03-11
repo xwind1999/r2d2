@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping\CustomIdGenerator;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\RoomPriceRepository")
  */
 class RoomPrice
 {
