@@ -28,12 +28,12 @@ class RoomPrice
     /**
      * @ORM\Column(type="string", length=45)
      */
-    public string $roomSmartboxId;
+    public string $roomGoldenId;
 
     /**
      * @ORM\Column(type="string", length=45)
      */
-    public string $rateBandSmartboxId;
+    public string $rateBandGoldenId;
 
     /**
      * @ORM\Column(type="date")
