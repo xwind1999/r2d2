@@ -21,6 +21,9 @@ properties:
     type: string
     format: uuid
     description: Room UUID
+  booking_golden_id:
+    type: string
+    description: Booking Golde ID (booking component ID)
   room_golden_id:
     type: string
     description: Room Golden ID (room component ID)
