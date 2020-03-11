@@ -148,12 +148,12 @@ class PartnerControllerTest extends TestCase
 
     /**
      * @covers ::create
-     * @covers \App\Contract\Response\Experience\ExperienceCreateResponse::__construct
+     * @covers \App\Contract\Response\Partner\PartnerCreateResponse::__construct
      */
     public function testCreate()
     {
         $partnerCreateRequest = new PartnerCreateRequest();
-        $uuid = '1234';
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $uuidInterface = $this->prophesize(UuidInterface::class);
         $uuidInterface->toString()->willReturn($uuid);
         $partner = new Partner();

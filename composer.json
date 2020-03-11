@@ -46,7 +46,7 @@
         "psr-4": {
             "App\\": "src/",
             "Psr\\Log\\": "src-vendor-fixes/Psr/Log",
-            "Clogger\\": "src-logger-middleware/",
+            "Doctrine\\ORM\\": "src-vendor-fixes/doctrine/",
             "R2D2\\Hooks\\": "hooks/"
         }
     },

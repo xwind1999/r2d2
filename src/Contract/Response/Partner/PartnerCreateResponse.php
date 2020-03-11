@@ -7,7 +7,6 @@ namespace App\Contract\Response\Partner;
 use App\Contract\ResponseContract;
 use App\Entity\Partner;
 use JMS\Serializer\Annotation as JMS;
-use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class PartnerCreateResponse extends ResponseContract
@@ -24,14 +23,6 @@ class PartnerCreateResponse extends ResponseContract
 
     public function __construct(Partner $partner)
     {
-        /*
-         * @todo remove verification after issue is fixed on doctrine
-         * @see https://github.com/doctrine/orm/issues/7999
-         */
-        if ($partner->uuid instanceof UuidInterface) {
-            $this->uuid = $partner->uuid->toString();
-        } else {
-            $this->uuid = '';
-        }
+        $this->uuid = $partner->uuid->toString();
     }
 }

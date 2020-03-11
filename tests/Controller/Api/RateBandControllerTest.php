@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @coversDefaultClass \App\Controller\Api\PartnerController
+ * @coversDefaultClass \App\Controller\Api\RateBandController
  */
 class RateBandControllerTest extends TestCase
 {

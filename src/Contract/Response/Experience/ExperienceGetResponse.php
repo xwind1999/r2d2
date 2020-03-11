@@ -7,7 +7,6 @@ namespace App\Contract\Response\Experience;
 use App\Contract\ResponseContract;
 use App\Entity\Experience;
 use JMS\Serializer\Annotation as JMS;
-use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class ExperienceGetResponse extends ResponseContract
@@ -78,16 +77,7 @@ class ExperienceGetResponse extends ResponseContract
 
     public function __construct(Experience $experience)
     {
-        /*
-         * @todo remove verification after issue is fixed on doctrine
-         * @see https://github.com/doctrine/orm/issues/7999
-         */
-        if ($experience->uuid instanceof UuidInterface) {
-            $this->uuid = $experience->uuid->toString();
-        } else {
-            $this->uuid = '';
-        }
-
+        $this->uuid = $experience->uuid->toString();
         $this->goldenId = $experience->goldenId;
         $this->partnerGoldenId = $experience->partnerGoldenId;
         $this->name = $experience->name;

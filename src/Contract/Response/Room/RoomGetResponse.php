@@ -7,7 +7,6 @@ namespace App\Contract\Response\Room;
 use App\Contract\ResponseContract;
 use App\Entity\Room;
 use JMS\Serializer\Annotation as JMS;
-use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class RoomGetResponse extends ResponseContract
@@ -97,16 +96,7 @@ class RoomGetResponse extends ResponseContract
 
     public function __construct(Room $room)
     {
-        /*
-         * @todo remove verification after issue is fixed on doctrine
-         * @see https://github.com/doctrine/orm/issues/7999
-         */
-        if ($room->uuid instanceof UuidInterface) {
-            $this->uuid = $room->uuid->toString();
-        } else {
-            $this->uuid = '';
-        }
-
+        $this->uuid = $room->uuid->toString();
         $this->goldenId = $room->goldenId;
         $this->partnerGoldenId = $room->partnerGoldenId;
         $this->name = $room->name;
