@@ -372,18 +372,6 @@
     "seld/jsonlint": {
         "version": "1.7.2"
     },
-    "sensiolabs/security-checker": {
-        "version": "4.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "4.0",
-            "ref": "160c9b600564faa1224e8f387d49ef13ceb8b793"
-        },
-        "files": [
-            "config/packages/security_checker.yaml"
-        ]
-    },
     "symfony/asset": {
         "version": "v5.0.3"
     },
@@ -473,12 +461,6 @@
             "src/Controller/.gitignore",
             "src/Kernel.php"
         ]
-    },
-    "symfony/http-client": {
-        "version": "v5.0.4"
-    },
-    "symfony/http-client-contracts": {
-        "version": "v2.0.1"
     },
     "symfony/http-foundation": {
         "version": "v5.0.2"

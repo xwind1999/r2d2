@@ -73,7 +73,7 @@ Read about: [PHPDoc Documentation](https://www.phpdoc.org/)
     - In case something goes wrong, you will have the work saved
 - When you are going to create an MR, rebase it before sending to code review
 - When working in an already created MR, always use the words **WIP** (Work In Progress) in case the work has been finished yet
-- Always mark to delete your branch when the MR is complete
+- Always confirm that the option to delete your branch when the MR is merged is marked
 - Always mark to squash the commits in a recently created MR
         
  
@@ -93,15 +93,41 @@ Take those rules as a consideration when developing:
 - Validate if we have migrations in case of new fields/entities
 - Look for duplicated code
 - Check if the code is well-designed
-- Code must not be complex than necessary
+- Code must not be more complex than necessary
 - Coverage must be of 100% of anything new
 - Unit tests are developed according to our recommendations
 - It has been used a meaningful and clear name for classes, methods, variables, etc
 - There are properly comments
+- The jobs in the pipeline are all passing as they should and have the expected artifacts generated
+- New jobs were added to the pipeline if part of the ticket requirements
 - Additional suggestions:
     - Review fewer than 400 lines of code at a time
     - Take your time. Inspection rates should under 500 LOC per hour
         - Source: [Code Review Report](https://smartbear.com/resources/ebooks/the-state-of-code-review-2019/)
+
+##### Merging Code
+R2-D2 project development is based on merge requests proposed by any Smartbox Software Engineer or third-party collaborator. Merge request acceptance or rejection is decided based on the votes cast by the R2D2 team.
+
+###### Merge Request Voting Policy
+- "-1" votes must always be justified by technical and objective reasons;
+- "+1" votes do not require justification, unless there is at least one "-1"  vote;
+- Team members can change their votes as many times as they desire during the course of a merge request discussion;
+- Team members are not allowed to vote on their own merge requests.
+
+###### Merge Request Merging Policy
+A merge request can be merged if:
+
+- It is a minor change[1];
+- Enough time was given for peer reviews;
+- No discussions were left open;
+- All automated tests, validations and analysis passes;
+- Code coverage remains on 100%;
+- At least two R2-D2 Team members voted "+1"  and no team member voted "-1" (via Gitlab reactions or as comments).
+
+###### Merge Request Merging Process
+All code must be committed to the repository through merge requests, except for minor changes[1] which can be committed directly to the repository.
+
+[1]: Minor changes comprise typos, DocBlock fixes, code standards violations, and minor CSS, JavaScript and HTML modifications.
 
 ##### DIRECTORY STRUCTURE
 
