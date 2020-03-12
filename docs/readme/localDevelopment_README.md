@@ -8,6 +8,7 @@
 ## Instructions
 1. clone the repository
 2. execute ```bin/rc install```
+3. access the docs on [http://localhost/api/doc](http://localhost/api/doc)
 
 # Using the R2D2 CLI
 To make things easier in local environments, we have the r2d2 cli, that wraps up some commands we constantly need to run.
