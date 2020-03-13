@@ -47,6 +47,7 @@ class ExperienceCreateRequest implements RequestBodyInterface, ValidatableReques
 
     /**
      * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
      * @Assert\NotBlank
      *
      * @JMS\Type("strict_integer")

@@ -55,6 +55,7 @@ class ExperienceGetResponse extends ResponseContract
 
     /**
      * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
      * @Assert\NotBlank
      *
      * @JMS\Type("integer")

@@ -46,7 +46,7 @@ class Experience
     public string $description;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", options={"unsigned"=true})
      */
     public int $duration;
 }
