@@ -48,32 +48,32 @@ class Booking
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
      */
-    public string $voucher;
+    public ?string $voucher = null;
 
     /**
      * @ORM\Column(type="string", length=3, nullable=true)
      */
-    public string $brand;
+    public ?string $brand = null;
 
     /**
      * @ORM\Column(type="string", length=2, nullable=true)
      */
-    public string $country;
+    public ?string $country = null;
 
     /**
      * @ORM\Column(type="string", length=10, nullable=true)
      */
-    public string $requestType;
+    public ?string $requestType = null;
 
     /**
      * @ORM\Column(type="string", length=45, nullable=true)
      */
-    public string $channel;
+    public ?string $channel = null;
 
     /**
      * @ORM\Column(type="string", length=45, nullable=true)
      */
-    public string $cancellationChannel;
+    public ?string $cancellationChannel = null;
 
     /**
      * @ORM\Column(type="string", length=30)
@@ -81,7 +81,7 @@ class Booking
     public string $status;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", options={"unsigned"=true})
      */
     public int $totalPrice;
 
@@ -103,32 +103,32 @@ class Booking
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    public string $customerFirstName;
+    public ?string $customerFirstName = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    public string $customerLastName;
+    public ?string $customerLastName = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    public string $customerEmail;
+    public ?string $customerEmail = null;
 
     /**
      * @ORM\Column(type="string", length=45, nullable=true)
      */
-    public string $customerPhone;
+    public ?string $customerPhone = null;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    public string $customerComment;
+    public ?string $customerComment = null;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    public string $partnerComment;
+    public ?string $partnerComment = null;
 
     /**
      * @ORM\Column(type="date")
@@ -138,5 +138,5 @@ class Booking
     /**
      * @ORM\Column(type="date", nullable=true)
      */
-    public \DateTime $cancelledAt;
+    public ?\DateTime $cancelledAt = null;
 }

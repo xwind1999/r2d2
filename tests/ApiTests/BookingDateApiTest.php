@@ -24,6 +24,13 @@ class BookingDateApiTest extends ApiTestCase
         $this->bookingDateCreateRequest->guestsCount = 1;
     }
 
+    public function testCreateWithInvalidBookingGoldenId()
+    {
+        $this->bookingDateCreateRequest->bookingGoldenId = '';
+        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->bookingDateCreateRequest));
+        $this->assertEquals(422, $this->client()->getResponse()->getStatusCode());
+    }
+
     public function testCreateSuccess(): string
     {
         $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->bookingDateCreateRequest));

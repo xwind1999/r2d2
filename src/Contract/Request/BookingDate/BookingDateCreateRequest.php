@@ -47,6 +47,7 @@ class BookingDateCreateRequest implements RequestBodyInterface, ValidatableReque
 
     /**
      * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
      * @Assert\NotBlank
      *
      * @JMS\Type("strict_integer")
@@ -63,6 +64,7 @@ class BookingDateCreateRequest implements RequestBodyInterface, ValidatableReque
 
     /**
      * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
      * @Assert\NotBlank
      *
      * @JMS\Type("strict_integer")

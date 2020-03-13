@@ -56,6 +56,7 @@ class BookingDateGetResponse extends ResponseContract
 
     /**
      * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
      * @Assert\NotBlank
      *
      * @JMS\Type("strict_integer")
@@ -72,6 +73,7 @@ class BookingDateGetResponse extends ResponseContract
 
     /**
      * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
      * @Assert\NotBlank
      *
      * @JMS\Type("strict_integer")
