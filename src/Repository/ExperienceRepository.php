@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Experience;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\ExperienceNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -22,12 +22,35 @@ class ExperienceRepository extends ServiceEntityRepository
         parent::__construct($registry, Experience::class);
     }
 
+    public function save(Experience $entity): void
+    {
+        $this->_em->persist($entity);
+        $this->_em->flush();
+    }
+
+    public function delete(Experience $entity): void
+    {
+        $this->_em->remove($entity);
+        $this->_em->flush();
+    }
+
     public function findOne(string $uuid): Experience
     {
         $experience = $this->find($uuid);
 
         if (null === $experience) {
-            throw new EntityNotFoundException();
+            throw new ExperienceNotFoundException();
+        }
+
+        return $experience;
+    }
+
+    public function findOneByGoldenId(string $goldenId): Experience
+    {
+        $experience = $this->findOneBy(['goldenId' => $goldenId]);
+
+        if (null === $experience) {
+            throw new ExperienceNotFoundException();
         }
 
         return $experience;

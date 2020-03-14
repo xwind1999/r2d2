@@ -8,12 +8,14 @@ use App\Contract\Request\RoomPrice\RoomPriceCreateRequest;
 use App\Contract\Request\RoomPrice\RoomPriceUpdateRequest;
 use App\Contract\Response\RoomPrice\RoomPriceCreateResponse;
 use App\Contract\Response\RoomPrice\RoomPriceGetResponse;
+use App\Contract\Response\RoomPrice\RoomPriceUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\RoomPriceManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -61,14 +63,10 @@ class RoomPriceController
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
      */
-    public function get(string $uuid, RoomPriceManager $roomPriceManager): RoomPriceGetResponse
+    public function get(UuidInterface $uuid, RoomPriceManager $roomPriceManager): RoomPriceGetResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $roomPrice = $roomPriceManager->get($uuid);
+            $roomPrice = $roomPriceManager->get($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -94,14 +92,10 @@ class RoomPriceController
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function delete(string $uuid, RoomPriceManager $roomPriceManager): Response
+    public function delete(UuidInterface $uuid, RoomPriceManager $roomPriceManager): Response
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $roomPriceManager->delete($uuid);
+            $roomPriceManager->delete($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -125,25 +119,22 @@ class RoomPriceController
      *         @Model(type=RoomPriceUpdateRequest::class)
      * )
      * @SWG\Response(
-     *     response=204,
-     *     description="Booking Date upated"
+     *     response=200,
+     *     description="RoomPrice updated",
+     *     @Model(type=RoomPriceUpdateResponse::class)
      * )
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function put(string $uuid, RoomPriceUpdateRequest $roomPriceUpdateRequest, RoomPriceManager $roomPriceManager): Response
+    public function put(UuidInterface $uuid, RoomPriceUpdateRequest $roomPriceUpdateRequest, RoomPriceManager $roomPriceManager): RoomPriceUpdateResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $roomPriceManager->update($uuid, $roomPriceUpdateRequest);
+            $roomPrice = $roomPriceManager->update($uuid->toString(), $roomPriceUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
 
-        return new Response(null, 204);
+        return new RoomPriceUpdateResponse($roomPrice);
     }
 }

@@ -8,25 +8,27 @@ use App\Contract\Request\Room\RoomCreateRequest;
 use App\Contract\Request\Room\RoomUpdateRequest;
 use App\Entity\Room;
 use App\Exception\Repository\EntityNotFoundException;
+use App\Repository\PartnerRepository;
 use App\Repository\RoomRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
 class RoomManager
 {
-    protected EntityManagerInterface $em;
-
     protected RoomRepository $repository;
 
-    public function __construct(EntityManagerInterface $em, RoomRepository $repository)
+    protected PartnerRepository $partnerRepository;
+
+    public function __construct(RoomRepository $repository, PartnerRepository $partnerRepository)
     {
-        $this->em = $em;
         $this->repository = $repository;
+        $this->partnerRepository = $partnerRepository;
     }
 
     public function create(RoomCreateRequest $roomCreateRequest): Room
     {
-        $room = new Room();
+        $partner = $this->partnerRepository->findOneByGoldenId($roomCreateRequest->partnerGoldenId);
 
+        $room = new Room();
+        $room->partner = $partner;
         $room->goldenId = $roomCreateRequest->goldenId;
         $room->partnerGoldenId = $roomCreateRequest->partnerGoldenId;
         $room->name = $roomCreateRequest->name;
@@ -35,8 +37,7 @@ class RoomManager
         $room->isSellable = $roomCreateRequest->isSellable;
         $room->status = $roomCreateRequest->status;
 
-        $this->em->persist($room);
-        $this->em->flush();
+        $this->repository->save($room);
 
         return $room;
     }
@@ -55,17 +56,18 @@ class RoomManager
     public function delete(string $uuid): void
     {
         $room = $this->get($uuid);
-        $this->em->remove($room);
-        $this->em->flush();
+        $this->repository->delete($room);
     }
 
     /**
      * @throws EntityNotFoundException
      */
-    public function update(string $uuid, RoomUpdateRequest $roomUpdateRequest): void
+    public function update(string $uuid, RoomUpdateRequest $roomUpdateRequest): Room
     {
-        $room = $this->get($uuid);
+        $partner = $this->partnerRepository->findOneByGoldenId($roomUpdateRequest->partnerGoldenId);
 
+        $room = $this->get($uuid);
+        $room->partner = $partner;
         $room->goldenId = $roomUpdateRequest->goldenId;
         $room->partnerGoldenId = $roomUpdateRequest->partnerGoldenId;
         $room->name = $roomUpdateRequest->name;
@@ -74,7 +76,8 @@ class RoomManager
         $room->isSellable = $roomUpdateRequest->isSellable;
         $room->status = $roomUpdateRequest->status;
 
-        $this->em->persist($room);
-        $this->em->flush();
+        $this->repository->save($room);
+
+        return $room;
     }
 }

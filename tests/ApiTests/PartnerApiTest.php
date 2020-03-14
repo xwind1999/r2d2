@@ -4,37 +4,25 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests;
 
-use App\Contract\Request\Partner\PartnerCreateRequest;
-use App\Contract\Request\Partner\PartnerUpdateRequest;
-
 class PartnerApiTest extends ApiTestCase
 {
     const API_BASE_URL = '/api/partner';
-    protected PartnerCreateRequest $partnerCreateRequest;
-
-    public function setUp(): void
-    {
-        $this->partnerCreateRequest = new PartnerCreateRequest();
-        $this->partnerCreateRequest->goldenId = '1234';
-        $this->partnerCreateRequest->status = 'active';
-        $this->partnerCreateRequest->currency = 'EUR';
-    }
 
     public function testCreateWithInvalidGoldenId()
     {
-        $this->partnerCreateRequest->goldenId = '';
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->partnerCreateRequest));
-        $this->assertEquals(422, $this->client()->getResponse()->getStatusCode());
+        $partnerCreateRequest = self::$partnerHelper->getDefault(['golden_id' => '']);
+        $response = self::$partnerHelper->create($partnerCreateRequest);
+        $this->assertEquals(422, $response->getStatusCode());
     }
 
     public function testCreateSuccess(): string
     {
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->partnerCreateRequest));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertEquals(201, $this->client()->getResponse()->getStatusCode());
+        $response = self::$partnerHelper->create();
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertEquals(201, $response->getStatusCode());
 
-        return $response['uuid'];
+        return $responseContent->uuid;
     }
 
     /**
@@ -42,11 +30,11 @@ class PartnerApiTest extends ApiTestCase
      */
     public function testGet(string $uuid): string
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertArrayHasKey('created_at', $response);
-        $this->assertEquals(200, $this->client()->getResponse()->getStatusCode());
+        $response = self::$partnerHelper->get($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertObjectHasAttribute('created_at', $responseContent);
+        $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;
     }
@@ -56,16 +44,15 @@ class PartnerApiTest extends ApiTestCase
      */
     public function testUpdate(string $uuid): string
     {
-        $payload = new PartnerUpdateRequest();
-        $payload->uuid = $uuid;
-        $payload->goldenId = '9999';
-        $payload->status = 'inactive';
-        $payload->currency = 'DKK';
-        $payload->ceaseDate = new \DateTime();
-        $this->client()->request('PUT', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], [], $this->serialize($payload));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
+        $partner = json_decode(self::$partnerHelper->get($uuid)->getContent(), true);
+        $payload = [
+            'status' => 'inactive',
+            'cease_date' => (new \DateTime())->format('Y-m-d'),
+        ] + $partner;
+        $response = self::$partnerHelper->update($uuid, $payload);
+        $responseContent = json_decode($response->getContent());
+        $this->assertEquals($payload['status'], $responseContent->status);
+        $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;
     }
@@ -75,10 +62,10 @@ class PartnerApiTest extends ApiTestCase
      */
     public function testDelete(string $uuid): string
     {
-        $this->client()->request('DELETE', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
+        $response = self::$partnerHelper->delete($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertNull($responseContent);
+        $this->assertEquals(204, $response->getStatusCode());
 
         return $uuid;
     }
@@ -88,7 +75,7 @@ class PartnerApiTest extends ApiTestCase
      */
     public function testGetAfterDelete(string $uuid)
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $this->assertEquals(404, $this->client()->getResponse()->getStatusCode());
+        $response = self::$partnerHelper->get($uuid);
+        $this->assertEquals(404, $response->getStatusCode());
     }
 }

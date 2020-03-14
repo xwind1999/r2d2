@@ -6,10 +6,11 @@ namespace App\Tests\Manager;
 
 use App\Contract\Request\RateBand\RateBandCreateRequest;
 use App\Contract\Request\RateBand\RateBandUpdateRequest;
+use App\Entity\Partner;
 use App\Entity\RateBand;
 use App\Manager\RateBandManager;
+use App\Repository\PartnerRepository;
 use App\Repository\RateBandRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -21,19 +22,19 @@ use Ramsey\Uuid\UuidInterface;
 class RateBandManagerTest extends TestCase
 {
     /**
-     * @var EntityManagerInterface|ObjectProphecy
-     */
-    protected $em;
-
-    /**
      * @var ObjectProphecy|RateBandRepository
      */
     protected $repository;
 
+    /**
+     * @var ObjectProphecy|PartnerRepository
+     */
+    protected $partnerRepository;
+
     public function setUp(): void
     {
-        $this->em = $this->prophesize(EntityManagerInterface::class);
         $this->repository = $this->prophesize(RateBandRepository::class);
+        $this->partnerRepository = $this->prophesize(PartnerRepository::class);
     }
 
     /**
@@ -43,7 +44,10 @@ class RateBandManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new RateBandManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new RateBandManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $partner = new Partner();
+        $partner->goldenId = '4321';
+        $this->partnerRepository->findOneByGoldenId('4321')->willReturn($partner);
         $rateBandUpdateRequest = new RateBandUpdateRequest();
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $rateBandUpdateRequest->uuid = $uuid;
@@ -61,11 +65,11 @@ class RateBandManagerTest extends TestCase
         $rateBand->name = 'testName';
         $this->repository->findOne($uuid)->willReturn($rateBand);
 
-        $this->em->persist(Argument::type(RateBand::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(RateBand::class))->shouldBeCalled();
 
-        $manager->update($uuid, $rateBandUpdateRequest);
+        $updatedRateBand = $manager->update($uuid, $rateBandUpdateRequest);
 
+        $this->assertSame($rateBand, $updatedRateBand);
         $this->assertEquals('1234', $rateBand->goldenId);
         $this->assertEquals('4321', $rateBand->partnerGoldenId);
         $this->assertEquals('testName', $rateBand->name);
@@ -78,7 +82,7 @@ class RateBandManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new RateBandManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new RateBandManager($this->repository->reveal(), $this->partnerRepository->reveal());
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -87,8 +91,7 @@ class RateBandManagerTest extends TestCase
         $rateBand->uuid = $uuidInterface->reveal();
         $this->repository->findOne($uuid)->willReturn($rateBand);
 
-        $this->em->remove(Argument::type(RateBand::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->delete(Argument::type(RateBand::class))->shouldBeCalled();
 
         $manager->delete($uuid);
     }
@@ -99,14 +102,16 @@ class RateBandManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new RateBandManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new RateBandManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $partner = new Partner();
+        $partner->goldenId = '4321';
+        $this->partnerRepository->findOneByGoldenId('4321')->willReturn($partner);
         $rateBandCreateRequest = new RateBandCreateRequest();
         $rateBandCreateRequest->goldenId = '1234';
         $rateBandCreateRequest->partnerGoldenId = '4321';
         $rateBandCreateRequest->name = 'testName';
 
-        $this->em->persist(Argument::type(RateBand::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(RateBand::class))->shouldBeCalled();
 
         $rateBand = $manager->create($rateBandCreateRequest);
         $this->assertEquals($rateBandCreateRequest->goldenId, $rateBand->goldenId);

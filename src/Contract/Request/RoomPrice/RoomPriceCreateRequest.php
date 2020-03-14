@@ -39,6 +39,7 @@ class RoomPriceCreateRequest implements RequestBodyInterface, ValidatableRequest
 
     /**
      * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
      * @Assert\NotBlank
      *
      * @JMS\Type("strict_integer")

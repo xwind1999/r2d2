@@ -8,30 +8,33 @@ use App\Contract\Request\RateBand\RateBandCreateRequest;
 use App\Contract\Request\RateBand\RateBandUpdateRequest;
 use App\Entity\RateBand;
 use App\Exception\Repository\EntityNotFoundException;
+use App\Repository\PartnerRepository;
 use App\Repository\RateBandRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
 class RateBandManager
 {
-    protected EntityManagerInterface $em;
-
     protected RateBandRepository $repository;
 
-    public function __construct(EntityManagerInterface $em, RateBandRepository $repository)
+    protected PartnerRepository $partnerRepository;
+
+    public function __construct(RateBandRepository $repository, PartnerRepository $partnerRepository)
     {
-        $this->em = $em;
         $this->repository = $repository;
+        $this->partnerRepository = $partnerRepository;
     }
 
     public function create(RateBandCreateRequest $rateBandCreateRequest): RateBand
     {
+        $partner = $this->partnerRepository->findOneByGoldenId($rateBandCreateRequest->partnerGoldenId);
+
         $rateBand = new RateBand();
+        $rateBand->partner = $partner;
+
         $rateBand->goldenId = $rateBandCreateRequest->goldenId;
         $rateBand->partnerGoldenId = $rateBandCreateRequest->partnerGoldenId;
         $rateBand->name = $rateBandCreateRequest->name;
 
-        $this->em->persist($rateBand);
-        $this->em->flush();
+        $this->repository->save($rateBand);
 
         return $rateBand;
     }
@@ -49,23 +52,26 @@ class RateBandManager
      */
     public function delete(string $uuid): void
     {
-        $box = $this->get($uuid);
-        $this->em->remove($box);
-        $this->em->flush();
+        $rateBand = $this->get($uuid);
+        $this->repository->delete($rateBand);
     }
 
     /**
      * @throws EntityNotFoundException
      */
-    public function update(string $uuid, RateBandUpdateRequest $rateBandUpdateRequest): void
+    public function update(string $uuid, RateBandUpdateRequest $rateBandUpdateRequest): RateBand
     {
+        $partner = $this->partnerRepository->findOneByGoldenId($rateBandUpdateRequest->partnerGoldenId);
+
         $rateBand = $this->get($uuid);
 
+        $rateBand->partner = $partner;
         $rateBand->goldenId = $rateBandUpdateRequest->goldenId;
         $rateBand->partnerGoldenId = $rateBandUpdateRequest->partnerGoldenId;
         $rateBand->name = $rateBandUpdateRequest->name;
 
-        $this->em->persist($rateBand);
-        $this->em->flush();
+        $this->repository->save($rateBand);
+
+        return $rateBand;
     }
 }

@@ -7,9 +7,12 @@ namespace App\Tests\Manager;
 use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
+use App\Entity\Experience;
+use App\Entity\Partner;
 use App\Manager\BookingManager;
 use App\Repository\BookingRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ExperienceRepository;
+use App\Repository\PartnerRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -21,19 +24,25 @@ use Ramsey\Uuid\UuidInterface;
 class BookingManagerTest extends TestCase
 {
     /**
-     * @var EntityManagerInterface|ObjectProphecy
-     */
-    protected $em;
-
-    /**
      * @var BookingRepository|ObjectProphecy
      */
     protected $repository;
 
+    /**
+     * @var ObjectProphecy|PartnerRepository
+     */
+    protected $partnerRepository;
+
+    /**
+     * @var ExperienceRepository|ObjectProphecy
+     */
+    protected $experienceRepository;
+
     public function setUp(): void
     {
-        $this->em = $this->prophesize(EntityManagerInterface::class);
         $this->repository = $this->prophesize(BookingRepository::class);
+        $this->partnerRepository = $this->prophesize(PartnerRepository::class);
+        $this->experienceRepository = $this->prophesize(ExperienceRepository::class);
     }
 
     /**
@@ -43,7 +52,16 @@ class BookingManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new BookingManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new BookingManager($this->repository->reveal(), $this->partnerRepository->reveal(), $this->experienceRepository->reveal());
+
+        $partner = new Partner();
+        $partner->goldenId = '5432';
+        $this->partnerRepository->findOneByGoldenId('5432')->willReturn($partner);
+
+        $experience = new Experience();
+        $experience->goldenId = '9012';
+        $this->experienceRepository->findOneByGoldenId('9012')->willReturn($experience);
+
         $bookingUpdateRequest = new BookingUpdateRequest();
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $currentDate = new \DateTime();
@@ -102,8 +120,7 @@ class BookingManagerTest extends TestCase
         $booking->cancelledAt = null;
         $this->repository->findOne($uuid)->willReturn($booking);
 
-        $this->em->persist(Argument::type(Booking::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(Booking::class))->shouldBeCalled();
 
         $manager->update($uuid, $bookingUpdateRequest);
         $this->assertEquals('9876', $booking->goldenId);
@@ -138,7 +155,7 @@ class BookingManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new BookingManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new BookingManager($this->repository->reveal(), $this->partnerRepository->reveal(), $this->experienceRepository->reveal());
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -147,8 +164,7 @@ class BookingManagerTest extends TestCase
         $booking->uuid = $uuidInterface->reveal();
         $this->repository->findOne($uuid)->willReturn($booking);
 
-        $this->em->remove(Argument::type(Booking::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->delete(Argument::type(Booking::class))->shouldBeCalled();
 
         $manager->delete($uuid);
     }
@@ -159,7 +175,16 @@ class BookingManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new BookingManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new BookingManager($this->repository->reveal(), $this->partnerRepository->reveal(), $this->experienceRepository->reveal());
+
+        $partner = new Partner();
+        $partner->goldenId = '5678';
+        $this->partnerRepository->findOneByGoldenId('5678')->willReturn($partner);
+
+        $experience = new Experience();
+        $experience->goldenId = '9012';
+        $this->experienceRepository->findOneByGoldenId('9012')->willReturn($experience);
+
         $currentDate = new \DateTime();
 
         $bookingCreateRequest = new BookingCreateRequest();
@@ -188,8 +213,7 @@ class BookingManagerTest extends TestCase
         $bookingCreateRequest->placedAt = $currentDate;
         $bookingCreateRequest->cancelledAt = null;
 
-        $this->em->persist(Argument::type(Booking::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(Booking::class))->shouldBeCalled();
 
         $booking = $manager->create($bookingCreateRequest);
         $this->assertEquals($bookingCreateRequest->goldenId, $booking->goldenId);

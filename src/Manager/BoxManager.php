@@ -9,17 +9,13 @@ use App\Contract\Request\Box\BoxUpdateRequest;
 use App\Entity\Box;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Repository\BoxRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
 class BoxManager
 {
-    protected EntityManagerInterface $em;
-
     protected BoxRepository $repository;
 
-    public function __construct(EntityManagerInterface $em, BoxRepository $repository)
+    public function __construct(BoxRepository $repository)
     {
-        $this->em = $em;
         $this->repository = $repository;
     }
 
@@ -31,8 +27,7 @@ class BoxManager
         $box->country = $boxCreateRequest->country;
         $box->status = $boxCreateRequest->status;
 
-        $this->em->persist($box);
-        $this->em->flush();
+        $this->repository->save($box);
 
         return $box;
     }
@@ -51,14 +46,13 @@ class BoxManager
     public function delete(string $uuid): void
     {
         $box = $this->get($uuid);
-        $this->em->remove($box);
-        $this->em->flush();
+        $this->repository->delete($box);
     }
 
     /**
      * @throws EntityNotFoundException
      */
-    public function update(string $uuid, BoxUpdateRequest $boxUpdateRequest): void
+    public function update(string $uuid, BoxUpdateRequest $boxUpdateRequest): Box
     {
         $box = $this->get($uuid);
 
@@ -67,7 +61,8 @@ class BoxManager
         $box->country = $boxUpdateRequest->country;
         $box->status = $boxUpdateRequest->status;
 
-        $this->em->persist($box);
-        $this->em->flush();
+        $this->repository->save($box);
+
+        return $box;
     }
 }

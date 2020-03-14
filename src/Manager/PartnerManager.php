@@ -9,17 +9,13 @@ use App\Contract\Request\Partner\PartnerUpdateRequest;
 use App\Entity\Partner;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Repository\PartnerRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
 class PartnerManager
 {
-    protected EntityManagerInterface $em;
-
     protected PartnerRepository $repository;
 
-    public function __construct(EntityManagerInterface $em, PartnerRepository $repository)
+    public function __construct(PartnerRepository $repository)
     {
-        $this->em = $em;
         $this->repository = $repository;
     }
 
@@ -31,8 +27,7 @@ class PartnerManager
         $partner->currency = $partnerCreateRequest->currency;
         $partner->ceaseDate = $partnerCreateRequest->ceaseDate;
 
-        $this->em->persist($partner);
-        $this->em->flush();
+        $this->repository->save($partner);
 
         return $partner;
     }
@@ -50,15 +45,14 @@ class PartnerManager
      */
     public function delete(string $uuid): void
     {
-        $box = $this->get($uuid);
-        $this->em->remove($box);
-        $this->em->flush();
+        $partner = $this->get($uuid);
+        $this->repository->delete($partner);
     }
 
     /**
      * @throws EntityNotFoundException
      */
-    public function update(string $uuid, PartnerUpdateRequest $partnerUpdateRequest): void
+    public function update(string $uuid, PartnerUpdateRequest $partnerUpdateRequest): Partner
     {
         $partner = $this->get($uuid);
 
@@ -67,7 +61,8 @@ class PartnerManager
         $partner->currency = $partnerUpdateRequest->currency;
         $partner->ceaseDate = $partnerUpdateRequest->ceaseDate;
 
-        $this->em->persist($partner);
-        $this->em->flush();
+        $this->repository->save($partner);
+
+        return $partner;
     }
 }

@@ -4,37 +4,32 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests;
 
-use App\Contract\Request\RateBand\RateBandCreateRequest;
-use App\Contract\Request\RateBand\RateBandUpdateRequest;
-
 class RateBandApiTest extends ApiTestCase
 {
     const API_BASE_URL = '/api/rate-band';
-    protected RateBandCreateRequest $rateBandCreateRequest;
-
-    public function setUp(): void
-    {
-        $this->rateBandCreateRequest = new RateBandCreateRequest();
-        $this->rateBandCreateRequest->goldenId = '1234';
-        $this->rateBandCreateRequest->partnerGoldenId = '5678';
-        $this->rateBandCreateRequest->name = 'test room';
-    }
 
     public function testCreateWithInvalidPartnerGoldenId()
     {
-        $this->rateBandCreateRequest->partnerGoldenId = '';
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->rateBandCreateRequest));
-        $this->assertEquals(422, $this->client()->getResponse()->getStatusCode());
+        $rateBandCreateRequest = self::$rateBandHelper->getDefault(['partner_golden_id' => '']);
+        $response = self::$rateBandHelper->create($rateBandCreateRequest);
+        $this->assertEquals(422, $response->getStatusCode());
+    }
+
+    public function testCreateWithNonExistentPartner()
+    {
+        $rateBandCreateRequest = self::$rateBandHelper->getDefault(['partner_golden_id' => 'non-existent-partner']);
+        $response = self::$rateBandHelper->create($rateBandCreateRequest);
+        $this->assertEquals(500, $response->getStatusCode());
     }
 
     public function testCreateSuccess(): string
     {
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->rateBandCreateRequest));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertEquals(201, $this->client()->getResponse()->getStatusCode());
+        $response = self::$rateBandHelper->create();
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertEquals(201, $response->getStatusCode());
 
-        return $response['uuid'];
+        return $responseContent->uuid;
     }
 
     /**
@@ -42,11 +37,11 @@ class RateBandApiTest extends ApiTestCase
      */
     public function testGet(string $uuid): string
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertArrayHasKey('created_at', $response);
-        $this->assertEquals(200, $this->client()->getResponse()->getStatusCode());
+        $response = self::$rateBandHelper->get($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertObjectHasAttribute('created_at', $responseContent);
+        $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;
     }
@@ -56,15 +51,14 @@ class RateBandApiTest extends ApiTestCase
      */
     public function testUpdate(string $uuid): string
     {
-        $payload = new RateBandUpdateRequest();
-        $payload->uuid = $uuid;
-        $payload->goldenId = '9898';
-        $payload->partnerGoldenId = '2222';
-        $payload->name = 'updated test rate band';
-        $this->client()->request('PUT', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], [], $this->serialize($payload));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
+        $rateBand = json_decode(self::$rateBandHelper->get($uuid)->getContent(), true);
+        $payload = [
+            'name' => 'updated test rate band',
+        ] + $rateBand;
+        $response = self::$rateBandHelper->update($uuid, $payload);
+        $responseContent = json_decode($response->getContent());
+        $this->assertEquals($payload['name'], $responseContent->name);
+        $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;
     }
@@ -74,10 +68,10 @@ class RateBandApiTest extends ApiTestCase
      */
     public function testDelete(string $uuid): string
     {
-        $this->client()->request('DELETE', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
+        $response = self::$rateBandHelper->delete($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertNull($responseContent);
+        $this->assertEquals(204, $response->getStatusCode());
 
         return $uuid;
     }
@@ -87,7 +81,7 @@ class RateBandApiTest extends ApiTestCase
      */
     public function testGetAfterDelete(string $uuid)
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $this->assertEquals(404, $this->client()->getResponse()->getStatusCode());
+        $response = self::$rateBandHelper->get($uuid);
+        $this->assertEquals(404, $response->getStatusCode());
     }
 }

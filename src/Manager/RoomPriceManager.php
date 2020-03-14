@@ -8,32 +8,40 @@ use App\Contract\Request\RoomPrice\RoomPriceCreateRequest;
 use App\Contract\Request\RoomPrice\RoomPriceUpdateRequest;
 use App\Entity\RoomPrice;
 use App\Exception\Repository\EntityNotFoundException;
+use App\Repository\RateBandRepository;
 use App\Repository\RoomPriceRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\RoomRepository;
 
 class RoomPriceManager
 {
-    protected EntityManagerInterface $em;
-
     protected RoomPriceRepository $repository;
 
-    public function __construct(EntityManagerInterface $em, RoomPriceRepository $repository)
+    protected RoomRepository $roomRepository;
+
+    protected RateBandRepository $rateBandRepository;
+
+    public function __construct(RoomPriceRepository $repository, RoomRepository $roomRepository, RateBandRepository $rateBandRepository)
     {
-        $this->em = $em;
         $this->repository = $repository;
+        $this->roomRepository = $roomRepository;
+        $this->rateBandRepository = $rateBandRepository;
     }
 
     public function create(RoomPriceCreateRequest $roomPriceCreateRequest): RoomPrice
     {
+        $rateBand = $this->rateBandRepository->findOneByGoldenId($roomPriceCreateRequest->rateBandGoldenId);
+        $room = $this->roomRepository->findOneByGoldenId($roomPriceCreateRequest->roomGoldenId);
+
         $roomPrice = new RoomPrice();
 
+        $roomPrice->rateBand = $rateBand;
+        $roomPrice->room = $room;
         $roomPrice->roomGoldenId = $roomPriceCreateRequest->roomGoldenId;
         $roomPrice->rateBandGoldenId = $roomPriceCreateRequest->rateBandGoldenId;
         $roomPrice->date = $roomPriceCreateRequest->date;
         $roomPrice->price = $roomPriceCreateRequest->price;
 
-        $this->em->persist($roomPrice);
-        $this->em->flush();
+        $this->repository->save($roomPrice);
 
         return $roomPrice;
     }
@@ -52,23 +60,28 @@ class RoomPriceManager
     public function delete(string $uuid): void
     {
         $roomPrice = $this->get($uuid);
-        $this->em->remove($roomPrice);
-        $this->em->flush();
+        $this->repository->delete($roomPrice);
     }
 
     /**
      * @throws EntityNotFoundException
      */
-    public function update(string $uuid, RoomPriceUpdateRequest $roomPriceUpdateRequest): void
+    public function update(string $uuid, RoomPriceUpdateRequest $roomPriceUpdateRequest): RoomPrice
     {
+        $rateBand = $this->rateBandRepository->findOneByGoldenId($roomPriceUpdateRequest->rateBandGoldenId);
+        $room = $this->roomRepository->findOneByGoldenId($roomPriceUpdateRequest->roomGoldenId);
+
         $roomPrice = $this->get($uuid);
 
+        $roomPrice->rateBand = $rateBand;
+        $roomPrice->room = $room;
         $roomPrice->roomGoldenId = $roomPriceUpdateRequest->roomGoldenId;
         $roomPrice->rateBandGoldenId = $roomPriceUpdateRequest->rateBandGoldenId;
         $roomPrice->date = $roomPriceUpdateRequest->date;
         $roomPrice->price = $roomPriceUpdateRequest->price;
 
-        $this->em->persist($roomPrice);
-        $this->em->flush();
+        $this->repository->save($roomPrice);
+
+        return $roomPrice;
     }
 }

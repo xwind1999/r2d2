@@ -4,41 +4,32 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests;
 
-use App\Contract\Request\Room\RoomCreateRequest;
-use App\Contract\Request\Room\RoomUpdateRequest;
-
 class RoomApiTest extends ApiTestCase
 {
     const API_BASE_URL = '/api/room';
-    protected RoomCreateRequest $roomCreateRequest;
-
-    public function setUp(): void
-    {
-        $this->roomCreateRequest = new RoomCreateRequest();
-        $this->roomCreateRequest->goldenId = '1234';
-        $this->roomCreateRequest->partnerGoldenId = '5678';
-        $this->roomCreateRequest->name = 'test room';
-        $this->roomCreateRequest->description = 'this is a test room';
-        $this->roomCreateRequest->inventory = 1;
-        $this->roomCreateRequest->isSellable = true;
-        $this->roomCreateRequest->status = 'live';
-    }
 
     public function testCreateWithInvalidPartnerGoldenId()
     {
-        $this->roomCreateRequest->partnerGoldenId = '';
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->roomCreateRequest));
-        $this->assertEquals(422, $this->client()->getResponse()->getStatusCode());
+        $roomCreateRequest = self::$roomHelper->getDefault(['partner_golden_id' => '']);
+        $response = self::$roomHelper->create($roomCreateRequest);
+        $this->assertEquals(422, $response->getStatusCode());
+    }
+
+    public function testCreateWithNonExistentPartner()
+    {
+        $roomCreateRequest = self::$roomHelper->getDefault(['partner_golden_id' => 'non-existent-partner']);
+        $response = self::$roomHelper->create($roomCreateRequest);
+        $this->assertEquals(500, $response->getStatusCode());
     }
 
     public function testCreateSuccess(): string
     {
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->roomCreateRequest));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertEquals(201, $this->client()->getResponse()->getStatusCode());
+        $response = self::$roomHelper->create();
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertEquals(201, $response->getStatusCode());
 
-        return $response['uuid'];
+        return $responseContent->uuid;
     }
 
     /**
@@ -46,11 +37,11 @@ class RoomApiTest extends ApiTestCase
      */
     public function testGet(string $uuid): string
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertArrayHasKey('created_at', $response);
-        $this->assertEquals(200, $this->client()->getResponse()->getStatusCode());
+        $response = self::$roomHelper->get($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertObjectHasAttribute('created_at', $responseContent);
+        $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;
     }
@@ -60,19 +51,15 @@ class RoomApiTest extends ApiTestCase
      */
     public function testUpdate(string $uuid): string
     {
-        $payload = new RoomUpdateRequest();
-        $payload->uuid = $uuid;
-        $payload->goldenId = '9898';
-        $payload->partnerGoldenId = '2222';
-        $payload->name = 'updated test room';
-        $payload->description = 'this is a test room, but updated';
-        $payload->inventory = 2;
-        $payload->isSellable = false;
-        $payload->status = 'gone';
-        $this->client()->request('PUT', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], [], $this->serialize($payload));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
+        $room = json_decode(self::$roomHelper->get($uuid)->getContent(), true);
+        $payload = [
+            'name' => 'updated test room',
+            'description' => 'this is a test room, but updated',
+        ] + $room;
+        $response = self::$roomHelper->update($uuid, $payload);
+        $responseContent = json_decode($response->getContent());
+        $this->assertEquals($payload['name'], $responseContent->name);
+        $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;
     }
@@ -82,10 +69,10 @@ class RoomApiTest extends ApiTestCase
      */
     public function testDelete(string $uuid): string
     {
-        $this->client()->request('DELETE', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
+        $response = self::$roomHelper->delete($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertNull($responseContent);
+        $this->assertEquals(204, $response->getStatusCode());
 
         return $uuid;
     }
@@ -95,7 +82,7 @@ class RoomApiTest extends ApiTestCase
      */
     public function testGetAfterDelete(string $uuid)
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $this->assertEquals(404, $this->client()->getResponse()->getStatusCode());
+        $response = self::$roomHelper->get($uuid);
+        $this->assertEquals(404, $response->getStatusCode());
     }
 }

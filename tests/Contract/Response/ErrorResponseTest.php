@@ -12,12 +12,16 @@ class ErrorResponseTest extends TestCase
     public function testToArray()
     {
         $errorResponse = new ErrorResponse();
+        $errorResponse->errorList = ['this is something that happened'];
         $message = 'test message';
         $code = 1112223;
         $expected = [
             'error' => [
                 'message' => $message,
                 'code' => $code,
+                'errors' => [
+                    'this is something that happened',
+                ],
             ],
         ];
         $errorResponse->message = $message;

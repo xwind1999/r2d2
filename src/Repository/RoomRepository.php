@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Room;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\RoomPriceNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -22,12 +22,35 @@ class RoomRepository extends ServiceEntityRepository
         parent::__construct($registry, Room::class);
     }
 
+    public function save(Room $entity): void
+    {
+        $this->_em->persist($entity);
+        $this->_em->flush();
+    }
+
+    public function delete(Room $entity): void
+    {
+        $this->_em->remove($entity);
+        $this->_em->flush();
+    }
+
     public function findOne(string $uuid): Room
     {
         $room = $this->find($uuid);
 
         if (null === $room) {
-            throw new EntityNotFoundException();
+            throw new RoomPriceNotFoundException();
+        }
+
+        return $room;
+    }
+
+    public function findOneByGoldenId(string $goldenId): Room
+    {
+        $room = $this->findOneBy(['goldenId' => $goldenId]);
+
+        if (null === $room) {
+            throw new RoomPriceNotFoundException();
         }
 
         return $room;

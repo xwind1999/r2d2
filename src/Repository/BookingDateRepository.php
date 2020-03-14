@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\BookingDate;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\BookingDateNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -22,12 +22,24 @@ class BookingDateRepository extends ServiceEntityRepository
         parent::__construct($registry, BookingDate::class);
     }
 
+    public function save(BookingDate $entity): void
+    {
+        $this->_em->persist($entity);
+        $this->_em->flush();
+    }
+
+    public function delete(BookingDate $entity): void
+    {
+        $this->_em->remove($entity);
+        $this->_em->flush();
+    }
+
     public function findOne(string $uuid): BookingDate
     {
         $bookingDate = $this->find($uuid);
 
         if (null === $bookingDate) {
-            throw new EntityNotFoundException();
+            throw new BookingDateNotFoundException();
         }
 
         return $bookingDate;

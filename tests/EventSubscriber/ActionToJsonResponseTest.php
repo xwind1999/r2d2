@@ -33,7 +33,8 @@ class ActionToJsonResponseTest extends TestCase
 
     public function testReturnedObjectToJsonResponse()
     {
-        $testResponse = new ResponseContract();
+        $testResponse = new class() extends ResponseContract {
+        };
         $event = new ViewEvent(
             new Kernel('prod', false),
             new Request(),

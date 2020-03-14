@@ -26,9 +26,21 @@ class RoomAvailability
     public UuidInterface $uuid;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Room")
+     * @ORM\JoinColumn(name="room_uuid", referencedColumnName="uuid", nullable=false)
+     */
+    public Room $room;
+
+    /**
      * @ORM\Column(type="string", length=45)
      */
     public string $roomGoldenId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="RateBand")
+     * @ORM\JoinColumn(name="rate_band_uuid", referencedColumnName="uuid", nullable=false)
+     */
+    public RateBand $rateBand;
 
     /**
      * @ORM\Column(type="string", length=45)

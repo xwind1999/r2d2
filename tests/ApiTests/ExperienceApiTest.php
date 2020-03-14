@@ -4,39 +4,41 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests;
 
-use App\Contract\Request\Experience\ExperienceCreateRequest;
-use App\Contract\Request\Experience\ExperienceUpdateRequest;
-
 class ExperienceApiTest extends ApiTestCase
 {
     const API_BASE_URL = '/api/experience';
-    protected ExperienceCreateRequest $experienceCreateRequest;
-
-    public function setUp(): void
-    {
-        $this->experienceCreateRequest = new ExperienceCreateRequest();
-        $this->experienceCreateRequest->goldenId = '1234';
-        $this->experienceCreateRequest->partnerGoldenId = '1234';
-        $this->experienceCreateRequest->name = '1234';
-        $this->experienceCreateRequest->description = '1234';
-        $this->experienceCreateRequest->duration = 1;
-    }
 
     public function testCreateWithInvalidPartnerGoldenId()
     {
-        $this->experienceCreateRequest->partnerGoldenId = '';
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->experienceCreateRequest));
-        $this->assertEquals(422, $this->client()->getResponse()->getStatusCode());
+        $experienceCreateRequest = self::$experienceHelper->getDefault(['partner_golden_id' => '']);
+        $response = self::$experienceHelper->create($experienceCreateRequest);
+        $this->assertEquals(422, $response->getStatusCode());
+    }
+
+    public function testCreateWithNonExistentPartner()
+    {
+        $experienceCreateRequest = self::$experienceHelper->getDefault(['partner_golden_id' => 'non-existent-partner']);
+        $response = self::$experienceHelper->create($experienceCreateRequest);
+        $this->assertEquals(500, $response->getStatusCode());
+    }
+
+    public function testCreateWithExistentGoldenId()
+    {
+        $experienceCreateRequest = self::$experienceHelper->getDefault();
+        self::$experienceHelper->addValidPartner($experienceCreateRequest);
+        self::$experienceHelper->create($experienceCreateRequest);
+        $response = self::$experienceHelper->create($experienceCreateRequest);
+        $this->assertEquals(500, $response->getStatusCode());
     }
 
     public function testCreateSuccess(): string
     {
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->experienceCreateRequest));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertEquals(201, $this->client()->getResponse()->getStatusCode());
+        $response = self::$experienceHelper->create();
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertEquals(201, $response->getStatusCode());
 
-        return $response['uuid'];
+        return $responseContent->uuid;
     }
 
     /**
@@ -44,11 +46,11 @@ class ExperienceApiTest extends ApiTestCase
      */
     public function testGet(string $uuid): string
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertArrayHasKey('created_at', $response);
-        $this->assertEquals(200, $this->client()->getResponse()->getStatusCode());
+        $response = self::$experienceHelper->get($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertObjectHasAttribute('created_at', $responseContent);
+        $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;
     }
@@ -58,19 +60,16 @@ class ExperienceApiTest extends ApiTestCase
      */
     public function testUpdate(string $uuid): string
     {
-        $payload = new ExperienceUpdateRequest();
-        $payload->uuid = $uuid;
-        $payload->goldenId = '1234';
-        $payload->partnerGoldenId = '5678';
-        $payload->name = '98767';
-        $payload->description = '1234';
-        $payload->duration = 2;
-        $this->client()->request('PUT', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], [], $this->serialize($payload));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
+        $experience = json_decode(self::$experienceHelper->get($uuid)->getContent(), true);
+        $payload = [
+            'description' => 'new description for this experience',
+        ] + $experience;
+        $response = self::$experienceHelper->update($uuid, $payload);
+        $responseContent = json_decode($response->getContent());
+        $this->assertEquals($payload['description'], $responseContent->description);
+        $this->assertEquals(200, $response->getStatusCode());
 
-        return $uuid;
+        return $responseContent->uuid;
     }
 
     /**
@@ -78,10 +77,10 @@ class ExperienceApiTest extends ApiTestCase
      */
     public function testDelete(string $uuid): string
     {
-        $this->client()->request('DELETE', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
+        $response = self::$experienceHelper->delete($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertNull($responseContent);
+        $this->assertEquals(204, $response->getStatusCode());
 
         return $uuid;
     }
@@ -91,7 +90,7 @@ class ExperienceApiTest extends ApiTestCase
      */
     public function testGetAfterDelete(string $uuid)
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $this->assertEquals(404, $this->client()->getResponse()->getStatusCode());
+        $response = self::$experienceHelper->get($uuid);
+        $this->assertEquals(404, $response->getStatusCode());
     }
 }

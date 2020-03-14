@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\RateBand;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\RateBandNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -22,12 +22,35 @@ class RateBandRepository extends ServiceEntityRepository
         parent::__construct($registry, RateBand::class);
     }
 
+    public function save(RateBand $entity): void
+    {
+        $this->_em->persist($entity);
+        $this->_em->flush();
+    }
+
+    public function delete(RateBand $entity): void
+    {
+        $this->_em->remove($entity);
+        $this->_em->flush();
+    }
+
     public function findOne(string $uuid): RateBand
     {
         $rateBand = $this->find($uuid);
 
         if (null === $rateBand) {
-            throw new EntityNotFoundException();
+            throw new RateBandNotFoundException();
+        }
+
+        return $rateBand;
+    }
+
+    public function findOneByGoldenId(string $goldenId): RateBand
+    {
+        $rateBand = $this->findOneBy(['goldenId' => $goldenId]);
+
+        if (null === $rateBand) {
+            throw new RateBandNotFoundException();
         }
 
         return $rateBand;

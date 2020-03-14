@@ -7,13 +7,14 @@ namespace App\Tests\Controller\Api;
 use App\Contract\Request\RoomAvailability\RoomAvailabilityCreateRequest;
 use App\Contract\Request\RoomAvailability\RoomAvailabilityUpdateRequest;
 use App\Contract\Response\RoomAvailability\RoomAvailabilityGetResponse;
+use App\Contract\Response\RoomAvailability\RoomAvailabilityUpdateResponse;
 use App\Controller\Api\RoomAvailabilityController;
 use App\Entity\RoomAvailability;
 use App\Exception\Http\ResourceNotFoundException;
-use App\Exception\Http\UnprocessableEntityException;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\RoomAvailabilityNotFoundException;
 use App\Manager\RoomAvailabilityManager;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
@@ -30,21 +31,9 @@ class RoomAvailabilityControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $controller = new RoomAvailabilityController();
         $roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
-        $roomAvailabilityManager->get($uuid)->willThrow(EntityNotFoundException::class);
+        $roomAvailabilityManager->get($uuid)->willThrow(RoomAvailabilityNotFoundException::class);
         $this->expectException(ResourceNotFoundException::class);
-        $controller->get($uuid, $roomAvailabilityManager->reveal());
-    }
-
-    /**
-     * @covers ::get
-     * @covers \App\Contract\Response\RoomAvailability\RoomAvailabilityGetResponse::__construct
-     */
-    public function testIfGetWillThrowUnprocessableEntityException(): void
-    {
-        $controller = new RoomAvailabilityController();
-        $roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->get('12345', $roomAvailabilityManager->reveal());
+        $controller->get(Uuid::fromString($uuid), $roomAvailabilityManager->reveal());
     }
 
     /**
@@ -69,7 +58,7 @@ class RoomAvailabilityControllerTest extends TestCase
         $controller = new RoomAvailabilityController();
         $roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
         $roomAvailabilityManager->get($uuid)->willReturn($roomAvailability);
-        $return = $controller->get($uuid, $roomAvailabilityManager->reveal());
+        $return = $controller->get(Uuid::fromString($uuid), $roomAvailabilityManager->reveal());
         $this->assertEquals(RoomAvailabilityGetResponse::class, get_class($return));
         $this->assertEquals($uuid, $return->uuid);
         $this->assertEquals($roomAvailability->roomGoldenId, $return->roomGoldenId);
@@ -89,36 +78,25 @@ class RoomAvailabilityControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $roomAvailabilityUpdateRequest = new RoomAvailabilityUpdateRequest();
         $roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
-        $roomAvailabilityManager->update($uuid, $roomAvailabilityUpdateRequest)->willThrow(EntityNotFoundException::class);
+        $roomAvailabilityManager->update($uuid, $roomAvailabilityUpdateRequest)->willThrow(RoomAvailabilityNotFoundException::class);
         $controller = new RoomAvailabilityController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->put($uuid, $roomAvailabilityUpdateRequest, $roomAvailabilityManager->reveal());
+        $controller->put(Uuid::fromString($uuid), $roomAvailabilityUpdateRequest, $roomAvailabilityManager->reveal());
     }
 
     /**
      * @covers ::put
+     * @dataProvider sampleRoomAvailability
      */
-    public function testPut()
+    public function testPut(string $uuid, RoomAvailability $roomAvailability)
     {
-        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $roomAvailabilityUpdateRequest = new RoomAvailabilityUpdateRequest();
         $roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
-        $roomAvailabilityManager->update($uuid, $roomAvailabilityUpdateRequest)->shouldBeCalled();
+        $roomAvailabilityManager->update($uuid, $roomAvailabilityUpdateRequest)->shouldBeCalled()->willReturn($roomAvailability);
         $controller = new RoomAvailabilityController();
-        $response = $controller->put($uuid, $roomAvailabilityUpdateRequest, $roomAvailabilityManager->reveal());
-        $this->assertEquals(204, $response->getStatusCode());
-        $this->assertEmpty($response->getContent());
-    }
-
-    /**
-     * @covers ::delete
-     */
-    public function testIfDeleteWillThrowUnprocessableEntityException()
-    {
-        $roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
-        $controller = new RoomAvailabilityController();
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->delete('1234', $roomAvailabilityManager->reveal());
+        $response = $controller->put(Uuid::fromString($uuid), $roomAvailabilityUpdateRequest, $roomAvailabilityManager->reveal());
+        $this->assertInstanceOf(RoomAvailabilityUpdateResponse::class, $response);
+        $this->assertEquals(200, $response->getHttpCode());
     }
 
     /**
@@ -128,10 +106,10 @@ class RoomAvailabilityControllerTest extends TestCase
     {
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
-        $roomAvailabilityManager->delete($uuid)->willThrow(EntityNotFoundException::class);
+        $roomAvailabilityManager->delete($uuid)->willThrow(RoomAvailabilityNotFoundException::class);
         $controller = new RoomAvailabilityController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->delete($uuid, $roomAvailabilityManager->reveal());
+        $controller->delete(Uuid::fromString($uuid), $roomAvailabilityManager->reveal());
     }
 
     /**
@@ -143,7 +121,7 @@ class RoomAvailabilityControllerTest extends TestCase
         $roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
         $roomAvailabilityManager->delete($uuid)->shouldBeCalled();
         $controller = new RoomAvailabilityController();
-        $response = $controller->delete($uuid, $roomAvailabilityManager->reveal());
+        $response = $controller->delete(Uuid::fromString($uuid), $roomAvailabilityManager->reveal());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
     }
@@ -151,20 +129,34 @@ class RoomAvailabilityControllerTest extends TestCase
     /**
      * @covers ::create
      * @covers \App\Contract\Response\RoomAvailability\RoomAvailabilityCreateResponse::__construct
+     * @dataProvider sampleRoomAvailability
      */
-    public function testCreate()
+    public function testCreate(string $uuid, RoomAvailability $roomAvailability)
     {
         $roomAvailabilityCreateRequest = new RoomAvailabilityCreateRequest();
-        $uuid = '1234';
-        $uuidInterface = $this->prophesize(UuidInterface::class);
-        $uuidInterface->toString()->willReturn($uuid);
-        $roomAvailability = new RoomAvailability();
-        $roomAvailability->uuid = $uuidInterface->reveal();
         $roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
         $roomAvailabilityManager->create($roomAvailabilityCreateRequest)->willReturn($roomAvailability);
         $controller = new RoomAvailabilityController();
         $roomAvailabilityCreateResponse = $controller->create($roomAvailabilityCreateRequest, $roomAvailabilityManager->reveal());
 
         $this->assertEquals($uuid, $roomAvailabilityCreateResponse->uuid);
+    }
+
+    public function sampleRoomAvailability(): iterable
+    {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
+        $uuidInterface = $this->prophesize(UuidInterface::class);
+        $uuidInterface->toString()->willReturn($uuid);
+        $rateBand = new RoomAvailability();
+        $rateBand->uuid = $uuidInterface->reveal();
+        $rateBand->roomGoldenId = '1234';
+        $rateBand->rateBandGoldenId = 'rb1234';
+        $rateBand->stock = 2;
+        $rateBand->date = new \DateTime();
+        $rateBand->type = 'instant';
+        $rateBand->createdAt = new \DateTime();
+        $rateBand->updatedAt = new \DateTime();
+
+        yield [$uuid, $rateBand];
     }
 }

@@ -6,10 +6,13 @@ namespace App\Tests\Manager;
 
 use App\Contract\Request\RoomPrice\RoomPriceCreateRequest;
 use App\Contract\Request\RoomPrice\RoomPriceUpdateRequest;
+use App\Entity\RateBand;
+use App\Entity\Room;
 use App\Entity\RoomPrice;
 use App\Manager\RoomPriceManager;
+use App\Repository\RateBandRepository;
 use App\Repository\RoomPriceRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\RoomRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -21,19 +24,25 @@ use Ramsey\Uuid\UuidInterface;
 class RoomPriceManagerTest extends TestCase
 {
     /**
-     * @var EntityManagerInterface|ObjectProphecy
-     */
-    protected $em;
-
-    /**
      * @var ObjectProphecy|RoomPriceRepository
      */
     protected $repository;
 
+    /**
+     * @var ObjectProphecy|RoomRepository
+     */
+    protected $roomRepository;
+
+    /**
+     * @var ObjectProphecy|RateBandRepository
+     */
+    protected $rateBandRepository;
+
     public function setUp(): void
     {
-        $this->em = $this->prophesize(EntityManagerInterface::class);
         $this->repository = $this->prophesize(RoomPriceRepository::class);
+        $this->roomRepository = $this->prophesize(RoomRepository::class);
+        $this->rateBandRepository = $this->prophesize(RateBandRepository::class);
     }
 
     /**
@@ -43,7 +52,13 @@ class RoomPriceManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new RoomPriceManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new RoomPriceManager($this->repository->reveal(), $this->roomRepository->reveal(), $this->rateBandRepository->reveal());
+        $room = new Room();
+        $room->goldenId = '1234';
+        $rateBand = new RateBand();
+        $rateBand->goldenId = '7895';
+        $this->roomRepository->findOneByGoldenId('1234')->willReturn($room);
+        $this->rateBandRepository->findOneByGoldenId('7895')->willReturn($rateBand);
         $roomPriceUpdateRequest = new RoomPriceUpdateRequest();
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $currentDate = new \DateTime();
@@ -63,11 +78,11 @@ class RoomPriceManagerTest extends TestCase
         $roomPrice->price = 10;
         $this->repository->findOne($uuid)->willReturn($roomPrice);
 
-        $this->em->persist(Argument::type(RoomPrice::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(RoomPrice::class))->shouldBeCalled();
 
-        $manager->update($uuid, $roomPriceUpdateRequest);
+        $updatedRoomPrice = $manager->update($uuid, $roomPriceUpdateRequest);
 
+        $this->assertSame($roomPrice, $updatedRoomPrice);
         $this->assertEquals('1234', $roomPrice->roomGoldenId);
         $this->assertEquals('7895', $roomPrice->rateBandGoldenId);
         $this->assertEquals($currentDate, $roomPrice->date);
@@ -81,7 +96,7 @@ class RoomPriceManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new RoomPriceManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new RoomPriceManager($this->repository->reveal(), $this->roomRepository->reveal(), $this->rateBandRepository->reveal());
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -90,8 +105,7 @@ class RoomPriceManagerTest extends TestCase
         $roomPrice->uuid = $uuidInterface->reveal();
         $this->repository->findOne($uuid)->willReturn($roomPrice);
 
-        $this->em->remove(Argument::type(RoomPrice::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->delete(Argument::type(RoomPrice::class))->shouldBeCalled();
 
         $manager->delete($uuid);
     }
@@ -102,7 +116,14 @@ class RoomPriceManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new RoomPriceManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new RoomPriceManager($this->repository->reveal(), $this->roomRepository->reveal(), $this->rateBandRepository->reveal());
+        $room = new Room();
+        $room->goldenId = '1234';
+        $rateBand = new RateBand();
+        $rateBand->goldenId = '5678';
+        $this->roomRepository->findOneByGoldenId('1234')->willReturn($room);
+        $this->rateBandRepository->findOneByGoldenId('5678')->willReturn($rateBand);
+
         $currentDate = new \DateTime();
 
         $roomPriceCreateRequest = new RoomPriceCreateRequest();
@@ -111,8 +132,7 @@ class RoomPriceManagerTest extends TestCase
         $roomPriceCreateRequest->date = $currentDate;
         $roomPriceCreateRequest->price = 20;
 
-        $this->em->persist(Argument::type(RoomPrice::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(RoomPrice::class))->shouldBeCalled();
 
         $roomPrice = $manager->create($roomPriceCreateRequest);
 

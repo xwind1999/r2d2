@@ -6,10 +6,11 @@ namespace App\Tests\Manager;
 
 use App\Contract\Request\Room\RoomCreateRequest;
 use App\Contract\Request\Room\RoomUpdateRequest;
+use App\Entity\Partner;
 use App\Entity\Room;
 use App\Manager\RoomManager;
+use App\Repository\PartnerRepository;
 use App\Repository\RoomRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -21,19 +22,19 @@ use Ramsey\Uuid\UuidInterface;
 class RoomManagerTest extends TestCase
 {
     /**
-     * @var EntityManagerInterface|ObjectProphecy
-     */
-    protected $em;
-
-    /**
      * @var ObjectProphecy|RoomRepository
      */
     protected $repository;
 
+    /**
+     * @var ObjectProphecy|PartnerRepository
+     */
+    protected $partnerRepository;
+
     public function setUp(): void
     {
-        $this->em = $this->prophesize(EntityManagerInterface::class);
         $this->repository = $this->prophesize(RoomRepository::class);
+        $this->partnerRepository = $this->prophesize(PartnerRepository::class);
     }
 
     /**
@@ -43,7 +44,10 @@ class RoomManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new RoomManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new RoomManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $partner = new Partner();
+        $partner->goldenId = '4321';
+        $this->partnerRepository->findOneByGoldenId('4321')->willReturn($partner);
         $roomUpdateRequest = new RoomUpdateRequest();
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $roomUpdateRequest->uuid = $uuid;
@@ -69,11 +73,11 @@ class RoomManagerTest extends TestCase
         $room->status = 'ok';
         $this->repository->findOne($uuid)->willReturn($room);
 
-        $this->em->persist(Argument::type(Room::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(Room::class))->shouldBeCalled();
 
-        $manager->update($uuid, $roomUpdateRequest);
+        $updatedRoom = $manager->update($uuid, $roomUpdateRequest);
 
+        $this->assertSame($room, $updatedRoom);
         $this->assertEquals(2, $room->inventory);
         $this->assertEquals('4321', $room->partnerGoldenId);
         $this->assertEquals('room with a big big bed', $room->name);
@@ -88,7 +92,7 @@ class RoomManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new RoomManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new RoomManager($this->repository->reveal(), $this->partnerRepository->reveal());
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -97,8 +101,7 @@ class RoomManagerTest extends TestCase
         $room->uuid = $uuidInterface->reveal();
         $this->repository->findOne($uuid)->willReturn($room);
 
-        $this->em->remove(Argument::type(Room::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->delete(Argument::type(Room::class))->shouldBeCalled();
 
         $manager->delete($uuid);
     }
@@ -109,7 +112,10 @@ class RoomManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new RoomManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new RoomManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $partner = new Partner();
+        $partner->goldenId = '5678';
+        $this->partnerRepository->findOneByGoldenId('5678')->willReturn($partner);
         $roomCreateRequest = new RoomCreateRequest();
         $roomCreateRequest->goldenId = '5678';
         $roomCreateRequest->partnerGoldenId = '5678';
@@ -119,8 +125,7 @@ class RoomManagerTest extends TestCase
         $roomCreateRequest->isSellable = false;
         $roomCreateRequest->status = 'ok';
 
-        $this->em->persist(Argument::type(Room::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(Room::class))->shouldBeCalled();
 
         $room = $manager->create($roomCreateRequest);
         $this->assertEquals($roomCreateRequest->goldenId, $room->goldenId);

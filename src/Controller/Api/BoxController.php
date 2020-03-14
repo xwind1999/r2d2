@@ -8,12 +8,14 @@ use App\Contract\Request\Box\BoxCreateRequest;
 use App\Contract\Request\Box\BoxUpdateRequest;
 use App\Contract\Response\Box\BoxCreateResponse;
 use App\Contract\Response\Box\BoxGetResponse;
+use App\Contract\Response\Box\BoxUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\BoxManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -61,14 +63,10 @@ class BoxController
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
      */
-    public function get(string $uuid, BoxManager $boxManager): BoxGetResponse
+    public function get(UuidInterface $uuid, BoxManager $boxManager): BoxGetResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $box = $boxManager->get($uuid);
+            $box = $boxManager->get($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -94,14 +92,10 @@ class BoxController
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function delete(string $uuid, BoxManager $boxManager): Response
+    public function delete(UuidInterface $uuid, BoxManager $boxManager): Response
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $boxManager->delete($uuid);
+            $boxManager->delete($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -125,25 +119,22 @@ class BoxController
      *         @Model(type=BoxUpdateRequest::class)
      * )
      * @SWG\Response(
-     *     response=204,
-     *     description="Box upated"
+     *     response=200,
+     *     description="Box successfully updated",
+     *     @Model(type=BoxUpdateResponse::class)
      * )
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function put(string $uuid, BoxUpdateRequest $boxUpdateRequest, BoxManager $boxManager): Response
+    public function put(UuidInterface $uuid, BoxUpdateRequest $boxUpdateRequest, BoxManager $boxManager): BoxUpdateResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $boxManager->update($uuid, $boxUpdateRequest);
+            $box = $boxManager->update($uuid->toString(), $boxUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
 
-        return new Response(null, 204);
+        return new BoxUpdateResponse($box);
     }
 }

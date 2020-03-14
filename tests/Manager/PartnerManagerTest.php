@@ -9,7 +9,6 @@ use App\Contract\Request\Partner\PartnerUpdateRequest;
 use App\Entity\Partner;
 use App\Manager\PartnerManager;
 use App\Repository\PartnerRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -21,18 +20,12 @@ use Ramsey\Uuid\UuidInterface;
 class PartnerManagerTest extends TestCase
 {
     /**
-     * @var EntityManagerInterface|ObjectProphecy
-     */
-    protected $em;
-
-    /**
      * @var ObjectProphecy|PartnerRepository
      */
     protected $repository;
 
     public function setUp(): void
     {
-        $this->em = $this->prophesize(EntityManagerInterface::class);
         $this->repository = $this->prophesize(PartnerRepository::class);
     }
 
@@ -43,7 +36,7 @@ class PartnerManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new PartnerManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new PartnerManager($this->repository->reveal());
         $partnerUpdateRequest = new PartnerUpdateRequest();
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $partnerUpdateRequest->goldenId = '1234';
@@ -62,11 +55,11 @@ class PartnerManagerTest extends TestCase
         $partner->ceaseDate = new \DateTime('2020-10-10');
         $this->repository->findOne($uuid)->willReturn($partner);
 
-        $this->em->persist(Argument::type(Partner::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
 
-        $manager->update($uuid, $partnerUpdateRequest);
+        $updatedPartner = $manager->update($uuid, $partnerUpdateRequest);
 
+        $this->assertSame($partner, $updatedPartner);
         $this->assertEquals('1234', $partner->goldenId);
         $this->assertEquals('alive', $partner->status);
         $this->assertEquals('USD', $partner->currency);
@@ -80,7 +73,7 @@ class PartnerManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new PartnerManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new PartnerManager($this->repository->reveal());
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -89,8 +82,7 @@ class PartnerManagerTest extends TestCase
         $partner->uuid = $uuidInterface->reveal();
         $this->repository->findOne($uuid)->willReturn($partner);
 
-        $this->em->remove(Argument::type(Partner::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->delete(Argument::type(Partner::class))->shouldBeCalled();
 
         $manager->delete($uuid);
     }
@@ -101,15 +93,14 @@ class PartnerManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new PartnerManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new PartnerManager($this->repository->reveal());
         $partnerCreateRequest = new PartnerCreateRequest();
         $partnerCreateRequest->goldenId = '1234';
         $partnerCreateRequest->status = 'alive';
         $partnerCreateRequest->currency = 'USD';
         $partnerCreateRequest->ceaseDate = new \DateTime('2020-10-10');
 
-        $this->em->persist(Argument::type(Partner::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
 
         $partner = $manager->create($partnerCreateRequest);
         $this->assertEquals($partnerCreateRequest->goldenId, $partner->goldenId);

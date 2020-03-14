@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Box;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\BoxNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -22,12 +22,35 @@ class BoxRepository extends ServiceEntityRepository
         parent::__construct($registry, Box::class);
     }
 
+    public function save(Box $entity): void
+    {
+        $this->_em->persist($entity);
+        $this->_em->flush();
+    }
+
+    public function delete(Box $entity): void
+    {
+        $this->_em->remove($entity);
+        $this->_em->flush();
+    }
+
     public function findOne(string $uuid): Box
     {
         $box = $this->find($uuid);
 
         if (null === $box) {
-            throw new EntityNotFoundException();
+            throw new BoxNotFoundException();
+        }
+
+        return $box;
+    }
+
+    public function findOneByGoldenId(string $goldenId): Box
+    {
+        $box = $this->findOneBy(['goldenId' => $goldenId]);
+
+        if (null === $box) {
+            throw new BoxNotFoundException();
         }
 
         return $box;

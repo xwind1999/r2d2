@@ -4,41 +4,22 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests;
 
-use App\Contract\Request\BookingDate\BookingDateCreateRequest;
-use App\Contract\Request\BookingDate\BookingDateUpdateRequest;
-
 class BookingDateApiTest extends ApiTestCase
 {
-    const API_BASE_URL = '/api/booking-date';
-    protected BookingDateCreateRequest $bookingDateCreateRequest;
-
-    public function setUp(): void
-    {
-        $this->bookingDateCreateRequest = new BookingDateCreateRequest();
-        $this->bookingDateCreateRequest->bookingGoldenId = '1234';
-        $this->bookingDateCreateRequest->roomGoldenId = '1123';
-        $this->bookingDateCreateRequest->rateBandGoldenId = '12';
-        $this->bookingDateCreateRequest->date = new \DateTime();
-        $this->bookingDateCreateRequest->price = 99;
-        $this->bookingDateCreateRequest->isUpsell = true;
-        $this->bookingDateCreateRequest->guestsCount = 1;
-    }
-
     public function testCreateWithInvalidBookingGoldenId()
     {
-        $this->bookingDateCreateRequest->bookingGoldenId = '';
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->bookingDateCreateRequest));
-        $this->assertEquals(422, $this->client()->getResponse()->getStatusCode());
+        $response = self::$bookingDateHelper->create(['booking_golden_id' => '']);
+        $this->assertEquals(422, $response->getStatusCode());
     }
 
     public function testCreateSuccess(): string
     {
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->bookingDateCreateRequest));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertEquals(201, $this->client()->getResponse()->getStatusCode());
+        $response = self::$bookingDateHelper->create();
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertEquals(201, $response->getStatusCode());
 
-        return $response['uuid'];
+        return $responseContent->uuid;
     }
 
     /**
@@ -46,11 +27,11 @@ class BookingDateApiTest extends ApiTestCase
      */
     public function testGet(string $uuid): string
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertArrayHasKey('created_at', $response);
-        $this->assertEquals(200, $this->client()->getResponse()->getStatusCode());
+        $response = self::$bookingDateHelper->get($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertObjectHasAttribute('created_at', $responseContent);
+        $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;
     }
@@ -60,22 +41,16 @@ class BookingDateApiTest extends ApiTestCase
      */
     public function testUpdate(string $uuid): string
     {
-        $payload = new BookingDateUpdateRequest();
-        $payload->uuid = $uuid;
-        $payload->guestsCount = 2;
-        $payload->bookingGoldenId = '1234';
-        $payload->rateBandGoldenId = '12';
-        $payload->isUpsell = true;
-        $payload->roomGoldenId = '11234';
-        $payload->price = 120;
-        $payload->date = new \DateTime();
+        $bookingDate = json_decode(self::$bookingDateHelper->get($uuid)->getContent(), true);
+        $payload = [
+                'price' => 10990,
+            ] + $bookingDate;
+        $response = self::$bookingDateHelper->update($uuid, $payload);
+        $responseContent = json_decode($response->getContent());
+        $this->assertEquals($payload['price'], $responseContent->price);
+        $this->assertEquals(200, $response->getStatusCode());
 
-        $this->client()->request('PUT', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], [], $this->serialize($payload));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
-
-        return $uuid;
+        return $responseContent->uuid;
     }
 
     /**
@@ -83,10 +58,10 @@ class BookingDateApiTest extends ApiTestCase
      */
     public function testDelete(string $uuid): string
     {
-        $this->client()->request('DELETE', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
+        $response = self::$bookingDateHelper->delete($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertNull($responseContent);
+        $this->assertEquals(204, $response->getStatusCode());
 
         return $uuid;
     }
@@ -96,7 +71,7 @@ class BookingDateApiTest extends ApiTestCase
      */
     public function testGetAfterDelete(string $uuid)
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $this->assertEquals(404, $this->client()->getResponse()->getStatusCode());
+        $response = self::$bookingDateHelper->get($uuid);
+        $this->assertEquals(404, $response->getStatusCode());
     }
 }

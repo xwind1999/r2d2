@@ -7,13 +7,14 @@ namespace App\Tests\Controller\Api;
 use App\Contract\Request\Box\BoxCreateRequest;
 use App\Contract\Request\Box\BoxUpdateRequest;
 use App\Contract\Response\Box\BoxGetResponse;
+use App\Contract\Response\Box\BoxUpdateResponse;
 use App\Controller\Api\BoxController;
 use App\Entity\Box;
 use App\Exception\Http\ResourceNotFoundException;
-use App\Exception\Http\UnprocessableEntityException;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\BoxNotFoundException;
 use App\Manager\BoxManager;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
@@ -30,21 +31,9 @@ class BoxControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $controller = new BoxController();
         $boxManager = $this->prophesize(BoxManager::class);
-        $boxManager->get($uuid)->willThrow(EntityNotFoundException::class);
+        $boxManager->get($uuid)->willThrow(BoxNotFoundException::class);
         $this->expectException(ResourceNotFoundException::class);
-        $controller->get($uuid, $boxManager->reveal());
-    }
-
-    /**
-     * @covers ::get
-     * @covers \App\Contract\Response\Box\BoxGetResponse::__construct
-     */
-    public function testIfGetWillThrowUnprocessableEntityException(): void
-    {
-        $controller = new BoxController();
-        $boxManager = $this->prophesize(BoxManager::class);
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->get('12345', $boxManager->reveal());
+        $controller->get(Uuid::fromString($uuid), $boxManager->reveal());
     }
 
     /**
@@ -68,7 +57,7 @@ class BoxControllerTest extends TestCase
         $controller = new BoxController();
         $boxManager = $this->prophesize(BoxManager::class);
         $boxManager->get($uuid)->willReturn($box);
-        $return = $controller->get($uuid, $boxManager->reveal());
+        $return = $controller->get(Uuid::fromString($uuid), $boxManager->reveal());
         $this->assertEquals(BoxGetResponse::class, get_class($return));
         $this->assertEquals($uuid, $return->uuid);
         $this->assertEquals($box->goldenId, $return->goldenId);
@@ -87,36 +76,25 @@ class BoxControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $boxUpdateRequest = new BoxUpdateRequest();
         $boxManager = $this->prophesize(BoxManager::class);
-        $boxManager->update($uuid, $boxUpdateRequest)->willThrow(EntityNotFoundException::class);
+        $boxManager->update($uuid, $boxUpdateRequest)->willThrow(BoxNotFoundException::class);
         $controller = new BoxController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->put($uuid, $boxUpdateRequest, $boxManager->reveal());
+        $controller->put(Uuid::fromString($uuid), $boxUpdateRequest, $boxManager->reveal());
     }
 
     /**
      * @covers ::put
+     * @dataProvider sampleBox
      */
-    public function testPut()
+    public function testPut(string $uuid, Box $box)
     {
-        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $boxUpdateRequest = new BoxUpdateRequest();
         $boxManager = $this->prophesize(BoxManager::class);
-        $boxManager->update($uuid, $boxUpdateRequest)->shouldBeCalled();
+        $boxManager->update($uuid, $boxUpdateRequest)->shouldBeCalled()->willReturn($box);
         $controller = new BoxController();
-        $response = $controller->put($uuid, $boxUpdateRequest, $boxManager->reveal());
-        $this->assertEquals(204, $response->getStatusCode());
-        $this->assertEmpty($response->getContent());
-    }
-
-    /**
-     * @covers ::delete
-     */
-    public function testIfDeleteWillThrowUnprocessableEntityException()
-    {
-        $boxManager = $this->prophesize(BoxManager::class);
-        $controller = new BoxController();
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->delete('1234', $boxManager->reveal());
+        $response = $controller->put(Uuid::fromString($uuid), $boxUpdateRequest, $boxManager->reveal());
+        $this->assertInstanceOf(BoxUpdateResponse::class, $response);
+        $this->assertEquals(200, $response->getHttpCode());
     }
 
     /**
@@ -126,10 +104,10 @@ class BoxControllerTest extends TestCase
     {
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $boxManager = $this->prophesize(BoxManager::class);
-        $boxManager->delete($uuid)->willThrow(EntityNotFoundException::class);
+        $boxManager->delete($uuid)->willThrow(BoxNotFoundException::class);
         $controller = new BoxController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->delete($uuid, $boxManager->reveal());
+        $controller->delete(Uuid::fromString($uuid), $boxManager->reveal());
     }
 
     /**
@@ -141,7 +119,7 @@ class BoxControllerTest extends TestCase
         $boxManager = $this->prophesize(BoxManager::class);
         $boxManager->delete($uuid)->shouldBeCalled();
         $controller = new BoxController();
-        $response = $controller->delete($uuid, $boxManager->reveal());
+        $response = $controller->delete(Uuid::fromString($uuid), $boxManager->reveal());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
     }
@@ -149,20 +127,36 @@ class BoxControllerTest extends TestCase
     /**
      * @covers ::create
      * @covers \App\Contract\Response\Box\BoxCreateResponse::__construct
+     *
+     * @dataProvider sampleBox
      */
-    public function testCreate()
+    public function testCreate(string $uuid, Box $box)
     {
         $boxCreateRequest = new BoxCreateRequest();
-        $uuid = '1234';
         $uuidInterface = $this->prophesize(UuidInterface::class);
         $uuidInterface->toString()->willReturn($uuid);
-        $box = new Box();
-        $box->uuid = $uuidInterface->reveal();
         $boxManager = $this->prophesize(BoxManager::class);
         $boxManager->create($boxCreateRequest)->willReturn($box);
         $controller = new BoxController();
         $boxCreateResponse = $controller->create($boxCreateRequest, $boxManager->reveal());
 
         $this->assertEquals($uuid, $boxCreateResponse->uuid);
+    }
+
+    public function sampleBox(): iterable
+    {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
+        $uuidInterface = $this->prophesize(UuidInterface::class);
+        $uuidInterface->toString()->willReturn($uuid);
+        $box = new Box();
+        $box->uuid = $uuidInterface->reveal();
+        $box->goldenId = '1234';
+        $box->brand = 'sbx';
+        $box->country = 'fr';
+        $box->status = 'created';
+        $box->createdAt = new \DateTime();
+        $box->updatedAt = new \DateTime();
+
+        yield [$uuid, $box];
     }
 }
