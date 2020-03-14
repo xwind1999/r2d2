@@ -8,12 +8,14 @@ use App\Contract\Request\Partner\PartnerCreateRequest;
 use App\Contract\Request\Partner\PartnerUpdateRequest;
 use App\Contract\Response\Partner\PartnerCreateResponse;
 use App\Contract\Response\Partner\PartnerGetResponse;
+use App\Contract\Response\Partner\PartnerUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\PartnerManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -61,14 +63,10 @@ class PartnerController
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
      */
-    public function get(string $uuid, PartnerManager $partnerManager): PartnerGetResponse
+    public function get(UuidInterface $uuid, PartnerManager $partnerManager): PartnerGetResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $partner = $partnerManager->get($uuid);
+            $partner = $partnerManager->get($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -94,14 +92,10 @@ class PartnerController
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function delete(string $uuid, PartnerManager $partnerManager): Response
+    public function delete(UuidInterface $uuid, PartnerManager $partnerManager): Response
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $partnerManager->delete($uuid);
+            $partnerManager->delete($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -125,25 +119,22 @@ class PartnerController
      *         @Model(type=PartnerUpdateRequest::class)
      * )
      * @SWG\Response(
-     *     response=204,
-     *     description="Partner updated"
+     *     response=200,
+     *     description="Partner updated",
+     *     @Model(type=PartnerUpdateResponse::class)
      * )
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function put(string $uuid, PartnerUpdateRequest $partnerUpdateRequest, PartnerManager $partnerManager): Response
+    public function put(UuidInterface $uuid, PartnerUpdateRequest $partnerUpdateRequest, PartnerManager $partnerManager): PartnerUpdateResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $partnerManager->update($uuid, $partnerUpdateRequest);
+            $partner = $partnerManager->update($uuid->toString(), $partnerUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
 
-        return new Response(null, 204);
+        return new PartnerUpdateResponse($partner);
     }
 }

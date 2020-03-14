@@ -7,13 +7,14 @@ namespace App\Tests\Controller\Api;
 use App\Contract\Request\Partner\PartnerCreateRequest;
 use App\Contract\Request\Partner\PartnerUpdateRequest;
 use App\Contract\Response\Partner\PartnerGetResponse;
+use App\Contract\Response\Partner\PartnerUpdateResponse;
 use App\Controller\Api\PartnerController;
 use App\Entity\Partner;
 use App\Exception\Http\ResourceNotFoundException;
-use App\Exception\Http\UnprocessableEntityException;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\PartnerNotFoundException;
 use App\Manager\PartnerManager;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
@@ -30,21 +31,9 @@ class PartnerControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $controller = new PartnerController();
         $partnerManager = $this->prophesize(PartnerManager::class);
-        $partnerManager->get($uuid)->willThrow(EntityNotFoundException::class);
+        $partnerManager->get($uuid)->willThrow(PartnerNotFoundException::class);
         $this->expectException(ResourceNotFoundException::class);
-        $controller->get($uuid, $partnerManager->reveal());
-    }
-
-    /**
-     * @covers ::get
-     * @covers \App\Contract\Response\Partner\PartnerGetResponse::__construct
-     */
-    public function testIfGetWillThrowUnprocessableEntityException(): void
-    {
-        $controller = new PartnerController();
-        $partnerManager = $this->prophesize(PartnerManager::class);
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->get('12345', $partnerManager->reveal());
+        $controller->get(Uuid::fromString($uuid), $partnerManager->reveal());
     }
 
     /**
@@ -68,7 +57,7 @@ class PartnerControllerTest extends TestCase
         $controller = new PartnerController();
         $partnerManager = $this->prophesize(PartnerManager::class);
         $partnerManager->get($uuid)->willReturn($partner);
-        $return = $controller->get($uuid, $partnerManager->reveal());
+        $return = $controller->get(Uuid::fromString($uuid), $partnerManager->reveal());
         $this->assertEquals(PartnerGetResponse::class, get_class($return));
         $this->assertEquals($uuid, $return->uuid);
         $this->assertEquals($partner->goldenId, $return->goldenId);
@@ -87,36 +76,25 @@ class PartnerControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $partnerUpdateRequest = new PartnerUpdateRequest();
         $partnerManager = $this->prophesize(PartnerManager::class);
-        $partnerManager->update($uuid, $partnerUpdateRequest)->willThrow(EntityNotFoundException::class);
+        $partnerManager->update($uuid, $partnerUpdateRequest)->willThrow(PartnerNotFoundException::class);
         $controller = new PartnerController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->put($uuid, $partnerUpdateRequest, $partnerManager->reveal());
+        $controller->put(Uuid::fromString($uuid), $partnerUpdateRequest, $partnerManager->reveal());
     }
 
     /**
      * @covers ::put
+     * @dataProvider samplePartner
      */
-    public function testPut()
+    public function testPut(string $uuid, Partner $partner)
     {
-        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $partnerUpdateRequest = new PartnerUpdateRequest();
         $partnerManager = $this->prophesize(PartnerManager::class);
-        $partnerManager->update($uuid, $partnerUpdateRequest)->shouldBeCalled();
+        $partnerManager->update($uuid, $partnerUpdateRequest)->shouldBeCalled()->willReturn($partner);
         $controller = new PartnerController();
-        $response = $controller->put($uuid, $partnerUpdateRequest, $partnerManager->reveal());
-        $this->assertEquals(204, $response->getStatusCode());
-        $this->assertEmpty($response->getContent());
-    }
-
-    /**
-     * @covers ::delete
-     */
-    public function testIfDeleteWillThrowUnprocessableEntityException()
-    {
-        $partnerManager = $this->prophesize(PartnerManager::class);
-        $controller = new PartnerController();
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->delete('1234', $partnerManager->reveal());
+        $response = $controller->put(Uuid::fromString($uuid), $partnerUpdateRequest, $partnerManager->reveal());
+        $this->assertInstanceOf(PartnerUpdateResponse::class, $response);
+        $this->assertEquals(200, $response->getHttpCode());
     }
 
     /**
@@ -126,10 +104,10 @@ class PartnerControllerTest extends TestCase
     {
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $partnerManager = $this->prophesize(PartnerManager::class);
-        $partnerManager->delete($uuid)->willThrow(EntityNotFoundException::class);
+        $partnerManager->delete($uuid)->willThrow(PartnerNotFoundException::class);
         $controller = new PartnerController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->delete($uuid, $partnerManager->reveal());
+        $controller->delete(Uuid::fromString($uuid), $partnerManager->reveal());
     }
 
     /**
@@ -141,7 +119,7 @@ class PartnerControllerTest extends TestCase
         $partnerManager = $this->prophesize(PartnerManager::class);
         $partnerManager->delete($uuid)->shouldBeCalled();
         $controller = new PartnerController();
-        $response = $controller->delete($uuid, $partnerManager->reveal());
+        $response = $controller->delete(Uuid::fromString($uuid), $partnerManager->reveal());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
     }
@@ -149,20 +127,33 @@ class PartnerControllerTest extends TestCase
     /**
      * @covers ::create
      * @covers \App\Contract\Response\Partner\PartnerCreateResponse::__construct
+     * @dataProvider samplePartner
      */
-    public function testCreate()
+    public function testCreate(string $uuid, Partner $partner)
     {
         $partnerCreateRequest = new PartnerCreateRequest();
-        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
-        $uuidInterface = $this->prophesize(UuidInterface::class);
-        $uuidInterface->toString()->willReturn($uuid);
-        $partner = new Partner();
-        $partner->uuid = $uuidInterface->reveal();
         $partnerManager = $this->prophesize(PartnerManager::class);
         $partnerManager->create($partnerCreateRequest)->willReturn($partner);
         $controller = new PartnerController();
         $partnerCreateResponse = $controller->create($partnerCreateRequest, $partnerManager->reveal());
 
         $this->assertEquals($uuid, $partnerCreateResponse->uuid);
+    }
+
+    public function samplePartner(): iterable
+    {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
+        $uuidInterface = $this->prophesize(UuidInterface::class);
+        $uuidInterface->toString()->willReturn($uuid);
+        $partner = new Partner();
+        $partner->uuid = $uuidInterface->reveal();
+        $partner->goldenId = '1234';
+        $partner->status = 'active';
+        $partner->currency = 'EUR';
+        $partner->ceaseDate = null;
+        $partner->createdAt = new \DateTime();
+        $partner->updatedAt = new \DateTime();
+
+        yield [$uuid, $partner];
     }
 }

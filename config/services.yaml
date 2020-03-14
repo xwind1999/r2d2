@@ -32,6 +32,10 @@ services:
         tags:
             - { name: controller.argument_value_resolver, priority: 50 }
 
+    App\Helper\Request\UuidValueResolver:
+        tags:
+            - { name: controller.argument_value_resolver, priority: 500 }
+
     App\EventSubscriber\:
         resource: '../src/EventSubscriber'
         tags: ['kernel.event_subscriber']

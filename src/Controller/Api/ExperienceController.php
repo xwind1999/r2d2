@@ -8,12 +8,14 @@ use App\Contract\Request\Experience\ExperienceCreateRequest;
 use App\Contract\Request\Experience\ExperienceUpdateRequest;
 use App\Contract\Response\Experience\ExperienceCreateResponse;
 use App\Contract\Response\Experience\ExperienceGetResponse;
+use App\Contract\Response\Experience\ExperienceUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\ExperienceManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -61,14 +63,10 @@ class ExperienceController
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
      */
-    public function get(string $uuid, ExperienceManager $experienceManager): ExperienceGetResponse
+    public function get(UuidInterface $uuid, ExperienceManager $experienceManager): ExperienceGetResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $experience = $experienceManager->get($uuid);
+            $experience = $experienceManager->get($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -94,14 +92,10 @@ class ExperienceController
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function delete(string $uuid, ExperienceManager $experienceManager): Response
+    public function delete(UuidInterface $uuid, ExperienceManager $experienceManager): Response
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $experienceManager->delete($uuid);
+            $experienceManager->delete($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -125,25 +119,22 @@ class ExperienceController
      *         @Model(type=ExperienceUpdateRequest::class)
      * )
      * @SWG\Response(
-     *     response=204,
-     *     description="Experience upated"
+     *     response=200,
+     *     description="Experience updated",
+     *     @Model(type=ExperienceUpdateResponse::class)
      * )
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function put(string $uuid, ExperienceUpdateRequest $experienceUpdateRequest, ExperienceManager $experienceManager): Response
+    public function put(UuidInterface $uuid, ExperienceUpdateRequest $experienceUpdateRequest, ExperienceManager $experienceManager): ExperienceUpdateResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $experienceManager->update($uuid, $experienceUpdateRequest);
+            $experience = $experienceManager->update($uuid->toString(), $experienceUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
 
-        return new Response(null, 204);
+        return new ExperienceUpdateResponse($experience);
     }
 }

@@ -7,13 +7,14 @@ namespace App\Tests\Controller\Api;
 use App\Contract\Request\Room\RoomCreateRequest;
 use App\Contract\Request\Room\RoomUpdateRequest;
 use App\Contract\Response\Room\RoomGetResponse;
+use App\Contract\Response\Room\RoomUpdateResponse;
 use App\Controller\Api\RoomController;
 use App\Entity\Room;
 use App\Exception\Http\ResourceNotFoundException;
-use App\Exception\Http\UnprocessableEntityException;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\RoomNotFoundException;
 use App\Manager\RoomManager;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
@@ -30,21 +31,9 @@ class RoomControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $controller = new RoomController();
         $roomManager = $this->prophesize(RoomManager::class);
-        $roomManager->get($uuid)->willThrow(EntityNotFoundException::class);
+        $roomManager->get($uuid)->willThrow(RoomNotFoundException::class);
         $this->expectException(ResourceNotFoundException::class);
-        $controller->get($uuid, $roomManager->reveal());
-    }
-
-    /**
-     * @covers ::get
-     * @covers \App\Contract\Response\Room\RoomGetResponse::__construct
-     */
-    public function testIfGetWillThrowUnprocessableEntityException(): void
-    {
-        $controller = new RoomController();
-        $roomManager = $this->prophesize(RoomManager::class);
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->get('12345', $roomManager->reveal());
+        $controller->get(Uuid::fromString($uuid), $roomManager->reveal());
     }
 
     /**
@@ -71,7 +60,7 @@ class RoomControllerTest extends TestCase
         $controller = new RoomController();
         $roomManager = $this->prophesize(RoomManager::class);
         $roomManager->get($uuid)->willReturn($room);
-        $return = $controller->get($uuid, $roomManager->reveal());
+        $return = $controller->get(Uuid::fromString($uuid), $roomManager->reveal());
         $this->assertEquals(RoomGetResponse::class, get_class($return));
         $this->assertEquals($uuid, $return->uuid);
         $this->assertEquals($room->goldenId, $return->goldenId);
@@ -93,36 +82,25 @@ class RoomControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $roomUpdateRequest = new RoomUpdateRequest();
         $roomManager = $this->prophesize(RoomManager::class);
-        $roomManager->update($uuid, $roomUpdateRequest)->willThrow(EntityNotFoundException::class);
+        $roomManager->update($uuid, $roomUpdateRequest)->willThrow(RoomNotFoundException::class);
         $controller = new RoomController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->put($uuid, $roomUpdateRequest, $roomManager->reveal());
+        $controller->put(Uuid::fromString($uuid), $roomUpdateRequest, $roomManager->reveal());
     }
 
     /**
      * @covers ::put
+     * @dataProvider sampleRoom
      */
-    public function testPut()
+    public function testPut(string $uuid, Room $room)
     {
-        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $roomUpdateRequest = new RoomUpdateRequest();
         $roomManager = $this->prophesize(RoomManager::class);
-        $roomManager->update($uuid, $roomUpdateRequest)->shouldBeCalled();
+        $roomManager->update($uuid, $roomUpdateRequest)->shouldBeCalled()->willReturn($room);
         $controller = new RoomController();
-        $response = $controller->put($uuid, $roomUpdateRequest, $roomManager->reveal());
-        $this->assertEquals(204, $response->getStatusCode());
-        $this->assertEmpty($response->getContent());
-    }
-
-    /**
-     * @covers ::delete
-     */
-    public function testIfDeleteWillThrowUnprocessableEntityException()
-    {
-        $roomManager = $this->prophesize(RoomManager::class);
-        $controller = new RoomController();
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->delete('1234', $roomManager->reveal());
+        $response = $controller->put(Uuid::fromString($uuid), $roomUpdateRequest, $roomManager->reveal());
+        $this->assertInstanceOf(RoomUpdateResponse::class, $response);
+        $this->assertEquals(200, $response->getHttpCode());
     }
 
     /**
@@ -132,10 +110,10 @@ class RoomControllerTest extends TestCase
     {
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $roomManager = $this->prophesize(RoomManager::class);
-        $roomManager->delete($uuid)->willThrow(EntityNotFoundException::class);
+        $roomManager->delete($uuid)->willThrow(RoomNotFoundException::class);
         $controller = new RoomController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->delete($uuid, $roomManager->reveal());
+        $controller->delete(Uuid::fromString($uuid), $roomManager->reveal());
     }
 
     /**
@@ -147,7 +125,7 @@ class RoomControllerTest extends TestCase
         $roomManager = $this->prophesize(RoomManager::class);
         $roomManager->delete($uuid)->shouldBeCalled();
         $controller = new RoomController();
-        $response = $controller->delete($uuid, $roomManager->reveal());
+        $response = $controller->delete(Uuid::fromString($uuid), $roomManager->reveal());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
     }
@@ -155,20 +133,36 @@ class RoomControllerTest extends TestCase
     /**
      * @covers ::create
      * @covers \App\Contract\Response\Room\RoomCreateResponse::__construct
+     * @dataProvider sampleRoom
      */
-    public function testCreate()
+    public function testCreate(string $uuid, Room $room)
     {
         $roomCreateRequest = new RoomCreateRequest();
-        $uuid = '1234';
-        $uuidInterface = $this->prophesize(UuidInterface::class);
-        $uuidInterface->toString()->willReturn($uuid);
-        $room = new Room();
-        $room->uuid = $uuidInterface->reveal();
         $roomManager = $this->prophesize(RoomManager::class);
         $roomManager->create($roomCreateRequest)->willReturn($room);
         $controller = new RoomController();
         $roomCreateResponse = $controller->create($roomCreateRequest, $roomManager->reveal());
 
         $this->assertEquals($uuid, $roomCreateResponse->uuid);
+    }
+
+    public function sampleRoom(): iterable
+    {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
+        $uuidInterface = $this->prophesize(UuidInterface::class);
+        $uuidInterface->toString()->willReturn($uuid);
+        $room = new Room();
+        $room->uuid = $uuidInterface->reveal();
+        $room->goldenId = '1234';
+        $room->partnerGoldenId = '1234';
+        $room->name = 'test room';
+        $room->description = 'this is a test room';
+        $room->inventory = 2;
+        $room->isSellable = true;
+        $room->status = 'enabled';
+        $room->createdAt = new \DateTime();
+        $room->updatedAt = new \DateTime();
+
+        yield [$uuid, $room];
     }
 }

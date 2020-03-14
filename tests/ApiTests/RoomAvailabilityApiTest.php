@@ -4,40 +4,24 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests;
 
-use App\Contract\Request\RoomAvailability\RoomAvailabilityCreateRequest;
-use App\Contract\Request\RoomAvailability\RoomAvailabilityUpdateRequest;
-
 class RoomAvailabilityApiTest extends ApiTestCase
 {
     const API_BASE_URL = '/api/room-availability';
-    protected RoomAvailabilityCreateRequest $roomAvailabilityCreateRequest;
-
-    public function setUp(): void
-    {
-        $this->roomAvailabilityCreateRequest = new RoomAvailabilityCreateRequest();
-
-        $this->roomAvailabilityCreateRequest->roomGoldenId = '1234';
-        $this->roomAvailabilityCreateRequest->rateBandGoldenId = '5678';
-        $this->roomAvailabilityCreateRequest->stock = 2;
-        $this->roomAvailabilityCreateRequest->date = new \DateTime();
-        $this->roomAvailabilityCreateRequest->type = 'instant';
-    }
 
     public function testCreateWithInvalidRoomGoldenId()
     {
-        $this->roomAvailabilityCreateRequest->roomGoldenId = '';
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->roomAvailabilityCreateRequest));
-        $this->assertEquals(422, $this->client()->getResponse()->getStatusCode());
+        $response = self::$roomAvailabilityHelper->create(['room_golden_id' => '']);
+        $this->assertEquals(422, $response->getStatusCode());
     }
 
     public function testCreateSuccess(): string
     {
-        $this->client()->request('POST', self::API_BASE_URL, [], [], [], $this->serialize($this->roomAvailabilityCreateRequest));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertEquals(201, $this->client()->getResponse()->getStatusCode());
+        $response = self::$roomAvailabilityHelper->create();
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertEquals(201, $response->getStatusCode());
 
-        return $response['uuid'];
+        return $responseContent->uuid;
     }
 
     /**
@@ -45,11 +29,11 @@ class RoomAvailabilityApiTest extends ApiTestCase
      */
     public function testGet(string $uuid): string
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('uuid', $response);
-        $this->assertArrayHasKey('created_at', $response);
-        $this->assertEquals(200, $this->client()->getResponse()->getStatusCode());
+        $response = self::$roomAvailabilityHelper->get($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertObjectHasAttribute('created_at', $responseContent);
+        $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;
     }
@@ -59,18 +43,16 @@ class RoomAvailabilityApiTest extends ApiTestCase
      */
     public function testUpdate(string $uuid): string
     {
-        $payload = new RoomAvailabilityUpdateRequest();
-        $payload->roomGoldenId = '9876';
-        $payload->rateBandGoldenId = '5432';
-        $payload->stock = 1;
-        $payload->date = new \DateTime();
-        $payload->type = 'request';
-        $this->client()->request('PUT', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], [], $this->serialize($payload));
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
+        $roomPrice = json_decode(self::$roomAvailabilityHelper->get($uuid)->getContent(), true);
+        $payload = [
+                'stock' => 51,
+            ] + $roomPrice;
+        $response = self::$roomAvailabilityHelper->update($uuid, $payload);
+        $responseContent = json_decode($response->getContent());
+        $this->assertEquals($payload['stock'], $responseContent->stock);
+        $this->assertEquals(200, $response->getStatusCode());
 
-        return $uuid;
+        return $responseContent->uuid;
     }
 
     /**
@@ -78,10 +60,10 @@ class RoomAvailabilityApiTest extends ApiTestCase
      */
     public function testDelete(string $uuid): string
     {
-        $this->client()->request('DELETE', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $response = json_decode($this->client()->getResponse()->getContent(), true);
-        $this->assertNull($response);
-        $this->assertEquals(204, $this->client()->getResponse()->getStatusCode());
+        $response = self::$roomAvailabilityHelper->delete($uuid);
+        $responseContent = json_decode($response->getContent());
+        $this->assertNull($responseContent);
+        $this->assertEquals(204, $response->getStatusCode());
 
         return $uuid;
     }
@@ -91,7 +73,7 @@ class RoomAvailabilityApiTest extends ApiTestCase
      */
     public function testGetAfterDelete(string $uuid)
     {
-        $this->client()->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
-        $this->assertEquals(404, $this->client()->getResponse()->getStatusCode());
+        $response = self::$roomAvailabilityHelper->get($uuid);
+        $this->assertEquals(404, $response->getStatusCode());
     }
 }

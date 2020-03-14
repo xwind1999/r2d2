@@ -7,13 +7,14 @@ namespace App\Tests\Controller\Api;
 use App\Contract\Request\BookingDate\BookingDateCreateRequest;
 use App\Contract\Request\BookingDate\BookingDateUpdateRequest;
 use App\Contract\Response\BookingDate\BookingDateGetResponse;
+use App\Contract\Response\BookingDate\BookingDateUpdateResponse;
 use App\Controller\Api\BookingDateController;
 use App\Entity\BookingDate;
 use App\Exception\Http\ResourceNotFoundException;
-use App\Exception\Http\UnprocessableEntityException;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\BookingDateNotFoundException;
 use App\Manager\BookingDateManager;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
@@ -30,21 +31,9 @@ class BookingDateControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $controller = new BookingDateController();
         $bookingDateManager = $this->prophesize(BookingDateManager::class);
-        $bookingDateManager->get($uuid)->willThrow(EntityNotFoundException::class);
+        $bookingDateManager->get($uuid)->willThrow(BookingDateNotFoundException::class);
         $this->expectException(ResourceNotFoundException::class);
-        $controller->get($uuid, $bookingDateManager->reveal());
-    }
-
-    /**
-     * @covers ::get
-     * @covers \App\Contract\Response\BookingDate\BookingDateGetResponse::__construct
-     */
-    public function testIfGetWillThrowUnprocessableEntityException(): void
-    {
-        $controller = new BookingDateController();
-        $bookingDateManager = $this->prophesize(BookingDateManager::class);
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->get('12345', $bookingDateManager->reveal());
+        $controller->get(Uuid::fromString($uuid), $bookingDateManager->reveal());
     }
 
     /**
@@ -72,7 +61,7 @@ class BookingDateControllerTest extends TestCase
         $controller = new BookingDateController();
         $bookingDateManager = $this->prophesize(BookingDateManager::class);
         $bookingDateManager->get($uuid)->willReturn($bookingDate);
-        $return = $controller->get($uuid, $bookingDateManager->reveal());
+        $return = $controller->get(Uuid::fromString($uuid), $bookingDateManager->reveal());
         $this->assertEquals(BookingDateGetResponse::class, get_class($return));
         $this->assertEquals($uuid, $return->uuid);
         $this->assertEquals($bookingDate->bookingGoldenId, $return->bookingGoldenId);
@@ -94,36 +83,25 @@ class BookingDateControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $bookingDateUpdateRequest = new BookingDateUpdateRequest();
         $bookingDateManager = $this->prophesize(BookingDateManager::class);
-        $bookingDateManager->update($uuid, $bookingDateUpdateRequest)->willThrow(EntityNotFoundException::class);
+        $bookingDateManager->update($uuid, $bookingDateUpdateRequest)->willThrow(BookingDateNotFoundException::class);
         $controller = new BookingDateController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->put($uuid, $bookingDateUpdateRequest, $bookingDateManager->reveal());
+        $controller->put(Uuid::fromString($uuid), $bookingDateUpdateRequest, $bookingDateManager->reveal());
     }
 
     /**
      * @covers ::put
+     * @dataProvider sampleBookingDate
      */
-    public function testPut()
+    public function testPut(string $uuid, BookingDate $bookingDate)
     {
-        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $bookingDateUpdateRequest = new BookingDateUpdateRequest();
         $bookingDateManager = $this->prophesize(BookingDateManager::class);
-        $bookingDateManager->update($uuid, $bookingDateUpdateRequest)->shouldBeCalled();
+        $bookingDateManager->update($uuid, $bookingDateUpdateRequest)->shouldBeCalled()->willReturn($bookingDate);
         $controller = new BookingDateController();
-        $response = $controller->put($uuid, $bookingDateUpdateRequest, $bookingDateManager->reveal());
-        $this->assertEquals(204, $response->getStatusCode());
-        $this->assertEmpty($response->getContent());
-    }
-
-    /**
-     * @covers ::delete
-     */
-    public function testIfDeleteWillThrowUnprocessableEntityException()
-    {
-        $bookingDateManager = $this->prophesize(BookingDateManager::class);
-        $controller = new BookingDateController();
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->delete('1234', $bookingDateManager->reveal());
+        $response = $controller->put(Uuid::fromString($uuid), $bookingDateUpdateRequest, $bookingDateManager->reveal());
+        $this->assertInstanceOf(BookingDateUpdateResponse::class, $response);
+        $this->assertEquals(200, $response->getHttpCode());
     }
 
     /**
@@ -133,10 +111,10 @@ class BookingDateControllerTest extends TestCase
     {
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $bookingDateManager = $this->prophesize(BookingDateManager::class);
-        $bookingDateManager->delete($uuid)->willThrow(EntityNotFoundException::class);
+        $bookingDateManager->delete($uuid)->willThrow(BookingDateNotFoundException::class);
         $controller = new BookingDateController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->delete($uuid, $bookingDateManager->reveal());
+        $controller->delete(Uuid::fromString($uuid), $bookingDateManager->reveal());
     }
 
     /**
@@ -148,7 +126,7 @@ class BookingDateControllerTest extends TestCase
         $bookingDateManager = $this->prophesize(BookingDateManager::class);
         $bookingDateManager->delete($uuid)->shouldBeCalled();
         $controller = new BookingDateController();
-        $response = $controller->delete($uuid, $bookingDateManager->reveal());
+        $response = $controller->delete(Uuid::fromString($uuid), $bookingDateManager->reveal());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
     }
@@ -156,20 +134,36 @@ class BookingDateControllerTest extends TestCase
     /**
      * @covers ::create
      * @covers \App\Contract\Response\BookingDate\BookingDateCreateResponse::__construct
+     * @dataProvider sampleBookingDate
      */
-    public function testCreate()
+    public function testCreate(string $uuid, BookingDate $bookingDate)
     {
         $bookingDateCreateRequest = new BookingDateCreateRequest();
-        $uuid = '1234';
-        $uuidInterface = $this->prophesize(UuidInterface::class);
-        $uuidInterface->toString()->willReturn($uuid);
-        $bookingDate = new BookingDate();
-        $bookingDate->uuid = $uuidInterface->reveal();
         $bookingDateManager = $this->prophesize(BookingDateManager::class);
         $bookingDateManager->create($bookingDateCreateRequest)->willReturn($bookingDate);
         $controller = new BookingDateController();
         $bookingDateCreateResponse = $controller->create($bookingDateCreateRequest, $bookingDateManager->reveal());
 
         $this->assertEquals($uuid, $bookingDateCreateResponse->uuid);
+    }
+
+    public function sampleBookingDate(): iterable
+    {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
+        $uuidInterface = $this->prophesize(UuidInterface::class);
+        $uuidInterface->toString()->willReturn($uuid);
+        $bookingDate = new BookingDate();
+        $bookingDate->uuid = $uuidInterface->reveal();
+        $bookingDate->bookingGoldenId = '1234';
+        $bookingDate->roomGoldenId = '1234';
+        $bookingDate->rateBandGoldenId = '1234';
+        $bookingDate->date = new \DateTime('2020-01-01');
+        $bookingDate->price = 9990;
+        $bookingDate->isUpsell = true;
+        $bookingDate->guestsCount = 1;
+        $bookingDate->createdAt = new \DateTime();
+        $bookingDate->updatedAt = new \DateTime();
+
+        yield [$uuid, $bookingDate];
     }
 }

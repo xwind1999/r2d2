@@ -9,24 +9,33 @@ use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Repository\BookingRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ExperienceRepository;
+use App\Repository\PartnerRepository;
 
 class BookingManager
 {
-    protected EntityManagerInterface $em;
-
     protected BookingRepository $repository;
 
-    public function __construct(EntityManagerInterface $em, BookingRepository $repository)
+    protected PartnerRepository $partnerRepository;
+
+    protected ExperienceRepository $experienceRepository;
+
+    public function __construct(BookingRepository $repository, PartnerRepository $partnerRepository, ExperienceRepository $experienceRepository)
     {
-        $this->em = $em;
         $this->repository = $repository;
+        $this->partnerRepository = $partnerRepository;
+        $this->experienceRepository = $experienceRepository;
     }
 
     public function create(BookingCreateRequest $bookingCreateRequest): Booking
     {
+        $partner = $this->partnerRepository->findOneByGoldenId($bookingCreateRequest->partnerGoldenId);
+        $experience = $this->experienceRepository->findOneByGoldenId($bookingCreateRequest->experienceGoldenId);
+
         $booking = new Booking();
 
+        $booking->partner = $partner;
+        $booking->experience = $experience;
         $booking->goldenId = $bookingCreateRequest->goldenId;
         $booking->partnerGoldenId = $bookingCreateRequest->partnerGoldenId;
         $booking->experienceGoldenId = $bookingCreateRequest->experienceGoldenId;
@@ -51,8 +60,7 @@ class BookingManager
         $booking->placedAt = $bookingCreateRequest->placedAt;
         $booking->cancelledAt = $bookingCreateRequest->cancelledAt;
 
-        $this->em->persist($booking);
-        $this->em->flush();
+        $this->repository->save($booking);
 
         return $booking;
     }
@@ -71,17 +79,21 @@ class BookingManager
     public function delete(string $uuid): void
     {
         $booking = $this->get($uuid);
-        $this->em->remove($booking);
-        $this->em->flush();
+        $this->repository->delete($booking);
     }
 
     /**
      * @throws EntityNotFoundException
      */
-    public function update(string $uuid, BookingUpdateRequest $bookingUpdateRequest): void
+    public function update(string $uuid, BookingUpdateRequest $bookingUpdateRequest): Booking
     {
+        $partner = $this->partnerRepository->findOneByGoldenId($bookingUpdateRequest->partnerGoldenId);
+        $experience = $this->experienceRepository->findOneByGoldenId($bookingUpdateRequest->experienceGoldenId);
+
         $booking = $this->get($uuid);
 
+        $booking->partner = $partner;
+        $booking->experience = $experience;
         $booking->goldenId = $bookingUpdateRequest->goldenId;
         $booking->partnerGoldenId = $bookingUpdateRequest->partnerGoldenId;
         $booking->experienceGoldenId = $bookingUpdateRequest->experienceGoldenId;
@@ -106,7 +118,8 @@ class BookingManager
         $booking->placedAt = $bookingUpdateRequest->placedAt;
         $booking->cancelledAt = $bookingUpdateRequest->cancelledAt;
 
-        $this->em->persist($booking);
-        $this->em->flush();
+        $this->repository->save($booking);
+
+        return $booking;
     }
 }

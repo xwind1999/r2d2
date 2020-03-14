@@ -8,12 +8,14 @@ use App\Contract\Request\RoomAvailability\RoomAvailabilityCreateRequest;
 use App\Contract\Request\RoomAvailability\RoomAvailabilityUpdateRequest;
 use App\Contract\Response\RoomAvailability\RoomAvailabilityCreateResponse;
 use App\Contract\Response\RoomAvailability\RoomAvailabilityGetResponse;
+use App\Contract\Response\RoomAvailability\RoomAvailabilityUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\RoomAvailabilityManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -61,14 +63,10 @@ class RoomAvailabilityController
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
      */
-    public function get(string $uuid, RoomAvailabilityManager $roomAvailabilityManager): RoomAvailabilityGetResponse
+    public function get(UuidInterface $uuid, RoomAvailabilityManager $roomAvailabilityManager): RoomAvailabilityGetResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $roomAvailability = $roomAvailabilityManager->get($uuid);
+            $roomAvailability = $roomAvailabilityManager->get($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -94,14 +92,10 @@ class RoomAvailabilityController
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function delete(string $uuid, RoomAvailabilityManager $roomAvailabilityManager): Response
+    public function delete(UuidInterface $uuid, RoomAvailabilityManager $roomAvailabilityManager): Response
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $roomAvailabilityManager->delete($uuid);
+            $roomAvailabilityManager->delete($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -125,25 +119,22 @@ class RoomAvailabilityController
      *         @Model(type=RoomAvailabilityUpdateRequest::class)
      * )
      * @SWG\Response(
-     *     response=204,
-     *     description="Room Availability upated"
+     *     response=200,
+     *     description="Room Availability updated",
+     *     @Model(type=RoomAvailabilityUpdateResponse::class)
      * )
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function put(string $uuid, RoomAvailabilityUpdateRequest $roomAvailabilityUpdateRequest, RoomAvailabilityManager $roomAvailabilityManager): Response
+    public function put(UuidInterface $uuid, RoomAvailabilityUpdateRequest $roomAvailabilityUpdateRequest, RoomAvailabilityManager $roomAvailabilityManager): RoomAvailabilityUpdateResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $roomAvailabilityManager->update($uuid, $roomAvailabilityUpdateRequest);
+            $roomAvailability = $roomAvailabilityManager->update($uuid->toString(), $roomAvailabilityUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
 
-        return new Response(null, 204);
+        return new RoomAvailabilityUpdateResponse($roomAvailability);
     }
 }

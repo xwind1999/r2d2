@@ -9,32 +9,33 @@ use App\Contract\Request\Experience\ExperienceUpdateRequest;
 use App\Entity\Experience;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Repository\ExperienceRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\PartnerRepository;
 
 class ExperienceManager
 {
-    protected EntityManagerInterface $em;
-
     protected ExperienceRepository $repository;
 
-    public function __construct(EntityManagerInterface $em, ExperienceRepository $repository)
+    protected PartnerRepository $partnerRepository;
+
+    public function __construct(ExperienceRepository $repository, PartnerRepository $partnerRepository)
     {
-        $this->em = $em;
         $this->repository = $repository;
+        $this->partnerRepository = $partnerRepository;
     }
 
     public function create(ExperienceCreateRequest $experienceCreateRequest): Experience
     {
-        $experience = new Experience();
+        $partner = $this->partnerRepository->findOneByGoldenId($experienceCreateRequest->partnerGoldenId);
 
+        $experience = new Experience();
+        $experience->partner = $partner;
         $experience->goldenId = $experienceCreateRequest->goldenId;
         $experience->partnerGoldenId = $experienceCreateRequest->partnerGoldenId;
         $experience->name = $experienceCreateRequest->name;
         $experience->description = $experienceCreateRequest->description;
         $experience->duration = $experienceCreateRequest->duration;
 
-        $this->em->persist($experience);
-        $this->em->flush();
+        $this->repository->save($experience);
 
         return $experience;
     }
@@ -53,24 +54,26 @@ class ExperienceManager
     public function delete(string $uuid): void
     {
         $experience = $this->get($uuid);
-        $this->em->remove($experience);
-        $this->em->flush();
+        $this->repository->delete($experience);
     }
 
     /**
      * @throws EntityNotFoundException
      */
-    public function update(string $uuid, ExperienceUpdateRequest $experienceUpdateRequest): void
+    public function update(string $uuid, ExperienceUpdateRequest $experienceUpdateRequest): Experience
     {
-        $experience = $this->get($uuid);
+        $partner = $this->partnerRepository->findOneByGoldenId($experienceUpdateRequest->partnerGoldenId);
 
+        $experience = $this->get($uuid);
+        $experience->partner = $partner;
         $experience->goldenId = $experienceUpdateRequest->goldenId;
         $experience->partnerGoldenId = $experienceUpdateRequest->partnerGoldenId;
         $experience->name = $experienceUpdateRequest->name;
         $experience->description = $experienceUpdateRequest->description;
         $experience->duration = $experienceUpdateRequest->duration;
 
-        $this->em->persist($experience);
-        $this->em->flush();
+        $this->repository->save($experience);
+
+        return $experience;
     }
 }

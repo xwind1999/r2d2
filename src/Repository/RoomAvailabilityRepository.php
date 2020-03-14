@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\RoomAvailability;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\RoomAvailabilityNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -22,12 +22,24 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         parent::__construct($registry, RoomAvailability::class);
     }
 
+    public function save(RoomAvailability $entity): void
+    {
+        $this->_em->persist($entity);
+        $this->_em->flush();
+    }
+
+    public function delete(RoomAvailability $entity): void
+    {
+        $this->_em->remove($entity);
+        $this->_em->flush();
+    }
+
     public function findOne(string $uuid): RoomAvailability
     {
         $roomAvailability = $this->find($uuid);
 
         if (null === $roomAvailability) {
-            throw new EntityNotFoundException();
+            throw new RoomAvailabilityNotFoundException();
         }
 
         return $roomAvailability;

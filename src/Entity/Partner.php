@@ -11,6 +11,7 @@ use Ramsey\Uuid\UuidInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PartnerRepository")
+ * @ORM\Table(indexes={@ORM\Index(columns={"golden_id"})})
  */
 class Partner
 {
@@ -26,7 +27,7 @@ class Partner
     public UuidInterface $uuid;
 
     /**
-     * @ORM\Column(type="string", length=45)
+     * @ORM\Column(type="string", length=45, unique=true)
      */
     public string $goldenId;
 

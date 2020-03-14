@@ -9,7 +9,6 @@ use App\Contract\Request\Box\BoxUpdateRequest;
 use App\Entity\Box;
 use App\Manager\BoxManager;
 use App\Repository\BoxRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -21,18 +20,12 @@ use Ramsey\Uuid\UuidInterface;
 class BoxManagerTest extends TestCase
 {
     /**
-     * @var EntityManagerInterface|ObjectProphecy
-     */
-    protected $em;
-
-    /**
      * @var BoxRepository|ObjectProphecy
      */
     protected $repository;
 
     public function setUp(): void
     {
-        $this->em = $this->prophesize(EntityManagerInterface::class);
         $this->repository = $this->prophesize(BoxRepository::class);
     }
 
@@ -43,7 +36,7 @@ class BoxManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new BoxManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new BoxManager($this->repository->reveal());
         $boxUpdateRequest = new BoxUpdateRequest();
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $boxUpdateRequest->goldenId = '5678';
@@ -62,11 +55,11 @@ class BoxManagerTest extends TestCase
         $box->status = 'integrated';
         $this->repository->findOne($uuid)->willReturn($box);
 
-        $this->em->persist(Argument::type(Box::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
 
-        $manager->update($uuid, $boxUpdateRequest);
+        $updatedBox = $manager->update($uuid, $boxUpdateRequest);
 
+        $this->assertSame($box, $updatedBox);
         $this->assertEquals('integrated2', $box->status);
         $this->assertEquals('sbx', $box->brand);
         $this->assertEquals('fr', $box->country);
@@ -80,7 +73,7 @@ class BoxManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new BoxManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new BoxManager($this->repository->reveal());
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -89,8 +82,7 @@ class BoxManagerTest extends TestCase
         $box->uuid = $uuidInterface->reveal();
         $this->repository->findOne($uuid)->willReturn($box);
 
-        $this->em->remove(Argument::type(Box::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->delete(Argument::type(Box::class))->shouldBeCalled();
 
         $manager->delete($uuid);
     }
@@ -101,15 +93,14 @@ class BoxManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new BoxManager($this->em->reveal(), $this->repository->reveal());
+        $manager = new BoxManager($this->repository->reveal());
         $boxCreateRequest = new BoxCreateRequest();
         $boxCreateRequest->goldenId = '5678';
         $boxCreateRequest->brand = 'sbx';
         $boxCreateRequest->country = 'fr';
         $boxCreateRequest->status = 'integrated2';
 
-        $this->em->persist(Argument::type(Box::class))->shouldBeCalled();
-        $this->em->flush()->shouldBeCalled();
+        $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
 
         $box = $manager->create($boxCreateRequest);
         $this->assertEquals($boxCreateRequest->goldenId, $box->goldenId);

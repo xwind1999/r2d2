@@ -8,12 +8,14 @@ use App\Contract\Request\RateBand\RateBandCreateRequest;
 use App\Contract\Request\RateBand\RateBandUpdateRequest;
 use App\Contract\Response\RateBand\RateBandCreateResponse;
 use App\Contract\Response\RateBand\RateBandGetResponse;
+use App\Contract\Response\RateBand\RateBandUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\RateBandManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -61,14 +63,10 @@ class RateBandController
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
      */
-    public function get(string $uuid, RateBandManager $rateBandManager): RateBandGetResponse
+    public function get(UuidInterface $uuid, RateBandManager $rateBandManager): RateBandGetResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $rateBand = $rateBandManager->get($uuid);
+            $rateBand = $rateBandManager->get($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -94,14 +92,10 @@ class RateBandController
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function delete(string $uuid, RateBandManager $rateBandManager): Response
+    public function delete(UuidInterface $uuid, RateBandManager $rateBandManager): Response
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $rateBandManager->delete($uuid);
+            $rateBandManager->delete($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -125,25 +119,22 @@ class RateBandController
      *         @Model(type=RateBandUpdateRequest::class)
      * )
      * @SWG\Response(
-     *     response=204,
-     *     description="RateBand updated"
+     *     response=200,
+     *     description="RateBand updated",
+     *     @Model(type=RateBandUpdateResponse::class)
      * )
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function put(string $uuid, RateBandUpdateRequest $rateBandUpdateRequest, RateBandManager $rateBandManager): Response
+    public function put(UuidInterface $uuid, RateBandUpdateRequest $rateBandUpdateRequest, RateBandManager $rateBandManager): RateBandUpdateResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $rateBandManager->update($uuid, $rateBandUpdateRequest);
+            $rateBand = $rateBandManager->update($uuid->toString(), $rateBandUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
 
-        return new Response(null, 204);
+        return new RateBandUpdateResponse($rateBand);
     }
 }

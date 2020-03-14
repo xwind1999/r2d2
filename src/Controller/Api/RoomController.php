@@ -8,12 +8,14 @@ use App\Contract\Request\Room\RoomCreateRequest;
 use App\Contract\Request\Room\RoomUpdateRequest;
 use App\Contract\Response\Room\RoomCreateResponse;
 use App\Contract\Response\Room\RoomGetResponse;
+use App\Contract\Response\Room\RoomUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\RoomManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -61,14 +63,10 @@ class RoomController
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
      */
-    public function get(string $uuid, RoomManager $roomManager): RoomGetResponse
+    public function get(UuidInterface $uuid, RoomManager $roomManager): RoomGetResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $room = $roomManager->get($uuid);
+            $room = $roomManager->get($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -94,14 +92,10 @@ class RoomController
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function delete(string $uuid, RoomManager $roomManager): Response
+    public function delete(UuidInterface $uuid, RoomManager $roomManager): Response
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $roomManager->delete($uuid);
+            $roomManager->delete($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -125,25 +119,22 @@ class RoomController
      *         @Model(type=RoomUpdateRequest::class)
      * )
      * @SWG\Response(
-     *     response=204,
-     *     description="Room upated"
+     *     response=200,
+     *     description="Room updated",
+     *     @Model(type=RoomUpdateResponse::class)
      * )
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function put(string $uuid, RoomUpdateRequest $roomUpdateRequest, RoomManager $roomManager): Response
+    public function put(UuidInterface $uuid, RoomUpdateRequest $roomUpdateRequest, RoomManager $roomManager): RoomUpdateResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $roomManager->update($uuid, $roomUpdateRequest);
+            $room = $roomManager->update($uuid->toString(), $roomUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
 
-        return new Response(null, 204);
+        return new RoomUpdateResponse($room);
     }
 }

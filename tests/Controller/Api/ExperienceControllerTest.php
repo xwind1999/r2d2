@@ -7,13 +7,14 @@ namespace App\Tests\Controller\Api;
 use App\Contract\Request\Experience\ExperienceCreateRequest;
 use App\Contract\Request\Experience\ExperienceUpdateRequest;
 use App\Contract\Response\Experience\ExperienceGetResponse;
+use App\Contract\Response\Experience\ExperienceUpdateResponse;
 use App\Controller\Api\ExperienceController;
 use App\Entity\Experience;
 use App\Exception\Http\ResourceNotFoundException;
-use App\Exception\Http\UnprocessableEntityException;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceManager;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
@@ -30,21 +31,9 @@ class ExperienceControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $controller = new ExperienceController();
         $experienceManager = $this->prophesize(ExperienceManager::class);
-        $experienceManager->get($uuid)->willThrow(EntityNotFoundException::class);
+        $experienceManager->get($uuid)->willThrow(ExperienceNotFoundException::class);
         $this->expectException(ResourceNotFoundException::class);
-        $controller->get($uuid, $experienceManager->reveal());
-    }
-
-    /**
-     * @covers ::get
-     * @covers \App\Contract\Response\Experience\ExperienceGetResponse::__construct
-     */
-    public function testIfGetWillThrowUnprocessableEntityException(): void
-    {
-        $controller = new ExperienceController();
-        $experienceManager = $this->prophesize(ExperienceManager::class);
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->get('12345', $experienceManager->reveal());
+        $controller->get(Uuid::fromString($uuid), $experienceManager->reveal());
     }
 
     /**
@@ -69,7 +58,7 @@ class ExperienceControllerTest extends TestCase
         $controller = new ExperienceController();
         $experienceManager = $this->prophesize(ExperienceManager::class);
         $experienceManager->get($uuid)->willReturn($experience);
-        $return = $controller->get($uuid, $experienceManager->reveal());
+        $return = $controller->get(Uuid::fromString($uuid), $experienceManager->reveal());
         $this->assertEquals(ExperienceGetResponse::class, get_class($return));
         $this->assertEquals($uuid, $return->uuid);
         $this->assertEquals($experience->goldenId, $return->goldenId);
@@ -89,36 +78,25 @@ class ExperienceControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $experienceUpdateRequest = new ExperienceUpdateRequest();
         $experienceManager = $this->prophesize(ExperienceManager::class);
-        $experienceManager->update($uuid, $experienceUpdateRequest)->willThrow(EntityNotFoundException::class);
+        $experienceManager->update($uuid, $experienceUpdateRequest)->willThrow(ExperienceNotFoundException::class);
         $controller = new ExperienceController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->put($uuid, $experienceUpdateRequest, $experienceManager->reveal());
+        $controller->put(Uuid::fromString($uuid), $experienceUpdateRequest, $experienceManager->reveal());
     }
 
     /**
      * @covers ::put
+     * @dataProvider sampleExperience
      */
-    public function testPut()
+    public function testPut(string $uuid, Experience $experience)
     {
-        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $experienceUpdateRequest = new ExperienceUpdateRequest();
         $experienceManager = $this->prophesize(ExperienceManager::class);
-        $experienceManager->update($uuid, $experienceUpdateRequest)->shouldBeCalled();
+        $experienceManager->update($uuid, $experienceUpdateRequest)->shouldBeCalled()->willReturn($experience);
         $controller = new ExperienceController();
-        $response = $controller->put($uuid, $experienceUpdateRequest, $experienceManager->reveal());
-        $this->assertEquals(204, $response->getStatusCode());
-        $this->assertEmpty($response->getContent());
-    }
-
-    /**
-     * @covers ::delete
-     */
-    public function testIfDeleteWillThrowUnprocessableEntityException()
-    {
-        $experienceManager = $this->prophesize(ExperienceManager::class);
-        $controller = new ExperienceController();
-        $this->expectException(UnprocessableEntityException::class);
-        $controller->delete('1234', $experienceManager->reveal());
+        $response = $controller->put(Uuid::fromString($uuid), $experienceUpdateRequest, $experienceManager->reveal());
+        $this->assertEquals(200, $response->getHttpCode());
+        $this->assertInstanceOf(ExperienceUpdateResponse::class, $response);
     }
 
     /**
@@ -128,10 +106,10 @@ class ExperienceControllerTest extends TestCase
     {
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $experienceManager = $this->prophesize(ExperienceManager::class);
-        $experienceManager->delete($uuid)->willThrow(EntityNotFoundException::class);
+        $experienceManager->delete($uuid)->willThrow(ExperienceNotFoundException::class);
         $controller = new ExperienceController();
         $this->expectException(ResourceNotFoundException::class);
-        $controller->delete($uuid, $experienceManager->reveal());
+        $controller->delete(Uuid::fromString($uuid), $experienceManager->reveal());
     }
 
     /**
@@ -143,7 +121,7 @@ class ExperienceControllerTest extends TestCase
         $experienceManager = $this->prophesize(ExperienceManager::class);
         $experienceManager->delete($uuid)->shouldBeCalled();
         $controller = new ExperienceController();
-        $response = $controller->delete($uuid, $experienceManager->reveal());
+        $response = $controller->delete(Uuid::fromString($uuid), $experienceManager->reveal());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
     }
@@ -151,20 +129,35 @@ class ExperienceControllerTest extends TestCase
     /**
      * @covers ::create
      * @covers \App\Contract\Response\Experience\ExperienceCreateResponse::__construct
+     *
+     * @dataProvider sampleExperience
      */
-    public function testCreate()
+    public function testCreate(string $uuid, Experience $experience)
     {
         $experienceCreateRequest = new ExperienceCreateRequest();
-        $uuid = '1234';
-        $uuidInterface = $this->prophesize(UuidInterface::class);
-        $uuidInterface->toString()->willReturn($uuid);
-        $experience = new Experience();
-        $experience->uuid = $uuidInterface->reveal();
         $experienceManager = $this->prophesize(ExperienceManager::class);
         $experienceManager->create($experienceCreateRequest)->willReturn($experience);
         $controller = new ExperienceController();
         $experienceCreateResponse = $controller->create($experienceCreateRequest, $experienceManager->reveal());
 
         $this->assertEquals($uuid, $experienceCreateResponse->uuid);
+    }
+
+    public function sampleExperience(): iterable
+    {
+        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
+        $uuidInterface = $this->prophesize(UuidInterface::class);
+        $uuidInterface->toString()->willReturn($uuid);
+        $experience = new Experience();
+        $experience->uuid = $uuidInterface->reveal();
+        $experience->goldenId = '1234';
+        $experience->partnerGoldenId = '1234';
+        $experience->name = '1234';
+        $experience->description = '1234';
+        $experience->duration = 2;
+        $experience->createdAt = new \DateTime();
+        $experience->updatedAt = new \DateTime();
+
+        yield [$uuid, $experience];
     }
 }

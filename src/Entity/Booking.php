@@ -10,7 +10,8 @@ use Doctrine\ORM\Mapping\CustomIdGenerator;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\BookingRepository")
+ * @ORM\Table(indexes={@ORM\Index(columns={"golden_id"})})
  */
 class Booking
 {
@@ -26,14 +27,26 @@ class Booking
     public UuidInterface $uuid;
 
     /**
-     * @ORM\Column(type="string", length=45)
+     * @ORM\Column(type="string", length=45, unique=true)
      */
     public string $goldenId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Partner")
+     * @ORM\JoinColumn(name="partner_uuid", referencedColumnName="uuid", nullable=false)
+     */
+    public Partner $partner;
 
     /**
      * @ORM\Column(type="string", length=45)
      */
     public string $partnerGoldenId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Experience")
+     * @ORM\JoinColumn(name="experience_uuid", referencedColumnName="uuid", nullable=false)
+     */
+    public Experience $experience;
 
     /**
      * @ORM\Column(type="string", length=45)

@@ -8,12 +8,14 @@ use App\Contract\Request\BookingDate\BookingDateCreateRequest;
 use App\Contract\Request\BookingDate\BookingDateUpdateRequest;
 use App\Contract\Response\BookingDate\BookingDateCreateResponse;
 use App\Contract\Response\BookingDate\BookingDateGetResponse;
+use App\Contract\Response\BookingDate\BookingDateUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\BookingDateManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -61,14 +63,10 @@ class BookingDateController
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
      */
-    public function get(string $uuid, BookingDateManager $bookingDateManager): BookingDateGetResponse
+    public function get(UuidInterface $uuid, BookingDateManager $bookingDateManager): BookingDateGetResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $bookingDate = $bookingDateManager->get($uuid);
+            $bookingDate = $bookingDateManager->get($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -94,14 +92,10 @@ class BookingDateController
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function delete(string $uuid, BookingDateManager $bookingDateManager): Response
+    public function delete(UuidInterface $uuid, BookingDateManager $bookingDateManager): Response
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $bookingDateManager->delete($uuid);
+            $bookingDateManager->delete($uuid->toString());
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
@@ -125,25 +119,22 @@ class BookingDateController
      *         @Model(type=BookingDateUpdateRequest::class)
      * )
      * @SWG\Response(
-     *     response=204,
-     *     description="Booking Date upated"
+     *     response=200,
+     *     description="Booking Date upated",
+     *     @Model(type=BookingDateUpdateResponse::class)
      * )
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function put(string $uuid, BookingDateUpdateRequest $bookingDateUpdateRequest, BookingDateManager $bookingDateManager): Response
+    public function put(UuidInterface $uuid, BookingDateUpdateRequest $bookingDateUpdateRequest, BookingDateManager $bookingDateManager): BookingDateUpdateResponse
     {
-        if (!Uuid::isValid($uuid)) {
-            throw new UnprocessableEntityException();
-        }
-
         try {
-            $bookingDateManager->update($uuid, $bookingDateUpdateRequest);
+            $bookingDate = $bookingDateManager->update($uuid->toString(), $bookingDateUpdateRequest);
         } catch (EntityNotFoundException $exception) {
             throw new ResourceNotFoundException();
         }
 
-        return new Response(null, 204);
+        return new BookingDateUpdateResponse($bookingDate);
     }
 }

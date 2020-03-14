@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Partner;
-use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\PartnerNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -22,12 +22,35 @@ class PartnerRepository extends ServiceEntityRepository
         parent::__construct($registry, Partner::class);
     }
 
+    public function save(Partner $entity): void
+    {
+        $this->_em->persist($entity);
+        $this->_em->flush();
+    }
+
+    public function delete(Partner $entity): void
+    {
+        $this->_em->remove($entity);
+        $this->_em->flush();
+    }
+
     public function findOne(string $uuid): Partner
     {
         $partner = $this->find($uuid);
 
         if (null === $partner) {
-            throw new EntityNotFoundException();
+            throw new PartnerNotFoundException();
+        }
+
+        return $partner;
+    }
+
+    public function findOneByGoldenId(string $goldenId): Partner
+    {
+        $partner = $this->findOneBy(['goldenId' => $goldenId]);
+
+        if (null === $partner) {
+            throw new PartnerNotFoundException();
         }
 
         return $partner;
