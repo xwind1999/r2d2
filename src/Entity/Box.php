@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Helper\TimestampableEntityTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\CustomIdGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -45,4 +47,16 @@ class Box
      * @ORM\Column(type="string", length=30, nullable=true)
      */
     public ?string $status;
+
+    /**
+     * @var Collection<int, BoxExperience>
+     *
+     * @ORM\OneToMany(targetEntity="BoxExperience", mappedBy="box")
+     */
+    public Collection $boxExperience;
+
+    public function __construct()
+    {
+        $this->boxExperience = new ArrayCollection();
+    }
 }
