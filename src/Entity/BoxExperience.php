@@ -4,26 +4,19 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Helper\TimestampableEntityTrait;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\CustomIdGenerator;
-use Ramsey\Uuid\UuidInterface;
 
 /**
  * @ORM\Entity()
  */
 class BoxExperience
 {
-    use TimestampableEntityTrait;
-
     /**
      * @ORM\Id
-     * @ORM\Column(type="uuid_binary_ordered_time", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     *
-     * @CustomIdGenerator(class="Ramsey\Uuid\Doctrine\UuidOrderedTimeGenerator")
+     * @ORM\ManyToOne(targetEntity="Box")
+     * @ORM\JoinColumn(name="box_uuid", referencedColumnName="uuid", nullable=false)
      */
-    public UuidInterface $uuid;
+    public Box $box;
 
     /**
      * @ORM\Column(type="string", length=45, nullable=true)
@@ -31,7 +24,19 @@ class BoxExperience
     public string $boxGoldenId;
 
     /**
+     * @ORM\Id
+     * @ORM\ManyToOne(targetEntity="Experience")
+     * @ORM\JoinColumn(name="experience_uuid", referencedColumnName="uuid", nullable=false)
+     */
+    public Experience $experience;
+
+    /**
      * @ORM\Column(type="string", length=45, nullable=true)
      */
     public string $experienceGoldenId;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    public \DateTime $externalUpdatedAt;
 }

@@ -6,6 +6,7 @@ namespace App\Tests\ApiTests;
 
 use App\Tests\ApiTests\Helper\BookingDateHelper;
 use App\Tests\ApiTests\Helper\BookingHelper;
+use App\Tests\ApiTests\Helper\BoxExperienceHelper;
 use App\Tests\ApiTests\Helper\BoxHelper;
 use App\Tests\ApiTests\Helper\ExperienceHelper;
 use App\Tests\ApiTests\Helper\PartnerHelper;
@@ -46,6 +47,8 @@ class ApiTestCase extends WebTestCase
 
     public static BookingHelper $bookingHelper;
 
+    public static BoxExperienceHelper $boxExperienceHelper;
+
     public static function setUpBeforeClass(): void
     {
         if (isset($_ENV['API_TEST_BASE_URL'])) {
@@ -71,6 +74,7 @@ class ApiTestCase extends WebTestCase
         static::$boxHelper = new BoxHelper(clone static::$client, static::$serializer);
         static::$bookingDateHelper = new BookingDateHelper(clone static::$client, static::$serializer);
         static::$bookingHelper = new BookingHelper(clone static::$client, static::$serializer);
+        static::$boxExperienceHelper = new BoxExperienceHelper(clone static::$client, static::$serializer);
     }
 
     /**
