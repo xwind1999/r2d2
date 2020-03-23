@@ -25,11 +25,11 @@ class BookingDate
      */
     public UuidInterface $uuid;
 
-//    /**
-//     * @ORM\ManyToOne(targetEntity="Booking")
-//     * @ORM\JoinColumn(name="booking_uuid", referencedColumnName="uuid", nullable=false)
-//     */
-//    public Booking $booking;
+    /**
+     * @ORM\ManyToOne(targetEntity="Booking")
+     * @ORM\JoinColumn(name="booking_uuid", referencedColumnName="uuid", nullable=false)
+     */
+    public Booking $booking;
 
     /**
      * @ORM\Column(type="string", length=45)

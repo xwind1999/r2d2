@@ -9,6 +9,7 @@ use App\Contract\Request\BookingDate\BookingDateUpdateRequest;
 use App\Entity\BookingDate;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Repository\BookingDateRepository;
+use App\Repository\BookingRepository;
 use App\Repository\RateBandRepository;
 use App\Repository\RoomRepository;
 
@@ -20,22 +21,31 @@ class BookingDateManager
 
     protected RateBandRepository $rateBandRepository;
 
-    public function __construct(BookingDateRepository $repository, RoomRepository $roomRepository, RateBandRepository $rateBandRepository)
-    {
+    protected BookingRepository $bookingRepository;
+
+    public function __construct(
+        BookingDateRepository $repository,
+        RoomRepository $roomRepository,
+        RateBandRepository $rateBandRepository,
+        BookingRepository $bookingRepository
+    ) {
         $this->repository = $repository;
         $this->roomRepository = $roomRepository;
         $this->rateBandRepository = $rateBandRepository;
+        $this->bookingRepository = $bookingRepository;
     }
 
     public function create(BookingDateCreateRequest $bookingDateCreateRequest): BookingDate
     {
         $rateBand = $this->rateBandRepository->findOneByGoldenId($bookingDateCreateRequest->rateBandGoldenId);
         $room = $this->roomRepository->findOneByGoldenId($bookingDateCreateRequest->roomGoldenId);
+        $booking = $this->bookingRepository->findOneByGoldenId($bookingDateCreateRequest->bookingGoldenId);
 
         $bookingDate = new BookingDate();
 
         $bookingDate->rateBand = $rateBand;
         $bookingDate->room = $room;
+        $bookingDate->booking = $booking;
         $bookingDate->bookingGoldenId = $bookingDateCreateRequest->bookingGoldenId;
         $bookingDate->roomGoldenId = $bookingDateCreateRequest->roomGoldenId;
         $bookingDate->rateBandGoldenId = $bookingDateCreateRequest->rateBandGoldenId;
@@ -73,11 +83,13 @@ class BookingDateManager
     {
         $rateBand = $this->rateBandRepository->findOneByGoldenId($bookingDateUpdateRequest->rateBandGoldenId);
         $room = $this->roomRepository->findOneByGoldenId($bookingDateUpdateRequest->roomGoldenId);
+        $booking = $this->bookingRepository->findOneByGoldenId($bookingDateUpdateRequest->bookingGoldenId);
 
         $bookingDate = $this->get($uuid);
 
         $bookingDate->rateBand = $rateBand;
         $bookingDate->room = $room;
+        $bookingDate->booking = $booking;
         $bookingDate->bookingGoldenId = $bookingDateUpdateRequest->bookingGoldenId;
         $bookingDate->roomGoldenId = $room->goldenId;
         $bookingDate->rateBandGoldenId = $rateBand->goldenId;

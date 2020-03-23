@@ -36,6 +36,12 @@ class BookingDateHelper
         return $overrides + $payload;
     }
 
+    public function addValidBooking(array &$payload)
+    {
+        $booking = json_decode(ApiTestCase::$bookingHelper->create()->getContent());
+        $payload['booking_golden_id'] = $booking->golden_id;
+    }
+
     public function addValidRoom(array &$payload)
     {
         $room = json_decode(ApiTestCase::$roomHelper->create()->getContent());
@@ -57,6 +63,7 @@ class BookingDateHelper
             $payload = $this->getDefault();
             $this->addValidRoom($payload);
             $this->addValidRateBand($payload);
+            $this->addValidBooking($payload);
         }
         $this->client->request('POST', self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
