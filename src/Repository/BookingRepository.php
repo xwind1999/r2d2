@@ -44,4 +44,15 @@ class BookingRepository extends ServiceEntityRepository
 
         return $booking;
     }
+
+    public function findOneByGoldenId(string $goldenId): Booking
+    {
+        $booking = $this->findOneBy(['goldenId' => $goldenId]);
+
+        if (null === $booking) {
+            throw new BookingNotFoundException();
+        }
+
+        return $booking;
+    }
 }
