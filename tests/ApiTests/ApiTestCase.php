@@ -8,9 +8,9 @@ use App\Tests\ApiTests\Helper\BookingDateHelper;
 use App\Tests\ApiTests\Helper\BookingHelper;
 use App\Tests\ApiTests\Helper\BoxExperienceHelper;
 use App\Tests\ApiTests\Helper\BoxHelper;
+use App\Tests\ApiTests\Helper\BroadcastListenerHelper;
 use App\Tests\ApiTests\Helper\ExperienceHelper;
 use App\Tests\ApiTests\Helper\PartnerHelper;
-use App\Tests\ApiTests\Helper\ProductHelper;
 use App\Tests\ApiTests\Helper\RateBandHelper;
 use App\Tests\ApiTests\Helper\RoomAvailabilityHelper;
 use App\Tests\ApiTests\Helper\RoomHelper;
@@ -29,7 +29,7 @@ class ApiTestCase extends WebTestCase
 
     public static PartnerHelper $partnerHelper;
 
-    public static ProductHelper $productHelper;
+    public static BroadcastListenerHelper $broadcastListenerHelper;
 
     public static ExperienceHelper $experienceHelper;
 
@@ -65,7 +65,7 @@ class ApiTestCase extends WebTestCase
     public static function initHelpers(): void
     {
         static::$partnerHelper = new PartnerHelper(clone static::$client, static::$serializer);
-        static::$productHelper = new ProductHelper(clone static::$client, static::$serializer);
+        static::$broadcastListenerHelper = new BroadcastListenerHelper(clone static::$client, static::$serializer);
         static::$experienceHelper = new ExperienceHelper(clone static::$client, static::$serializer);
         static::$rateBandHelper = new RateBandHelper(clone static::$client, static::$serializer);
         static::$roomHelper = new RoomHelper(clone static::$client, static::$serializer);

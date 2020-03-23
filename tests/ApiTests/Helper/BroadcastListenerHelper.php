@@ -8,9 +8,10 @@ use JMS\Serializer\Serializer;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ProductHelper
+class BroadcastListenerHelper
 {
-    const API_BASE_URL = '/broadcast-listeners/products';
+    const API_PRODUCT_BASE_URL = '/broadcast-listener/product';
+    const API_PARTNER_BASE_URL = '/broadcast-listener/partner';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
 
@@ -20,7 +21,7 @@ class ProductHelper
         $this->serializer = $serializer;
     }
 
-    public function getDefault(array $overrides = []): array
+    public function getDefaultProduct(array $overrides = []): array
     {
         $payload = [
             'uuid' => '3fa85f64-5717-4562-b3fc-2c963f66afa6',
@@ -36,15 +37,28 @@ class ProductHelper
         return $overrides + $payload;
     }
 
+    public function getDefaultPartner(array $overrides = []): array
+    {
+        $payload = [
+            'uuid' => '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+            'golden_id' => bin2hex(random_bytes(12)),
+            'status' => 'alive',
+            'currency' => 'USD',
+            'ceased_date' => '2020-03-18',
+        ];
+
+        return $overrides + $payload;
+    }
+
     /**
      * @return JsonResponse|object
      */
-    public function create(array $payload = [])
+    public function testProducts(array $payload = [])
     {
         if (empty($payload)) {
-            $payload = $this->getDefault();
+            $payload = $this->getDefaultProduct();
         }
-        $this->client->request('POST', self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request('POST', self::API_PRODUCT_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }
@@ -52,12 +66,12 @@ class ProductHelper
     /**
      * @return JsonResponse|object
      */
-    public function update(array $payload = [])
+    public function testPartners(array $payload = [])
     {
         if (empty($payload)) {
-            $payload = $this->getDefault();
+            $payload = $this->getDefaultPartner();
         }
-        $this->client->request('PUT', self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request('POST', self::API_PARTNER_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }
