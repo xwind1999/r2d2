@@ -9,6 +9,8 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Controller\BroadcastListener\BroadcastListenerController;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @coversDefaultClass \App\Controller\BroadcastListener\BroadcastListenerController
@@ -16,9 +18,25 @@ use Symfony\Component\HttpFoundation\Response;
 class BroadcastListenerControllerTest extends TestCase
 {
     /**
-     * @covers ::handleProducts
+     * @var MessageBusInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    public function testHandleProducts()
+    private $messageBus;
+
+    /**
+     * @var Envelope
+     */
+    private Envelope $envelope;
+
+    public function setUp(): void
+    {
+        $this->envelope = new Envelope(new \stdClass());
+        $this->messageBus = $this->createMock(MessageBusInterface::class);
+    }
+
+    /**
+     * @covers ::productListener
+     */
+    public function testHandleProductsSuccessfully()
     {
         $productRequest = new ProductRequest();
         $productRequest->uuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
@@ -30,16 +48,20 @@ class BroadcastListenerControllerTest extends TestCase
         $productRequest->isSellable = true;
         $productRequest->partnerGoldenId = '123456';
 
+        $this->messageBus->expects($this->once())
+            ->method('dispatch')
+            ->willReturn($this->envelope);
+
         $controller = new BroadcastListenerController();
-        $response = $controller->productListener($productRequest);
+        $response = $controller->productListener($productRequest, $this->messageBus);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }
 
     /**
-     * @covers ::handlePartners
+     * @covers ::partnerListener
      */
-    public function testHandlePartners()
+    public function testHandlePartnersSuccessfully()
     {
         $partnerRequest = new PartnerRequest();
         $partnerRequest->uuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
@@ -48,8 +70,12 @@ class BroadcastListenerControllerTest extends TestCase
         $partnerRequest->status = 'alive';
         $partnerRequest->ceaseDate = new \DateTime();
 
+        $this->messageBus->expects($this->once())
+            ->method('dispatch')
+            ->willReturn($this->envelope);
+
         $controller = new BroadcastListenerController();
-        $response = $controller->partnerListener($partnerRequest);
+        $response = $controller->partnerListener($partnerRequest, $this->messageBus);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }

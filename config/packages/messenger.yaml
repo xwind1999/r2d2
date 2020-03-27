@@ -1,0 +1,24 @@
+framework:
+    messenger:
+        # Uncomment this (and the failed transport below) to send failed messages to this transport for later handling.
+        # failure_transport: failed
+
+        transports:
+        # https://symfony.com/doc/current/messenger.html#transports
+            broadcast-listeners-partner:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queue_name: broadcast-listeners-partner
+
+            broadcast-listeners-product:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queue_name: broadcast-listeners-product
+
+            failed: 'doctrine://default?queue_name=failed-broadcast-listeners'
+        # sync: 'sync://'
+
+        routing:
+        # Route your messages to the transports
+            'App\Contract\Request\BroadcastListener\PartnerRequest': broadcast-listeners-partner
+            'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
