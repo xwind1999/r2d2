@@ -9,6 +9,7 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class BroadcastListenerController
@@ -27,9 +28,10 @@ class BroadcastListenerController
      *     @Model(type=Response::class)
      * )
      */
-    public function productListener(ProductRequest $productRequest): Response
+    public function productListener(ProductRequest $productRequest, MessageBusInterface $messageBus): Response
     {
-        //TODO logic
+        $messageBus->dispatch($productRequest);
+
         return new Response(null, 202);
     }
 
@@ -47,9 +49,10 @@ class BroadcastListenerController
      *     @Model(type=PartnerBroadcastResponse::class)
      * )
      */
-    public function partnerListener(PartnerRequest $partnerRequest): Response
+    public function partnerListener(PartnerRequest $partnerRequest, MessageBusInterface $messageBus): Response
     {
-        //TODO logic
+        $messageBus->dispatch($partnerRequest);
+
         return new Response(null, 202);
     }
 }
