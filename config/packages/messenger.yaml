@@ -15,7 +15,10 @@ framework:
                 options:
                     queue_name: broadcast-listeners-product
 
-            failed: 'doctrine://default?queue_name=failed-broadcast-listeners'
+            failed-broadcast-listeners:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queue_name: failed-broadcast-listeners
         # sync: 'sync://'
 
         routing:

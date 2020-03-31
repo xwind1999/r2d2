@@ -9,19 +9,9 @@ COPY ./toggle-xdebug.sh /
 RUN chmod 777 /usr/local/etc/php/conf.d/ -R
 RUN rm -rf /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
-ENV LIBRDKAFKA_VERSION v1.3.0
-RUN cd /tmp \
-    && git clone \
-        --branch ${LIBRDKAFKA_VERSION} \
-        --depth 1 \
-        https://github.com/edenhill/librdkafka.git \
-    && cd librdkafka \
-    && ./configure \
-    && make \
-    && make install \
-    && pecl install rdkafka \
-    && docker-php-ext-enable rdkafka \
-    && rm -rf /tmp/librdkafka
+RUN apk --no-cache --update add rabbitmq-c-dev \
+   && pecl install amqp \
+   && docker-php-ext-enable amqp
 
 RUN rm -rf /service; mkdir /service; chmod 777 /service
 COPY ./start.sh /

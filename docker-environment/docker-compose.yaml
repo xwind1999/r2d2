@@ -57,10 +57,20 @@ services:
       - ./php/www.conf:/etc/php7/php-fpm.d/www.conf:cached
       - ./php/xdebug.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
 
+#  r2-d2-rabbitmq:
+#    container_name: r2-d2-rabbitmq
+#    image: rabbitmq:3.8-management
+#    ports:
+#      - '15672:15672'
+#      - '5672:5672'
+#    volumes:
+#      - r2-d2-rabbitmq-data:/var/lib/rabbitmq:cached
+#    networks:
+#      - r2-d2-network
+
 volumes:
   r2-d2-mysql-data: {}
-  r2-d2-kafka-data: {}
-  r2-d2-zookeeper-data: {}
+  r2-d2-rabbitmq-data: {}
 
 networks:
   r2-d2-network:
