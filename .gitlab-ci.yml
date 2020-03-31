@@ -2,21 +2,27 @@ stages:
   - Build base image
   - Build
   - Test
-  - Test Coverage Analysis
   - Static analysis
-  - Build Api Reference
+  - App Container Build
+  - Project Env Deploy
+  - Project Env Validation
   - Build Reports
   - Publish Reports
 
-include:
-  - local: '/.ci/.gitlab-ci.yaml'
-  - local: '/.ci/quality.gitlab-ci.yaml'
-  - local: '/.ci/staticAnalysis.gitlab-ci.yaml'
-  - local: '/.ci/testCoverageAnalysis.gitlab-ci.yaml'
-  - local: '/.ci/buildReports.gitlab-ci.yaml'
-
 variables:
   GIT_DEPTH: 1
+
+default:
+  image: ${BASE_FULL_IMAGE}
+  before_script:
+    - echo '10.11.0.178 ie1-i-chef-02' >> /etc/hosts
+
+include:
+  - local: '/.ci/build-app-container.yaml'
+  - local: '/.ci/deploy.yaml'
+  - local: '/.ci/quality.yaml'
+  - local: '/.ci/static-analysis.yaml'
+  - local: '/.ci/build-reports.yaml'
 
 composer:
   stage: Build
@@ -33,22 +39,12 @@ composer:
     - composer config cache-dir cache/composer
     - composer install -n --no-progress
   artifacts:
-    expire_in: 1 days
+    expire_in: 1 day
     paths:
       - vendor/
+      - public/bundles
   tags:
     - k8s-alpha
-
-#notify:
-#  stage: Publish API reference
-#  image: ${BASE_FULL_IMAGE}
-#  variables:
-#    BROADCAST_CHANNEL: r2-d2
-#    ENVIRONMENT_NAME: r2-d2
-#  script:
-#    - ${CI_PROJECT_DIR}/.ci/notify.sh
-#  tags:
-#    - k8s-alpha
 
 pages:
   stage: Publish Reports
@@ -57,6 +53,8 @@ pages:
     - mermaid-generate-images
     - Api-Tests
     - code-tests-aggregate
+    - phpmetrics
+    - generate-api-reference
   script:
     - rm -rf public/
     - mv report/html/ public/
@@ -70,7 +68,7 @@ pages:
   artifacts:
     paths:
       - public
-    expire_in: 7 days
+    expire_in: 1 day
   tags:
     - k8s-alpha
   only:

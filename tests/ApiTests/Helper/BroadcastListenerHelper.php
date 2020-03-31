@@ -14,10 +14,12 @@ class BroadcastListenerHelper
     const API_PARTNER_BASE_URL = '/broadcast-listener/partner';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
+    protected ?string $baseUrl = null;
 
-    public function __construct(AbstractBrowser $client, Serializer $serializer)
+    public function __construct(AbstractBrowser $client, Serializer $serializer, ?string $baseUrl)
     {
         $this->client = $client;
+        $this->baseUrl = $baseUrl;
         $this->serializer = $serializer;
     }
 
@@ -58,7 +60,7 @@ class BroadcastListenerHelper
         if (empty($payload)) {
             $payload = $this->getDefaultProduct();
         }
-        $this->client->request('POST', self::API_PRODUCT_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request('POST', $this->baseUrl.self::API_PRODUCT_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }
@@ -71,7 +73,7 @@ class BroadcastListenerHelper
         if (empty($payload)) {
             $payload = $this->getDefaultPartner();
         }
-        $this->client->request('POST', self::API_PARTNER_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request('POST', $this->baseUrl.self::API_PARTNER_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }
