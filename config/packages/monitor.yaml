@@ -4,7 +4,5 @@ liip_monitor:
     checks:
         php_extensions: [pdo]
         doctrine_dbal: default
-        security_advisory:
-            lock_file: '%kernel.project_dir%/composer.lock'
         php_version:
             "7.4": ">="

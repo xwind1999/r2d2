@@ -1,0 +1,61 @@
+variables:
+  BASE_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base
+  BASE_IMAGE_VERSION: 0.0.11
+  BASE_FULL_IMAGE: ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
+  APP_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-api:${CI_PIPELINE_ID}_${CI_COMMIT_SHA}
+
+build-base-image:
+  stage: Build base image
+  image: docker:dind
+  only:
+    - CI-master
+  tags:
+    - k8s-alpha
+  script:
+    - >
+      docker build --pull
+      --tag ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
+      --tag ${BASE_IMAGE}:latest .ci/docker/base
+    - docker push ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
+    - docker push ${BASE_IMAGE}:latest
+
+cleanup-and-prepare-files:
+  stage: Static analysis
+  dependencies:
+    - composer
+  cache:
+    key:
+      files:
+        - composer.lock
+        - symfony.lock
+    paths:
+      - cache/composer
+  script:
+    - composer config cache-dir cache/composer
+    - composer install -n -o --no-progress --no-scripts
+    - echo ${CI_COMMIT_SHA} > public/version.txt
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - vendor/
+      - public/bundles
+      - public/version.txt
+  tags:
+    - k8s-alpha
+  only:
+    - master
+
+build-app-container:
+  stage: App Container Build
+  image: docker:dind
+  dependencies:
+    - cleanup-and-prepare-files
+  tags:
+    - k8s
+  only:
+    - master
+  script:
+    - >
+      docker build --pull -f .ci/docker/app/Dockerfile
+      --tag "$APP_IMAGE" .
+    - docker push $APP_IMAGE

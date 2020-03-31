@@ -14,10 +14,12 @@ class BoxExperienceHelper
     const API_BASE_URL = '/api/box-experience';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
+    protected ?string $baseUrl = null;
 
-    public function __construct(AbstractBrowser $client, Serializer $serializer)
+    public function __construct(AbstractBrowser $client, Serializer $serializer, ?string $baseUrl)
     {
         $this->client = $client;
+        $this->baseUrl = $baseUrl;
         $this->serializer = $serializer;
     }
 
@@ -52,7 +54,7 @@ class BoxExperienceHelper
             $this->addValidExperience($payload);
             $this->addValidBox($payload);
         }
-        $this->client->request('POST', self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request('POST', $this->baseUrl.self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }
@@ -67,7 +69,7 @@ class BoxExperienceHelper
             'box_golden_id' => $boxGoldenId,
         ];
 
-        $this->client->request('DELETE', self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request('DELETE', $this->baseUrl.self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }

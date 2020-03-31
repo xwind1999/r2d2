@@ -49,10 +49,14 @@ class ApiTestCase extends WebTestCase
 
     public static BoxExperienceHelper $boxExperienceHelper;
 
+    public static ?string $baseUrl = null;
+
     public static function setUpBeforeClass(): void
     {
-        if (isset($_ENV['API_TEST_BASE_URL'])) {
-            static::$client = new HttpBrowser(HttpClient::createForBaseUri($_ENV['API_TEST_BASE_URL']));
+        if (isset($_SERVER['API_TEST_BASE_URL'])) {
+            static::$baseUrl = $_SERVER['API_TEST_BASE_URL'];
+            static::$client = new HttpBrowser(HttpClient::create());
+            static::$kernel = static::bootKernel([]);
         } else {
             static::$client = static::createClient();
         }
@@ -64,17 +68,17 @@ class ApiTestCase extends WebTestCase
 
     public static function initHelpers(): void
     {
-        static::$partnerHelper = new PartnerHelper(clone static::$client, static::$serializer);
-        static::$broadcastListenerHelper = new BroadcastListenerHelper(clone static::$client, static::$serializer);
-        static::$experienceHelper = new ExperienceHelper(clone static::$client, static::$serializer);
-        static::$rateBandHelper = new RateBandHelper(clone static::$client, static::$serializer);
-        static::$roomHelper = new RoomHelper(clone static::$client, static::$serializer);
-        static::$roomPriceHelper = new RoomPriceHelper(clone static::$client, static::$serializer);
-        static::$roomAvailabilityHelper = new RoomAvailabilityHelper(clone static::$client, static::$serializer);
-        static::$boxHelper = new BoxHelper(clone static::$client, static::$serializer);
-        static::$bookingDateHelper = new BookingDateHelper(clone static::$client, static::$serializer);
-        static::$bookingHelper = new BookingHelper(clone static::$client, static::$serializer);
-        static::$boxExperienceHelper = new BoxExperienceHelper(clone static::$client, static::$serializer);
+        static::$partnerHelper = new PartnerHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$broadcastListenerHelper = new BroadcastListenerHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$experienceHelper = new ExperienceHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$rateBandHelper = new RateBandHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$roomHelper = new RoomHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$roomPriceHelper = new RoomPriceHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$roomAvailabilityHelper = new RoomAvailabilityHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$boxHelper = new BoxHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$bookingDateHelper = new BookingDateHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$bookingHelper = new BookingHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$boxExperienceHelper = new BoxExperienceHelper(clone static::$client, static::$serializer, static::$baseUrl);
     }
 
     /**

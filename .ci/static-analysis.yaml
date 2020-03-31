@@ -8,30 +8,6 @@ phpstan:
   tags:
     - k8s-alpha
 
-php-cs-fixer:
-  stage: Static analysis
-  image: ${BASE_FULL_IMAGE}
-  needs:
-    - composer
-  script:
-    - vendor/bin/php-cs-fixer fix -v --dry-run
-  tags:
-    - k8s-alpha
-
-phpmetrics:
-  stage: Static analysis
-  image: ${BASE_FULL_IMAGE}
-  needs:
-    - composer
-  script:
-    - vendor/bin/phpmetrics --report-html=report/html/phpmetrics src
-  artifacts:
-    expire_in: 3 days
-    paths:
-      - report/
-  tags:
-    - k8s-alpha
-
 psalm:
   stage: Static analysis
   image: ${BASE_FULL_IMAGE}
@@ -42,3 +18,17 @@ psalm:
   tags:
     - k8s-alpha
 
+infection:
+  stage: Static analysis
+  image: ${BASE_FULL_IMAGE}
+  dependencies:
+    - composer
+    - unitTests
+  script:
+    - phpdbg -qrr vendor/bin/infection --min-covered-msi=80 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage --test-framework-options="--testsuite=UnitTests "
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - report/
+  tags:
+    - k8s-alpha

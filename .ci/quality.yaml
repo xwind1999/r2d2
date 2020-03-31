@@ -11,7 +11,7 @@ unitTests:
   script:
     - phpdbg -qrr vendor/bin/phpunit --testsuite=UnitTests --colors=never
   artifacts:
-    expire_in: 3 days
+    expire_in: 1 day
     paths:
       - report/
   tags:
@@ -28,12 +28,41 @@ Api-Tests:
     - bin/console doctrine:schema:update --force
     - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
   artifacts:
-    expire_in: 3 days
+    expire_in: 1 day
     paths:
       - report/html/api-tests/
       - report/raw/api-tests/
   tags:
     - k8s-alpha
+
+Project-Env-Api-Tests:
+  stage: Project Env Validation
+  image: ${BASE_FULL_IMAGE}
+  needs:
+    - composer
+    - '[DEVINT] Deploy'
+  dependencies:
+    - composer
+  variables:
+    API_TEST_BASE_URL: "http://ie1-devint-r2d2-api-01.z.sbxtest.net"
+  script:
+    - php vendor/bin/phpunit --testsuite=ApiTests --testdox --no-coverage
+  tags:
+    - k8s-alpha
+  only:
+    - master
+
+Project-Env-Healthcheck:
+  stage: Project Env Validation
+  image: ${BASE_FULL_IMAGE}
+  needs:
+    - '[DEVINT] Deploy'
+  script:
+    - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
+  tags:
+    - k8s-alpha
+  only:
+    - master
 
 .running-r2d2:
   variables:
@@ -99,3 +128,13 @@ build-R2D2-stub-image:
   script:
     - docker build -t ${BASE_IMAGE_Stub}:latest -f stub/Dockerfile .
     - docker push ${BASE_IMAGE_Stub}:latest
+
+php-cs-fixer:
+  stage: Test
+  image: ${BASE_FULL_IMAGE}
+  needs:
+    - composer
+  script:
+    - vendor/bin/php-cs-fixer fix -v --dry-run
+  tags:
+    - k8s-alpha

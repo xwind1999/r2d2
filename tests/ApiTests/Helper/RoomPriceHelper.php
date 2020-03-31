@@ -14,10 +14,12 @@ class RoomPriceHelper
     const API_BASE_URL = '/api/room-price';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
+    protected ?string $baseUrl = null;
 
-    public function __construct(AbstractBrowser $client, Serializer $serializer)
+    public function __construct(AbstractBrowser $client, Serializer $serializer, ?string $baseUrl)
     {
         $this->client = $client;
+        $this->baseUrl = $baseUrl;
         $this->serializer = $serializer;
     }
 
@@ -55,7 +57,7 @@ class RoomPriceHelper
             $this->addValidRoom($payload);
             $this->addValidRateBand($payload);
         }
-        $this->client->request('POST', self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request('POST', $this->baseUrl.self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }
@@ -65,7 +67,7 @@ class RoomPriceHelper
      */
     public function get(string $uuid)
     {
-        $this->client->request('GET', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
+        $this->client->request('GET', sprintf('%s/%s', $this->baseUrl.self::API_BASE_URL, $uuid), [], [], []);
 
         return $this->client->getResponse();
     }
@@ -75,7 +77,7 @@ class RoomPriceHelper
      */
     public function delete(string $uuid)
     {
-        $this->client->request('DELETE', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], []);
+        $this->client->request('DELETE', sprintf('%s/%s', $this->baseUrl.self::API_BASE_URL, $uuid), [], [], []);
 
         return $this->client->getResponse();
     }
@@ -85,7 +87,7 @@ class RoomPriceHelper
      */
     public function update(string $uuid, array $payload)
     {
-        $this->client->request('PUT', sprintf('%s/%s', self::API_BASE_URL, $uuid), [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request('PUT', sprintf('%s/%s', $this->baseUrl.self::API_BASE_URL, $uuid), [], [], [], $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }
