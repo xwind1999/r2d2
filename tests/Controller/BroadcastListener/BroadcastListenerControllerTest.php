@@ -6,6 +6,7 @@ namespace App\Tests\Controller\Api;
 
 use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
+use App\Contract\Request\BroadcastListener\RelationshipRequest;
 use App\Controller\BroadcastListener\BroadcastListenerController;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,9 +23,6 @@ class BroadcastListenerControllerTest extends TestCase
      */
     private $messageBus;
 
-    /**
-     * @var Envelope
-     */
     private Envelope $envelope;
 
     public function setUp(): void
@@ -76,6 +74,31 @@ class BroadcastListenerControllerTest extends TestCase
 
         $controller = new BroadcastListenerController();
         $response = $controller->partnerListener($partnerRequest, $this->messageBus);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(202, $response->getStatusCode());
+    }
+
+    /**
+     * @covers ::relationshipListener
+     */
+    public function testHandleRelationshipsSuccessfully()
+    {
+        $relationshipRequest = new RelationshipRequest();
+        $relationshipRequest->parentProduct = 'BB0000335658';
+        $relationshipRequest->childProduct = 'HG0000335654';
+        $relationshipRequest->sortOrder = 1;
+        $relationshipRequest->isEnabled = true;
+        $relationshipRequest->relationshipType = 'Box-Experience';
+        $relationshipRequest->printType = 'Digital';
+        $relationshipRequest->childCount = 4;
+        $relationshipRequest->childQuantity = 0;
+
+        $this->messageBus->expects($this->once())
+            ->method('dispatch')
+            ->willReturn($this->envelope);
+
+        $controller = new BroadcastListenerController();
+        $response = $controller->relationshipListener($relationshipRequest, $this->messageBus);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }

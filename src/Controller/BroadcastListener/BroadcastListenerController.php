@@ -6,6 +6,7 @@ namespace App\Controller\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
+use App\Contract\Request\BroadcastListener\RelationshipRequest;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,8 +26,7 @@ class BroadcastListenerController
      * )
      * @SWG\Response(
      *     response=202,
-     *     description="Product handled",
-     *     @Model(type=Response::class)
+     *     description="Product handled")
      * )
      */
     public function productListener(ProductRequest $productRequest, MessageBusInterface $messageBus): Response
@@ -47,13 +47,33 @@ class BroadcastListenerController
      * )
      * @SWG\Response(
      *     response=202,
-     *     description="Partner handled",
-     *     @Model(type=PartnerBroadcastResponse::class)
+     *     description="Partner handled")
      * )
      */
     public function partnerListener(PartnerRequest $partnerRequest, MessageBusInterface $messageBus): Response
     {
         $messageBus->dispatch($partnerRequest);
+
+        return new Response(null, 202);
+    }
+
+    /**
+     * @Route("/api/broadcast-listener/relationship", methods={"POST"}, format="json")
+     *
+     * @SWG\Tag(name="relationships")
+     * @SWG\Parameter(
+     *         name="body",
+     *         in="body",
+     *         @Model(type=RelationshipRequest::class)
+     * )
+     * @SWG\Response(
+     *     response=202,
+     *     description="Relationship handled")
+     * )
+     */
+    public function relationshipListener(RelationshipRequest $relationshipRequest, MessageBusInterface $messageBus): Response
+    {
+        $messageBus->dispatch($relationshipRequest);
 
         return new Response(null, 202);
     }
