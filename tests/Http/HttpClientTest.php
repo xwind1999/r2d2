@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Http;
 
+use App\Event\Http\BadResponseReceivedEvent;
 use App\Event\Http\ExternalServiceRequestMadeEvent;
-use App\Event\Http\MalformedResponseReceivedEvent;
 use App\Event\Http\WellFormedResponseReceivedEvent;
 use App\Exception\HttpClient\ConnectException;
 use App\Http\HttpClient;
@@ -67,7 +67,7 @@ class HttpClientTest extends TestCase
         $headers = ['X-Header' => 'value'];
 
         $this->dispatcher->dispatch(Argument::type(ExternalServiceRequestMadeEvent::class))->shouldBeCalled();
-        $this->dispatcher->dispatch(Argument::type(MalformedResponseReceivedEvent::class))->shouldBeCalled();
+        $this->dispatcher->dispatch(Argument::type(BadResponseReceivedEvent::class))->shouldBeCalled();
 
         $exception = $this->prophesize(HttpExceptionInterface::class);
 
@@ -90,7 +90,7 @@ class HttpClientTest extends TestCase
         $headers = ['X-Header' => 'value'];
 
         $this->dispatcher->dispatch(Argument::type(ExternalServiceRequestMadeEvent::class))->shouldBeCalled();
-        $this->dispatcher->dispatch(Argument::type(MalformedResponseReceivedEvent::class))->shouldBeCalled();
+        $this->dispatcher->dispatch(Argument::type(BadResponseReceivedEvent::class))->shouldBeCalled();
 
         $this->httpClientInterface->request($method, $uri, Argument::type('array'))->willThrow(new \Exception());
 

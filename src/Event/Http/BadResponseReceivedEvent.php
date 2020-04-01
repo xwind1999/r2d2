@@ -7,9 +7,9 @@ namespace App\Event\Http;
 use App\Helper\LoggableEventInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class MalformedResponseReceivedEvent implements LoggableEventInterface
+class BadResponseReceivedEvent implements LoggableEventInterface
 {
-    protected const MESSAGE = 'Request made to external service';
+    protected const MESSAGE = 'Bad response received from external service';
 
     protected string $clientId;
 

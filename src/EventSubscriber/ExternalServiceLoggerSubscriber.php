@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
+use App\Event\Http\BadResponseReceivedEvent;
 use App\Event\Http\ExternalServiceRequestMadeEvent;
-use App\Event\Http\MalformedResponseReceivedEvent;
 use App\Event\Http\WellFormedResponseReceivedEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -14,7 +14,7 @@ class ExternalServiceLoggerSubscriber implements EventSubscriberInterface
 {
     protected const SUBSCRIBED_EVENTS = [
         WellFormedResponseReceivedEvent::class => 'logWellFormedResponseReceived',
-        MalformedResponseReceivedEvent::class => 'logMalformedResponseReceived',
+        BadResponseReceivedEvent::class => 'logBadResponseReceived',
         ExternalServiceRequestMadeEvent::class => 'logRequestMade',
     ];
 
@@ -35,7 +35,7 @@ class ExternalServiceLoggerSubscriber implements EventSubscriberInterface
         $this->logger->notice($event);
     }
 
-    public function logMalformedResponseReceived(MalformedResponseReceivedEvent $event): void
+    public function logBadResponseReceived(BadResponseReceivedEvent $event): void
     {
         $this->logger->error($event);
     }
