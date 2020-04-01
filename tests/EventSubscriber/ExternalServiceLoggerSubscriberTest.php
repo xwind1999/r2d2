@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\EventSubscriber;
 
+use App\Event\Http\BadResponseReceivedEvent;
 use App\Event\Http\ExternalServiceRequestMadeEvent;
-use App\Event\Http\MalformedResponseReceivedEvent;
 use App\Event\Http\WellFormedResponseReceivedEvent;
 use App\EventSubscriber\ExternalServiceLoggerSubscriber;
 use PHPUnit\Framework\TestCase;
@@ -41,9 +41,9 @@ class ExternalServiceLoggerSubscriberTest extends TestCase
 
     public function testLogMalformedResponseReceived()
     {
-        $event = $this->prophesize(MalformedResponseReceivedEvent::class)->reveal();
+        $event = $this->prophesize(BadResponseReceivedEvent::class)->reveal();
         $this->logger->error($event)->shouldBeCalled();
-        $this->subscriber->logMalformedResponseReceived($event);
+        $this->subscriber->logBadResponseReceived($event);
     }
 
     public function testLogRequestMade()
