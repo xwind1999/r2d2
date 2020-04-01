@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Manager;
+namespace App\Tests\Handler;
 
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Handler\ProductBroadcastHandler;

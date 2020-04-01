@@ -12,6 +12,7 @@ class BroadcastListenerHelper
 {
     const API_PRODUCT_BASE_URL = '/api/broadcast-listener/product';
     const API_PARTNER_BASE_URL = '/api/broadcast-listener/partner';
+    const API_RELATIONSHIP_BASE_URL = '/api/broadcast-listener/relationship';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;
@@ -52,6 +53,22 @@ class BroadcastListenerHelper
         return $overrides + $payload;
     }
 
+    public function getDefaultRelationship(array $overrides = []): array
+    {
+        $payload = [
+            'parent_product' => 'BB0000335658',
+            'child_product' => 'HG0000335654',
+            'sort_order' => 1,
+            'is_enabled' => true,
+            'relationship_type' => 'Box-Experience',
+            'print_type' => 'Digital',
+            'child_count' => 4,
+            'child_quantity' => 0,
+        ];
+
+        return $overrides + $payload;
+    }
+
     /**
      * @return JsonResponse|object
      */
@@ -74,6 +91,19 @@ class BroadcastListenerHelper
             $payload = $this->getDefaultPartner();
         }
         $this->client->request('POST', $this->baseUrl.self::API_PARTNER_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+
+        return $this->client->getResponse();
+    }
+
+    /**
+     * @return JsonResponse|object
+     */
+    public function testRelationships(array $payload = [])
+    {
+        if (empty($payload)) {
+            $payload = $this->getDefaultRelationship();
+        }
+        $this->client->request('POST', self::API_RELATIONSHIP_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }
