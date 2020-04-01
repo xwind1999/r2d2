@@ -15,15 +15,16 @@ use Symfony\Component\Routing\Annotation\Route;
 class BroadcastListenerController
 {
     /**
-     * @Route("/broadcast-listener/product", methods={"POST"}, format="json")
+     * @Route("/api/broadcast-listener/product", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="products")
+     * @SWG\Tag(name="broadcast-listener")
      * @SWG\Parameter(
      *         name="body",
      *         in="body",
      *         @Model(type=ProductRequest::class)
      * )
      * @SWG\Response(
+     *     response=202,
      *     description="Product handled",
      *     @Model(type=Response::class)
      * )
@@ -36,15 +37,16 @@ class BroadcastListenerController
     }
 
     /**
-     * @Route("/broadcast-listener/partner", methods={"POST"}, format="json")
+     * @Route("/api/broadcast-listener/partner", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="partners")
+     * @SWG\Tag(name="broadcast-listener")
      * @SWG\Parameter(
      *         name="body",
      *         in="body",
      *         @Model(type=PartnerRequest::class)
      * )
      * @SWG\Response(
+     *     response=202,
      *     description="Partner handled",
      *     @Model(type=PartnerBroadcastResponse::class)
      * )
