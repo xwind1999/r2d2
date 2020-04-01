@@ -41,6 +41,7 @@ Project-Env-Api-Tests:
   needs:
     - composer
     - '[DEVINT] Deploy'
+    - Post-deploy Health Check
   dependencies:
     - composer
   variables:
@@ -52,11 +53,19 @@ Project-Env-Api-Tests:
   only:
     - master
 
-Project-Env-Healthcheck:
-  stage: Project Env Validation
+Pre-deploy Health Check:
+  stage: Pre-deploy Health Check
   image: ${BASE_FULL_IMAGE}
-  needs:
-    - '[DEVINT] Deploy'
+  script:
+    - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
+  tags:
+    - k8s-alpha
+  only:
+    - master
+
+Post-deploy Health Check:
+  stage: Post-deploy Health Check
+  image: ${BASE_FULL_IMAGE}
   script:
     - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
   tags:
