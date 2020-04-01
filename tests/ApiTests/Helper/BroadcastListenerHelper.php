@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class BroadcastListenerHelper
 {
-    const API_PRODUCT_BASE_URL = '/broadcast-listener/product';
-    const API_PARTNER_BASE_URL = '/broadcast-listener/partner';
+    const API_PRODUCT_BASE_URL = '/api/broadcast-listener/product';
+    const API_PARTNER_BASE_URL = '/api/broadcast-listener/partner';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;
