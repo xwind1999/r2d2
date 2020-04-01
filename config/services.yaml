@@ -4,6 +4,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    clients.quickdata:
+        base_uri: '%env(QUICKDATA_URL)%'
 
 services:
     # default configuration for services in *this* file
@@ -40,27 +42,29 @@ services:
         tags:
             - { name: controller.argument_value_resolver, priority: 500 }
 
+    App\Helper\Request\RequestQueryResolver:
+        tags:
+            - { name: controller.argument_value_resolver, priority: 50 }
+
     App\EventSubscriber\:
         resource: '../src/EventSubscriber'
         tags: ['kernel.event_subscriber']
 
-    Clogger\Middleware\Context\ContextMiddleware:
-        class: Clogger\Middleware\Context\ContextMiddleware
+    Clogger\Middleware\Context\ContextMiddleware: ~
 
-    Clogger\Middleware\Exception\ExceptionCodeMiddleware:
-        class: Clogger\Middleware\Exception\ExceptionCodeMiddleware
+    Clogger\Middleware\Exception\ExceptionCodeMiddleware: ~
 
-    Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware:
-        class: Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware
+    Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware: ~
 
-    Clogger\Middleware\Exception\StackTraceMiddleware:
-        class: Clogger\Middleware\Exception\StackTraceMiddleware
+    Clogger\Middleware\Exception\StackTraceMiddleware: ~
+
+    App\Helper\Logger\LoggableEventMiddleware: ~
 
     Clogger\Clogger:
-        class: Clogger\Clogger
         arguments:
             - '@logger'
             - '@Clogger\Middleware\Context\ContextMiddleware'
+            - '@App\Helper\Logger\LoggableEventMiddleware'
             - '@Clogger\Middleware\Exception\StackTraceMiddleware'
             - '@Clogger\Middleware\Exception\ExceptionCodeMiddleware'
             - '@Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware'
@@ -68,18 +72,22 @@ services:
     Nelmio\ApiDocBundle\ApiDocGenerator: '@nelmio_api_doc.generator.default'
 
     Gedmo\Timestampable\TimestampableListener:
-        class: Gedmo\Timestampable\TimestampableListener
         tags:
             - { name: doctrine.event_subscriber, connection: default }
         calls:
             - [ setAnnotationReader, [ "@annotation_reader" ] ]
 
     App\Helper\Serializer\StrictIntegerHandler:
-        class: App\Helper\Serializer\StrictIntegerHandler
         tags:
             - { name: jms_serializer.subscribing_handler }
 
     App\Helper\Serializer\StrictBooleanHandler:
-        class: App\Helper\Serializer\StrictBooleanHandler
         tags:
             - { name: jms_serializer.subscribing_handler }
+
+    App\Http\HttpClientFactory: ~
+
+    App\QuickData\QuickData:
+        arguments:
+            - '%clients.quickdata%'
+            - '@App\Http\HttpClientFactory'

@@ -30,6 +30,7 @@ class ContextualException extends \Exception implements ContextualInterface
     public static function forContext($context, ?\Throwable $previous = null)
     {
         $exception = new static(static::MESSAGE, static::CODE, $previous);
+        $exception->setContext($context);
 
         return $exception;
     }

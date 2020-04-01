@@ -24,6 +24,9 @@ infection:
   dependencies:
     - composer
     - unitTests
+  needs:
+    - composer
+    - unitTests
   script:
     - phpdbg -qrr vendor/bin/infection --min-covered-msi=80 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage --test-framework-options="--testsuite=UnitTests "
   artifacts:
