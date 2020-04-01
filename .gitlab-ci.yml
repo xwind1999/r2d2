@@ -4,7 +4,9 @@ stages:
   - Test
   - Static analysis
   - App Container Build
+  - Pre-deploy Health Check
   - Project Env Deploy
+  - Post-deploy Health Check
   - Project Env Validation
   - Build Reports
   - Publish Reports
