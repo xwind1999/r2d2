@@ -79,7 +79,7 @@ Post-deploy Health Check:
   dependencies:
     - composer
   services:
-    - name: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.11
+    - name: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.12
       alias: r2-d2.localhost
       command: ["bash", "-c", 'rm -rf /app; ln -s /builds/millenniumfalcon/r2-d2-api /app; php /builds/millenniumfalcon/r2-d2-api/bin/console doctrine:schema:update --force; chmod 777 /tmp/db.sqlite; /start.sh']
   before_script:

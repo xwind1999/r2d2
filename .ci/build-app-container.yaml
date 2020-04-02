@@ -1,6 +1,6 @@
 variables:
   BASE_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base
-  BASE_IMAGE_VERSION: 0.0.11
+  BASE_IMAGE_VERSION: 0.0.12
   BASE_FULL_IMAGE: ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
   APP_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-api:${CI_PIPELINE_ID}_${CI_COMMIT_SHA}
 

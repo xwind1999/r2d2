@@ -2,7 +2,7 @@ FROM php:7.4-fpm-alpine
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_HOME /composer
-ENV COMPOSER_VERSION 1.9.2
+ENV COMPOSER_VERSION 1.10.1
 
 COPY ./runit/sv /etc/sv
 COPY ./runit/runit /etc/runit
@@ -20,7 +20,7 @@ RUN sed -i '/xfs/ s/33/82/g' /etc/passwd;\
 
 RUN apk add sudo libxml2-dev icu-dev runit $PHPIZE_DEPS openssh-client curl git bash
 
-RUN docker-php-ext-install pcntl soap pdo_mysql sockets intl
+RUN docker-php-ext-install pcntl soap pdo_mysql sockets intl opcache
 
 # COPY ./newrelic_install.sh /
 # RUN /newrelic_install.sh
