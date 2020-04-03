@@ -1,17 +1,16 @@
-###### Develop branch Gitlab Status:
-![pipeline status](http://gitlab.production.smartbox.com/millenniumfalcon/r2-d2-api/badges/master/pipeline.svg)
-![coverage report](http://gitlab.production.smartbox.com/millenniumfalcon/r2-d2-api/badges/master/coverage.svg)
-
-
-###### Reports and generated documentation:
-* [Unit Tests Coverage Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/phpunit/)
-* [PHPMetrics Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/phpmetrics/)
-
-* [Api Tests Coverage Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/api-tests/)
-
 # R2D2 API
 
 > A resourceful astromech droid, R2-D2 served Padmé Amidala, Anakin Skywalker and Luke Skywalker in turn, showing great bravery in rescuing his masters and their friends from many perils.
+
+## Master branch Gitlab Status:
+![pipeline status](http://gitlab.production.smartbox.com/millenniumfalcon/r2-d2-api/badges/master/pipeline.svg)
+![coverage report](http://gitlab.production.smartbox.com/millenniumfalcon/r2-d2-api/badges/master/coverage.svg)
+
+##  Reports and generated documentation
+* [Main Documentation](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api)
+* [Unit Tests Coverage Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/phpunit/)
+* [PHPMetrics Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/phpmetrics/)
+* [Api Tests Coverage Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/api-tests/)
 
 ## Main Responsibilities (domains):
 
