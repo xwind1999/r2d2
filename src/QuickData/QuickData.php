@@ -11,6 +11,8 @@ class QuickData
 {
     protected const CLIENT_ID = 'quickdata';
     protected const ENGINE_ID = '9D712592-92DD-4824-8FAD-7459CF953A01';
+    protected const GET_PACKAGE_ENDPOINT = 'GetPackage/1/%s';
+    protected const GET_RANGE_ENDPOINT = 'GetRangeV2/1/%s';
 
     protected HttpClient $httpClient;
 
@@ -21,9 +23,21 @@ class QuickData
 
     public function getPackage(int $packageCode, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
     {
-        $q = $this->httpClient->request('GET', sprintf('GetPackage/1/%s', self::ENGINE_ID), [
+        $q = $this->httpClient->request('GET', sprintf(self::GET_PACKAGE_ENDPOINT, self::ENGINE_ID), [
             'format' => 'json',
             'PackageCode' => (string) $packageCode,
+            'dateFrom' => $dateFrom->format('Y-m-d'),
+            'dateTo' => $dateTo->format('Y-m-d'),
+        ]);
+
+        return $q->toArray();
+    }
+
+    public function getRange(int $boxId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
+    {
+        $q = $this->httpClient->request('GET', sprintf(self::GET_RANGE_ENDPOINT, self::ENGINE_ID), [
+            'format' => 'json',
+            'boxVersion' => (string) $boxId,
             'dateFrom' => $dateFrom->format('Y-m-d'),
             'dateTo' => $dateTo->format('Y-m-d'),
         ]);

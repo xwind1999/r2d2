@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Provider;
 
 use App\Contract\Response\QuickData\GetPackageResponse;
+use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataErrorResponse;
 use App\Contract\Response\QuickData\QuickDataResponse;
 use App\QuickData\QuickData;
@@ -36,5 +37,18 @@ class LegacyAvailabilityProvider
 
             return $response;
         }
+    }
+
+    public function getAvailabilitiesForBox(int $boxId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): GetRangeResponse
+    {
+        //we check if the experience is CM-enabled here, then we call the appropriate client
+        try {
+            $data = $this->quickData->getRange($boxId, $dateFrom, $dateTo);
+            //but we process them the same way, so we have a GetRangeResponse ready
+        } catch (HttpExceptionInterface $exception) {
+            $data = [];
+        }
+
+        return $this->serializer->fromArray($data, GetRangeResponse::class);
     }
 }
