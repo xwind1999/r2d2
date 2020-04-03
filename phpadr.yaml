@@ -1,0 +1,4 @@
+directory: docs/adr
+template:
+  decision-record: docs/templates/adr_skeleton.md
+

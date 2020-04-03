@@ -18,6 +18,8 @@ default:
   image: ${BASE_FULL_IMAGE}
   before_script:
     - echo '10.11.0.178 ie1-i-chef-02' >> /etc/hosts
+  tags:
+    - k8s-alpha
 
 include:
   - local: '/.ci/build-app-container.yaml'
@@ -28,7 +30,6 @@ include:
 
 composer:
   stage: Build
-  image: ${BASE_FULL_IMAGE}
   cache:
     key:
       files:
@@ -45,33 +46,28 @@ composer:
     paths:
       - vendor/
       - public/bundles
-  tags:
-    - k8s-alpha
 
 pages:
   stage: Publish Reports
-  image: ${BASE_FULL_IMAGE}
   needs:
     - mermaid-generate-images
     - Api-Tests
     - code-tests-aggregate
     - phpmetrics
     - generate-api-reference
+    - composer
   script:
+    - vendor/bin/phpadr workspace:list --config=phpadr.yaml | sed 1,3d | head -n -2 | awk '{$1="["$1"]""(docs/adr/"$1")";print}' | sed -e 's/^/  \* /' >> docs/docsify/_sidebar.md
     - rm -rf public/
-    - mv report/html/ public/
-    - mkdir -p public/reference/
-    - mkdir -p public/docs/
-    - cp -R reference/* public/reference/
+    - mv docs/docsify public/
+    - mv docs public/
+    - cp README.md public/
+    - mv report/ public/
+    - mv reference public/
     - cp openapi.json public/
-    - cp -R docs/* public/docs/
-    - cp docs/html/openapi.html public/reference/r2d2-api/
-    - cp docs/html/implemented.html public/reference/r2d2-api/
   artifacts:
     paths:
       - public
     expire_in: 1 day
-  tags:
-    - k8s-alpha
   only:
     - master
