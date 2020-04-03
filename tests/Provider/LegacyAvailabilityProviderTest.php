@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Provider;
 
 use App\Contract\Response\QuickData\GetPackageResponse;
+use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataErrorResponse;
 use App\Provider\LegacyAvailabilityProvider;
 use App\QuickData\QuickData;
@@ -69,5 +70,41 @@ class LegacyAvailabilityProviderTest extends TestCase
         $response = $legacyAvailabilityProvider->getAvailabilityForExperience($experienceId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(QuickDataErrorResponse::class, $response);
+    }
+
+    public function testGetAvailabilitiesForBox()
+    {
+        $boxId = 1234;
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(), $this->serializer->reveal());
+
+        $result = $this->prophesize(GetRangeResponse::class);
+        $this->quickData->getRange($boxId, $dateFrom, $dateTo)->willReturn([]);
+        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
+        $response = $legacyAvailabilityProvider->getAvailabilitiesForBox($boxId, $dateFrom, $dateTo);
+
+        $this->assertInstanceOf(GetRangeResponse::class, $response);
+    }
+
+    public function testGetAvailabilitiesForBoxWillFailDueToHttpError()
+    {
+        $boxId = 1234;
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(), $this->serializer->reveal());
+
+        $result = $this->prophesize(GetRangeResponse::class);
+        $responseInterface = $this->prophesize(ResponseInterface::class);
+        $exception = $this->prophesize(HttpExceptionInterface::class);
+        $this->quickData->getRange($boxId, $dateFrom, $dateTo)->willThrow($exception->reveal());
+
+        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
+        $response = $legacyAvailabilityProvider->getAvailabilitiesForBox($boxId, $dateFrom, $dateTo);
+
+        $this->assertInstanceOf(GetRangeResponse::class, $response);
+        $this->assertEmpty($response->packagesList);
     }
 }
