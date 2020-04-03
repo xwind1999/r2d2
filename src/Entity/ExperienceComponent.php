@@ -4,24 +4,27 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Helper\TimestampableEntityTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\BoxExperienceRepository")
+ * @ORM\Entity()
  */
-class BoxExperience
+class ExperienceComponent
 {
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Box")
-     * @ORM\JoinColumn(name="box_uuid", referencedColumnName="uuid", nullable=false)
-     */
-    public Box $box;
+    use TimestampableEntityTrait;
 
     /**
-     * @ORM\Column(type="string", length=45, nullable=true)
+     * @ORM\Id
+     * @ORM\ManyToOne(targetEntity="Room")
+     * @ORM\JoinColumn(name="room_uuid", referencedColumnName="uuid", nullable=false)
      */
-    public string $boxGoldenId;
+    public Room $room;
+
+    /**
+     * @ORM\Column(type="string", length=45, unique=true)
+     */
+    public string $goldenId;
 
     /**
      * @ORM\Id
@@ -31,9 +34,9 @@ class BoxExperience
     public Experience $experience;
 
     /**
-     * @ORM\Column(type="string", length=45, nullable=true)
+     * @ORM\Column(type="boolean")
      */
-    public string $experienceGoldenId;
+    public bool $isEnabled;
 
     /**
      * @ORM\Column(type="datetime")
