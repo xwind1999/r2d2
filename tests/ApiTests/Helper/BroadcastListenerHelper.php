@@ -103,7 +103,7 @@ class BroadcastListenerHelper
         if (empty($payload)) {
             $payload = $this->getDefaultRelationship();
         }
-        $this->client->request('POST', self::API_RELATIONSHIP_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request('POST', $this->baseUrl.self::API_RELATIONSHIP_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }
