@@ -66,8 +66,16 @@ class Experience
      */
     public Collection $boxExperience;
 
+    /**
+     * @var Collection<int, ExperienceComponent>
+     *
+     * @ORM\OneToMany(targetEntity="ExperienceComponent", mappedBy="experience", fetch="EXTRA_LAZY")
+     */
+    public Collection $experienceComponent;
+
     public function __construct()
     {
         $this->boxExperience = new ArrayCollection();
+        $this->experienceComponent = new ArrayCollection();
     }
 }

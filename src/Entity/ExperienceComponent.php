@@ -8,7 +8,7 @@ use App\Helper\TimestampableEntityTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\ExperienceComponentRepository")
  */
 class ExperienceComponent
 {
@@ -22,9 +22,9 @@ class ExperienceComponent
     public Room $room;
 
     /**
-     * @ORM\Column(type="string", length=45, unique=true)
+     * @ORM\Column(type="string", length=45, nullable=true)
      */
-    public string $goldenId;
+    public string $roomGoldenId;
 
     /**
      * @ORM\Id
@@ -32,6 +32,11 @@ class ExperienceComponent
      * @ORM\JoinColumn(name="experience_uuid", referencedColumnName="uuid", nullable=false)
      */
     public Experience $experience;
+
+    /**
+     * @ORM\Column(type="string", length=45, nullable=true)
+     */
+    public string $experienceGoldenId;
 
     /**
      * @ORM\Column(type="boolean")
