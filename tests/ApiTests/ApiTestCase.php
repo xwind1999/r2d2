@@ -9,6 +9,7 @@ use App\Tests\ApiTests\Helper\BookingHelper;
 use App\Tests\ApiTests\Helper\BoxExperienceHelper;
 use App\Tests\ApiTests\Helper\BoxHelper;
 use App\Tests\ApiTests\Helper\BroadcastListenerHelper;
+use App\Tests\ApiTests\Helper\ExperienceComponentHelper;
 use App\Tests\ApiTests\Helper\ExperienceHelper;
 use App\Tests\ApiTests\Helper\PartnerHelper;
 use App\Tests\ApiTests\Helper\RateBandHelper;
@@ -49,6 +50,8 @@ class ApiTestCase extends WebTestCase
 
     public static BoxExperienceHelper $boxExperienceHelper;
 
+    public static ExperienceComponentHelper $experienceComponentHelper;
+
     public static ?string $baseUrl = null;
 
     public static function setUpBeforeClass(): void
@@ -79,6 +82,7 @@ class ApiTestCase extends WebTestCase
         static::$bookingDateHelper = new BookingDateHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$bookingHelper = new BookingHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$boxExperienceHelper = new BoxExperienceHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$experienceComponentHelper = new ExperienceComponentHelper(clone static::$client, static::$serializer, static::$baseUrl);
     }
 
     /**
