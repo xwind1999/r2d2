@@ -34,6 +34,7 @@ class RoomManager
         $room->name = $roomCreateRequest->name;
         $room->description = $roomCreateRequest->description;
         $room->inventory = $roomCreateRequest->inventory;
+        $room->duration = $roomCreateRequest->duration;
         $room->isSellable = $roomCreateRequest->isSellable;
         $room->status = $roomCreateRequest->status;
 
@@ -73,6 +74,7 @@ class RoomManager
         $room->name = $roomUpdateRequest->name;
         $room->description = $roomUpdateRequest->description;
         $room->inventory = $roomUpdateRequest->inventory;
+        $room->duration = $roomUpdateRequest->duration;
         $room->isSellable = $roomUpdateRequest->isSellable;
         $room->status = $roomUpdateRequest->status;
 

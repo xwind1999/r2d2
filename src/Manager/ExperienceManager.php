@@ -33,7 +33,6 @@ class ExperienceManager
         $experience->partnerGoldenId = $experienceCreateRequest->partnerGoldenId;
         $experience->name = $experienceCreateRequest->name;
         $experience->description = $experienceCreateRequest->description;
-        $experience->duration = $experienceCreateRequest->duration;
 
         $this->repository->save($experience);
 
@@ -70,7 +69,6 @@ class ExperienceManager
         $experience->partnerGoldenId = $experienceUpdateRequest->partnerGoldenId;
         $experience->name = $experienceUpdateRequest->name;
         $experience->description = $experienceUpdateRequest->description;
-        $experience->duration = $experienceUpdateRequest->duration;
 
         $this->repository->save($experience);
 

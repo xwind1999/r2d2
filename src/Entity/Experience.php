@@ -55,11 +55,6 @@ class Experience
     public string $description;
 
     /**
-     * @ORM\Column(type="integer", options={"unsigned"=true})
-     */
-    public int $duration;
-
-    /**
      * @var Collection<int, BoxExperience>
      *
      * @ORM\OneToMany(targetEntity="BoxExperience", mappedBy="experience", fetch="EXTRA_LAZY")

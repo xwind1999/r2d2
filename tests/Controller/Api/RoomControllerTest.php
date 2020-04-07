@@ -52,6 +52,7 @@ class RoomControllerTest extends TestCase
         $room->name = 'room with small bed';
         $room->description = 'the bed is very small';
         $room->inventory = 1;
+        $room->duration = 0;
         $room->isSellable = false;
         $room->status = 'ok';
         $room->createdAt = new \DateTime();
@@ -68,6 +69,7 @@ class RoomControllerTest extends TestCase
         $this->assertEquals($room->name, $return->name);
         $this->assertEquals($room->description, $return->description);
         $this->assertEquals($room->inventory, $return->inventory);
+        $this->assertEquals($room->duration, $return->duration);
         $this->assertEquals($room->isSellable, $return->isSellable);
         $this->assertEquals($room->status, $return->status);
         $this->assertEquals($room->createdAt, $return->createdAt);
@@ -158,6 +160,7 @@ class RoomControllerTest extends TestCase
         $room->name = 'test room';
         $room->description = 'this is a test room';
         $room->inventory = 2;
+        $room->duration = 2;
         $room->isSellable = true;
         $room->status = 'enabled';
         $room->createdAt = new \DateTime();

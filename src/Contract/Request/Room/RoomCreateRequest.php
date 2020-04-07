@@ -56,6 +56,15 @@ class RoomCreateRequest implements RequestBodyInterface, ValidatableRequest
     public int $inventory;
 
     /**
+     * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
+     * @Assert\NotBlank
+     *
+     * @JMS\Type("strict_integer")
+     */
+    public int $duration;
+
+    /**
      * @Assert\Type(type="boolean")
      * @Assert\NotNull()
      *

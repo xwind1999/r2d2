@@ -31,6 +31,7 @@ class RoomHelper
             'name' => 'this is a simple room',
             'description' => 'but this room includes a jacuzzi',
             'inventory' => 10,
+            'duration' => 1,
             'is_sellable' => true,
             'status' => 'enabled',
         ];
