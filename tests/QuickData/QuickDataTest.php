@@ -71,4 +71,26 @@ class QuickDataTest extends TestCase
         ])->willReturn($response->reveal())->shouldBeCalled();
         $this->assertEquals([], $quickData->getRange($boxId, $dateFrom, $dateTo));
     }
+
+    public function testGetPackageV2()
+    {
+        $this->httpClientFactory->buildWithOptions(Argument::type('string'), [])->willReturn($this->httpClient->reveal());
+        $quickData = new QuickData([], $this->httpClientFactory->reveal());
+
+        $listPackageCodeArray = [1234, 5678];
+        $listPackageCode = '1234,5678';
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $response = $this->prophesize(ResponseInterface::class);
+        $response->toArray()->willReturn([]);
+
+        $this->httpClient->request(Argument::any(), Argument::any(), [
+            'format' => 'json',
+            'listPackageCode' => $listPackageCode,
+            'dateFrom' => $dateFrom->format('Y-m-d'),
+            'dateTo' => $dateTo->format('Y-m-d'),
+        ])->willReturn($response->reveal())->shouldBeCalled();
+        $this->assertEquals([], $quickData->getPackageV2($listPackageCodeArray, $dateFrom, $dateTo));
+    }
 }

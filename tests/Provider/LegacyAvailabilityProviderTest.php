@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Provider;
 
 use App\Contract\Response\QuickData\GetPackageResponse;
+use App\Contract\Response\QuickData\GetPackageV2Response;
 use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataErrorResponse;
 use App\Provider\LegacyAvailabilityProvider;
@@ -106,5 +107,41 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $this->assertInstanceOf(GetRangeResponse::class, $response);
         $this->assertEmpty($response->packagesList);
+    }
+
+    public function testGetAvailabilityForMultipleExperiences()
+    {
+        $experienceIds = [1234, 5678];
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(), $this->serializer->reveal());
+
+        $result = $this->prophesize(GetPackageResponse::class);
+        $this->quickData->getPackageV2($experienceIds, $dateFrom, $dateTo)->willReturn([]);
+        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
+        $response = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
+
+        $this->assertInstanceOf(GetPackageResponse::class, $response);
+    }
+
+    public function testGetAvailabilityForMultipleExperiencesWillFailDueToHttpError()
+    {
+        $experienceIds = [1234, 5678];
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(), $this->serializer->reveal());
+
+        $exception = $this->prophesize(HttpExceptionInterface::class);
+        $result = $this->prophesize(GetPackageV2Response::class);
+
+        $this->quickData->getPackageV2($experienceIds, $dateFrom, $dateTo)->willThrow($exception->reveal());
+
+        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
+        $response = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
+
+        $this->assertInstanceOf(GetPackageV2Response::class, $response);
+        $this->assertEmpty($response->listPackage);
     }
 }
