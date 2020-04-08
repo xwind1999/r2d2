@@ -12,7 +12,7 @@ class DayAvailabilityPrice
     /**
      * @Assert\Type(type="datetime")
      *
-     * @JMS\Type("DateTime<'Y-m-d\TH:i:s.u', '', 'Y-m-d\TH:i:s.uuT'>")
+     * @JMS\Type("DateTime<'Y-m-d\TH:i:s.u', '', 'Y-m-d\TH:i:s.u'>")
      * @JMS\SerializedName("Date")
      */
     public \DateTime $date;
