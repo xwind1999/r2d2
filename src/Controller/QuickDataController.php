@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Contract\Request\QuickData\AvailabilityPricePeriodRequest;
 use App\Contract\Request\QuickData\GetPackageRequest;
 use App\Contract\Request\QuickData\GetPackageV2Request;
 use App\Contract\Request\QuickData\GetRangeRequest;
@@ -136,6 +137,48 @@ class QuickDataController
     public function getPackageV2(GetPackageV2Request $getPackageV2Request, LegacyAvailabilityProvider $legacyAvailabilityProvider): QuickDataResponse
     {
         $quickDataResponse = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($getPackageV2Request->listPackageCode, $getPackageV2Request->dateFrom, $getPackageV2Request->dateTo);
+
+        return $quickDataResponse;
+    }
+
+    /**
+     * @Route("/api/quickdata/availabilitypriceperiod/1/{engineId}", methods={"GET"}, format="json")
+     *
+     * @SWG\Parameter(
+     *     name="engineId",
+     *     in="path",
+     *     type="string",
+     *     format="string",
+     *     description="Ignored"
+     * )
+     * @SWG\Parameter(
+     *     name="prestid",
+     *     in="query",
+     *     type="integer",
+     *     format="integer",
+     *     description="Prest ID (example: 2878007)"
+     * )
+     * @SWG\Parameter(
+     *     name="dateFrom",
+     *     in="query",
+     *     type="string",
+     *     format="date"
+     * )
+     * @SWG\Parameter(
+     *     name="dateTo",
+     *     in="query",
+     *     type="string",
+     *     format="date"
+     * )
+     * @SWG\Tag(name="quickdata")
+     * @SWG\Response(
+     *     description="Quickdata handled",
+     *     response="200"
+     * )
+     */
+    public function availabilityPricePeriod(AvailabilityPricePeriodRequest $availabilityPricePeriodRequest, LegacyAvailabilityProvider $legacyAvailabilityProvider): QuickDataResponse
+    {
+        $quickDataResponse = $legacyAvailabilityProvider->getAvailabilityPriceForExperience($availabilityPricePeriodRequest->prestId, $availabilityPricePeriodRequest->dateFrom, $availabilityPricePeriodRequest->dateTo);
 
         return $quickDataResponse;
     }
