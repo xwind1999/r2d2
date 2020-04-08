@@ -54,7 +54,6 @@ class ExperienceManagerTest extends TestCase
         $experienceUpdateRequest->partnerGoldenId = '5678';
         $experienceUpdateRequest->name = 'dinner with massage';
         $experienceUpdateRequest->description = 'a fancy dinner with feet massage';
-        $experienceUpdateRequest->duration = 1;
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
         $uuidInterface->toString()->willReturn($uuid);
@@ -65,7 +64,6 @@ class ExperienceManagerTest extends TestCase
         $experience->partnerGoldenId = '5678';
         $experience->name = '7895';
         $experience->description = '12365488';
-        $experience->duration = 0;
         $this->repository->findOne($uuid)->willReturn($experience);
 
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
@@ -73,7 +71,6 @@ class ExperienceManagerTest extends TestCase
         $updatedExperience = $manager->update($uuid, $experienceUpdateRequest);
 
         $this->assertSame($experience, $updatedExperience);
-        $this->assertEquals(1, $experience->duration);
         $this->assertEquals('5678', $experience->partnerGoldenId);
         $this->assertEquals('dinner with massage', $experience->name);
         $this->assertEquals('a fancy dinner with feet massage', $experience->description);
@@ -116,7 +113,6 @@ class ExperienceManagerTest extends TestCase
         $experienceCreateRequest->partnerGoldenId = '5678';
         $experienceCreateRequest->name = 'dinner with massage';
         $experienceCreateRequest->description = 'a fancy dinner with feet massage';
-        $experienceCreateRequest->duration = 0;
 
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
 
@@ -125,6 +121,5 @@ class ExperienceManagerTest extends TestCase
         $this->assertEquals($experienceCreateRequest->partnerGoldenId, $experience->partnerGoldenId);
         $this->assertEquals($experienceCreateRequest->name, $experience->name);
         $this->assertEquals($experienceCreateRequest->description, $experience->description);
-        $this->assertEquals($experienceCreateRequest->duration, $experience->duration);
     }
 }

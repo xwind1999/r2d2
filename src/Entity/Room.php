@@ -60,6 +60,11 @@ class Room
     public int $inventory;
 
     /**
+     * @ORM\Column(type="integer", options={"unsigned"=true})
+     */
+    public int $duration;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     public bool $isSellable;

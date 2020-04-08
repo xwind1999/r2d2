@@ -29,7 +29,6 @@ class ExperienceHelper
             'golden_id' => bin2hex(random_bytes(12)),
             'name' => '1234',
             'description' => '1234',
-            'duration' => 1,
             'partner_golden_id' => '1234',
         ];
 

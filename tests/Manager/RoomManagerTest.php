@@ -56,6 +56,7 @@ class RoomManagerTest extends TestCase
         $roomUpdateRequest->name = 'room with a big big bed';
         $roomUpdateRequest->description = 'the bed is so big it could fit two families';
         $roomUpdateRequest->inventory = 2;
+        $roomUpdateRequest->duration = 1;
         $roomUpdateRequest->isSellable = true;
         $roomUpdateRequest->status = 'not_ok';
 
@@ -69,6 +70,7 @@ class RoomManagerTest extends TestCase
         $room->name = 'room with small bed';
         $room->description = 'the bed is very small';
         $room->inventory = 1;
+        $room->duration = 0;
         $room->isSellable = false;
         $room->status = 'ok';
         $this->repository->findOne($uuid)->willReturn($room);
@@ -79,6 +81,7 @@ class RoomManagerTest extends TestCase
 
         $this->assertSame($room, $updatedRoom);
         $this->assertEquals(2, $room->inventory);
+        $this->assertEquals(1, $room->duration);
         $this->assertEquals('4321', $room->partnerGoldenId);
         $this->assertEquals('room with a big big bed', $room->name);
         $this->assertEquals('the bed is so big it could fit two families', $room->description);
@@ -122,6 +125,7 @@ class RoomManagerTest extends TestCase
         $roomCreateRequest->name = 'room with small bed';
         $roomCreateRequest->description = 'the bed is very small';
         $roomCreateRequest->inventory = 1;
+        $roomCreateRequest->duration = 0;
         $roomCreateRequest->isSellable = false;
         $roomCreateRequest->status = 'ok';
 
@@ -133,6 +137,7 @@ class RoomManagerTest extends TestCase
         $this->assertEquals($roomCreateRequest->name, $room->name);
         $this->assertEquals($roomCreateRequest->description, $room->description);
         $this->assertEquals($roomCreateRequest->inventory, $room->inventory);
+        $this->assertEquals($roomCreateRequest->duration, $room->duration);
         $this->assertEquals($roomCreateRequest->isSellable, $room->isSellable);
         $this->assertEquals($roomCreateRequest->status, $room->status);
     }

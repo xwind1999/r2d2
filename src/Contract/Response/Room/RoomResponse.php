@@ -64,6 +64,14 @@ abstract class RoomResponse extends ResponseContract
     public int $inventory;
 
     /**
+     * @Assert\Type(type="integer")
+     * @Assert\NotBlank
+     *
+     * @JMS\Type("integer")
+     */
+    public int $duration;
+
+    /**
      * @Assert\Type(type="boolean")
      * @Assert\NotNull()
      *
@@ -102,6 +110,7 @@ abstract class RoomResponse extends ResponseContract
         $this->name = $room->name;
         $this->description = $room->description;
         $this->inventory = $room->inventory;
+        $this->duration = $room->duration;
         $this->isSellable = $room->isSellable;
         $this->status = $room->status;
         $this->createdAt = $room->createdAt;

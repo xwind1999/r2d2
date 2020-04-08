@@ -54,14 +54,6 @@ abstract class ExperienceResponse extends ResponseContract
     public string $description;
 
     /**
-     * @Assert\Type(type="integer")
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("integer")
-     */
-    public int $duration;
-
-    /**
      * @Assert\NotBlank
      *
      * @JMS\Type("DateTime")
@@ -82,7 +74,6 @@ abstract class ExperienceResponse extends ResponseContract
         $this->partnerGoldenId = $experience->partnerGoldenId;
         $this->name = $experience->name;
         $this->description = $experience->description;
-        $this->duration = $experience->duration;
         $this->createdAt = $experience->createdAt;
         $this->updatedAt = $experience->updatedAt;
     }
