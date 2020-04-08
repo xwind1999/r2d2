@@ -110,7 +110,7 @@ class QuickDataController
      *     description="Ignored"
      * )
      * @SWG\Parameter(
-     *     name="listPackageCode",
+     *     name="ListPackageCode",
      *     in="query",
      *     type="string",
      *     format="string",
@@ -159,13 +159,13 @@ class QuickDataController
      *     description="Prest ID (example: 2878007)"
      * )
      * @SWG\Parameter(
-     *     name="dateFrom",
+     *     name="datefrom",
      *     in="query",
      *     type="string",
      *     format="date"
      * )
      * @SWG\Parameter(
-     *     name="dateTo",
+     *     name="dateto",
      *     in="query",
      *     type="string",
      *     format="date"

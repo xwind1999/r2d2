@@ -151,12 +151,13 @@ class LegacyAvailabilityProviderTest extends TestCase
         $prestId = 1234;
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
-
+        $quickdataResponse = ['DaysAvailabilityPrice' => [['Date' => '2020-01-01T01:00:00.00000000+03:00']]];
+        $formattedResponse = ['DaysAvailabilityPrice' => [['Date' => '2020-01-01T00:00:00.000000']]];
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(), $this->serializer->reveal());
 
         $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
-        $this->quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo)->willReturn([]);
-        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
+        $this->quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo)->willReturn($quickdataResponse);
+        $this->serializer->fromArray($formattedResponse, Argument::any())->willReturn($result->reveal());
         $response = $legacyAvailabilityProvider->getAvailabilityPriceForExperience($prestId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(AvailabilityPricePeriodResponse::class, $response);

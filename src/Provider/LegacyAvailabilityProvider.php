@@ -16,6 +16,8 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 
 class LegacyAvailabilityProvider
 {
+    private const DATE_TIME_FORMAT = 'Y-m-d\TH:i:s.u';
+
     protected QuickData $quickData;
 
     protected ArrayTransformerInterface $serializer;
@@ -72,6 +74,15 @@ class LegacyAvailabilityProvider
         //we check if the experience is CM-enabled here, then we call the appropriate client
         try {
             $data = $this->quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo);
+
+            if (isset($data['DaysAvailabilityPrice'])) {
+                foreach ($data['DaysAvailabilityPrice'] as $key => $value) {
+                    $data['DaysAvailabilityPrice'][$key]['Date'] = (new \DateTime($value['Date']))
+                        ->setTime(0, 0, 0, 0)
+                        ->format(self::DATE_TIME_FORMAT)
+                    ;
+                }
+            }
             //but we process them the same way, so we have a GetRangeResponse ready
         } catch (HttpExceptionInterface $exception) {
             $data = [];
