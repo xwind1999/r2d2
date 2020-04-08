@@ -16,7 +16,7 @@ class GetPackageV2Request implements RequestQueryInterface, ValidatableRequest
      * @Assert\Positive()
      * @Assert\NotBlank
      *
-     * @JMS\SerializedName("listPackageCode")
+     * @JMS\SerializedName("ListPackageCode")
      * @JMS\Type("csv")
      */
     public array $listPackageCode;

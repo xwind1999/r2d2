@@ -25,7 +25,7 @@ class AvailabilityPricePeriodRequest implements RequestQueryInterface, Validatab
      * @Assert\Type(type="DateTime")
      * @Assert\NotBlank
      *
-     * @JMS\SerializedName("dateFrom")
+     * @JMS\SerializedName("datefrom")
      * @JMS\Type("DateTime<'Y-m-d'>")
      */
     public \DateTimeInterface $dateFrom;
@@ -34,7 +34,7 @@ class AvailabilityPricePeriodRequest implements RequestQueryInterface, Validatab
      * @Assert\Type(type="DateTime")
      * @Assert\NotBlank
      *
-     * @JMS\SerializedName("dateTo")
+     * @JMS\SerializedName("dateto")
      * @JMS\Type("DateTime<'Y-m-d'>")
      */
     public \DateTimeInterface $dateTo;
