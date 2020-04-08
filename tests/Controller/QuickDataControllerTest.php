@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Controller;
 
 use App\Contract\Request\QuickData\GetPackageRequest;
+use App\Contract\Request\QuickData\GetPackageV2Request;
 use App\Contract\Request\QuickData\GetRangeRequest;
 use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataResponse;
@@ -54,5 +55,26 @@ class QuickDataControllerTest extends TestCase
         $response = $controller->getRange($getRangeRequest, $legacyAvailabilityProvider->reveal());
 
         $this->assertInstanceOf(GetRangeResponse::class, $response);
+    }
+
+    public function testGetPackageV2()
+    {
+        $experienceIds = [1234, 5678];
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $getPackageV2Request = new GetPackageV2Request();
+        $getPackageV2Request->listPackageCode = $experienceIds;
+        $getPackageV2Request->dateFrom = $dateFrom;
+        $getPackageV2Request->dateTo = $dateTo;
+        $legacyAvailabilityProvider = $this->prophesize(LegacyAvailabilityProvider::class);
+
+        $controller = new QuickDataController();
+
+        $qdResponse = $this->prophesize(QuickDataResponse::class);
+        $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo)->willReturn($qdResponse->reveal());
+        $response = $controller->getPackageV2($getPackageV2Request, $legacyAvailabilityProvider->reveal());
+
+        $this->assertInstanceOf(QuickDataResponse::class, $response);
     }
 }

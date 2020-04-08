@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Contract\Request\QuickData\GetPackageRequest;
+use App\Contract\Request\QuickData\GetPackageV2Request;
 use App\Contract\Request\QuickData\GetRangeRequest;
 use App\Contract\Response\QuickData\QuickDataResponse;
 use App\Provider\LegacyAvailabilityProvider;
@@ -93,6 +94,48 @@ class QuickDataController
     public function getRange(GetRangeRequest $getRangeRequest, LegacyAvailabilityProvider $legacyAvailabilityProvider): QuickDataResponse
     {
         $quickDataResponse = $legacyAvailabilityProvider->getAvailabilitiesForBox($getRangeRequest->boxVersion, $getRangeRequest->dateFrom, $getRangeRequest->dateTo);
+
+        return $quickDataResponse;
+    }
+
+    /**
+     * @Route("/api/quickdata/GetPackageV2/1/{engineId}", methods={"GET"}, format="json")
+     *
+     * @SWG\Parameter(
+     *     name="engineId",
+     *     in="path",
+     *     type="string",
+     *     format="string",
+     *     description="Ignored"
+     * )
+     * @SWG\Parameter(
+     *     name="listPackageCode",
+     *     in="query",
+     *     type="string",
+     *     format="string",
+     *     description="Experience IDs, comma separated (example: 88826,677507)"
+     * )
+     * @SWG\Parameter(
+     *     name="dateFrom",
+     *     in="query",
+     *     type="string",
+     *     format="date"
+     * )
+     * @SWG\Parameter(
+     *     name="dateTo",
+     *     in="query",
+     *     type="string",
+     *     format="date"
+     * )
+     * @SWG\Tag(name="quickdata")
+     * @SWG\Response(
+     *     description="Quickdata handled",
+     *     response="200"
+     * )
+     */
+    public function getPackageV2(GetPackageV2Request $getPackageV2Request, LegacyAvailabilityProvider $legacyAvailabilityProvider): QuickDataResponse
+    {
+        $quickDataResponse = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($getPackageV2Request->listPackageCode, $getPackageV2Request->dateFrom, $getPackageV2Request->dateTo);
 
         return $quickDataResponse;
     }

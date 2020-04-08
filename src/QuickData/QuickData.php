@@ -12,6 +12,7 @@ class QuickData
     protected const CLIENT_ID = 'quickdata';
     protected const ENGINE_ID = '9D712592-92DD-4824-8FAD-7459CF953A01';
     protected const GET_PACKAGE_ENDPOINT = 'GetPackage/1/%s';
+    protected const GET_PACKAGE_V2_ENDPOINT = 'GetPackageV2/1/%s';
     protected const GET_RANGE_ENDPOINT = 'GetRangeV2/1/%s';
 
     protected HttpClient $httpClient;
@@ -38,6 +39,21 @@ class QuickData
         $q = $this->httpClient->request('GET', sprintf(self::GET_RANGE_ENDPOINT, self::ENGINE_ID), [
             'format' => 'json',
             'boxVersion' => (string) $boxId,
+            'dateFrom' => $dateFrom->format('Y-m-d'),
+            'dateTo' => $dateTo->format('Y-m-d'),
+        ]);
+
+        return $q->toArray();
+    }
+
+    /**
+     * @param array<int, int> $packageCodes
+     */
+    public function getPackageV2(array $packageCodes, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
+    {
+        $q = $this->httpClient->request('GET', sprintf(self::GET_PACKAGE_V2_ENDPOINT, self::ENGINE_ID), [
+            'format' => 'json',
+            'listPackageCode' => implode(',', $packageCodes),
             'dateFrom' => $dateFrom->format('Y-m-d'),
             'dateTo' => $dateTo->format('Y-m-d'),
         ]);
