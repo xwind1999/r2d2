@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Provider;
 
+use App\Contract\Response\QuickData\AvailabilityPricePeriodResponse;
 use App\Contract\Response\QuickData\GetPackageResponse;
 use App\Contract\Response\QuickData\GetPackageV2Response;
 use App\Contract\Response\QuickData\GetRangeResponse;
@@ -143,5 +144,41 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $this->assertInstanceOf(GetPackageV2Response::class, $response);
         $this->assertEmpty($response->listPackage);
+    }
+
+    public function testGetAvailabilityPriceForExperience()
+    {
+        $prestId = 1234;
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(), $this->serializer->reveal());
+
+        $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
+        $this->quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo)->willReturn([]);
+        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
+        $response = $legacyAvailabilityProvider->getAvailabilityPriceForExperience($prestId, $dateFrom, $dateTo);
+
+        $this->assertInstanceOf(AvailabilityPricePeriodResponse::class, $response);
+    }
+
+    public function testGetAvailabilityPriceForExperienceWillFailDueToHttpError()
+    {
+        $prestId = 1234;
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(), $this->serializer->reveal());
+
+        $exception = $this->prophesize(HttpExceptionInterface::class);
+        $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
+
+        $this->quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo)->willThrow($exception->reveal());
+
+        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
+        $response = $legacyAvailabilityProvider->getAvailabilityPriceForExperience($prestId, $dateFrom, $dateTo);
+
+        $this->assertInstanceOf(AvailabilityPricePeriodResponse::class, $response);
+        $this->assertEmpty($response->daysAvailabilityPrice);
     }
 }

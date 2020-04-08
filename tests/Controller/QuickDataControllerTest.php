@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use App\Contract\Request\QuickData\AvailabilityPricePeriodRequest;
 use App\Contract\Request\QuickData\GetPackageRequest;
 use App\Contract\Request\QuickData\GetPackageV2Request;
 use App\Contract\Request\QuickData\GetRangeRequest;
@@ -74,6 +75,27 @@ class QuickDataControllerTest extends TestCase
         $qdResponse = $this->prophesize(QuickDataResponse::class);
         $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo)->willReturn($qdResponse->reveal());
         $response = $controller->getPackageV2($getPackageV2Request, $legacyAvailabilityProvider->reveal());
+
+        $this->assertInstanceOf(QuickDataResponse::class, $response);
+    }
+
+    public function testAvailabilityPricePeriod()
+    {
+        $prestId = 5678;
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $availabilityPricePeriodRequest = new AvailabilityPricePeriodRequest();
+        $availabilityPricePeriodRequest->prestId = $prestId;
+        $availabilityPricePeriodRequest->dateFrom = $dateFrom;
+        $availabilityPricePeriodRequest->dateTo = $dateTo;
+        $legacyAvailabilityProvider = $this->prophesize(LegacyAvailabilityProvider::class);
+
+        $controller = new QuickDataController();
+
+        $qdResponse = $this->prophesize(QuickDataResponse::class);
+        $legacyAvailabilityProvider->getAvailabilityPriceForExperience($prestId, $dateFrom, $dateTo)->willReturn($qdResponse->reveal());
+        $response = $controller->availabilityPricePeriod($availabilityPricePeriodRequest, $legacyAvailabilityProvider->reveal());
 
         $this->assertInstanceOf(QuickDataResponse::class, $response);
     }

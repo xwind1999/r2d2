@@ -14,6 +14,7 @@ class QuickData
     protected const GET_PACKAGE_ENDPOINT = 'GetPackage/1/%s';
     protected const GET_PACKAGE_V2_ENDPOINT = 'GetPackageV2/1/%s';
     protected const GET_RANGE_ENDPOINT = 'GetRangeV2/1/%s';
+    protected const AVAILABILITY_PRICE_PERIOD_ENDPOINT = 'availabilitypriceperiod/1/%s';
 
     protected HttpClient $httpClient;
 
@@ -54,6 +55,18 @@ class QuickData
         $q = $this->httpClient->request('GET', sprintf(self::GET_PACKAGE_V2_ENDPOINT, self::ENGINE_ID), [
             'format' => 'json',
             'listPackageCode' => implode(',', $packageCodes),
+            'dateFrom' => $dateFrom->format('Y-m-d'),
+            'dateTo' => $dateTo->format('Y-m-d'),
+        ]);
+
+        return $q->toArray();
+    }
+
+    public function availabilityPricePeriod(int $prestid, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
+    {
+        $q = $this->httpClient->request('GET', sprintf(self::AVAILABILITY_PRICE_PERIOD_ENDPOINT, self::ENGINE_ID), [
+            'format' => 'json',
+            'prestid' => $prestid,
             'dateFrom' => $dateFrom->format('Y-m-d'),
             'dateTo' => $dateTo->format('Y-m-d'),
         ]);

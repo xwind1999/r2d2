@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Provider;
 
+use App\Contract\Response\QuickData\AvailabilityPricePeriodResponse;
 use App\Contract\Response\QuickData\GetPackageResponse;
 use App\Contract\Response\QuickData\GetPackageV2Response;
 use App\Contract\Response\QuickData\GetRangeResponse;
@@ -64,5 +65,18 @@ class LegacyAvailabilityProvider
         }
 
         return $this->serializer->fromArray($data, GetPackageV2Response::class);
+    }
+
+    public function getAvailabilityPriceForExperience(int $prestId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): QuickDataResponse
+    {
+        //we check if the experience is CM-enabled here, then we call the appropriate client
+        try {
+            $data = $this->quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo);
+            //but we process them the same way, so we have a GetRangeResponse ready
+        } catch (HttpExceptionInterface $exception) {
+            $data = [];
+        }
+
+        return $this->serializer->fromArray($data, AvailabilityPricePeriodResponse::class);
     }
 }

@@ -93,4 +93,25 @@ class QuickDataTest extends TestCase
         ])->willReturn($response->reveal())->shouldBeCalled();
         $this->assertEquals([], $quickData->getPackageV2($listPackageCodeArray, $dateFrom, $dateTo));
     }
+
+    public function testAvailabilityPricePeriod()
+    {
+        $this->httpClientFactory->buildWithOptions(Argument::type('string'), [])->willReturn($this->httpClient->reveal());
+        $quickData = new QuickData([], $this->httpClientFactory->reveal());
+
+        $prestId = 1234;
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $response = $this->prophesize(ResponseInterface::class);
+        $response->toArray()->willReturn([]);
+
+        $this->httpClient->request(Argument::any(), Argument::any(), [
+            'format' => 'json',
+            'prestid' => $prestId,
+            'dateFrom' => $dateFrom->format('Y-m-d'),
+            'dateTo' => $dateTo->format('Y-m-d'),
+        ])->willReturn($response->reveal())->shouldBeCalled();
+        $this->assertEquals([], $quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo));
+    }
 }
