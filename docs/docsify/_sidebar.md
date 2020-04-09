@@ -6,6 +6,7 @@
   - [CI/CD](docs/readme/ci-cd_README.md)
   - [Test automation guidelines](docs/readme/testAutomation_README.md)
   - [Initial tools and libraries](docs/readme/toolsAndLibraries_README.md)
+  - [Exceptions and Error Codes](docs/exceptions.md)
 
 - Architecture Decision Records
   - [ADR HowTo](docs/adr.md)
