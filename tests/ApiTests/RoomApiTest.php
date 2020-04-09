@@ -19,7 +19,7 @@ class RoomApiTest extends ApiTestCase
     {
         $roomCreateRequest = self::$roomHelper->getDefault(['partner_golden_id' => 'non-existent-partner']);
         $response = self::$roomHelper->create($roomCreateRequest);
-        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     public function testCreateSuccess(): string

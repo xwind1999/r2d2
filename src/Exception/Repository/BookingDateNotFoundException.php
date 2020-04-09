@@ -6,4 +6,5 @@ namespace App\Exception\Repository;
 
 class BookingDateNotFoundException extends EntityNotFoundException
 {
+    protected const CODE = 1000011;
 }

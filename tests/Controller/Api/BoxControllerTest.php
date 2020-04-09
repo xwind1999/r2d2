@@ -10,9 +10,12 @@ use App\Contract\Response\Box\BoxGetResponse;
 use App\Contract\Response\Box\BoxUpdateResponse;
 use App\Controller\Api\BoxController;
 use App\Entity\Box;
+use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Manager\BoxManager;
+use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -141,6 +144,21 @@ class BoxControllerTest extends TestCase
         $boxCreateResponse = $controller->create($boxCreateRequest, $boxManager->reveal());
 
         $this->assertEquals($uuid, $boxCreateResponse->uuid);
+    }
+
+    /**
+     * @covers ::create
+     * @covers \App\Contract\Response\Box\BoxCreateResponse::__construct
+     */
+    public function testCreateWithExistingGoldenId()
+    {
+        $boxCreateRequest = new BoxCreateRequest();
+        $boxManager = $this->prophesize(BoxManager::class);
+        $exception = new UniqueConstraintViolationException('', $this->prophesize(DriverException::class)->reveal());
+        $boxManager->create($boxCreateRequest)->willThrow($exception);
+        $controller = new BoxController();
+        $this->expectException(ResourceConflictException::class);
+        $controller->create($boxCreateRequest, $boxManager->reveal());
     }
 
     public function sampleBox(): iterable

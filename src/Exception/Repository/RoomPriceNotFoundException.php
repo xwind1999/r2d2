@@ -6,4 +6,5 @@ namespace App\Exception\Repository;
 
 class RoomPriceNotFoundException extends EntityNotFoundException
 {
+    protected const CODE = 1000020;
 }

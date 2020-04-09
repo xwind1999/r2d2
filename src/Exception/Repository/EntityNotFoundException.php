@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Exception\Repository;
 
-abstract class EntityNotFoundException extends \Exception
+use App\Exception\Http\ResourceNotFoundException;
+
+abstract class EntityNotFoundException extends ResourceNotFoundException
 {
+    protected const CODE = 1000010;
 }
