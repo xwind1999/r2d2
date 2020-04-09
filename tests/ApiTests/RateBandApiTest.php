@@ -19,7 +19,7 @@ class RateBandApiTest extends ApiTestCase
     {
         $rateBandCreateRequest = self::$rateBandHelper->getDefault(['partner_golden_id' => 'non-existent-partner']);
         $response = self::$rateBandHelper->create($rateBandCreateRequest);
-        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     public function testCreateSuccess(): string

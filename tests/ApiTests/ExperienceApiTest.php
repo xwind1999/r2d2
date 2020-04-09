@@ -19,7 +19,7 @@ class ExperienceApiTest extends ApiTestCase
     {
         $experienceCreateRequest = self::$experienceHelper->getDefault(['partner_golden_id' => 'non-existent-partner']);
         $response = self::$experienceHelper->create($experienceCreateRequest);
-        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     public function testCreateWithExistentGoldenId()
@@ -28,7 +28,7 @@ class ExperienceApiTest extends ApiTestCase
         self::$experienceHelper->addValidPartner($experienceCreateRequest);
         self::$experienceHelper->create($experienceCreateRequest);
         $response = self::$experienceHelper->create($experienceCreateRequest);
-        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertEquals(409, $response->getStatusCode());
     }
 
     public function testCreateSuccess(): string

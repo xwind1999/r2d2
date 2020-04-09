@@ -9,10 +9,12 @@ use App\Contract\Request\Experience\ExperienceUpdateRequest;
 use App\Contract\Response\Experience\ExperienceCreateResponse;
 use App\Contract\Response\Experience\ExperienceGetResponse;
 use App\Contract\Response\Experience\ExperienceUpdateResponse;
+use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\ExperienceManager;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -39,7 +41,11 @@ class ExperienceController
      */
     public function create(ExperienceCreateRequest $experienceCreateRequest, ExperienceManager $experienceManager): ExperienceCreateResponse
     {
-        $experience = $experienceManager->create($experienceCreateRequest);
+        try {
+            $experience = $experienceManager->create($experienceCreateRequest);
+        } catch (UniqueConstraintViolationException $exception) {
+            throw ResourceConflictException::forContext([], $exception);
+        }
 
         return new ExperienceCreateResponse($experience);
     }

@@ -10,9 +10,12 @@ use App\Contract\Response\Experience\ExperienceGetResponse;
 use App\Contract\Response\Experience\ExperienceUpdateResponse;
 use App\Controller\Api\ExperienceController;
 use App\Entity\Experience;
+use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceManager;
+use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -139,6 +142,21 @@ class ExperienceControllerTest extends TestCase
         $experienceCreateResponse = $controller->create($experienceCreateRequest, $experienceManager->reveal());
 
         $this->assertEquals($uuid, $experienceCreateResponse->uuid);
+    }
+
+    /**
+     * @covers ::create
+     * @covers \App\Contract\Response\Experience\ExperienceCreateResponse::__construct
+     */
+    public function testCreateWithExistingGoldenId()
+    {
+        $experienceCreateRequest = new ExperienceCreateRequest();
+        $experienceManager = $this->prophesize(ExperienceManager::class);
+        $exception = new UniqueConstraintViolationException('', $this->prophesize(DriverException::class)->reveal());
+        $experienceManager->create($experienceCreateRequest)->willThrow($exception);
+        $controller = new ExperienceController();
+        $this->expectException(ResourceConflictException::class);
+        $controller->create($experienceCreateRequest, $experienceManager->reveal());
     }
 
     public function sampleExperience(): iterable

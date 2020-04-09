@@ -13,7 +13,7 @@ class BoxApiTest extends ApiTestCase
         $payload = self::$boxHelper->getDefault();
         self::$boxHelper->create($payload);
         $response = self::$boxHelper->create($payload);
-        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertEquals(409, $response->getStatusCode());
     }
 
     public function testCreateWithInvalidBrand()

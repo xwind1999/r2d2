@@ -9,10 +9,12 @@ use App\Contract\Request\Box\BoxUpdateRequest;
 use App\Contract\Response\Box\BoxCreateResponse;
 use App\Contract\Response\Box\BoxGetResponse;
 use App\Contract\Response\Box\BoxUpdateResponse;
+use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\BoxManager;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -39,7 +41,11 @@ class BoxController
      */
     public function create(BoxCreateRequest $boxCreateRequest, BoxManager $boxManager): BoxCreateResponse
     {
-        $box = $boxManager->create($boxCreateRequest);
+        try {
+            $box = $boxManager->create($boxCreateRequest);
+        } catch (UniqueConstraintViolationException $exception) {
+            throw ResourceConflictException::forContext([], $exception);
+        }
 
         return new BoxCreateResponse($box);
     }
