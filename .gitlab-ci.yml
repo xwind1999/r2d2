@@ -58,6 +58,7 @@ pages:
     - composer
   script:
     - vendor/bin/phpadr workspace:list --config=phpadr.yaml | sed 1,3d | head -n -2 | awk '{$1="["$1"]""(docs/adr/"$1")";print}' | sed -e 's/^/  \* /' >> docs/docsify/_sidebar.md
+    - bin/console r2d2:exception:dump >> docs/exceptions.md
     - rm -rf public/
     - mv docs/docsify public/
     - mv docs public/
