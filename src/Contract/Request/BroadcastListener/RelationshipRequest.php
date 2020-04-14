@@ -38,7 +38,7 @@ class RelationshipRequest implements RequestBodyInterface, ValidatableRequest
 
     /**
      * @Assert\Type(type="boolean")
-     * @Assert\NotBlank
+     * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
      */

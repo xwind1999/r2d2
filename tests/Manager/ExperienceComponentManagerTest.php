@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Contract\Request\BroadcastListener\RelationshipRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentCreateRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentDeleteRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentUpdateRequest;
@@ -308,5 +309,45 @@ class ExperienceComponentManagerTest extends TestCase
 
         $this->expectException(ExperienceNotFoundException::class);
         $manager->create($experienceComponentCreateRequest);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplace()
+    {
+        $manager = new ExperienceComponentManager(
+            $this->experienceComponentRepository->reveal(),
+            $this->roomRepository->reveal(),
+            $this->experienceRepository->reveal()
+        );
+
+        $room = new Room();
+        $room->goldenId = '1234';
+        $this->roomRepository->findOneByGoldenId('1234')->willReturn($room);
+
+        $experience = new Experience();
+        $experience->goldenId = '7895';
+        $this->experienceRepository->findOneByGoldenId('7895')->willReturn($experience);
+
+        $date = new \DateTime();
+        $relationshipRequest = new RelationshipRequest();
+        $relationshipRequest->childProduct = '1234';
+        $relationshipRequest->parentProduct = '7895';
+        $relationshipRequest->isEnabled = false;
+
+        $experienceComponent = new ExperienceComponent();
+        $experienceComponent->roomGoldenId = '1234';
+        $experienceComponent->experienceGoldenId = '7895';
+        $experienceComponent->isEnabled = true;
+        $experienceComponent->externalUpdatedAt = $date;
+        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room)->willReturn($experienceComponent);
+
+        $this->experienceComponentRepository->save(Argument::type(ExperienceComponent::class))->shouldBeCalled();
+
+        $updatedExperienceComponent = $manager->replace($relationshipRequest);
+
+        $this->assertSame(null, $updatedExperienceComponent);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Contract\Request\BroadcastListener\RelationshipRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentCreateRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentDeleteRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentUpdateRequest;
@@ -11,7 +12,7 @@ use App\Entity\ExperienceComponent;
 use App\Exception\Manager\ExperienceComponent\RelationshipAlreadyExistsException;
 use App\Exception\Repository\ExperienceComponentNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
-use App\Exception\Repository\RoomPriceNotFoundException;
+use App\Exception\Repository\RoomNotFoundException;
 use App\Repository\ExperienceComponentRepository;
 use App\Repository\ExperienceRepository;
 use App\Repository\RoomRepository;
@@ -38,7 +39,7 @@ class ExperienceComponentManager
      * @throws ExperienceComponentNotFoundException
      * @throws ExperienceNotFoundException
      * @throws RelationshipAlreadyExistsException
-     * @throws RoomPriceNotFoundException
+     * @throws RoomNotFoundException
      */
     public function create(ExperienceComponentCreateRequest $experienceComponentCreateRequestComponent): ExperienceComponent
     {
@@ -66,7 +67,7 @@ class ExperienceComponentManager
 
     /**
      * @throws ExperienceNotFoundException
-     * @throws RoomPriceNotFoundException
+     * @throws RoomNotFoundException
      * @throws ExperienceComponentNotFoundException
      */
     public function delete(ExperienceComponentDeleteRequest $experienceDeleteRequestComponent): void
@@ -88,7 +89,7 @@ class ExperienceComponentManager
     /**
      * @throws ExperienceComponentNotFoundException
      * @throws ExperienceNotFoundException
-     * @throws RoomPriceNotFoundException
+     * @throws RoomNotFoundException
      */
     public function update(ExperienceComponentUpdateRequest $experienceComponentUpdateRequest): ExperienceComponent
     {
@@ -110,5 +111,26 @@ class ExperienceComponentManager
         $this->experienceComponentRepository->save($experienceComponent);
 
         return $experienceComponent;
+    }
+
+    /**
+     * @throws ExperienceNotFoundException
+     * @throws RoomNotFoundException
+     */
+    public function replace(RelationshipRequest $relationshipRequest): void
+    {
+        $room = $this->roomRepository->findOneByGoldenId($relationshipRequest->childProduct);
+        $experience = $this->experienceRepository->findOneByGoldenId($relationshipRequest->parentProduct);
+        $experienceComponent = $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room);
+
+        $experienceComponent = $experienceComponent ?? new ExperienceComponent();
+        $experienceComponent->room = $room;
+        $experienceComponent->roomGoldenId = $room->goldenId;
+        $experienceComponent->experience = $experience;
+        $experienceComponent->experienceGoldenId = $experience->goldenId;
+        $experienceComponent->isEnabled = $relationshipRequest->isEnabled;
+        $experienceComponent->externalUpdatedAt = new \DateTime();
+
+        $this->experienceComponentRepository->save($experienceComponent);
     }
 }

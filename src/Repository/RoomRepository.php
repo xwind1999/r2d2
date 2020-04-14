@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Room;
-use App\Exception\Repository\RoomPriceNotFoundException;
+use App\Exception\Repository\RoomNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -39,7 +39,7 @@ class RoomRepository extends ServiceEntityRepository
         $room = $this->find($uuid);
 
         if (null === $room) {
-            throw new RoomPriceNotFoundException();
+            throw new RoomNotFoundException();
         }
 
         return $room;
@@ -50,7 +50,7 @@ class RoomRepository extends ServiceEntityRepository
         $room = $this->findOneBy(['goldenId' => $goldenId]);
 
         if (null === $room) {
-            throw new RoomPriceNotFoundException();
+            throw new RoomNotFoundException();
         }
 
         return $room;

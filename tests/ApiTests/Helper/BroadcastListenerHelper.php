@@ -12,7 +12,7 @@ class BroadcastListenerHelper
 {
     const API_PRODUCT_BASE_URL = '/api/broadcast-listener/product';
     const API_PARTNER_BASE_URL = '/api/broadcast-listener/partner';
-    const API_RELATIONSHIP_BASE_URL = '/api/broadcast-listener/relationship';
+    const API_RELATIONSHIP_BASE_URL = '/api/broadcast-listener/product-relationship';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;
