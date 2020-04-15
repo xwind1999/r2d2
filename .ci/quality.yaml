@@ -1,5 +1,5 @@
 variables:
-  PACT_BROKER: http://10.10.0.234:32584/
+  PACT_BROKER: http://pactbroker.production.smartbox.com:30336/
   BASE_IMAGE_Stub: docker-registry.production.smartbox.com/millenium-falcon/r2d2-stub
 
 unitTests:
