@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\Partner\PartnerCreateRequest;
 use App\Contract\Request\Partner\PartnerUpdateRequest;
 use App\Entity\Partner;
+use App\Exception\Repository\PartnerNotFoundException;
 use App\Manager\PartnerManager;
 use App\Repository\PartnerRepository;
 use PHPUnit\Framework\TestCase;
@@ -107,5 +109,47 @@ class PartnerManagerTest extends TestCase
         $this->assertEquals($partnerCreateRequest->status, $partner->status);
         $this->assertEquals($partnerCreateRequest->currency, $partner->currency);
         $this->assertEquals($partnerCreateRequest->ceaseDate, $partner->ceaseDate);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplace()
+    {
+        $manager = new PartnerManager($this->repository->reveal());
+        $partnerRequest = new PartnerRequest();
+        $partnerRequest->goldenId = '1234';
+        $partnerRequest->status = 'active';
+        $partnerRequest->currency = 'EUR';
+        $partnerRequest->ceaseDate = new \DateTime('2020-10-10');
+
+        $this->repository->findOneByGoldenId($partnerRequest->goldenId)->shouldBeCalled();
+        $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
+
+        $this->assertEmpty($manager->replace($partnerRequest));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceCatchesPartnerNotFoundException()
+    {
+        $manager = new PartnerManager($this->repository->reveal());
+        $partnerRequest = new PartnerRequest();
+        $partnerRequest->goldenId = '1584878545';
+        $partnerRequest->status = 'active';
+        $partnerRequest->currency = 'USD';
+        $partnerRequest->ceaseDate = new \DateTime('2020-10-10');
+
+        $this->repository
+            ->findOneByGoldenId($partnerRequest->goldenId)
+            ->shouldBeCalled()
+            ->willThrow(new PartnerNotFoundException())
+        ;
+        $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
+
+        $this->assertEmpty($manager->replace($partnerRequest));
     }
 }
