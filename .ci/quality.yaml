@@ -98,6 +98,7 @@ contractTests-against-Stub:
     - pact-provider-verifier --provider-base-url=http://r2d2-api-stub:8080 --pact-broker-base-url=$PACT_BROKER --provider=R2D2
   tags:
     - docker
+  allow_failure: true
 
 contractTests-against-Api:
   stage: Test

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\Partner\PartnerCreateRequest;
 use App\Contract\Request\Partner\PartnerUpdateRequest;
 use App\Entity\Partner;
 use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\PartnerNotFoundException;
 use App\Repository\PartnerRepository;
 
 class PartnerManager
@@ -64,5 +66,21 @@ class PartnerManager
         $this->repository->save($partner);
 
         return $partner;
+    }
+
+    public function replace(PartnerRequest $partnerRequest): void
+    {
+        try {
+            $partner = $this->repository->findOneByGoldenId($partnerRequest->goldenId);
+        } catch (PartnerNotFoundException $exception) {
+            $partner = new Partner();
+        }
+
+        $partner->goldenId = $partnerRequest->goldenId;
+        $partner->status = $partnerRequest->status;
+        $partner->currency = $partnerRequest->currency;
+        $partner->ceaseDate = $partnerRequest->ceaseDate;
+
+        $this->repository->save($partner);
     }
 }
