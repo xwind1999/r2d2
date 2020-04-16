@@ -44,6 +44,7 @@ class PartnerManagerTest extends TestCase
         $partnerUpdateRequest->goldenId = '1234';
         $partnerUpdateRequest->status = 'alive';
         $partnerUpdateRequest->currency = 'USD';
+        $partnerUpdateRequest->isChannelManagerActive = true;
         $partnerUpdateRequest->ceaseDate = new \DateTime('2020-10-10');
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -54,6 +55,7 @@ class PartnerManagerTest extends TestCase
         $partner->goldenId = '1234';
         $partner->status = 'alive';
         $partner->currency = 'USD';
+        $partner->isChannelManagerActive = true;
         $partner->ceaseDate = new \DateTime('2020-10-10');
         $this->repository->findOne($uuid)->willReturn($partner);
 
@@ -100,6 +102,7 @@ class PartnerManagerTest extends TestCase
         $partnerCreateRequest->goldenId = '1234';
         $partnerCreateRequest->status = 'alive';
         $partnerCreateRequest->currency = 'USD';
+        $partnerCreateRequest->isChannelManagerActive = true;
         $partnerCreateRequest->ceaseDate = new \DateTime('2020-10-10');
 
         $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
@@ -122,6 +125,7 @@ class PartnerManagerTest extends TestCase
         $partnerRequest->goldenId = '1234';
         $partnerRequest->status = 'active';
         $partnerRequest->currency = 'EUR';
+        $partnerRequest->isChannelManagerActive = true;
         $partnerRequest->ceaseDate = new \DateTime('2020-10-10');
 
         $this->repository->findOneByGoldenId($partnerRequest->goldenId)->shouldBeCalled();
@@ -141,6 +145,7 @@ class PartnerManagerTest extends TestCase
         $partnerRequest->goldenId = '1584878545';
         $partnerRequest->status = 'active';
         $partnerRequest->currency = 'USD';
+        $partnerRequest->isChannelManagerActive = true;
         $partnerRequest->ceaseDate = new \DateTime('2020-10-10');
 
         $this->repository

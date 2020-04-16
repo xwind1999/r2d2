@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Event\ProductRelationship\ExperienceComponentEvent;
+use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Exception\Repository\RoomNotFoundException;
 use App\Handler\ProductRelationshipBroadcastHandler;
@@ -30,7 +30,7 @@ class ExperienceComponentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function handleMessage(ExperienceComponentEvent $event): void
+    public function handleMessage(ExperienceComponentRelationshipBroadcastEvent $event): void
     {
         try {
             $this->experienceComponentManager->replace($event->getRelationshipRequest());

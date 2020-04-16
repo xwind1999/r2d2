@@ -35,6 +35,10 @@ class BroadcastListenerHelper
             'is_sellable' => true,
             'is_reservable' => true,
             'partner_golden_id' => bin2hex(random_bytes(12)),
+            'brand' => 'SBX',
+            'country' => 'FR',
+            'status' => 'active',
+            'type' => 'mev',
         ];
 
         return $overrides + $payload;
@@ -47,6 +51,7 @@ class BroadcastListenerHelper
             'golden_id' => bin2hex(random_bytes(12)),
             'status' => 'alive',
             'currency' => 'USD',
+            'is_channel_manager_active' => true,
             'ceased_date' => '2020-03-18',
         ];
 

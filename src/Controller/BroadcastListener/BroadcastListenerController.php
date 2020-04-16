@@ -60,7 +60,7 @@ class BroadcastListenerController
     /**
      * @Route("/api/broadcast-listener/product-relationship", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="relationships")
+     * @SWG\Tag(name="broadcast-listener")
      * @SWG\Parameter(
      *         name="body",
      *         in="body",

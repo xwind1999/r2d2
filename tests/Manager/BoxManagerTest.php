@@ -6,7 +6,9 @@ namespace App\Tests\Manager;
 
 use App\Contract\Request\Box\BoxCreateRequest;
 use App\Contract\Request\Box\BoxUpdateRequest;
+use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Entity\Box;
+use App\Exception\Repository\BoxNotFoundException;
 use App\Manager\BoxManager;
 use App\Repository\BoxRepository;
 use PHPUnit\Framework\TestCase;
@@ -101,11 +103,53 @@ class BoxManagerTest extends TestCase
         $boxCreateRequest->status = 'integrated2';
 
         $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
-
         $box = $manager->create($boxCreateRequest);
+
         $this->assertEquals($boxCreateRequest->goldenId, $box->goldenId);
         $this->assertEquals($boxCreateRequest->brand, $box->brand);
         $this->assertEquals($boxCreateRequest->country, $box->country);
         $this->assertEquals($boxCreateRequest->status, $box->status);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplace()
+    {
+        $manager = new BoxManager($this->repository->reveal());
+        $productRequest = new ProductRequest();
+        $productRequest->goldenId = '1234';
+        $productRequest->brand = 'SBX';
+        $productRequest->country = 'FR';
+        $productRequest->status = 'active';
+
+        $this->repository->findOneByGoldenId($productRequest->goldenId);
+        $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
+
+        $this->assertEmpty($manager->replace($productRequest));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceCatchesBoxNotFoundException()
+    {
+        $manager = new BoxManager($this->repository->reveal());
+        $productRequest = new ProductRequest();
+        $productRequest->goldenId = '1234';
+        $productRequest->brand = 'SBX';
+        $productRequest->country = 'FR';
+        $productRequest->status = 'active';
+
+        $this->repository
+            ->findOneByGoldenId($productRequest->goldenId)
+            ->shouldBeCalled()
+            ->willThrow(new BoxNotFoundException())
+        ;
+        $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
+
+        $this->assertEmpty($manager->replace($productRequest));
     }
 }

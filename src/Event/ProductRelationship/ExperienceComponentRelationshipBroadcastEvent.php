@@ -7,7 +7,7 @@ namespace App\Event\ProductRelationship;
 use App\Contract\Request\BroadcastListener\RelationshipRequest;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ExperienceComponentEvent extends Event
+class ExperienceComponentRelationshipBroadcastEvent extends Event
 {
     private RelationshipRequest $relationshipRequest;
 

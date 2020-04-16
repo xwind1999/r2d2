@@ -27,6 +27,7 @@ class PartnerBroadcastHandlerTest extends TestCase
         $partnerRequest->goldenId = '1234';
         $partnerRequest->status = 'alive';
         $partnerRequest->currency = 'USD';
+        $partnerRequest->isChannelManagerActive = true;
         $partnerRequest->ceaseDate = new \DateTime('2020-10-10');
 
         $logger = $this->prophesize(LoggerInterface::class);
@@ -48,6 +49,7 @@ class PartnerBroadcastHandlerTest extends TestCase
         $partnerRequest->goldenId = '1234';
         $partnerRequest->status = 'alive';
         $partnerRequest->currency = 'USD';
+        $partnerRequest->isChannelManagerActive = true;
         $partnerRequest->ceaseDate = new \DateTime('2020-10-10');
 
         $logger = $this->prophesize(LoggerInterface::class);

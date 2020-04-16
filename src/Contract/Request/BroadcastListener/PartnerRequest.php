@@ -47,6 +47,14 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
     public string $currency;
 
     /**
+     * @Assert\Type(type="boolean")
+     * @Assert\NotNull()
+     *
+     * @JMS\Type("strict_boolean")
+     */
+    public bool $isChannelManagerActive;
+
+    /**
      * @Assert\Type(type="DateTime")
      *
      * @JMS\Type("DateTime<'Y-m-d'>")
@@ -60,6 +68,7 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
             'golden_id' => $this->goldenId,
             'status' => $this->status,
             'currency' => $this->currency,
+            'is_channel_manager_active' => $this->isChannelManagerActive,
             'cease_date' => $this->ceaseDate,
         ];
     }
