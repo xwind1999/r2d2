@@ -10,9 +10,6 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class ProductBroadcastHandler implements MessageHandlerInterface
 {
-    /**
-     * @var LoggerInterface
-     */
     private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
