@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Handler;
 
 use App\Contract\Request\BroadcastListener\RelationshipRequest;
-use App\Event\ProductRelationship\ExperienceComponentEvent;
+use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\Handler\ProductRelationshipBroadcastHandler;
 use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
 use App\Resolver\ProductRelationshipTypeResolver;
@@ -32,13 +32,13 @@ class ProductRelationshipBroadcastHandlerTest extends TestCase
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $messageBusInterface;
+    private $eventDispatcher;
 
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->productRelationshipTypeResolver = $this->createMock(ProductRelationshipTypeResolver::class);
-        $this->messageBusInterface = $this->createMock(EventDispatcherInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
 
     /**
@@ -61,11 +61,11 @@ class ProductRelationshipBroadcastHandlerTest extends TestCase
         $productRelationshipBroadcastHandler = new ProductRelationshipBroadcastHandler(
             $this->logger,
             $this->productRelationshipTypeResolver,
-            $this->messageBusInterface
+            $this->eventDispatcher
         );
-        $envelope = $this->createMock(ExperienceComponentEvent::class);
+        $envelope = $this->createMock(ExperienceComponentRelationshipBroadcastEvent::class);
 
-        $this->messageBusInterface->expects($this->once())->method('dispatch')->willReturn($envelope);
+        $this->eventDispatcher->expects($this->once())->method('dispatch')->willReturn($envelope);
         $this->assertEquals(null, $productRelationshipBroadcastHandler->__invoke($relationshipRequest));
     }
 
@@ -89,7 +89,7 @@ class ProductRelationshipBroadcastHandlerTest extends TestCase
         $productRelationshipBroadcastHandler = new ProductRelationshipBroadcastHandler(
             $this->logger,
             $this->productRelationshipTypeResolver,
-            $this->messageBusInterface
+            $this->eventDispatcher
         );
 
         $this->productRelationshipTypeResolver

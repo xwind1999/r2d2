@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Event\ProductRelationship;
 
 use App\Contract\Request\BroadcastListener\RelationshipRequest;
-use App\Event\ProductRelationship\ExperienceComponentEvent;
+use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \App\Event\ProductRelationship\ExperienceComponentEvent
+ * @coversDefaultClass \App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent
  */
-class ExperienceComponentEventTest extends TestCase
+class ExperienceComponentRelationshipBroadcastEventTest extends TestCase
 {
     /**
      * @covers ::__construct
@@ -21,7 +21,7 @@ class ExperienceComponentEventTest extends TestCase
     {
         $relationshipRequest = $this->createMock(RelationshipRequest::class);
 
-        $experienceComponentEvent = new ExperienceComponentEvent($relationshipRequest);
+        $experienceComponentEvent = new ExperienceComponentRelationshipBroadcastEvent($relationshipRequest);
         $this->assertInstanceOf(RelationshipRequest::class, $experienceComponentEvent->getRelationshipRequest());
     }
 }

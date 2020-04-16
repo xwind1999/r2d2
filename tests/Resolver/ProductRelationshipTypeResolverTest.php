@@ -24,8 +24,8 @@ class ProductRelationshipTypeResolverTest extends TestCase
         $relationshipRequest->relationshipType = 'Experience-Component';
 
         $relationshipTypeResolver = new ProductRelationshipTypeResolver();
-        $experienceComponentManager = $relationshipTypeResolver->resolve($relationshipRequest);
-        $this->assertInstanceOf(Event::class, $experienceComponentManager);
+        $event = $relationshipTypeResolver->resolve($relationshipRequest);
+        $this->assertInstanceOf(Event::class, $event);
     }
 
     /**

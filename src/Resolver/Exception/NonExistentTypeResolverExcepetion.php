@@ -6,5 +6,5 @@ namespace App\Resolver\Exception;
 
 class NonExistentTypeResolverExcepetion extends \Exception
 {
-    protected const MESSAGE = 'Invalid relationship type.';
+    protected const MESSAGE = 'Invalid type.';
 }

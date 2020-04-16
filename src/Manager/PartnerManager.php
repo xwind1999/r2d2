@@ -27,6 +27,7 @@ class PartnerManager
         $partner->goldenId = $partnerCreateRequest->goldenId;
         $partner->status = $partnerCreateRequest->status;
         $partner->currency = $partnerCreateRequest->currency;
+        $partner->isChannelManagerActive = $partnerCreateRequest->isChannelManagerActive;
         $partner->ceaseDate = $partnerCreateRequest->ceaseDate;
 
         $this->repository->save($partner);
@@ -61,6 +62,7 @@ class PartnerManager
         $partner->goldenId = $partnerUpdateRequest->goldenId;
         $partner->status = $partnerUpdateRequest->status;
         $partner->currency = $partnerUpdateRequest->currency;
+        $partner->isChannelManagerActive = $partnerUpdateRequest->isChannelManagerActive;
         $partner->ceaseDate = $partnerUpdateRequest->ceaseDate;
 
         $this->repository->save($partner);
@@ -79,6 +81,7 @@ class PartnerManager
         $partner->goldenId = $partnerRequest->goldenId;
         $partner->status = $partnerRequest->status;
         $partner->currency = $partnerRequest->currency;
+        $partner->isChannelManagerActive = $partnerRequest->isChannelManagerActive;
         $partner->ceaseDate = $partnerRequest->ceaseDate;
 
         $this->repository->save($partner);

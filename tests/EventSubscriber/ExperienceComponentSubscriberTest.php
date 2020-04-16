@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\EventSubscriber;
 
 use App\Contract\Request\BroadcastListener\RelationshipRequest;
-use App\Event\ProductRelationship\ExperienceComponentEvent;
+use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\EventSubscriber\ExperienceComponentSubscriber;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
@@ -31,7 +31,7 @@ class ExperienceComponentSubscriberTest extends TestCase
     private $experienceComponentManager;
 
     /**
-     * @var ExperienceComponentEvent|\PHPUnit\Framework\MockObject\MockObject
+     * @var ExperienceComponentRelationshipBroadcastEvent|\PHPUnit\Framework\MockObject\MockObject
      */
     private $experienceComponentEvent;
 
@@ -39,7 +39,7 @@ class ExperienceComponentSubscriberTest extends TestCase
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->experienceComponentManager = $this->createMock(ExperienceComponentManager::class);
-        $this->experienceComponentEvent = $this->createMock(ExperienceComponentEvent::class);
+        $this->experienceComponentEvent = $this->createMock(ExperienceComponentRelationshipBroadcastEvent::class);
     }
 
     /**
