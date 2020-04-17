@@ -1,6 +1,6 @@
 variables:
   BASE_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base
-  BASE_IMAGE_VERSION: 0.0.12
+  BASE_IMAGE_VERSION: 0.0.14
   BASE_FULL_IMAGE: ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
   APP_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-api:${CI_PIPELINE_ID}_${CI_COMMIT_SHA}
 
@@ -9,8 +9,9 @@ build-base-image:
   image: docker:dind
   only:
     - CI-master
+    - fix-docker-images
   tags:
-    - k8s-alpha
+    - k8s
   script:
     - >
       docker build --pull
@@ -44,6 +45,7 @@ cleanup-and-prepare-files:
     - k8s-alpha
   only:
     - master
+    - fix-docker-images
 
 build-app-container:
   stage: App Container Build
@@ -54,6 +56,7 @@ build-app-container:
     - k8s
   only:
     - master
+    - fix-docker-images
   script:
     - >
       docker build --pull -f .ci/docker/app/Dockerfile

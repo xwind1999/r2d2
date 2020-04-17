@@ -2,25 +2,19 @@ FROM php:7.4-fpm-alpine
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_HOME /composer
-ENV COMPOSER_VERSION 1.10.1
+ENV COMPOSER_VERSION 1.10.5
 
 COPY ./runit/sv /etc/sv
 COPY ./runit/runit /etc/runit
-RUN mkdir /service; ln -s /etc/sv/nginx /service/nginx;ln -s /etc/sv/php-fpm /service/php-fpm
+
+RUN mkdir /service; \
+    chmod 777 /service
 
 RUN apk add nginx; mkdir -p /run/nginx
 
-RUN sed -i '/xfs/ s/33/82/g' /etc/passwd;\
-    sed -i '/www-data/ s/82/33/g' /etc/passwd; \
-    sed -i '/xfs/ s/33/82/g' /etc/group;\
-    sed -i '/www-data/ s/82/33/g' /etc/group; \
-    mkdir /app; \
-    chown 33.33 /app -R;\
-    chown 33.33 /home/www-data -R;
+RUN apk add sudo libxml2-dev icu-dev runit $PHPIZE_DEPS openssh-client curl git bash rabbitmq-c-dev
 
-RUN apk add sudo libxml2-dev icu-dev runit $PHPIZE_DEPS openssh-client curl git bash
-
-RUN docker-php-ext-install pcntl soap pdo_mysql sockets intl opcache
+RUN docker-php-ext-install pcntl soap pdo_mysql sockets intl opcache && pecl install amqp && docker-php-ext-enable amqp
 
 # COPY ./newrelic_install.sh /
 # RUN /newrelic_install.sh
@@ -43,19 +37,14 @@ RUN mkdir -p /etc/php7; \
     mkdir -p /etc/nginx/; \
     mkdir -p /etc/nginx/conf.d
 
-COPY ./start.sh ./start_crond.sh /
+COPY ./start.sh ./start-crond.sh ./start-command.sh  /
 
 COPY ./nginx/default.conf /etc/nginx/conf.d
 COPY ./nginx/nginx.conf /etc/nginx
 COPY ./php/php-fpm.conf /etc/php7
 COPY ./php/www.conf /etc/php7/php-fpm.d
-COPY phpdbg-wrapper /usr/local/bin
-COPY load-key.sh /
-RUN ln -s /tmp/.ssh /root/.ssh
+COPY ./load-key.sh /
 
 WORKDIR /app
 
-ENV HOME="/tmp"
-
-EXPOSE 80
-
+CMD ["/start.sh"]
