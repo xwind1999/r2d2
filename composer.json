@@ -51,8 +51,7 @@
         "psr-4": {
             "App\\": "src/",
             "Psr\\Log\\": "src-vendor-fixes/Psr/Log",
-            "Doctrine\\ORM\\": "src-vendor-fixes/doctrine/",
-            "R2D2\\Hooks\\": "hooks/"
+            "Doctrine\\ORM\\": "src-vendor-fixes/doctrine/"
         }
     },
     "autoload-dev": {
