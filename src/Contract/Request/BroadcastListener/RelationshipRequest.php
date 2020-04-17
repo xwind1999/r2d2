@@ -6,10 +6,11 @@ namespace App\Contract\Request\BroadcastListener;
 
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
+use Clogger\ContextualInterface;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class RelationshipRequest implements RequestBodyInterface, ValidatableRequest
+class RelationshipRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface
 {
     /**
      * @Assert\Type(type="string")
@@ -72,4 +73,18 @@ class RelationshipRequest implements RequestBodyInterface, ValidatableRequest
      * @JMS\Type("strict_integer")
      */
     public int $childQuantity = 0;
+
+    public function getContext(): array
+    {
+        return [
+            'parent_product' => $this->parentProduct,
+            'child_product' => $this->childProduct,
+            'sort_order' => $this->sortOrder,
+            'is_enabled' => $this->isEnabled,
+            'relationship_type' => $this->relationshipType,
+            'print_type' => $this->printType,
+            'child_count' => $this->childCount,
+            'child_quantity' => $this->childQuantity,
+        ];
+    }
 }

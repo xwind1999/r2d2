@@ -13,8 +13,6 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class ProductRelationshipBroadcastHandler implements MessageHandlerInterface
 {
-    public const EXPERIENCE_COMPONENT_EVENT = 'relationship.experience-component';
-
     private LoggerInterface $logger;
     private ProductRelationshipTypeResolver $productRelationshipTypeResolver;
     private EventDispatcherInterface $eventDispatcher;
@@ -32,8 +30,8 @@ class ProductRelationshipBroadcastHandler implements MessageHandlerInterface
     public function __invoke(RelationshipRequest $relationshipRequest): void
     {
         try {
-            $productRelationship = $this->productRelationshipTypeResolver->resolve($relationshipRequest);
-            $this->eventDispatcher->dispatch($productRelationship, self::EXPERIENCE_COMPONENT_EVENT);
+            $productRelationshipEvent = $this->productRelationshipTypeResolver->resolve($relationshipRequest);
+            $this->eventDispatcher->dispatch($productRelationshipEvent, $productRelationshipEvent->getEventName());
         } catch (NonExistentTypeResolverExcepetion $exception) {
             $this->logger->warning(
                 $exception->getMessage(),

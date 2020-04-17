@@ -16,6 +16,7 @@ class ExperienceComponentRelationshipBroadcastEventTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::getRelationshipRequest
+     * @covers ::getEventName
      */
     public function testEvent(): void
     {
@@ -23,5 +24,6 @@ class ExperienceComponentRelationshipBroadcastEventTest extends TestCase
 
         $experienceComponentEvent = new ExperienceComponentRelationshipBroadcastEvent($relationshipRequest);
         $this->assertInstanceOf(RelationshipRequest::class, $experienceComponentEvent->getRelationshipRequest());
+        $this->assertEquals(ExperienceComponentRelationshipBroadcastEvent::EVENT_NAME, $experienceComponentEvent->getEventName());
     }
 }

@@ -6,6 +6,7 @@ namespace App\Tests\Manager;
 
 use App\Contract\Request\BoxExperience\BoxExperienceCreateRequest;
 use App\Contract\Request\BoxExperience\BoxExperienceDeleteRequest;
+use App\Contract\Request\BroadcastListener\RelationshipRequest;
 use App\Entity\Box;
 use App\Entity\BoxExperience;
 use App\Entity\Experience;
@@ -196,5 +197,45 @@ class BoxExperienceManagerTest extends TestCase
 
         $this->expectException(ExperienceNotFoundException::class);
         $manager->create($bookingCreateRequest);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplace()
+    {
+        $manager = new BoxExperienceManager(
+            $this->repository->reveal(),
+            $this->boxRepository->reveal(),
+            $this->experienceRepository->reveal()
+        );
+
+        $box = new Box();
+        $box->goldenId = '1234';
+        $this->boxRepository->findOneByGoldenId('1234')->willReturn($box);
+
+        $experience = new Experience();
+        $experience->goldenId = '7895';
+        $this->experienceRepository->findOneByGoldenId('7895')->willReturn($experience);
+
+        $date = new \DateTime();
+        $relationshipRequest = new RelationshipRequest();
+        $relationshipRequest->parentProduct = '1234';
+        $relationshipRequest->childProduct = '7895';
+        $relationshipRequest->isEnabled = false;
+
+        $boxExperience = new BoxExperience();
+        $boxExperience->boxGoldenId = '1234';
+        $boxExperience->experienceGoldenId = '7895';
+        $boxExperience->isEnabled = true;
+        $boxExperience->externalUpdatedAt = $date;
+        $this->repository->findOneByBoxExperience($box, $experience)->willReturn($boxExperience);
+
+        $this->repository->save(Argument::type(BoxExperience::class))->shouldBeCalled();
+
+        $updatedBoxExperience = $manager->replace($relationshipRequest);
+
+        $this->assertSame(null, $updatedBoxExperience);
     }
 }

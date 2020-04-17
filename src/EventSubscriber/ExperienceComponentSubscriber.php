@@ -7,7 +7,6 @@ namespace App\EventSubscriber;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Exception\Repository\RoomNotFoundException;
-use App\Handler\ProductRelationshipBroadcastHandler;
 use App\Manager\ExperienceComponentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -26,7 +25,7 @@ class ExperienceComponentSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ProductRelationshipBroadcastHandler::EXPERIENCE_COMPONENT_EVENT => ['handleMessage'],
+            ExperienceComponentRelationshipBroadcastEvent::EVENT_NAME => ['handleMessage'],
         ];
     }
 
@@ -36,17 +35,11 @@ class ExperienceComponentSubscriber implements EventSubscriberInterface
             $this->experienceComponentManager->replace($event->getRelationshipRequest());
         } catch (ExperienceNotFoundException $exception) {
             $this->logger->warning(
-                'No existing Experience for this relationship',
-                [
-                    'parent_product' => $event->getRelationshipRequest()->parentProduct,
-                ]
+                'No existing Experience for this relationship', $event->getRelationshipRequest()->getContext()
             );
         } catch (RoomNotFoundException $exception) {
             $this->logger->warning(
-                'No existing Room for this relationship',
-                [
-                    'child_product' => $event->getRelationshipRequest()->childProduct,
-                ]
+                'No existing Room for this relationship', $event->getRelationshipRequest()->getContext()
             );
         }
     }
