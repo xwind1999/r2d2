@@ -7,9 +7,9 @@ namespace App\Event\ProductRelationship;
 use App\Contract\Request\BroadcastListener\RelationshipRequest;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ExperienceComponentRelationshipBroadcastEvent extends Event implements ProductRelationshipEventInterface
+class BoxExperienceRelationshipBroadcastEvent extends Event implements ProductRelationshipEventInterface
 {
-    public const EVENT_NAME = 'relationship.experience-component';
+    public const EVENT_NAME = 'relationship.box-experience';
 
     private RelationshipRequest $relationshipRequest;
 

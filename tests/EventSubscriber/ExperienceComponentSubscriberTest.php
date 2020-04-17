@@ -10,7 +10,6 @@ use App\EventSubscriber\ExperienceComponentSubscriber;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Exception\Repository\RoomNotFoundException;
-use App\Handler\ProductRelationshipBroadcastHandler;
 use App\Manager\ExperienceComponentManager;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -48,7 +47,7 @@ class ExperienceComponentSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
-            [ProductRelationshipBroadcastHandler::EXPERIENCE_COMPONENT_EVENT => ['handleMessage']],
+            [ExperienceComponentRelationshipBroadcastEvent::EVENT_NAME => ['handleMessage']],
             ExperienceComponentSubscriber::getSubscribedEvents()
         );
     }
@@ -68,8 +67,11 @@ class ExperienceComponentSubscriberTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::handleMessage
+     * @covers \App\Exception\Repository\RoomNotFoundException
+     * @covers \App\Exception\Repository\ExperienceNotFoundException
+     * @covers \App\Contract\Request\BroadcastListener\RelationshipRequest::getContext
      *
-     * @dataProvider sampleExcepetion
+     * @dataProvider sampleException
      */
     public function testHandleMessageThrowsRoomNotFoundException(EntityNotFoundException $exception): void
     {
@@ -82,9 +84,12 @@ class ExperienceComponentSubscriberTest extends TestCase
         ;
         $this->logger->expects($this->once())->method('warning')->willReturn(null);
 
-        $relationshipRequest = $this->createMock(RelationshipRequest::class);
+        $relationshipRequest = new RelationshipRequest();
         $relationshipRequest->childProduct = '111';
         $relationshipRequest->parentProduct = '222';
+        $relationshipRequest->sortOrder = 1;
+        $relationshipRequest->isEnabled = true;
+        $relationshipRequest->relationshipType = 'EXPERIENCE-COMPONENT';
 
         $this->experienceComponentEvent
             ->expects($this->exactly(2))
@@ -94,7 +99,7 @@ class ExperienceComponentSubscriberTest extends TestCase
         $experienceComponentSubscriber->handleMessage($this->experienceComponentEvent);
     }
 
-    public function sampleExcepetion(): array
+    public function sampleException(): array
     {
         return [
             [new RoomNotFoundException()],
