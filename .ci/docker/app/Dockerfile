@@ -1,4 +1,4 @@
-FROM docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.14
+FROM docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.15
 
 COPY .ci/docker/app/warm-start.sh /
 

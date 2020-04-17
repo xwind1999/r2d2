@@ -4,12 +4,6 @@ ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_HOME /composer
 ENV COMPOSER_VERSION 1.10.5
 
-COPY ./runit/sv /etc/sv
-COPY ./runit/runit /etc/runit
-
-RUN mkdir /service; \
-    chmod 777 /service
-
 RUN apk add nginx; mkdir -p /run/nginx
 
 RUN apk add sudo libxml2-dev icu-dev runit $PHPIZE_DEPS openssh-client curl git bash rabbitmq-c-dev
@@ -36,6 +30,12 @@ RUN mkdir -p /etc/php7; \
     mkdir -p /etc/php7/php-fpm.d; \
     mkdir -p /etc/nginx/; \
     mkdir -p /etc/nginx/conf.d
+
+COPY ./runit/sv /etc/sv
+COPY ./runit/runit /etc/runit
+
+RUN mkdir /service; \
+    chmod 777 /service
 
 COPY ./start.sh ./start-crond.sh ./start-command.sh  /
 
