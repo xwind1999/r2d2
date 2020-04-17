@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Redirect output to stderr.
-exec 1>&2
-
-bin/rc --githook phpcs fix -v --dry-run --show-progress none
