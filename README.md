@@ -28,13 +28,3 @@
 
 * Availability and Upsell Prices
 * Product information
-
-## Documentation
-
-* [Project details](docs/readme/projectDetails_README.md)
-* [Development Guidelines](docs/readme/DevelopmentGuidelines/README.md)
-* [CI/CD](docs/readme/ci-cd_README.md)
-* [Local setup](docs/readme/localDevelopment_README.md)   
-* [Test automation guidelines](docs/readme/testAutomation_README.md)
-* [Initial tools and libraries](docs/readme/toolsAndLibraries_README.md)
-
