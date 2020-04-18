@@ -37,7 +37,7 @@ cleanup-and-prepare-files:
   script:
     - /load-key.sh "${SSH_KNOWN_HOSTS}" "${SSH_KEY}"
     - composer config cache-dir cache/composer
-    - composer install -n -o --no-progress --no-scripts
+    - composer install -n -o --no-progress
     - echo ${CI_COMMIT_SHA} > public/version.txt
     - echo ${CI_COMMIT_TAG} > public/tag.txt
   artifacts:
