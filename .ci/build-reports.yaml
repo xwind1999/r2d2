@@ -40,9 +40,7 @@ mermaid-generate-images:
     - 'cd docs; for flow in architecture/diagram/*.mmd; do node /data/index.bundle.js -i ${flow%%.*}.mmd -o ${flow%%.*}.png; done; cd ..; mv docs/architecture/diagram/*.png report/html/docs/architecture/diagram/;'
     - ls -lah report/html/docs/architecture/diagram/
   only:
-    refs:
-      - master
-      - tags
+    - master
   tags:
     - k8s-alpha
   except:
@@ -64,3 +62,21 @@ code-tests-aggregate:
   tags:
     - k8s-alpha
 
+generate-extra-docs:
+  stage: Build Reports
+  image: ${BASE_FULL_IMAGE}
+  needs:
+    - composer
+  script:
+    - >
+      vendor/bin/phpadr workspace:list --config=phpadr.yaml | sed 1,3d | head -n -2 | awk '{$1=""$1""": adr/"$1"";print}' | sed -e 's/^/      - /' >> mkdocs.yml
+    - bin/console r2d2:exception:dump >> docs/exceptions.md
+    - cp README.md docs/
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - mkdocs.yml
+      - docs/exceptions.md
+      - docs/README.md
+  tags:
+    - k8s-alpha

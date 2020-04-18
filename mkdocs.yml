@@ -1,0 +1,33 @@
+site_name: R2D2
+site_description: r2d2 project
+site_author: r2d2 team
+img: mkdocs/r2d2.gif
+
+extra_css:
+  - 'mkdocs/dark.css'
+theme:
+  name: material
+  palette:
+    primary: light blue
+    accent: deep orange
+  custom_dir: docs/mkdocs
+
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+nav:
+  - Home: README.md
+  - Local setup: readme/localDevelopment_README.md
+  - Project details: readme/projectDetails_README.md
+  - Development Guidelines: readme/DevelopmentGuidelines/README.md
+  - CI/CD: readme/ci-cd_README.md
+  - Test automation guidelines: readme/testAutomation_README.md
+  - Initial tools and libraries: readme/toolsAndLibraries_README.md
+  - Exceptions and Error Codes: exceptions.md
+  # DO NOT MODIFY ANYTHING BELOW THIS LINE
+  - Architecture Decision Records:
+      - ADR HowTo: adr.md

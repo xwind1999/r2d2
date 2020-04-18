@@ -9,6 +9,7 @@ stages:
   - Post-deploy Health Check
   - Project Env Validation
   - Build Reports
+  - Generate Documentation
   - Publish Reports
 
 variables:
@@ -47,6 +48,20 @@ composer:
       - vendor/
       - public/bundles
 
+build-docs:
+  stage: Generate Documentation
+  image: squidfunk/mkdocs-material
+  needs:
+    - generate-extra-docs
+  script:
+    - mkdocs build -d mkdocs/
+  artifacts:
+    paths:
+      - mkdocs
+    expire_in: 1 day
+  only:
+    - master
+
 pages:
   stage: Publish Reports
   needs:
@@ -55,14 +70,10 @@ pages:
     - code-tests-aggregate
     - phpmetrics
     - generate-api-reference
-    - composer
+    - build-docs
   script:
-    - vendor/bin/phpadr workspace:list --config=phpadr.yaml | sed 1,3d | head -n -2 | awk '{$1="["$1"]""(docs/adr/"$1")";print}' | sed -e 's/^/  \* /' >> docs/docsify/_sidebar.md
-    - bin/console r2d2:exception:dump >> docs/exceptions.md
     - rm -rf public/
-    - mv docs/docsify public/
-    - mv docs public/
-    - cp README.md public/
+    - mv mkdocs public/
     - mv report/ public/
     - mv reference public/
     - cp openapi.json public/
