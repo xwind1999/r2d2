@@ -105,27 +105,45 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="8")
+     * @Assert\Length(min="1", max="10")
      * @Assert\NotBlank
      *
      * @JMS\Type("string")
      */
     public string $type;
 
+    /**
+     * @Assert\Type(type="string")
+     * @Assert\Length(min="1", max="2")
+     *
+     * @JMS\Type("string")
+     */
+    public ?string $productPeopleNumber = null;
+
+    /**
+     * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
+     *
+     * @JMS\Type("strict_integer")
+     */
+    public ?int $voucherExpirationDuration = null;
+
     public function getContext(): array
     {
         return [
-            'goldenId' => $this->goldenId,
+            'golden_id' => $this->goldenId,
             'name' => $this->name,
             'description' => $this->description,
             'universe' => $this->universe,
-            'isSellable' => $this->isReservable,
-            'isReservable' => $this->isReservable,
-            'partnerGoldenId' => $this->partnerGoldenId,
+            'is_sellable' => $this->isReservable,
+            'is_reservable' => $this->isReservable,
+            'partner_golden_id' => $this->partnerGoldenId,
             'brand' => $this->brand,
             'country' => $this->country,
             'status' => $this->status,
             'type' => $this->type,
+            'product_people_number' => $this->productPeopleNumber,
+            'voucher_expiration_duration' => $this->voucherExpirationDuration,
         ];
     }
 }
