@@ -39,6 +39,8 @@ class BroadcastListenerHelper
             'country' => 'FR',
             'status' => 'active',
             'type' => 'mev',
+            'product_people_number' => '2',
+            'voucher_expiration_duration' => 3,
         ];
 
         return $overrides + $payload;

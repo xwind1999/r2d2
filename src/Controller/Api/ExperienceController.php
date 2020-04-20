@@ -39,8 +39,10 @@ class ExperienceController
      *     @Model(type=ExperienceCreateResponse::class)
      * )
      */
-    public function create(ExperienceCreateRequest $experienceCreateRequest, ExperienceManager $experienceManager): ExperienceCreateResponse
-    {
+    public function create(
+        ExperienceCreateRequest $experienceCreateRequest,
+        ExperienceManager $experienceManager
+    ): ExperienceCreateResponse {
         try {
             $experience = $experienceManager->create($experienceCreateRequest);
         } catch (UniqueConstraintViolationException $exception) {
@@ -133,8 +135,11 @@ class ExperienceController
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      */
-    public function put(UuidInterface $uuid, ExperienceUpdateRequest $experienceUpdateRequest, ExperienceManager $experienceManager): ExperienceUpdateResponse
-    {
+    public function put(
+        UuidInterface $uuid,
+        ExperienceUpdateRequest $experienceUpdateRequest,
+        ExperienceManager $experienceManager
+    ): ExperienceUpdateResponse {
         try {
             $experience = $experienceManager->update($uuid->toString(), $experienceUpdateRequest);
         } catch (EntityNotFoundException $exception) {

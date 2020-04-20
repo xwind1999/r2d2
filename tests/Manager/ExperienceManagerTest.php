@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Experience\ExperienceCreateRequest;
 use App\Contract\Request\Experience\ExperienceUpdateRequest;
 use App\Entity\Experience;
 use App\Entity\Partner;
+use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceManager;
 use App\Repository\ExperienceRepository;
 use App\Repository\PartnerRepository;
@@ -54,6 +56,8 @@ class ExperienceManagerTest extends TestCase
         $experienceUpdateRequest->partnerGoldenId = '5678';
         $experienceUpdateRequest->name = 'dinner with massage';
         $experienceUpdateRequest->description = 'a fancy dinner with feet massage';
+        $experienceUpdateRequest->productPeopleNumber = '1';
+        $experienceUpdateRequest->voucherExpirationDuration = 2;
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
         $uuidInterface->toString()->willReturn($uuid);
@@ -64,6 +68,8 @@ class ExperienceManagerTest extends TestCase
         $experience->partnerGoldenId = '5678';
         $experience->name = '7895';
         $experience->description = '12365488';
+        $experience->peopleNumber = '2';
+        $experience->duration = 3;
         $this->repository->findOne($uuid)->willReturn($experience);
 
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
@@ -113,6 +119,8 @@ class ExperienceManagerTest extends TestCase
         $experienceCreateRequest->partnerGoldenId = '5678';
         $experienceCreateRequest->name = 'dinner with massage';
         $experienceCreateRequest->description = 'a fancy dinner with feet massage';
+        $experienceCreateRequest->productPeopleNumber = '2';
+        $experienceCreateRequest->voucherExpirationDuration = 3;
 
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
 
@@ -121,5 +129,55 @@ class ExperienceManagerTest extends TestCase
         $this->assertEquals($experienceCreateRequest->partnerGoldenId, $experience->partnerGoldenId);
         $this->assertEquals($experienceCreateRequest->name, $experience->name);
         $this->assertEquals($experienceCreateRequest->description, $experience->description);
+        $this->assertEquals($experienceCreateRequest->productPeopleNumber, $experience->peopleNumber);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplace()
+    {
+        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $productRequest = new ProductRequest();
+        $productRequest->goldenId = '5678';
+        $productRequest->partnerGoldenId = '5678';
+        $productRequest->name = 'dinner with massage';
+        $productRequest->description = 'a fancy dinner with feet massage';
+        $productRequest->productPeopleNumber = '2';
+        $productRequest->voucherExpirationDuration = 3;
+
+        $this->partnerRepository->findOneByGoldenId($productRequest->goldenId);
+        $this->repository->findOneByGoldenId($productRequest->goldenId);
+
+        $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
+
+        $this->assertEmpty($manager->replace($productRequest));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceCatchesExperienceNotFoundException()
+    {
+        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $productRequest = new ProductRequest();
+        $productRequest->goldenId = '5678';
+        $productRequest->partnerGoldenId = '5678';
+        $productRequest->name = 'dinner with massage';
+        $productRequest->description = 'a fancy dinner with feet massage';
+        $productRequest->productPeopleNumber = '2';
+        $productRequest->voucherExpirationDuration = 3;
+
+        $this->partnerRepository->findOneByGoldenId($productRequest->goldenId);
+        $this->repository
+            ->findOneByGoldenId($productRequest->goldenId)
+            ->shouldBeCalled()
+            ->willThrow(new ExperienceNotFoundException())
+        ;
+        $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
+
+        $this->assertEmpty($manager->replace($productRequest));
     }
 }

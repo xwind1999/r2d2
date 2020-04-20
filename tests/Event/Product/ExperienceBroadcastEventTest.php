@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Event\Product;
 
 use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Event\Product\BoxBroadcastEvent;
+use App\Event\Product\ExperienceBroadcastEvent;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \App\Event\Product\BoxBroadcastEvent
+ * @coversDefaultClass \App\Event\Product\ExperienceBroadcastEvent
  */
-class BoxBroadcastEventTest extends TestCase
+class ExperienceBroadcastEventTest extends TestCase
 {
     /**
      * @covers ::__construct
@@ -22,8 +22,8 @@ class BoxBroadcastEventTest extends TestCase
     {
         $productRequest = $this->prophesize(ProductRequest::class);
 
-        $event = new BoxBroadcastEvent($productRequest->reveal());
+        $event = new ExperienceBroadcastEvent($productRequest->reveal());
         $this->assertInstanceOf(ProductRequest::class, $event->getProductRequest());
-        $this->assertEquals('broadcast.box', $event->getEventName());
+        $this->assertEquals('broadcast.experience', $event->getEventName());
     }
 }

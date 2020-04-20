@@ -8,6 +8,7 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
 use App\Resolver\ProductTypeResolver;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -16,29 +17,49 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ProductTypeResolverTest extends TestCase
 {
     /**
+     * @var ObjectProphecy|ProductRequest
+     */
+    private $productRequest;
+
+    protected function setUp(): void
+    {
+        $this->productRequest = $this->prophesize(ProductRequest::class);
+    }
+
+    /**
      * @covers ::resolve
      */
-    public function testResolveSuccessfully()
+    public function testResolveUsingBoxSuccessfully()
     {
-        $productRequest = $this->createMock(ProductRequest::class);
-        $productRequest->type = 'mev';
+        $this->productRequest->type = 'mev';
 
         $relationshipTypeResolver = new ProductTypeResolver();
-        $event = $relationshipTypeResolver->resolve($productRequest);
+        $event = $relationshipTypeResolver->resolve($this->productRequest->reveal());
         $this->assertInstanceOf(Event::class, $event);
     }
 
     /**
      * @covers ::resolve
      */
-    public function testResolveThrowsNonExistentTypeResolverExcepetion()
+    public function testResolveUsingExperienceSuccessfully()
     {
-        $productRequest = $this->createMock(ProductRequest::class);
-        $productRequest->type = 'Invalid-type';
+        $this->productRequest->type = 'experience';
+
+        $relationshipTypeResolver = new ProductTypeResolver();
+        $event = $relationshipTypeResolver->resolve($this->productRequest->reveal());
+        $this->assertInstanceOf(Event::class, $event);
+    }
+
+    /**
+     * @covers ::resolve
+     */
+    public function testResolveUsingBoxThrowsNonExistentTypeResolverExcepetion()
+    {
+        $this->productRequest->type = 'Invalid-type';
 
         $this->expectException(NonExistentTypeResolverExcepetion::class);
 
         $relationshipTypeResolver = new ProductTypeResolver();
-        $relationshipTypeResolver->resolve($productRequest);
+        $relationshipTypeResolver->resolve($this->productRequest->reveal());
     }
 }

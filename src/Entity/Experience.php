@@ -68,6 +68,16 @@ class Experience
      */
     public Collection $experienceComponent;
 
+    /**
+     * @ORM\Column(type="string", length=2, nullable=true, options={"fixed": true})
+     */
+    public ?string $peopleNumber = null;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true, options={"unsigned"=true})
+     */
+    public ?int $duration = null;
+
     public function __construct()
     {
         $this->boxExperience = new ArrayCollection();

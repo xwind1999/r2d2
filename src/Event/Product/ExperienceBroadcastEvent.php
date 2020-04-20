@@ -8,9 +8,9 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\Contract\ProductRequestEventInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class BoxBroadcastEvent extends Event implements ProductRequestEventInterface
+class ExperienceBroadcastEvent extends Event implements ProductRequestEventInterface
 {
-    public const EVENT_NAME = 'broadcast.box';
+    public const EVENT_NAME = 'broadcast.experience';
     private ProductRequest $productRequest;
 
     public function __construct(ProductRequest $productRequest)
