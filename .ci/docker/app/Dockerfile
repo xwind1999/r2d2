@@ -4,6 +4,6 @@ COPY .ci/docker/app/warm-start.sh /
 
 COPY . /app
 
-RUN mkdir /app/var; chown -R www-data.www-data /app/var
+RUN mkdir /app/var; chown -R www-data.www-data /app
 
 CMD ["/warm-start.sh", "/start.sh"]
