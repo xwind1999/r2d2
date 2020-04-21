@@ -26,6 +26,7 @@ class BoxExperienceHelper
     public function getDefault(array $overrides = []): array
     {
         $payload = [
+            'is_enabled' => true,
             'external_updated_at' => '2020-01-01T00:00:00+0',
         ];
 
@@ -54,7 +55,11 @@ class BoxExperienceHelper
             $this->addValidExperience($payload);
             $this->addValidBox($payload);
         }
-        $this->client->request('POST', $this->baseUrl.self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+
+        $this->client->request(
+            'POST',
+            $this->baseUrl.self::API_BASE_URL, [], [], [],
+            $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }
@@ -69,7 +74,10 @@ class BoxExperienceHelper
             'box_golden_id' => $boxGoldenId,
         ];
 
-        $this->client->request('DELETE', $this->baseUrl.self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request(
+            'DELETE',
+            $this->baseUrl.self::API_BASE_URL, [], [], [],
+            $this->serializer->serialize($payload, 'json'));
 
         return $this->client->getResponse();
     }

@@ -36,6 +36,11 @@ class BoxExperience
     public string $experienceGoldenId;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    public bool $isEnabled;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     public \DateTime $externalUpdatedAt;

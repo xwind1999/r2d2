@@ -49,6 +49,7 @@ class BoxExperienceManager
         $boxExperience->boxGoldenId = $box->goldenId;
         $boxExperience->experience = $experience;
         $boxExperience->experienceGoldenId = $experience->goldenId;
+        $boxExperience->isEnabled = $boxExperienceCreateRequest->isEnabled;
         $boxExperience->externalUpdatedAt = $boxExperienceCreateRequest->externalUpdatedAt;
 
         $this->boxExperienceRepository->save($boxExperience);
@@ -88,6 +89,7 @@ class BoxExperienceManager
         $boxExperience->box = $box;
         $boxExperience->boxGoldenId = $box->goldenId;
         $boxExperience->experience = $experience;
+        $boxExperience->isEnabled = $relationshipRequest->isEnabled;
         $boxExperience->experienceGoldenId = $experience->goldenId;
         $boxExperience->externalUpdatedAt = new \DateTime();
 

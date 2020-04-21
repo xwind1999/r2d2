@@ -32,6 +32,14 @@ class BoxExperienceCreateResponse extends ResponseContract
     public string $experienceGoldenId;
 
     /**
+     * @Assert\Type(type="boolean")
+     * @Assert\NotNull()
+     *
+     * @JMS\Type("strict_boolean")
+     */
+    public bool $isEnabled;
+
+    /**
      * @Assert\Type(type="DateTime")
      * @Assert\NotBlank
      *
@@ -44,5 +52,6 @@ class BoxExperienceCreateResponse extends ResponseContract
         $this->boxGoldenId = $boxExperience->boxGoldenId;
         $this->experienceGoldenId = $boxExperience->experienceGoldenId;
         $this->externalUpdatedAt = $boxExperience->externalUpdatedAt;
+        $this->isEnabled = $boxExperience->isEnabled;
     }
 }

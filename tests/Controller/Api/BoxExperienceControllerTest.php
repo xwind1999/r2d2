@@ -106,6 +106,7 @@ class BoxExperienceControllerTest extends TestCase
         $boxExperience = new BoxExperience();
         $boxExperience->experienceGoldenId = '9012';
         $boxExperience->boxGoldenId = '1234';
+        $boxExperience->isEnabled = true;
         $boxExperience->externalUpdatedAt = new \DateTime('2020-05-05');
 
         yield [$boxExperience];

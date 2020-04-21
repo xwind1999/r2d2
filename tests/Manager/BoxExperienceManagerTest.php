@@ -122,6 +122,7 @@ class BoxExperienceManagerTest extends TestCase
         $bookingCreateRequest->boxGoldenId = '5678';
         $bookingCreateRequest->experienceGoldenId = '9012';
         $bookingCreateRequest->externalUpdatedAt = $currentDate;
+        $bookingCreateRequest->isEnabled = true;
 
         $this->repository->findOneByBoxExperience($box, $experience)->willReturn(null);
         $this->repository->save(Argument::type(BoxExperience::class))->shouldBeCalled();
@@ -130,6 +131,7 @@ class BoxExperienceManagerTest extends TestCase
         $this->assertEquals($bookingCreateRequest->boxGoldenId, $booking->boxGoldenId);
         $this->assertEquals($bookingCreateRequest->experienceGoldenId, $booking->experienceGoldenId);
         $this->assertEquals($bookingCreateRequest->externalUpdatedAt, $booking->externalUpdatedAt);
+        $this->assertEquals($bookingCreateRequest->isEnabled, $booking->isEnabled);
     }
 
     /**
