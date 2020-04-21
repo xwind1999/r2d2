@@ -6,6 +6,7 @@ namespace App\Resolver;
 
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\BoxBroadcastEvent;
+use App\Event\Product\ComponentBroadcastEvent;
 use App\Event\Product\Contract\ProductRequestEventInterface;
 use App\Event\Product\ExperienceBroadcastEvent;
 use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
@@ -17,6 +18,7 @@ class ProductTypeResolver
     ];
 
     protected const EXPERIENCE_TYPE = 'EXPERIENCE';
+    protected const COMPONENT_TYPE = 'COMPONENT';
 
     /**
      * @throws NonExistentTypeResolverExcepetion
@@ -30,6 +32,10 @@ class ProductTypeResolver
 
         if (self::EXPERIENCE_TYPE === $productType) {
             return new ExperienceBroadcastEvent($productRequest);
+        }
+
+        if (self::COMPONENT_TYPE === $productType) {
+            return new ComponentBroadcastEvent($productRequest);
         }
 
         throw new NonExistentTypeResolverExcepetion();

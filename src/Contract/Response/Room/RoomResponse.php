@@ -65,11 +65,10 @@ abstract class RoomResponse extends ResponseContract
 
     /**
      * @Assert\Type(type="integer")
-     * @Assert\NotBlank
      *
-     * @JMS\Type("integer")
+     * @JMS\Type("strict_integer")
      */
-    public int $duration;
+    public ?int $voucherExpirationDuration;
 
     /**
      * @Assert\Type(type="boolean")
@@ -78,6 +77,14 @@ abstract class RoomResponse extends ResponseContract
      * @JMS\Type("strict_boolean")
      */
     public bool $isSellable;
+
+    /**
+     * @Assert\Type(type="boolean")
+     * @Assert\NotNull()
+     *
+     * @JMS\Type("strict_boolean")
+     */
+    public bool $isReservable;
 
     /**
      * @Assert\Type(type="string")
@@ -110,8 +117,9 @@ abstract class RoomResponse extends ResponseContract
         $this->name = $room->name;
         $this->description = $room->description;
         $this->inventory = $room->inventory;
-        $this->duration = $room->duration;
+        $this->voucherExpirationDuration = $room->duration;
         $this->isSellable = $room->isSellable;
+        $this->isReservable = $room->isReservable;
         $this->status = $room->status;
         $this->createdAt = $room->createdAt;
         $this->updatedAt = $room->updatedAt;

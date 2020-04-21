@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Room\RoomCreateRequest;
 use App\Contract\Request\Room\RoomUpdateRequest;
 use App\Entity\Room;
 use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\PartnerNotFoundException;
+use App\Exception\Repository\RoomNotFoundException;
 use App\Repository\PartnerRepository;
 use App\Repository\RoomRepository;
 
@@ -34,8 +37,9 @@ class RoomManager
         $room->name = $roomCreateRequest->name;
         $room->description = $roomCreateRequest->description;
         $room->inventory = $roomCreateRequest->inventory;
-        $room->duration = $roomCreateRequest->duration;
+        $room->duration = $roomCreateRequest->voucherExpirationDuration;
         $room->isSellable = $roomCreateRequest->isSellable;
+        $room->isReservable = $roomCreateRequest->isReservable;
         $room->status = $roomCreateRequest->status;
 
         $this->repository->save($room);
@@ -74,12 +78,39 @@ class RoomManager
         $room->name = $roomUpdateRequest->name;
         $room->description = $roomUpdateRequest->description;
         $room->inventory = $roomUpdateRequest->inventory;
-        $room->duration = $roomUpdateRequest->duration;
+        $room->duration = $roomUpdateRequest->voucherExpirationDuration;
         $room->isSellable = $roomUpdateRequest->isSellable;
+        $room->isReservable = $roomUpdateRequest->isReservable;
         $room->status = $roomUpdateRequest->status;
 
         $this->repository->save($room);
 
         return $room;
+    }
+
+    /**
+     * @throws PartnerNotFoundException
+     */
+    public function replace(ProductRequest $productRequest): void
+    {
+        $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partnerGoldenId);
+
+        try {
+            $component = $this->repository->findOneByGoldenId($productRequest->goldenId);
+        } catch (RoomNotFoundException $exception) {
+            $component = new Room();
+        }
+
+        $component->goldenId = $productRequest->goldenId;
+        $component->partner = $partner;
+        $component->partnerGoldenId = $productRequest->partnerGoldenId;
+        $component->name = $productRequest->name;
+        $component->description = $productRequest->description;
+        $component->duration = $productRequest->voucherExpirationDuration;
+        $component->isReservable = $productRequest->isReservable;
+        $component->isSellable = $productRequest->isSellable;
+        $component->status = $productRequest->status;
+
+        $this->repository->save($component);
     }
 }
