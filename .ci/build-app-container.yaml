@@ -1,7 +1,10 @@
 variables:
   BASE_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base
+  VALIDATION_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-validation
   BASE_IMAGE_VERSION: 0.0.15
   BASE_FULL_IMAGE: ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
+  VALIDATION_FULL_IMAGE: ${VALIDATION_IMAGE}:${BASE_IMAGE_VERSION}
+  VALIDATION_FULL_IMAGE_LATEST: ${VALIDATION_IMAGE}:latest
   APP_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-api:${CI_PIPELINE_ID}_${CI_COMMIT_SHA}
 
 build-base-image:
@@ -9,16 +12,30 @@ build-base-image:
   image: docker:dind
   only:
     - CI-master
-    - fix-docker-images2
   tags:
     - k8s
   script:
     - >
       docker build --pull
-      --tag ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
+      --tag ${BASE_FULL_IMAGE}
       --tag ${BASE_IMAGE}:latest .ci/docker/base
     - docker push ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
     - docker push ${BASE_IMAGE}:latest
+
+build-validation-image:
+  stage: Build validation image
+  image: docker:dind
+  only:
+    - CI-master
+  tags:
+    - k8s
+  script:
+    - >
+      docker build --pull
+      --tag ${VALIDATION_FULL_IMAGE}
+      --tag ${VALIDATION_IMAGE}:latest .ci/docker/validation
+    - docker push ${VALIDATION_FULL_IMAGE}
+    - docker push ${VALIDATION_IMAGE}:latest
 
 cleanup-and-prepare-files:
   stage: Static analysis
@@ -45,7 +62,6 @@ cleanup-and-prepare-files:
     - k8s-alpha
   only:
     - master
-    - fix-docker-images2
 
 build-app-container:
   stage: App Container Build
@@ -56,7 +72,6 @@ build-app-container:
     - k8s
   only:
     - master
-    - fix-docker-images2
   script:
     - >
       docker build --pull -f .ci/docker/app/Dockerfile

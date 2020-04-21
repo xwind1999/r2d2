@@ -1,5 +1,6 @@
 stages:
   - Build base image
+  - Build validation image
   - Build
   - Test
   - Static analysis
