@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Room\RoomCreateRequest;
 use App\Contract\Request\Room\RoomUpdateRequest;
 use App\Entity\Partner;
 use App\Entity\Room;
+use App\Exception\Repository\RoomNotFoundException;
 use App\Manager\RoomManager;
 use App\Repository\PartnerRepository;
 use App\Repository\RoomRepository;
@@ -56,8 +58,9 @@ class RoomManagerTest extends TestCase
         $roomUpdateRequest->name = 'room with a big big bed';
         $roomUpdateRequest->description = 'the bed is so big it could fit two families';
         $roomUpdateRequest->inventory = 2;
-        $roomUpdateRequest->duration = 1;
+        $roomUpdateRequest->voucherExpirationDuration = 1;
         $roomUpdateRequest->isSellable = true;
+        $roomUpdateRequest->isReservable = true;
         $roomUpdateRequest->status = 'not_ok';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -72,6 +75,7 @@ class RoomManagerTest extends TestCase
         $room->inventory = 1;
         $room->duration = 0;
         $room->isSellable = false;
+        $room->isReservable = false;
         $room->status = 'ok';
         $this->repository->findOne($uuid)->willReturn($room);
 
@@ -82,6 +86,8 @@ class RoomManagerTest extends TestCase
         $this->assertSame($room, $updatedRoom);
         $this->assertEquals(2, $room->inventory);
         $this->assertEquals(1, $room->duration);
+        $this->assertEquals(true, $room->isReservable);
+        $this->assertEquals(true, $room->isSellable);
         $this->assertEquals('4321', $room->partnerGoldenId);
         $this->assertEquals('room with a big big bed', $room->name);
         $this->assertEquals('the bed is so big it could fit two families', $room->description);
@@ -125,8 +131,9 @@ class RoomManagerTest extends TestCase
         $roomCreateRequest->name = 'room with small bed';
         $roomCreateRequest->description = 'the bed is very small';
         $roomCreateRequest->inventory = 1;
-        $roomCreateRequest->duration = 0;
+        $roomCreateRequest->voucherExpirationDuration = 0;
         $roomCreateRequest->isSellable = false;
+        $roomCreateRequest->isReservable = false;
         $roomCreateRequest->status = 'ok';
 
         $this->repository->save(Argument::type(Room::class))->shouldBeCalled();
@@ -137,8 +144,62 @@ class RoomManagerTest extends TestCase
         $this->assertEquals($roomCreateRequest->name, $room->name);
         $this->assertEquals($roomCreateRequest->description, $room->description);
         $this->assertEquals($roomCreateRequest->inventory, $room->inventory);
-        $this->assertEquals($roomCreateRequest->duration, $room->duration);
+        $this->assertEquals($roomCreateRequest->voucherExpirationDuration, $room->duration);
         $this->assertEquals($roomCreateRequest->isSellable, $room->isSellable);
+        $this->assertEquals($roomCreateRequest->isReservable, $room->isReservable);
         $this->assertEquals($roomCreateRequest->status, $room->status);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplace()
+    {
+        $manager = new RoomManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $productRequest = new ProductRequest();
+        $productRequest->goldenId = '5678';
+        $productRequest->partnerGoldenId = '5678';
+        $productRequest->name = 'dinner with massage';
+        $productRequest->description = 'a fancy dinner with feet massage';
+        $productRequest->isSellable = true;
+        $productRequest->isReservable = true;
+        $productRequest->voucherExpirationDuration = 3;
+        $productRequest->status = 'test Status';
+
+        $this->partnerRepository->findOneByGoldenId($productRequest->goldenId);
+        $this->repository->findOneByGoldenId($productRequest->goldenId);
+
+        $this->repository->save(Argument::type(Room::class))->shouldBeCalled();
+
+        $this->assertEmpty($manager->replace($productRequest));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceCatchesExperienceNotFoundException()
+    {
+        $manager = new RoomManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $productRequest = new ProductRequest();
+        $productRequest->goldenId = '5678';
+        $productRequest->partnerGoldenId = '5678';
+        $productRequest->name = 'dinner with massage';
+        $productRequest->description = 'a fancy dinner with feet massage';
+        $productRequest->isSellable = true;
+        $productRequest->isReservable = true;
+        $productRequest->voucherExpirationDuration = 3;
+        $productRequest->status = 'test Status';
+
+        $this->partnerRepository->findOneByGoldenId($productRequest->goldenId);
+        $this->repository
+            ->findOneByGoldenId($productRequest->goldenId)
+            ->shouldBeCalled()
+            ->willThrow(new RoomNotFoundException())
+        ;
+        $this->repository->save(Argument::type(Room::class))->shouldBeCalled();
+
+        $this->assertEmpty($manager->replace($productRequest));
     }
 }

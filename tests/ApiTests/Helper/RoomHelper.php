@@ -33,7 +33,9 @@ class RoomHelper
             'inventory' => 10,
             'duration' => 1,
             'is_sellable' => true,
+            'is_reservable' => true,
             'status' => 'enabled',
+            'voucher_expiration_duration' => 3,
         ];
 
         return $overrides + $payload;

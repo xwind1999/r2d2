@@ -60,14 +60,19 @@ class Room
     public int $inventory;
 
     /**
-     * @ORM\Column(type="integer", options={"unsigned"=true})
+     * @ORM\Column(type="integer", nullable=true, options={"unsigned"=true})
      */
-    public int $duration;
+    public ?int $duration = null;
 
     /**
      * @ORM\Column(type="boolean")
      */
     public bool $isSellable;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    public bool $isReservable;
 
     /**
      * @ORM\Column(type="string", length=8)

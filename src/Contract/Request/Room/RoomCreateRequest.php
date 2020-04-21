@@ -58,11 +58,10 @@ class RoomCreateRequest implements RequestBodyInterface, ValidatableRequest
     /**
      * @Assert\Type(type="integer")
      * @Assert\PositiveOrZero
-     * @Assert\NotBlank
      *
      * @JMS\Type("strict_integer")
      */
-    public int $duration;
+    public int $voucherExpirationDuration;
 
     /**
      * @Assert\Type(type="boolean")
@@ -71,6 +70,14 @@ class RoomCreateRequest implements RequestBodyInterface, ValidatableRequest
      * @JMS\Type("strict_boolean")
      */
     public bool $isSellable;
+
+    /**
+     * @Assert\Type(type="boolean")
+     * @Assert\NotNull()
+     *
+     * @JMS\Type("strict_boolean")
+     */
+    public bool $isReservable;
 
     /**
      * @Assert\Type(type="string")
