@@ -36,4 +36,3 @@ variables:
     ENVIRONMENT_NAME: ie1-devint-r2d2
   only:
     - master
-    - fix-docker-images2
