@@ -31,7 +31,7 @@ class ExperienceComponentCreateRequest implements RequestBodyInterface, Validata
 
     /**
      * @Assert\Type(type="boolean")
-     * @Assert\NotBlank
+     * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
      */

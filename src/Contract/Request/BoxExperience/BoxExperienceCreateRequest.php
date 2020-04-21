@@ -30,6 +30,14 @@ class BoxExperienceCreateRequest implements RequestBodyInterface, ValidatableReq
     public string $experienceGoldenId;
 
     /**
+     * @Assert\Type(type="boolean")
+     * @Assert\NotNull
+     *
+     * @JMS\Type("strict_boolean")
+     */
+    public bool $isEnabled;
+
+    /**
      * @Assert\Type(type="DateTime")
      * @Assert\NotBlank
      *
