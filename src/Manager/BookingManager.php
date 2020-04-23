@@ -7,24 +7,31 @@ namespace App\Manager;
 use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
+use App\Entity\Guest;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Repository\BookingRepository;
 use App\Repository\ExperienceRepository;
+use App\Repository\GuestRepository;
 use App\Repository\PartnerRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class BookingManager
 {
-    protected BookingRepository $repository;
+    private BookingRepository $repository;
+    private PartnerRepository $partnerRepository;
+    private ExperienceRepository $experienceRepository;
+    private GuestRepository $guestRepository;
 
-    protected PartnerRepository $partnerRepository;
-
-    protected ExperienceRepository $experienceRepository;
-
-    public function __construct(BookingRepository $repository, PartnerRepository $partnerRepository, ExperienceRepository $experienceRepository)
-    {
+    public function __construct(
+        BookingRepository $repository,
+        PartnerRepository $partnerRepository,
+        ExperienceRepository $experienceRepository,
+        GuestRepository $guestRepository
+    ) {
         $this->repository = $repository;
         $this->partnerRepository = $partnerRepository;
         $this->experienceRepository = $experienceRepository;
+        $this->guestRepository = $guestRepository;
     }
 
     public function create(BookingCreateRequest $bookingCreateRequest): Booking
@@ -33,7 +40,6 @@ class BookingManager
         $experience = $this->experienceRepository->findOneByGoldenId($bookingCreateRequest->experienceGoldenId);
 
         $booking = new Booking();
-
         $booking->partner = $partner;
         $booking->experience = $experience;
         $booking->goldenId = $bookingCreateRequest->goldenId;
@@ -50,17 +56,30 @@ class BookingManager
         $booking->totalPrice = $bookingCreateRequest->totalPrice;
         $booking->startDate = $bookingCreateRequest->startDate;
         $booking->endDate = $bookingCreateRequest->endDate;
-        $booking->customerExternalId = $bookingCreateRequest->customerExternalId;
-        $booking->customerFirstName = $bookingCreateRequest->customerFirstName;
-        $booking->customerLastName = $bookingCreateRequest->customerLastName;
-        $booking->customerEmail = $bookingCreateRequest->customerEmail;
-        $booking->customerPhone = $bookingCreateRequest->customerPhone;
         $booking->customerComment = $bookingCreateRequest->customerComment;
         $booking->partnerComment = $bookingCreateRequest->partnerComment;
         $booking->placedAt = $bookingCreateRequest->placedAt;
         $booking->cancelledAt = $bookingCreateRequest->cancelledAt;
 
+        /** @var ArrayCollection<int, Guest> */
+        $guestCollection = new ArrayCollection();
+        foreach ($bookingCreateRequest->guest as $guestRequest) {
+            $guest = new Guest();
+            $guest->booking = $booking;
+            $guest->bookingGoldenId = $bookingCreateRequest->goldenId;
+            $guest->externalId = $guestRequest->externalId;
+            $guest->firstName = $guestRequest->firstName;
+            $guest->lastName = $guestRequest->lastName;
+            $guest->email = $guestRequest->email;
+            $guest->phone = $guestRequest->phone;
+
+            $guestCollection->add($guest);
+            $this->guestRepository->save($guest);
+        }
+
+        $booking->guest = $guestCollection;
         $this->repository->save($booking);
+        $this->guestRepository->flush();
 
         return $booking;
     }
@@ -108,11 +127,6 @@ class BookingManager
         $booking->totalPrice = $bookingUpdateRequest->totalPrice;
         $booking->startDate = $bookingUpdateRequest->startDate;
         $booking->endDate = $bookingUpdateRequest->endDate;
-        $booking->customerExternalId = $bookingUpdateRequest->customerExternalId;
-        $booking->customerFirstName = $bookingUpdateRequest->customerFirstName;
-        $booking->customerLastName = $bookingUpdateRequest->customerLastName;
-        $booking->customerEmail = $bookingUpdateRequest->customerEmail;
-        $booking->customerPhone = $bookingUpdateRequest->customerPhone;
         $booking->customerComment = $bookingUpdateRequest->customerComment;
         $booking->partnerComment = $bookingUpdateRequest->partnerComment;
         $booking->placedAt = $bookingUpdateRequest->placedAt;

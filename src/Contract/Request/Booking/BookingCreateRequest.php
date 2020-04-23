@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contract\Request\Booking;
 
+use App\Contract\Request\Guest\GuestRequest;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use JMS\Serializer\Annotation as JMS;
@@ -132,48 +133,7 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("string")
-     */
-    public string $customerExternalId;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="255")
-     *
-     * @JMS\Type("string")
-     */
-    public ?string $customerFirstName = null;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="255")
-     *
-     * @JMS\Type("string")
-     */
-    public ?string $customerLastName = null;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="255")
-     *
-     * @JMS\Type("string")
-     */
-    public ?string $customerEmail = null;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     *
-     * @JMS\Type("string")
-     */
-    public ?string $customerPhone = null;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="1024")
+     * @Assert\Length(min="1", max="254")
      *
      * @JMS\Type("string")
      */
@@ -181,11 +141,21 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="1024")
+     * @Assert\Length(min="1", max="254")
      *
      * @JMS\Type("string")
      */
     public ?string $partnerComment = null;
+
+    /**
+     * @Assert\Type(type="array")
+     * @Assert\NotBlank
+     *
+     * @JMS\Type("array<App\Contract\Request\Guest\GuestRequest>")
+     *
+     * @var array<int, GuestRequest>
+     */
+    public array $guest;
 
     /**
      * @Assert\Type(type="DateTime")

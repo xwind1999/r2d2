@@ -22,6 +22,20 @@ class BookingApiTest extends ApiTestCase
         return $responseContent->uuid;
     }
 
+    public function testCreateWithMultipleGuests(): string
+    {
+        $payload = self::$bookingHelper->getDefault();
+        self::$bookingHelper->addValidExperience($payload);
+        self::$bookingHelper->addValidPartner($payload);
+        self::$bookingHelper->addMultipleValidGuests($payload);
+        $response = self::$bookingHelper->create($payload);
+        $responseContent = json_decode($response->getContent());
+        $this->assertObjectHasAttribute('uuid', $responseContent);
+        $this->assertEquals(201, $response->getStatusCode());
+
+        return $responseContent->uuid;
+    }
+
     /**
      * @depends testCreateSuccess
      */

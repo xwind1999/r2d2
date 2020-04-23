@@ -6,6 +6,7 @@ namespace App\Contract\Response\Booking;
 
 use App\Contract\ResponseContract;
 use App\Entity\Booking;
+use App\Entity\Guest;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -142,47 +143,6 @@ abstract class BookingResponse extends ResponseContract
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("string")
-     */
-    public string $customerExternalId;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="255")
-     *
-     * @JMS\Type("string")
-     */
-    public ?string $customerFirstName;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="255")
-     *
-     * @JMS\Type("string")
-     */
-    public ?string $customerLastName;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="255")
-     *
-     * @JMS\Type("string")
-     */
-    public ?string $customerEmail;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     *
-     * @JMS\Type("string")
-     */
-    public ?string $customerPhone;
-
-    /**
-     * @Assert\Type(type="string")
      * @Assert\Length(min="1", max="1024")
      *
      * @JMS\Type("string")
@@ -211,6 +171,16 @@ abstract class BookingResponse extends ResponseContract
      * @JMS\Type("DateTime")
      */
     public ?\DateTime $cancelledAt;
+
+    /**
+     * @Assert\Type(type="array<App\Contract\Response\Guest\GuestResponse>")
+     * @Assert\NotBlank
+     *
+     * @JMS\Type("array<App\Contract\Response\Guest\GuestResponse>")
+     *
+     * @var array<int, Guest>
+     */
+    public array $guest;
 
     /**
      * @Assert\NotBlank
@@ -243,11 +213,7 @@ abstract class BookingResponse extends ResponseContract
         $this->totalPrice = $booking->totalPrice;
         $this->startDate = $booking->startDate;
         $this->endDate = $booking->endDate;
-        $this->customerExternalId = $booking->customerExternalId;
-        $this->customerFirstName = $booking->customerFirstName;
-        $this->customerLastName = $booking->customerLastName;
-        $this->customerEmail = $booking->customerEmail;
-        $this->customerPhone = $booking->customerPhone;
+        $this->guest = $booking->guest->toArray();
         $this->customerComment = $booking->customerComment;
         $this->partnerComment = $booking->partnerComment;
         $this->placedAt = $booking->placedAt;
