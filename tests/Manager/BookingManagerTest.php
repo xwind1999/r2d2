@@ -8,10 +8,12 @@ use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
 use App\Entity\Experience;
+use App\Entity\Guest;
 use App\Entity\Partner;
 use App\Manager\BookingManager;
 use App\Repository\BookingRepository;
 use App\Repository\ExperienceRepository;
+use App\Repository\GuestRepository;
 use App\Repository\PartnerRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -38,11 +40,17 @@ class BookingManagerTest extends TestCase
      */
     protected $experienceRepository;
 
+    /**
+     * @var GuestRepository|ObjectProphecy
+     */
+    private $guestRepository;
+
     public function setUp(): void
     {
         $this->repository = $this->prophesize(BookingRepository::class);
         $this->partnerRepository = $this->prophesize(PartnerRepository::class);
         $this->experienceRepository = $this->prophesize(ExperienceRepository::class);
+        $this->guestRepository = $this->prophesize(GuestRepository::class);
     }
 
     /**
@@ -52,7 +60,12 @@ class BookingManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new BookingManager($this->repository->reveal(), $this->partnerRepository->reveal(), $this->experienceRepository->reveal());
+        $manager = new BookingManager(
+            $this->repository->reveal(),
+            $this->partnerRepository->reveal(),
+            $this->experienceRepository->reveal(),
+            $this->guestRepository->reveal()
+        );
 
         $partner = new Partner();
         $partner->goldenId = '5432';
@@ -65,6 +78,9 @@ class BookingManagerTest extends TestCase
         $bookingUpdateRequest = new BookingUpdateRequest();
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $currentDate = new \DateTime();
+
+        $guest = new Guest();
+        $guest->externalId = '5435454';
 
         $bookingUpdateRequest->goldenId = '9876';
         $bookingUpdateRequest->partnerGoldenId = '5432';
@@ -80,11 +96,7 @@ class BookingManagerTest extends TestCase
         $bookingUpdateRequest->totalPrice = 150;
         $bookingUpdateRequest->startDate = new \DateTime('2020-05-05');
         $bookingUpdateRequest->endDate = new \DateTime('2020-05-06');
-        $bookingUpdateRequest->customerExternalId = 'W123123';
-        $bookingUpdateRequest->customerFirstName = 'new name';
-        $bookingUpdateRequest->customerLastName = 'new last name';
-        $bookingUpdateRequest->customerEmail = 'a@a.com';
-        $bookingUpdateRequest->customerPhone = '55566666';
+        $bookingUpdateRequest->guest = [$guest];
         $bookingUpdateRequest->customerComment = 'i want a double bed';
         $bookingUpdateRequest->partnerComment = 'i dont have double bed';
         $bookingUpdateRequest->placedAt = $currentDate;
@@ -109,11 +121,6 @@ class BookingManagerTest extends TestCase
         $booking->totalPrice = 150;
         $booking->startDate = new \DateTime('2020-05-05');
         $booking->endDate = new \DateTime('2020-05-06');
-        $booking->customerExternalId = 'W123123';
-        $booking->customerFirstName = null;
-        $booking->customerLastName = null;
-        $booking->customerEmail = null;
-        $booking->customerPhone = null;
         $booking->customerComment = null;
         $booking->partnerComment = null;
         $booking->placedAt = $currentDate;
@@ -137,11 +144,6 @@ class BookingManagerTest extends TestCase
         $this->assertEquals(150, $booking->totalPrice);
         $this->assertEquals(new \DateTime('2020-05-05'), $booking->startDate);
         $this->assertEquals(new \DateTime('2020-05-06'), $booking->endDate);
-        $this->assertEquals('W123123', $booking->customerExternalId);
-        $this->assertEquals('new name', $booking->customerFirstName);
-        $this->assertEquals('new last name', $booking->customerLastName);
-        $this->assertEquals('a@a.com', $booking->customerEmail);
-        $this->assertEquals('55566666', $booking->customerPhone);
         $this->assertEquals('i want a double bed', $booking->customerComment);
         $this->assertEquals('i dont have double bed', $booking->partnerComment);
         $this->assertEquals($currentDate, $booking->placedAt);
@@ -155,7 +157,12 @@ class BookingManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new BookingManager($this->repository->reveal(), $this->partnerRepository->reveal(), $this->experienceRepository->reveal());
+        $manager = new BookingManager(
+            $this->repository->reveal(),
+            $this->partnerRepository->reveal(),
+            $this->experienceRepository->reveal(),
+            $this->guestRepository->reveal()
+        );
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -175,7 +182,12 @@ class BookingManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new BookingManager($this->repository->reveal(), $this->partnerRepository->reveal(), $this->experienceRepository->reveal());
+        $manager = new BookingManager(
+            $this->repository->reveal(),
+            $this->partnerRepository->reveal(),
+            $this->experienceRepository->reveal(),
+            $this->guestRepository->reveal()
+        );
 
         $partner = new Partner();
         $partner->goldenId = '5678';
@@ -184,6 +196,9 @@ class BookingManagerTest extends TestCase
         $experience = new Experience();
         $experience->goldenId = '9012';
         $this->experienceRepository->findOneByGoldenId('9012')->willReturn($experience);
+
+        $guest = new Guest();
+        $guest->externalId = '5435454';
 
         $currentDate = new \DateTime();
 
@@ -203,11 +218,7 @@ class BookingManagerTest extends TestCase
         $bookingCreateRequest->totalPrice = 150;
         $bookingCreateRequest->startDate = new \DateTime('2020-05-05');
         $bookingCreateRequest->endDate = new \DateTime('2020-05-06');
-        $bookingCreateRequest->customerExternalId = 'W123123';
-        $bookingCreateRequest->customerFirstName = null;
-        $bookingCreateRequest->customerLastName = null;
-        $bookingCreateRequest->customerEmail = null;
-        $bookingCreateRequest->customerPhone = null;
+        $bookingCreateRequest->guest = [$guest];
         $bookingCreateRequest->customerComment = null;
         $bookingCreateRequest->partnerComment = null;
         $bookingCreateRequest->placedAt = $currentDate;
@@ -216,6 +227,7 @@ class BookingManagerTest extends TestCase
         $this->repository->save(Argument::type(Booking::class))->shouldBeCalled();
 
         $booking = $manager->create($bookingCreateRequest);
+
         $this->assertEquals($bookingCreateRequest->goldenId, $booking->goldenId);
         $this->assertEquals($bookingCreateRequest->partnerGoldenId, $booking->partnerGoldenId);
         $this->assertEquals($bookingCreateRequest->experienceGoldenId, $booking->experienceGoldenId);
@@ -230,11 +242,7 @@ class BookingManagerTest extends TestCase
         $this->assertEquals($bookingCreateRequest->totalPrice, $booking->totalPrice);
         $this->assertEquals($bookingCreateRequest->startDate, $booking->startDate);
         $this->assertEquals($bookingCreateRequest->endDate, $booking->endDate);
-        $this->assertEquals($bookingCreateRequest->customerExternalId, $booking->customerExternalId);
-        $this->assertEquals($bookingCreateRequest->customerFirstName, $booking->customerFirstName);
-        $this->assertEquals($bookingCreateRequest->customerLastName, $booking->customerLastName);
-        $this->assertEquals($bookingCreateRequest->customerEmail, $booking->customerEmail);
-        $this->assertEquals($bookingCreateRequest->customerPhone, $booking->customerPhone);
+        $this->assertEquals($bookingCreateRequest->guest[0]->externalId, $booking->guest->first()->externalId);
         $this->assertEquals($bookingCreateRequest->customerComment, $booking->customerComment);
         $this->assertEquals($bookingCreateRequest->partnerComment, $booking->partnerComment);
         $this->assertEquals($bookingCreateRequest->placedAt, $booking->placedAt);

@@ -40,11 +40,6 @@ class BookingHelper
             'total_price' => 150,
             'start_date' => '2020-05-05',
             'end_date' => '2020-05-06',
-            'customer_external_id' => 'W123123',
-            'customer_first_name' => null,
-            'customer_last_name' => null,
-            'customer_email' => null,
-            'customer_phone' => null,
             'customer_comment' => null,
             'partner_comment' => null,
             'placed_at' => '2020-01-01T00:00:00+0',
@@ -66,6 +61,25 @@ class BookingHelper
         $payload['partner_golden_id'] = $partner->golden_id;
     }
 
+    public function addValidGuest(array &$payload)
+    {
+        $payload['guest'][0] = [
+            'external_id' => '12345',
+        ];
+    }
+
+    public function addMultipleValidGuests(array &$payload)
+    {
+        $payload['guest'] = [
+            0 => [
+                'external_id' => '12345',
+            ],
+            1 => [
+                'external_id' => '54321',
+            ],
+        ];
+    }
+
     /**
      * @return JsonResponse|object
      */
@@ -75,6 +89,7 @@ class BookingHelper
             $payload = $this->getDefault();
             $this->addValidExperience($payload);
             $this->addValidPartner($payload);
+            $this->addValidGuest($payload);
         }
         $this->client->request('POST', $this->baseUrl.self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 

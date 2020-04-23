@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Helper\TimestampableEntityTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\CustomIdGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -109,31 +111,6 @@ class Booking
     public \DateTime $endDate;
 
     /**
-     * @ORM\Column(type="string", length=45)
-     */
-    public string $customerExternalId;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    public ?string $customerFirstName = null;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    public ?string $customerLastName = null;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    public ?string $customerEmail = null;
-
-    /**
-     * @ORM\Column(type="string", length=45, nullable=true)
-     */
-    public ?string $customerPhone = null;
-
-    /**
      * @ORM\Column(type="text", nullable=true)
      */
     public ?string $customerComment = null;
@@ -152,4 +129,16 @@ class Booking
      * @ORM\Column(type="date", nullable=true)
      */
     public ?\DateTime $cancelledAt = null;
+
+    /**
+     * @var Collection<int, Guest>
+     *
+     * @ORM\OneToMany(targetEntity="Guest", mappedBy="booking", cascade={"persist", "remove"})
+     */
+    public Collection $guest;
+
+    public function __construct()
+    {
+        $this->guest = new ArrayCollection();
+    }
 }
