@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controller\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\PartnerRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,14 +64,14 @@ class BroadcastListenerController
      * @SWG\Parameter(
      *         name="body",
      *         in="body",
-     *         @Model(type=RelationshipRequest::class)
+     *         @Model(type=ProductRelationshipRequest::class)
      * )
      * @SWG\Response(
      *     response=202,
      *     description="Relationship handled")
      * )
      */
-    public function relationshipListener(RelationshipRequest $relationshipRequest, MessageBusInterface $messageBus): Response
+    public function relationshipListener(ProductRelationshipRequest $relationshipRequest, MessageBusInterface $messageBus): Response
     {
         $messageBus->dispatch($relationshipRequest);
 

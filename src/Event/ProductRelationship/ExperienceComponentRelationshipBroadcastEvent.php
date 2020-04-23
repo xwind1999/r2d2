@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Event\ProductRelationship;
 
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class ExperienceComponentRelationshipBroadcastEvent extends Event implements ProductRelationshipEventInterface
 {
-    public const EVENT_NAME = 'relationship.experience-component';
+    public const EVENT_NAME = 'product-relationship.experience-component';
 
-    private RelationshipRequest $relationshipRequest;
+    private ProductRelationshipRequest $relationshipRequest;
 
-    public function __construct(RelationshipRequest $relationshipRequest)
+    public function __construct(ProductRelationshipRequest $relationshipRequest)
     {
         $this->relationshipRequest = $relationshipRequest;
     }
 
-    public function getRelationshipRequest(): RelationshipRequest
+    public function getProductRelationshipRequest(): ProductRelationshipRequest
     {
         return $this->relationshipRequest;
     }

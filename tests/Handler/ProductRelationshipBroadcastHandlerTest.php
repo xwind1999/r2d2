@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Handler;
 
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\Handler\ProductRelationshipBroadcastHandler;
 use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
@@ -50,7 +50,7 @@ class ProductRelationshipBroadcastHandlerTest extends TestCase
         $parentProduct = '860eb3100e3689e57b5d9772';
         $childProduct = 'cde730104afb457781d05436';
 
-        $relationshipRequest = new RelationshipRequest();
+        $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->parentProduct = $parentProduct;
         $relationshipRequest->childProduct = $childProduct;
         $relationshipRequest->sortOrder = 1;
@@ -78,7 +78,7 @@ class ProductRelationshipBroadcastHandlerTest extends TestCase
         $parentProduct = '860eb3100e3689e57b5d9772';
         $childProduct = 'cde730104afb457781d05436';
 
-        $relationshipRequest = new RelationshipRequest();
+        $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->parentProduct = $parentProduct;
         $relationshipRequest->childProduct = $childProduct;
         $relationshipRequest->sortOrder = 1;

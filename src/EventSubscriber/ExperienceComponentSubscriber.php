@@ -32,14 +32,16 @@ class ExperienceComponentSubscriber implements EventSubscriberInterface
     public function handleMessage(ExperienceComponentRelationshipBroadcastEvent $event): void
     {
         try {
-            $this->experienceComponentManager->replace($event->getRelationshipRequest());
+            $this->experienceComponentManager->replace($event->getProductRelationshipRequest());
         } catch (ExperienceNotFoundException $exception) {
             $this->logger->warning(
-                'No existing Experience for this relationship', $event->getRelationshipRequest()->getContext()
+                'No existing Experience for this relationship',
+                $event->getProductRelationshipRequest()->getContext()
             );
         } catch (RoomNotFoundException $exception) {
             $this->logger->warning(
-                'No existing Room for this relationship', $event->getRelationshipRequest()->getContext()
+                'No existing Room for this relationship',
+                $event->getProductRelationshipRequest()->getContext()
             );
         }
     }

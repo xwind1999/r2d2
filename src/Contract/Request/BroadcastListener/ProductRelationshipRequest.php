@@ -10,13 +10,14 @@ use Clogger\ContextualInterface;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class RelationshipRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface
+class ProductRelationshipRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface
 {
     /**
      * @Assert\Type(type="string")
      * @Assert\NotBlank
      *
      * @JMS\Type("string")
+     * @JMS\SerializedName("parentProduct")
      */
     public string $parentProduct;
 
@@ -25,6 +26,7 @@ class RelationshipRequest implements RequestBodyInterface, ValidatableRequest, C
      * @Assert\NotBlank
      *
      * @JMS\Type("string")
+     * @JMS\SerializedName("childProduct")
      */
     public string $childProduct;
 
@@ -34,6 +36,7 @@ class RelationshipRequest implements RequestBodyInterface, ValidatableRequest, C
      * @Assert\NotBlank
      *
      * @JMS\Type("strict_integer")
+     * @JMS\SerializedName("sortOrder")
      */
     public int $sortOrder;
 
@@ -42,6 +45,7 @@ class RelationshipRequest implements RequestBodyInterface, ValidatableRequest, C
      * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
+     * @JMS\SerializedName("isEnabled")
      */
     public bool $isEnabled;
 
@@ -50,6 +54,7 @@ class RelationshipRequest implements RequestBodyInterface, ValidatableRequest, C
      * @Assert\NotBlank
      *
      * @JMS\Type("string")
+     * @JMS\SerializedName("relationshipType")
      */
     public string $relationshipType;
 
@@ -57,6 +62,7 @@ class RelationshipRequest implements RequestBodyInterface, ValidatableRequest, C
      * @Assert\Type(type="string")
      *
      * @JMS\Type("string")
+     * @JMS\SerializedName("printType")
      */
     public string $printType = '';
 
@@ -64,6 +70,7 @@ class RelationshipRequest implements RequestBodyInterface, ValidatableRequest, C
      * @Assert\Type(type="integer")
      *
      * @JMS\Type("strict_integer")
+     * @JMS\SerializedName("childCount")
      */
     public int $childCount = 0;
 
@@ -71,6 +78,7 @@ class RelationshipRequest implements RequestBodyInterface, ValidatableRequest, C
      * @Assert\Type(type="integer")
      *
      * @JMS\Type("strict_integer")
+     * @JMS\SerializedName("childQuantity")
      */
     public int $childQuantity = 0;
 

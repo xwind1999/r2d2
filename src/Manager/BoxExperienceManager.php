@@ -6,7 +6,7 @@ namespace App\Manager;
 
 use App\Contract\Request\BoxExperience\BoxExperienceCreateRequest;
 use App\Contract\Request\BoxExperience\BoxExperienceDeleteRequest;
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Entity\BoxExperience;
 use App\Exception\Manager\BoxExperience\RelationshipAlreadyExistsException;
 use App\Exception\Repository\BoxNotFoundException;
@@ -79,7 +79,7 @@ class BoxExperienceManager
      * @throws ExperienceNotFoundException
      * @throws BoxNotFoundException
      */
-    public function replace(RelationshipRequest $relationshipRequest): void
+    public function replace(ProductRelationshipRequest $relationshipRequest): void
     {
         $box = $this->boxRepository->findOneByGoldenId($relationshipRequest->parentProduct);
         $experience = $this->experienceRepository->findOneByGoldenId($relationshipRequest->childProduct);

@@ -6,7 +6,7 @@ namespace App\Tests\Manager;
 
 use App\Contract\Request\BoxExperience\BoxExperienceCreateRequest;
 use App\Contract\Request\BoxExperience\BoxExperienceDeleteRequest;
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Entity\Box;
 use App\Entity\BoxExperience;
 use App\Entity\Experience;
@@ -222,7 +222,7 @@ class BoxExperienceManagerTest extends TestCase
         $this->experienceRepository->findOneByGoldenId('7895')->willReturn($experience);
 
         $date = new \DateTime();
-        $relationshipRequest = new RelationshipRequest();
+        $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->parentProduct = '1234';
         $relationshipRequest->childProduct = '7895';
         $relationshipRequest->isEnabled = false;

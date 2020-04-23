@@ -32,14 +32,16 @@ class BoxExperienceSubscriber implements EventSubscriberInterface
     public function handleMessage(BoxExperienceRelationshipBroadcastEvent $event): void
     {
         try {
-            $this->boxExperienceManager->replace($event->getRelationshipRequest());
+            $this->boxExperienceManager->replace($event->getProductRelationshipRequest());
         } catch (BoxNotFoundException $exception) {
             $this->logger->warning(
-                'No existing Box for this relationship', $event->getRelationshipRequest()->getContext()
+                'No existing Box for this relationship',
+                $event->getProductRelationshipRequest()->getContext()
             );
         } catch (ExperienceNotFoundException $exception) {
             $this->logger->warning(
-                'No existing Experience for this relationship', $event->getRelationshipRequest()->getContext()
+                'No existing Experience for this relationship',
+                $event->getProductRelationshipRequest()->getContext()
             );
         }
     }

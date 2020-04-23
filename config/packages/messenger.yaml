@@ -28,4 +28,4 @@ framework:
         # Route your messages to the transports
             'App\Contract\Request\BroadcastListener\PartnerRequest': broadcast-listeners-partner
             'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
-            'App\Contract\Request\BroadcastListener\RelationshipRequest': broadcast-listeners-product-relationship
+            'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
