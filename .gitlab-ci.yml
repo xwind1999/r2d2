@@ -21,7 +21,7 @@ default:
   before_script:
     - echo '10.11.0.178 ie1-i-chef-02' >> /etc/hosts
   tags:
-    - k8s-alpha
+    - k8s
 
 include:
   - local: '/.ci/build-app-container.yaml'

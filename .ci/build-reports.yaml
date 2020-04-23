@@ -9,8 +9,6 @@ generate-api-reference:
     expire_in: 1 day
     paths:
       - openapi.json
-  tags:
-    - k8s-alpha
 
 phpmetrics:
   stage: Build Reports
@@ -23,8 +21,6 @@ phpmetrics:
     expire_in: 1 day
     paths:
       - report/
-  tags:
-    - k8s-alpha
 
 mermaid-generate-images:
   stage: Build Reports
@@ -41,8 +37,6 @@ mermaid-generate-images:
     - ls -lah report/html/docs/architecture/diagram/
   only:
     - master
-  tags:
-    - k8s-alpha
   except:
     - schedules
 
@@ -59,8 +53,6 @@ code-tests-aggregate:
     paths:
       - report/
       - openapi.json
-  tags:
-    - k8s-alpha
 
 generate-extra-docs:
   stage: Build Reports
@@ -78,5 +70,3 @@ generate-extra-docs:
       - mkdocs.yml
       - docs/exceptions.md
       - docs/README.md
-  tags:
-    - k8s-alpha
