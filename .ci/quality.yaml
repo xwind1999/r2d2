@@ -14,8 +14,6 @@ unitTests:
     expire_in: 1 day
     paths:
       - report/
-  tags:
-    - k8s-alpha
 
 Api-Tests:
   stage: Test
@@ -38,8 +36,6 @@ Api-Tests:
       - report/html/api-tests/
       - report/html/db
       - report/raw/api-tests/
-  tags:
-    - k8s-alpha
 
 Project-Env-Api-Tests:
   stage: Project Env Validation
@@ -54,8 +50,6 @@ Project-Env-Api-Tests:
     API_TEST_BASE_URL: "http://ie1-devint-r2d2-api-01.z.sbxtest.net"
   script:
     - php vendor/bin/phpunit --testsuite=ApiTests --testdox --no-coverage
-  tags:
-    - k8s-alpha
   only:
     - master
 
@@ -64,8 +58,6 @@ Pre-deploy Health Check:
   image: ${BASE_FULL_IMAGE}
   script:
     - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
-  tags:
-    - k8s-alpha
   only:
     - master
 
@@ -74,8 +66,6 @@ Post-deploy Health Check:
   image: ${BASE_FULL_IMAGE}
   script:
     - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
-  tags:
-    - k8s-alpha
   only:
     - master
 
@@ -120,8 +110,6 @@ contractTests-against-Api:
   image: grubykarol/locust
   script:
     - locust -f tests/LoadTests/R2D2Locust.py  --host=http://r2-d2-api/ --no-web -c 1 -r 1 --only-summary --run-time 1m
-  tags:
-    - k8s-alpha
 
 validate-api-spec-schema:
   stage: Test
@@ -130,8 +118,6 @@ validate-api-spec-schema:
     entrypoint: [""]
   script:
     - swagger-cli validate reference/r2d2-api/openapi.yaml
-  tags:
-    - k8s-alpha
 
 build-R2D2-stub-image:
   stage: Build
@@ -139,8 +125,6 @@ build-R2D2-stub-image:
   only:
      changes:
        - stub/sandbox/main.js
-  tags:
-    - k8s
   script:
     - docker build -t ${BASE_IMAGE_Stub}:latest -f stub/Dockerfile .
     - docker push ${BASE_IMAGE_Stub}:latest
@@ -152,5 +136,3 @@ php-cs-fixer:
     - composer
   script:
     - vendor/bin/php-cs-fixer fix -v --dry-run
-  tags:
-    - k8s-alpha
