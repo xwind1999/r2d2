@@ -26,7 +26,7 @@ abstract class RoomAvailabilityResponse extends ResponseContract
      *
      * @JMS\Type("string")
      */
-    public string $roomGoldenId;
+    public string $componentGoldenId;
 
     /**
      * @Assert\Type(type="string")
@@ -79,7 +79,7 @@ abstract class RoomAvailabilityResponse extends ResponseContract
     public function __construct(RoomAvailability $roomAvailability)
     {
         $this->uuid = $roomAvailability->uuid->toString();
-        $this->roomGoldenId = $roomAvailability->roomGoldenId;
+        $this->componentGoldenId = $roomAvailability->componentGoldenId;
         $this->rateBandGoldenId = $roomAvailability->rateBandGoldenId;
         $this->stock = $roomAvailability->stock;
         $this->date = $roomAvailability->date;

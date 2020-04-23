@@ -8,7 +8,7 @@ class RoomAvailabilityApiTest extends ApiTestCase
 {
     public function testCreateWithInvalidRoomGoldenId()
     {
-        $response = self::$roomAvailabilityHelper->create(['room_golden_id' => '']);
+        $response = self::$roomAvailabilityHelper->create(['component_golden_id' => '']);
         $this->assertEquals(422, $response->getStatusCode());
     }
 

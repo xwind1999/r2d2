@@ -10,16 +10,16 @@ use App\Contract\Request\ExperienceComponent\ExperienceComponentDeleteRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentUpdateRequest;
 use App\Entity\ExperienceComponent;
 use App\Exception\Manager\ExperienceComponent\RelationshipAlreadyExistsException;
+use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ExperienceComponentNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
-use App\Exception\Repository\RoomNotFoundException;
+use App\Repository\ComponentRepository;
 use App\Repository\ExperienceComponentRepository;
 use App\Repository\ExperienceRepository;
-use App\Repository\RoomRepository;
 
 class ExperienceComponentManager
 {
-    protected RoomRepository $roomRepository;
+    protected ComponentRepository $componentRepository;
 
     protected ExperienceRepository $experienceRepository;
 
@@ -27,10 +27,10 @@ class ExperienceComponentManager
 
     public function __construct(
         ExperienceComponentRepository $experienceComponentRepository,
-        RoomRepository $roomRepository,
+        ComponentRepository $componentRepository,
         ExperienceRepository $experienceRepository
     ) {
-        $this->roomRepository = $roomRepository;
+        $this->componentRepository = $componentRepository;
         $this->experienceRepository = $experienceRepository;
         $this->experienceComponentRepository = $experienceComponentRepository;
     }
@@ -39,22 +39,22 @@ class ExperienceComponentManager
      * @throws ExperienceComponentNotFoundException
      * @throws ExperienceNotFoundException
      * @throws RelationshipAlreadyExistsException
-     * @throws RoomNotFoundException
+     * @throws ComponentNotFoundException
      */
     public function create(ExperienceComponentCreateRequest $experienceComponentCreateRequestComponent): ExperienceComponent
     {
-        $room = $this->roomRepository->findOneByGoldenId($experienceComponentCreateRequestComponent->roomGoldenId);
+        $component = $this->componentRepository->findOneByGoldenId($experienceComponentCreateRequestComponent->componentGoldenId);
         $experience = $this->experienceRepository->findOneByGoldenId(
             $experienceComponentCreateRequestComponent->experienceGoldenId
         );
 
-        if ($this->experienceComponentRepository->findOneByExperienceComponent($experience, $room)) {
+        if ($this->experienceComponentRepository->findOneByExperienceComponent($experience, $component)) {
             throw new RelationshipAlreadyExistsException();
         }
 
         $experienceComponent = new ExperienceComponent();
-        $experienceComponent->room = $room;
-        $experienceComponent->roomGoldenId = $room->goldenId;
+        $experienceComponent->component = $component;
+        $experienceComponent->componentGoldenId = $component->goldenId;
         $experienceComponent->experience = $experience;
         $experienceComponent->experienceGoldenId = $experience->goldenId;
         $experienceComponent->isEnabled = $experienceComponentCreateRequestComponent->isEnabled;
@@ -67,17 +67,17 @@ class ExperienceComponentManager
 
     /**
      * @throws ExperienceNotFoundException
-     * @throws RoomNotFoundException
+     * @throws ComponentNotFoundException
      * @throws ExperienceComponentNotFoundException
      */
     public function delete(ExperienceComponentDeleteRequest $experienceDeleteRequestComponent): void
     {
-        $room = $this->roomRepository->findOneByGoldenId($experienceDeleteRequestComponent->roomGoldenId);
+        $component = $this->componentRepository->findOneByGoldenId($experienceDeleteRequestComponent->componentGoldenId);
         $experience = $this->experienceRepository->findOneByGoldenId(
             $experienceDeleteRequestComponent->experienceGoldenId
         );
 
-        $experienceComponent = $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room);
+        $experienceComponent = $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component);
 
         if (!$experienceComponent) {
             return;
@@ -89,20 +89,20 @@ class ExperienceComponentManager
     /**
      * @throws ExperienceComponentNotFoundException
      * @throws ExperienceNotFoundException
-     * @throws RoomNotFoundException
+     * @throws ComponentNotFoundException
      */
     public function update(ExperienceComponentUpdateRequest $experienceComponentUpdateRequest): ExperienceComponent
     {
-        $room = $this->roomRepository->findOneByGoldenId($experienceComponentUpdateRequest->roomGoldenId);
+        $component = $this->componentRepository->findOneByGoldenId($experienceComponentUpdateRequest->componentGoldenId);
         $experience = $this->experienceRepository->findOneByGoldenId($experienceComponentUpdateRequest->experienceGoldenId);
-        $experienceComponent = $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room);
+        $experienceComponent = $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component);
 
         if (null === $experienceComponent) {
             throw new ExperienceComponentNotFoundException();
         }
 
-        $experienceComponent->room = $room;
-        $experienceComponent->roomGoldenId = $room->goldenId;
+        $experienceComponent->component = $component;
+        $experienceComponent->componentGoldenId = $component->goldenId;
         $experienceComponent->experience = $experience;
         $experienceComponent->experienceGoldenId = $experience->goldenId;
         $experienceComponent->isEnabled = $experienceComponentUpdateRequest->isEnabled;
@@ -115,17 +115,17 @@ class ExperienceComponentManager
 
     /**
      * @throws ExperienceNotFoundException
-     * @throws RoomNotFoundException
+     * @throws ComponentNotFoundException
      */
     public function replace(ProductRelationshipRequest $relationshipRequest): void
     {
-        $room = $this->roomRepository->findOneByGoldenId($relationshipRequest->childProduct);
+        $component = $this->componentRepository->findOneByGoldenId($relationshipRequest->childProduct);
         $experience = $this->experienceRepository->findOneByGoldenId($relationshipRequest->parentProduct);
-        $experienceComponent = $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room);
+        $experienceComponent = $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component);
 
         $experienceComponent = $experienceComponent ?? new ExperienceComponent();
-        $experienceComponent->room = $room;
-        $experienceComponent->roomGoldenId = $room->goldenId;
+        $experienceComponent->component = $component;
+        $experienceComponent->componentGoldenId = $component->goldenId;
         $experienceComponent->experience = $experience;
         $experienceComponent->experienceGoldenId = $experience->goldenId;
         $experienceComponent->isEnabled = $relationshipRequest->isEnabled;

@@ -21,7 +21,7 @@ properties:
     type: string
     format: uuid
     description: Room UUID
-  room_golden_id:
+  component_golden_id:
     type: string
     description: Room Golden ID
   rate_band_uuid:
@@ -52,7 +52,7 @@ properties:
 required:
   - uuid
   - room_uuid
-  - room_golden_id
+  - component_golden_id
   - date
   - price
   - currency

@@ -8,35 +8,35 @@ use App\Contract\Request\RoomPrice\RoomPriceCreateRequest;
 use App\Contract\Request\RoomPrice\RoomPriceUpdateRequest;
 use App\Entity\RoomPrice;
 use App\Exception\Repository\EntityNotFoundException;
+use App\Repository\ComponentRepository;
 use App\Repository\RateBandRepository;
 use App\Repository\RoomPriceRepository;
-use App\Repository\RoomRepository;
 
 class RoomPriceManager
 {
     protected RoomPriceRepository $repository;
 
-    protected RoomRepository $roomRepository;
+    protected ComponentRepository $componentRepository;
 
     protected RateBandRepository $rateBandRepository;
 
-    public function __construct(RoomPriceRepository $repository, RoomRepository $roomRepository, RateBandRepository $rateBandRepository)
+    public function __construct(RoomPriceRepository $repository, ComponentRepository $componentRepository, RateBandRepository $rateBandRepository)
     {
         $this->repository = $repository;
-        $this->roomRepository = $roomRepository;
+        $this->componentRepository = $componentRepository;
         $this->rateBandRepository = $rateBandRepository;
     }
 
     public function create(RoomPriceCreateRequest $roomPriceCreateRequest): RoomPrice
     {
         $rateBand = $this->rateBandRepository->findOneByGoldenId($roomPriceCreateRequest->rateBandGoldenId);
-        $room = $this->roomRepository->findOneByGoldenId($roomPriceCreateRequest->roomGoldenId);
+        $component = $this->componentRepository->findOneByGoldenId($roomPriceCreateRequest->componentGoldenId);
 
         $roomPrice = new RoomPrice();
 
         $roomPrice->rateBand = $rateBand;
-        $roomPrice->room = $room;
-        $roomPrice->roomGoldenId = $roomPriceCreateRequest->roomGoldenId;
+        $roomPrice->component = $component;
+        $roomPrice->componentGoldenId = $roomPriceCreateRequest->componentGoldenId;
         $roomPrice->rateBandGoldenId = $roomPriceCreateRequest->rateBandGoldenId;
         $roomPrice->date = $roomPriceCreateRequest->date;
         $roomPrice->price = $roomPriceCreateRequest->price;
@@ -69,13 +69,13 @@ class RoomPriceManager
     public function update(string $uuid, RoomPriceUpdateRequest $roomPriceUpdateRequest): RoomPrice
     {
         $rateBand = $this->rateBandRepository->findOneByGoldenId($roomPriceUpdateRequest->rateBandGoldenId);
-        $room = $this->roomRepository->findOneByGoldenId($roomPriceUpdateRequest->roomGoldenId);
+        $component = $this->componentRepository->findOneByGoldenId($roomPriceUpdateRequest->componentGoldenId);
 
         $roomPrice = $this->get($uuid);
 
         $roomPrice->rateBand = $rateBand;
-        $roomPrice->room = $room;
-        $roomPrice->roomGoldenId = $roomPriceUpdateRequest->roomGoldenId;
+        $roomPrice->component = $component;
+        $roomPrice->componentGoldenId = $roomPriceUpdateRequest->componentGoldenId;
         $roomPrice->rateBandGoldenId = $roomPriceUpdateRequest->rateBandGoldenId;
         $roomPrice->date = $roomPriceUpdateRequest->date;
         $roomPrice->price = $roomPriceUpdateRequest->price;

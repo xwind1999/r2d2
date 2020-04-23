@@ -16,15 +16,15 @@ class ExperienceComponent
 
     /**
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Room")
-     * @ORM\JoinColumn(name="room_uuid", referencedColumnName="uuid", nullable=false)
+     * @ORM\ManyToOne(targetEntity="Component")
+     * @ORM\JoinColumn(name="component_uuid", referencedColumnName="uuid", nullable=false)
      */
-    public Room $room;
+    public Component $component;
 
     /**
      * @ORM\Column(type="string", length=45, nullable=true)
      */
-    public string $roomGoldenId;
+    public string $componentGoldenId;
 
     /**
      * @ORM\Id

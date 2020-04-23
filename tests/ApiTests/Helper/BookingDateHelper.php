@@ -27,7 +27,7 @@ class BookingDateHelper
     {
         $payload = [
             'booking_golden_id' => '1234',
-            'room_golden_id' => '1123',
+            'component_golden_id' => '1123',
             'rate_band_golden_id' => '12',
             'date' => '2020-01-01',
             'price' => 9990,
@@ -44,10 +44,10 @@ class BookingDateHelper
         $payload['booking_golden_id'] = $booking->golden_id;
     }
 
-    public function addValidRoom(array &$payload)
+    public function addValidComponent(array &$payload)
     {
-        $room = json_decode(ApiTestCase::$roomHelper->create()->getContent());
-        $payload['room_golden_id'] = $room->golden_id;
+        $component = json_decode(ApiTestCase::$componentHelper->create()->getContent());
+        $payload['component_golden_id'] = $component->golden_id;
     }
 
     public function addValidRateBand(array &$payload)
@@ -63,7 +63,7 @@ class BookingDateHelper
     {
         if (empty($payload)) {
             $payload = $this->getDefault();
-            $this->addValidRoom($payload);
+            $this->addValidComponent($payload);
             $this->addValidRateBand($payload);
             $this->addValidBooking($payload);
         }

@@ -11,7 +11,7 @@ use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\ComponentBroadcastEvent;
 use App\EventSubscriber\ComponentBroadcastSubscriber;
-use App\Manager\RoomManager;
+use App\Manager\ComponentManager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -27,7 +27,7 @@ class ComponentBroadcastSubscriberTest extends TestCase
     private $logger;
 
     /**
-     * @var ObjectProphecy|RoomManager
+     * @var ComponentManager|ObjectProphecy
      */
     private $manager;
 
@@ -39,7 +39,7 @@ class ComponentBroadcastSubscriberTest extends TestCase
     public function setUp(): void
     {
         $this->logger = $this->prophesize(LoggerInterface::class);
-        $this->manager = $this->prophesize(RoomManager::class);
+        $this->manager = $this->prophesize(ComponentManager::class);
         $this->event = $this->prophesize(ComponentBroadcastEvent::class);
     }
 

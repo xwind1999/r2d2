@@ -35,7 +35,7 @@ abstract class BookingDateResponse extends ResponseContract
      *
      * @JMS\Type("string")
      */
-    public string $roomGoldenId;
+    public string $componentGoldenId;
 
     /**
      * @Assert\Type(type="string")
@@ -97,7 +97,7 @@ abstract class BookingDateResponse extends ResponseContract
     {
         $this->uuid = $bookingDate->uuid->toString();
         $this->bookingGoldenId = $bookingDate->bookingGoldenId;
-        $this->roomGoldenId = $bookingDate->roomGoldenId;
+        $this->componentGoldenId = $bookingDate->componentGoldenId;
         $this->rateBandGoldenId = $bookingDate->rateBandGoldenId;
         $this->date = $bookingDate->date;
         $this->price = $bookingDate->price;
