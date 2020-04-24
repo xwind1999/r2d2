@@ -28,11 +28,12 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
      *
      * @JMS\Type("string")
      */
-    public string $goldenId;
+    public string $id;
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="8")
+     * @Assert\Length(min="1", max="16")
+     * @Assert\NotBlank
      *
      * @JMS\Type("string")
      */
@@ -41,35 +42,39 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
     /**
      * @Assert\Type(type="string")
      * @Assert\Length(min="3", max="3")
+     * @Assert\NotBlank
      *
      * @JMS\Type("string")
+     * @JMS\SerializedName("currencyCode")
      */
-    public string $currency;
+    public string $currencyCode;
 
     /**
      * @Assert\Type(type="boolean")
      * @Assert\NotNull()
      *
      * @JMS\Type("strict_boolean")
+     * @JMS\SerializedName("isChannelManagerEnabled")
      */
-    public bool $isChannelManagerActive;
+    public bool $isChannelManagerEnabled;
 
     /**
      * @Assert\Type(type="DateTime")
      *
      * @JMS\Type("DateTime<'Y-m-d'>")
+     * @JMS\SerializedName("partnerCeaseDate")
      */
-    public ?\DateTime $ceaseDate = null;
+    public ?\DateTime $partnerCeaseDate = null;
 
     public function getContext(): array
     {
         return [
             'uuid' => $this->uuid,
-            'golden_id' => $this->goldenId,
+            'id' => $this->id,
             'status' => $this->status,
-            'currency' => $this->currency,
-            'is_channel_manager_active' => $this->isChannelManagerActive,
-            'cease_date' => $this->ceaseDate,
+            'currency_code' => $this->currencyCode,
+            'is_channel_manager_enabled' => $this->isChannelManagerEnabled,
+            'partner_cease_date' => $this->partnerCeaseDate,
         ];
     }
 }
