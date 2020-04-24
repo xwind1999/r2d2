@@ -64,7 +64,7 @@ class BookingHelper
     public function addValidGuest(array &$payload)
     {
         $payload['guest'][0] = [
-            'external_id' => '12345',
+            'first_name' => 'Person One',
         ];
     }
 
@@ -72,10 +72,10 @@ class BookingHelper
     {
         $payload['guest'] = [
             0 => [
-                'external_id' => '12345',
+                'first_name' => 'Person One',
             ],
             1 => [
-                'external_id' => '54321',
+                'first_name' => 'Person Two',
             ],
         ];
     }

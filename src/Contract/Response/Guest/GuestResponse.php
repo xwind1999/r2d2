@@ -11,15 +11,6 @@ class GuestResponse
 {
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("string")
-     */
-    public string $externalId;
-
-    /**
-     * @Assert\Type(type="string")
      * @Assert\Length(min="1", max="255")
      *
      * @JMS\Type("string")
