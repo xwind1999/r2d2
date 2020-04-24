@@ -50,11 +50,11 @@ class BroadcastListenerHelper
     {
         $payload = [
             'uuid' => '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-            'golden_id' => bin2hex(random_bytes(12)),
-            'status' => 'alive',
-            'currency' => 'USD',
-            'is_channel_manager_active' => true,
-            'ceased_date' => '2020-03-18',
+            'id' => bin2hex(random_bytes(12)),
+            'status' => 'new partner',
+            'currencyCode' => 'USD',
+            'isChannelManagerEnabled' => true,
+            'partnerCeaseDate' => '2020-03-18',
         ];
 
         return $overrides + $payload;

@@ -73,16 +73,16 @@ class PartnerManager
     public function replace(PartnerRequest $partnerRequest): void
     {
         try {
-            $partner = $this->repository->findOneByGoldenId($partnerRequest->goldenId);
+            $partner = $this->repository->findOneByGoldenId($partnerRequest->id);
         } catch (PartnerNotFoundException $exception) {
             $partner = new Partner();
         }
 
-        $partner->goldenId = $partnerRequest->goldenId;
+        $partner->goldenId = $partnerRequest->id;
         $partner->status = $partnerRequest->status;
-        $partner->currency = $partnerRequest->currency;
-        $partner->isChannelManagerActive = $partnerRequest->isChannelManagerActive;
-        $partner->ceaseDate = $partnerRequest->ceaseDate;
+        $partner->currency = $partnerRequest->currencyCode;
+        $partner->isChannelManagerActive = $partnerRequest->isChannelManagerEnabled;
+        $partner->ceaseDate = $partnerRequest->partnerCeaseDate;
 
         $this->repository->save($partner);
     }

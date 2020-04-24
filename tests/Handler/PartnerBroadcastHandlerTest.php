@@ -24,11 +24,11 @@ class PartnerBroadcastHandlerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $partnerRequest = new PartnerRequest();
         $partnerRequest->uuid = $uuid;
-        $partnerRequest->goldenId = '1234';
+        $partnerRequest->id = '1234';
         $partnerRequest->status = 'alive';
-        $partnerRequest->currency = 'USD';
-        $partnerRequest->isChannelManagerActive = true;
-        $partnerRequest->ceaseDate = new \DateTime('2020-10-10');
+        $partnerRequest->currencyCode = 'USD';
+        $partnerRequest->isChannelManagerEnabled = true;
+        $partnerRequest->partnerCeaseDate = new \DateTime('2020-10-10');
 
         $logger = $this->prophesize(LoggerInterface::class);
         $manager = $this->prophesize(PartnerManager::class);
@@ -46,11 +46,11 @@ class PartnerBroadcastHandlerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $partnerRequest = new PartnerRequest();
         $partnerRequest->uuid = $uuid;
-        $partnerRequest->goldenId = '1234';
+        $partnerRequest->id = '1234';
         $partnerRequest->status = 'alive';
-        $partnerRequest->currency = 'USD';
-        $partnerRequest->isChannelManagerActive = true;
-        $partnerRequest->ceaseDate = new \DateTime('2020-10-10');
+        $partnerRequest->currencyCode = 'USD';
+        $partnerRequest->isChannelManagerEnabled = true;
+        $partnerRequest->partnerCeaseDate = new \DateTime('2020-10-10');
 
         $logger = $this->prophesize(LoggerInterface::class);
         $manager = $this->prophesize(PartnerManager::class);

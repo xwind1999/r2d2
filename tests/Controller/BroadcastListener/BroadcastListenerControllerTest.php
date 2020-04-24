@@ -63,10 +63,10 @@ class BroadcastListenerControllerTest extends TestCase
     {
         $partnerRequest = new PartnerRequest();
         $partnerRequest->uuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
-        $partnerRequest->goldenId = '123456';
-        $partnerRequest->currency = 'USD';
+        $partnerRequest->id = '123456';
+        $partnerRequest->currencyCode = 'USD';
         $partnerRequest->status = 'alive';
-        $partnerRequest->ceaseDate = new \DateTime();
+        $partnerRequest->partnerCeaseDate = new \DateTime();
 
         $this->messageBus->expects($this->once())
             ->method('dispatch')

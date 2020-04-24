@@ -122,13 +122,13 @@ class PartnerManagerTest extends TestCase
     {
         $manager = new PartnerManager($this->repository->reveal());
         $partnerRequest = new PartnerRequest();
-        $partnerRequest->goldenId = '1234';
+        $partnerRequest->id = '1234';
         $partnerRequest->status = 'active';
-        $partnerRequest->currency = 'EUR';
-        $partnerRequest->isChannelManagerActive = true;
-        $partnerRequest->ceaseDate = new \DateTime('2020-10-10');
+        $partnerRequest->currencyCode = 'EUR';
+        $partnerRequest->isChannelManagerEnabled = true;
+        $partnerRequest->partnerCeaseDate = new \DateTime('2020-10-10');
 
-        $this->repository->findOneByGoldenId($partnerRequest->goldenId)->shouldBeCalled();
+        $this->repository->findOneByGoldenId($partnerRequest->id)->shouldBeCalled();
         $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
 
         $this->assertEmpty($manager->replace($partnerRequest));
@@ -142,14 +142,14 @@ class PartnerManagerTest extends TestCase
     {
         $manager = new PartnerManager($this->repository->reveal());
         $partnerRequest = new PartnerRequest();
-        $partnerRequest->goldenId = '1584878545';
+        $partnerRequest->id = '1584878545';
         $partnerRequest->status = 'active';
-        $partnerRequest->currency = 'USD';
-        $partnerRequest->isChannelManagerActive = true;
-        $partnerRequest->ceaseDate = new \DateTime('2020-10-10');
+        $partnerRequest->currencyCode = 'USD';
+        $partnerRequest->isChannelManagerEnabled = true;
+        $partnerRequest->partnerCeaseDate = new \DateTime('2020-10-10');
 
         $this->repository
-            ->findOneByGoldenId($partnerRequest->goldenId)
+            ->findOneByGoldenId($partnerRequest->id)
             ->shouldBeCalled()
             ->willThrow(new PartnerNotFoundException())
         ;
