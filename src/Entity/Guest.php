@@ -35,11 +35,6 @@ class Guest
     public string $bookingGoldenId;
 
     /**
-     * @ORM\Column(type="string", length=45)
-     */
-    public string $externalId;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     public ?string $firstName = null;

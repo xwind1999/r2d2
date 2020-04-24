@@ -198,7 +198,7 @@ class BookingManagerTest extends TestCase
         $this->experienceRepository->findOneByGoldenId('9012')->willReturn($experience);
 
         $guest = new Guest();
-        $guest->externalId = '5435454';
+        $guest->firstName = 'Person One';
 
         $currentDate = new \DateTime();
 
@@ -242,7 +242,7 @@ class BookingManagerTest extends TestCase
         $this->assertEquals($bookingCreateRequest->totalPrice, $booking->totalPrice);
         $this->assertEquals($bookingCreateRequest->startDate, $booking->startDate);
         $this->assertEquals($bookingCreateRequest->endDate, $booking->endDate);
-        $this->assertEquals($bookingCreateRequest->guest[0]->externalId, $booking->guest->first()->externalId);
+        $this->assertEquals($bookingCreateRequest->guest[0]->firstName, $booking->guest->first()->firstName);
         $this->assertEquals($bookingCreateRequest->customerComment, $booking->customerComment);
         $this->assertEquals($bookingCreateRequest->partnerComment, $booking->partnerComment);
         $this->assertEquals($bookingCreateRequest->placedAt, $booking->placedAt);

@@ -67,7 +67,6 @@ class BookingManager
             $guest = new Guest();
             $guest->booking = $booking;
             $guest->bookingGoldenId = $bookingCreateRequest->goldenId;
-            $guest->externalId = $guestRequest->externalId;
             $guest->firstName = $guestRequest->firstName;
             $guest->lastName = $guestRequest->lastName;
             $guest->email = $guestRequest->email;
