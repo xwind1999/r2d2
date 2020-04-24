@@ -19,15 +19,6 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
      *
      * @JMS\Type("string")
      */
-    public string $uuid;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("string")
-     */
     public string $id;
 
     /**
