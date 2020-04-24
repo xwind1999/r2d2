@@ -19,15 +19,6 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
      *
      * @JMS\Type("string")
      */
-    public string $uuid;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("string")
-     */
     public string $id;
 
     /**
@@ -69,7 +60,6 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
     public function getContext(): array
     {
         return [
-            'uuid' => $this->uuid,
             'id' => $this->id,
             'status' => $this->status,
             'currency_code' => $this->currencyCode,
