@@ -60,7 +60,6 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
     public function getContext(): array
     {
         return [
-            'uuid' => $this->uuid,
             'id' => $this->id,
             'status' => $this->status,
             'currency_code' => $this->currencyCode,
