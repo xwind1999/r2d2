@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Resolver;
 
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\Event\ProductRelationship\ProductRelationshipEventInterface;
@@ -18,7 +18,7 @@ class ProductRelationshipTypeResolver
     /**
      * @throws NonExistentTypeResolverExcepetion
      */
-    public function resolve(RelationshipRequest $relationshipRequest): ProductRelationshipEventInterface
+    public function resolve(ProductRelationshipRequest $relationshipRequest): ProductRelationshipEventInterface
     {
         $relationshipType = strtoupper($relationshipRequest->relationshipType);
 

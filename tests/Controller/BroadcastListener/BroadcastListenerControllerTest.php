@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Controller\Api;
 
 use App\Contract\Request\BroadcastListener\PartnerRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
 use App\Controller\BroadcastListener\BroadcastListenerController;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -83,7 +83,7 @@ class BroadcastListenerControllerTest extends TestCase
      */
     public function testHandleRelationshipsSuccessfully()
     {
-        $relationshipRequest = new RelationshipRequest();
+        $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->parentProduct = 'BB0000335658';
         $relationshipRequest->childProduct = 'HG0000335654';
         $relationshipRequest->sortOrder = 1;

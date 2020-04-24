@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\QuickData;
 
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
@@ -21,7 +21,7 @@ class ProductRelationshipTypeResolverTest extends TestCase
      */
     public function testResolveExperienceComponentSuccessfully()
     {
-        $relationshipRequest = $this->createMock(RelationshipRequest::class);
+        $relationshipRequest = $this->createMock(ProductRelationshipRequest::class);
         $relationshipRequest->relationshipType = 'Experience-Component';
 
         $relationshipTypeResolver = new ProductRelationshipTypeResolver();
@@ -34,7 +34,7 @@ class ProductRelationshipTypeResolverTest extends TestCase
      */
     public function testResolveBoxExperienceSuccessfully()
     {
-        $relationshipRequest = $this->createMock(RelationshipRequest::class);
+        $relationshipRequest = $this->createMock(ProductRelationshipRequest::class);
         $relationshipRequest->relationshipType = 'Box-Experience';
 
         $relationshipTypeResolver = new ProductRelationshipTypeResolver();
@@ -47,7 +47,7 @@ class ProductRelationshipTypeResolverTest extends TestCase
      */
     public function testResolveThrowsNonExistentTypeResolverExcepetion()
     {
-        $relationshipRequest = $this->createMock(RelationshipRequest::class);
+        $relationshipRequest = $this->createMock(ProductRelationshipRequest::class);
         $relationshipRequest->relationshipType = 'Component';
 
         $this->expectException(NonExistentTypeResolverExcepetion::class);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentCreateRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentDeleteRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentUpdateRequest;
@@ -332,7 +332,7 @@ class ExperienceComponentManagerTest extends TestCase
         $this->experienceRepository->findOneByGoldenId('7895')->willReturn($experience);
 
         $date = new \DateTime();
-        $relationshipRequest = new RelationshipRequest();
+        $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->childProduct = '1234';
         $relationshipRequest->parentProduct = '7895';
         $relationshipRequest->isEnabled = false;

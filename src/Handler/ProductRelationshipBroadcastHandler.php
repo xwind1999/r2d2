@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Handler;
 
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
 use App\Resolver\ProductRelationshipTypeResolver;
 use Psr\Log\LoggerInterface;
@@ -27,18 +27,13 @@ class ProductRelationshipBroadcastHandler implements MessageHandlerInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function __invoke(RelationshipRequest $relationshipRequest): void
+    public function __invoke(ProductRelationshipRequest $relationshipRequest): void
     {
         try {
             $productRelationshipEvent = $this->productRelationshipTypeResolver->resolve($relationshipRequest);
             $this->eventDispatcher->dispatch($productRelationshipEvent, $productRelationshipEvent->getEventName());
         } catch (NonExistentTypeResolverExcepetion $exception) {
-            $this->logger->warning(
-                $exception->getMessage(),
-                [
-                    'relationship_type' => $relationshipRequest->relationshipType,
-                ]
-            );
+            $this->logger->warning($exception->getMessage(), $relationshipRequest->getContext());
         }
     }
 }

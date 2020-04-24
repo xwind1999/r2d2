@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\EventSubscriber;
 
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\EventSubscriber\ExperienceComponentSubscriber;
 use App\Exception\Repository\EntityNotFoundException;
@@ -69,7 +69,7 @@ class ExperienceComponentSubscriberTest extends TestCase
      * @covers ::handleMessage
      * @covers \App\Exception\Repository\RoomNotFoundException
      * @covers \App\Exception\Repository\ExperienceNotFoundException
-     * @covers \App\Contract\Request\BroadcastListener\RelationshipRequest::getContext
+     * @covers \App\Contract\Request\BroadcastListener\ProductRelationshipRequest::getContext
      *
      * @dataProvider sampleException
      */
@@ -84,7 +84,7 @@ class ExperienceComponentSubscriberTest extends TestCase
         ;
         $this->logger->expects($this->once())->method('warning')->willReturn(null);
 
-        $relationshipRequest = new RelationshipRequest();
+        $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->childProduct = '111';
         $relationshipRequest->parentProduct = '222';
         $relationshipRequest->sortOrder = 1;
@@ -93,7 +93,7 @@ class ExperienceComponentSubscriberTest extends TestCase
 
         $this->experienceComponentEvent
             ->expects($this->exactly(2))
-            ->method('getRelationshipRequest')
+            ->method('getProductRelationshipRequest')
             ->willReturn($relationshipRequest)
         ;
         $experienceComponentSubscriber->handleMessage($this->experienceComponentEvent);

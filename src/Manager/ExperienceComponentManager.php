@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentCreateRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentDeleteRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentUpdateRequest;
@@ -117,7 +117,7 @@ class ExperienceComponentManager
      * @throws ExperienceNotFoundException
      * @throws RoomNotFoundException
      */
-    public function replace(RelationshipRequest $relationshipRequest): void
+    public function replace(ProductRelationshipRequest $relationshipRequest): void
     {
         $room = $this->roomRepository->findOneByGoldenId($relationshipRequest->childProduct);
         $experience = $this->experienceRepository->findOneByGoldenId($relationshipRequest->parentProduct);

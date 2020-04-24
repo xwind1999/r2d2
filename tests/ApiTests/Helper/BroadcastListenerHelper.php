@@ -10,9 +10,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class BroadcastListenerHelper
 {
-    const API_PRODUCT_BASE_URL = '/api/broadcast-listener/product';
-    const API_PARTNER_BASE_URL = '/api/broadcast-listener/partner';
-    const API_RELATIONSHIP_BASE_URL = '/api/broadcast-listener/product-relationship';
+    private const API_PRODUCT_BASE_URL = '/api/broadcast-listener/product';
+    private const API_PARTNER_BASE_URL = '/api/broadcast-listener/partner';
+    private const API_RELATIONSHIP_BASE_URL = '/api/broadcast-listener/product-relationship';
+
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;
@@ -63,14 +64,14 @@ class BroadcastListenerHelper
     public function getDefaultRelationship(array $overrides = []): array
     {
         $payload = [
-            'parent_product' => 'BB0000335658',
-            'child_product' => 'HG0000335654',
-            'sort_order' => 1,
-            'is_enabled' => true,
-            'relationship_type' => 'Box-Experience',
-            'print_type' => 'Digital',
-            'child_count' => 4,
-            'child_quantity' => 0,
+            'parentProduct' => 'BB0000335658',
+            'childProduct' => 'HG0000335654',
+            'sortOrder' => 1,
+            'isEnabled' => true,
+            'relationshipType' => 'Box-Experience',
+            'printType' => 'Digital',
+            'childCount' => 4,
+            'childQuantity' => 0,
         ];
 
         return $overrides + $payload;

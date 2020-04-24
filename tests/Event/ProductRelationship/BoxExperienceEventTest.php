@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Event\ProductRelationship;
 
-use App\Contract\Request\BroadcastListener\RelationshipRequest;
+use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
 use PHPUnit\Framework\TestCase;
 
@@ -15,15 +15,15 @@ class BoxExperienceEventTest extends TestCase
 {
     /**
      * @covers ::__construct
-     * @covers ::getRelationshipRequest
+     * @covers ::getProductRelationshipRequest
      * @covers ::getEventName
      */
     public function testEvent(): void
     {
-        $relationshipRequest = $this->createMock(RelationshipRequest::class);
+        $relationshipRequest = $this->createMock(ProductRelationshipRequest::class);
 
         $boxExperienceEvent = new BoxExperienceRelationshipBroadcastEvent($relationshipRequest);
-        $this->assertInstanceOf(RelationshipRequest::class, $boxExperienceEvent->getRelationshipRequest());
+        $this->assertInstanceOf(ProductRelationshipRequest::class, $boxExperienceEvent->getProductRelationshipRequest());
         $this->assertEquals(BoxExperienceRelationshipBroadcastEvent::EVENT_NAME, $boxExperienceEvent->getEventName());
     }
 }
