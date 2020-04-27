@@ -41,98 +41,172 @@ Sandbox.define('/api/room_availabilities', 'GET', function (req, res) {
     }
 });
 
-Sandbox.define('/api/broadcast_listeners/partners', 'POST', function(req, res){
+Sandbox.define('/api/broadcast-listeners/partner', 'POST', function(req, res){
 
-    // validate username is present
-    if (req.body.golden_id === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing golden_id"
+    //validate request from EAI about partner information
+    if (req.body.id === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"id\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
         })
     }
 
-    if (req.body.currency === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing currency"
+    if (req.body.status === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"status\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
         })
     }
 
-    if (req.body.cease_date === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing case date"
+    if (req.body.currencyCode === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"currencyCode\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
         })
     }
 
-    return res.json({
-        status: "ok"
+    if (req.body.isChannelManagerEnabled === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"isChannelManagerEnabled\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    return res.json(202, {
+        status: "Relationship handled"
     })
 });
 
-Sandbox.define('/api/broadcast_listeners/products', 'POST', function(req, res){
+Sandbox.define('/api/broadcast-listeners/product', 'POST', function(req, res){
 
-    // validate username is present
-    if (req.body.golden_id === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing golden_id"
+    // validate request from EAI about Product information
+    if (req.body.id === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"id\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
         })
     }
 
-    if (req.body.name === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing name"
+    if (req.body.isSellable === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"isSellable\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
         })
     }
 
-    if (req.body.description === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing description"
+    if (req.body.isReservable === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"isReservable\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
         })
     }
 
-    return res.json({
-        status: "ok"
+    if (req.body.status === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"status\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    if (req.body.type === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"type\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    return res.json(202, {
+        status: "Relationship handled"
     })
 });
 
-Sandbox.define('/api/broadcast_listeners/channel_room_availabilities', 'POST', function(req, res){
-
-    // validate username is present
-    if (req.body.partner_golden_id === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing partner_golden_id"
+Sandbox.define('/api/broadcast-listeners/product-relationship','POST',function (req, res) {
+    // validate request from EAI about Product-relationship
+    if (req.body.parentProduct === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"parentProduct\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
         })
     }
 
-    if (req.body.stock === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing stock"
+    if (req.body.childProduct === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"childProduct\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
         })
     }
 
-    if (req.body.room_golden_id === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing room_golden_id"
+    if (req.body.isEnabled === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"isEnabled\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
         })
     }
 
-    return res.json({
-        status: "ok"
+    if (req.body.relationshipType === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"relationshipType\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    if (req.body.sortOrder === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"sortOrder\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    return res.json(202, {
+        status: "Relationship handled"
     })
 });
+
 //test build
-Sandbox.define('/api/room_prices', 'OPTIONS', function (req, res) {
-    res.set('Access-Control-Allow-Origin', '*');
-});
 
-Sandbox.define('/api/room_prices', 'GET', function (req, res) {
+/*Sandbox.define('/api/room_prices', 'GET', function (req, res) {
     res.set('Access-Control-Allow-Origin', '*');
     res.status(200);
     var responseArray = [];
@@ -144,7 +218,10 @@ Sandbox.define('/api/room_prices', 'GET', function (req, res) {
         }
     }
     return res.json(responseArray);
-});
+});Sandbox.define('/api/room_prices', 'OPTIONS', function (req, res) {
+    res.set('Access-Control-Allow-Origin', '*');
+});*/
+
 
 
 function calculateDaysBetweenStartDateAndEndDate(start, end) {
