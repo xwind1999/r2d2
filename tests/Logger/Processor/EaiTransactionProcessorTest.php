@@ -22,7 +22,7 @@ class EaiTransactionProcessorTest extends TestCase
         $requestStack->getMasterRequest()->willReturn($request->reveal());
         $processor = new EaiTransactionProcessor($requestStack->reveal());
         $this->assertEquals(
-            ['test' => 'test2', 'extra' => ['eai_transaction_id' => 'eai-transaction-is-1234567']],
+            ['test' => 'test2', 'eai_transaction_id' => 'eai-transaction-is-1234567'],
             $processor(['test' => 'test2'])
         );
     }

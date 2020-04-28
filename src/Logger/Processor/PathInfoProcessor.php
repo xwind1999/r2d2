@@ -23,7 +23,7 @@ class PathInfoProcessor
             return $record;
         }
 
-        $record['extra']['path_info'] = $request->getPathInfo();
+        $record['path_info'] = $request->getPathInfo();
 
         return $record;
     }
