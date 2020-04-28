@@ -23,8 +23,8 @@ class RouteParametersProcessor
             return $record;
         }
 
-        $record['route'] = $request->attributes->all();
-        $record['route']['query'] = $request->query->all();
+        $record['extra']['route'] = $request->attributes->all();
+        $record['extra']['route']['query'] = $request->query->all();
 
         return $record;
     }

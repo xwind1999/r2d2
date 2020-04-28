@@ -18,7 +18,7 @@ class RequestIdProcessor
 
     public function __invoke(array $record): array
     {
-        $record['request_id'] = $this->requestUuid;
+        $record['extra']['request_id'] = $this->requestUuid;
 
         return $record;
     }

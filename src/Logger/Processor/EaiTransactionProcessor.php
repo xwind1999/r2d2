@@ -26,7 +26,7 @@ class EaiTransactionProcessor
             return $record;
         }
 
-        $record['eai_transaction_id'] = $transactionId;
+        $record['extra']['eai_transaction_id'] = $transactionId;
 
         return $record;
     }
