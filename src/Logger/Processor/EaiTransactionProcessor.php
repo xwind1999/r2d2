@@ -15,7 +15,7 @@ class EaiTransactionProcessor
         $this->requestStack = $requestStack;
     }
 
-    public function addInfo(array $record): array
+    public function __invoke(array $record): array
     {
         $request = $this->requestStack->getMasterRequest();
 
