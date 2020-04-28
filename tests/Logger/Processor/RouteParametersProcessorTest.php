@@ -18,10 +18,11 @@ class RouteParametersProcessorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->getPathInfo()->willReturn('this-is-the-path');
         $request->query = new ParameterBag(['q1' => 'q2']);
+        $request->attributes = new ParameterBag(['q3' => 'q4']);
         $requestStack->getMasterRequest()->willReturn($request->reveal());
         $processor = new RouteParametersProcessor($requestStack->reveal());
         $this->assertEquals(
-            ['test' => 'test2', 'extra' => ['route_parameters' => ['q1' => 'q2']]],
+            ['test' => 'test2', 'route' => ['q3' => 'q4', 'query' => ['q1' => 'q2']]],
             $processor(['test' => 'test2'])
         );
     }
