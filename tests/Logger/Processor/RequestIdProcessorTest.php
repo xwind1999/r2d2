@@ -19,7 +19,7 @@ class RequestIdProcessorTest extends TestCase
         $uuidFactory->uuid4()->willReturn($uuidInterface->reveal());
         $processor = new RequestIdProcessor($uuidFactory->reveal());
         $this->assertEquals(
-            ['test' => 'test2', 'request_id' => '3fa85f64-5717-4562-b3fc-2c963f66afa6'],
+            ['test' => 'test2', 'extra' => ['request_id' => '3fa85f64-5717-4562-b3fc-2c963f66afa6']],
             $processor(['test' => 'test2'])
         );
     }

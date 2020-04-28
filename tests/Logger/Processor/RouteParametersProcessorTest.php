@@ -22,7 +22,7 @@ class RouteParametersProcessorTest extends TestCase
         $requestStack->getMasterRequest()->willReturn($request->reveal());
         $processor = new RouteParametersProcessor($requestStack->reveal());
         $this->assertEquals(
-            ['test' => 'test2', 'route' => ['q3' => 'q4', 'query' => ['q1' => 'q2']]],
+            ['test' => 'test2', 'extra' => ['route' => ['q3' => 'q4', 'query' => ['q1' => 'q2']]]],
             $processor(['test' => 'test2'])
         );
     }

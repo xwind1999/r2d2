@@ -19,7 +19,7 @@ class PathInfoProcessorTest extends TestCase
         $requestStack->getMasterRequest()->willReturn($request->reveal());
         $processor = new PathInfoProcessor($requestStack->reveal());
         $this->assertEquals(
-            ['test' => 'test2', 'path_info' => 'this-is-the-path'],
+            ['test' => 'test2', 'extra' => ['path_info' => 'this-is-the-path']],
             $processor(['test' => 'test2'])
         );
     }
