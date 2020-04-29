@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class BookingHelper
 {
-    const API_BASE_URL = '/api/booking';
+    const API_BASE_URL = '/internal/booking';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;

@@ -6,8 +6,6 @@ namespace App\Tests\ApiTests;
 
 class ExperienceApiTest extends ApiTestCase
 {
-    const API_BASE_URL = '/api/experience';
-
     public function testCreateWithInvalidPartnerGoldenId()
     {
         $experienceCreateRequest = self::$experienceHelper->getDefault(['partner_golden_id' => '']);

@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class RateBandController
 {
     /**
-     * @Route("/api/rate-band", methods={"POST"}, format="json")
+     * @Route("/internal/rate-band", methods={"POST"}, format="json")
      *
      * @SWG\Tag(name="rate-band")
      * @SWG\Parameter(
@@ -45,7 +45,7 @@ class RateBandController
     }
 
     /**
-     * @Route("/api/rate-band/{uuid}", methods={"GET"}, format="json")
+     * @Route("/internal/rate-band/{uuid}", methods={"GET"}, format="json")
      *
      * @SWG\Tag(name="rate-band")
      * @SWG\Parameter(
@@ -75,7 +75,7 @@ class RateBandController
     }
 
     /**
-     * @Route("/api/rate-band/{uuid}", methods={"DELETE"}, format="json")
+     * @Route("/internal/rate-band/{uuid}", methods={"DELETE"}, format="json")
      *
      * @SWG\Tag(name="rate-band")
      * @SWG\Parameter(
@@ -104,7 +104,7 @@ class RateBandController
     }
 
     /**
-     * @Route("/api/rate-band/{uuid}", methods={"PUT"}, format="json")
+     * @Route("/internal/rate-band/{uuid}", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="rate-band")
      * @SWG\Parameter(

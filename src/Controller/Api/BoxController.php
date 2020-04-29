@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class BoxController
 {
     /**
-     * @Route("/api/box", methods={"POST"}, format="json")
+     * @Route("/internal/box", methods={"POST"}, format="json")
      *
      * @SWG\Tag(name="box")
      * @SWG\Parameter(
@@ -51,7 +51,7 @@ class BoxController
     }
 
     /**
-     * @Route("/api/box/{uuid}", methods={"GET"}, format="json")
+     * @Route("/internal/box/{uuid}", methods={"GET"}, format="json")
      *
      * @SWG\Tag(name="box")
      * @SWG\Parameter(
@@ -81,7 +81,7 @@ class BoxController
     }
 
     /**
-     * @Route("/api/box/{uuid}", methods={"DELETE"}, format="json")
+     * @Route("/internal/box/{uuid}", methods={"DELETE"}, format="json")
      *
      * @SWG\Tag(name="box")
      * @SWG\Parameter(
@@ -110,7 +110,7 @@ class BoxController
     }
 
     /**
-     * @Route("/api/box/{uuid}", methods={"PUT"}, format="json")
+     * @Route("/internal/box/{uuid}", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="box")
      * @SWG\Parameter(

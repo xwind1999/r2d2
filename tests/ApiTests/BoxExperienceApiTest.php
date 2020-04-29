@@ -6,8 +6,6 @@ namespace App\Tests\ApiTests;
 
 class BoxExperienceApiTest extends ApiTestCase
 {
-    protected const API_BASE_URL = '/api/box-experience';
-
     public function testCreateWithNonExistentBoxAndExperience(): void
     {
         $payload = self::$boxExperienceHelper->getDefault([

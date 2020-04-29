@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class BoxExperienceController
 {
     /**
-     * @Route("/api/box-experience", methods={"POST"}, format="json")
+     * @Route("/internal/box-experience", methods={"POST"}, format="json")
      *
      * @SWG\Tag(name="box-experience")
      * @SWG\Parameter(
@@ -56,7 +56,7 @@ class BoxExperienceController
     }
 
     /**
-     * @Route("/api/box-experience", methods={"DELETE"}, format="json")
+     * @Route("/internal/box-experience", methods={"DELETE"}, format="json")
      *
      * @SWG\Tag(name="box-experience")
      * @SWG\Parameter(

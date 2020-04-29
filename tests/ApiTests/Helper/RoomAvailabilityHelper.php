@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class RoomAvailabilityHelper
 {
-    const API_BASE_URL = '/api/room-availability';
+    const API_BASE_URL = '/internal/room-availability';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;

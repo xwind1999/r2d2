@@ -6,8 +6,6 @@ namespace App\Tests\ApiTests;
 
 class RateBandApiTest extends ApiTestCase
 {
-    const API_BASE_URL = '/api/rate-band';
-
     public function testCreateWithInvalidPartnerGoldenId()
     {
         $rateBandCreateRequest = self::$rateBandHelper->getDefault(['partner_golden_id' => '']);

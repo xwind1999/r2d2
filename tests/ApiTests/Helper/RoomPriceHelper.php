@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class RoomPriceHelper
 {
-    const API_BASE_URL = '/api/room-price';
+    const API_BASE_URL = '/internal/room-price';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;

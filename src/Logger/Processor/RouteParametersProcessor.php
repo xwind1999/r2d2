@@ -6,7 +6,7 @@ namespace App\Logger\Processor;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class PathInfoProcessor
+class RouteParametersProcessor
 {
     protected RequestStack $requestStack;
 
@@ -23,7 +23,8 @@ class PathInfoProcessor
             return $record;
         }
 
-        $record['extra']['path_info'] = $request->getPathInfo();
+        $record['extra']['route'] = $request->attributes->all();
+        $record['extra']['route']['query'] = $request->query->all();
 
         return $record;
     }

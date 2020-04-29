@@ -42,12 +42,14 @@ class ListPrestation
     public int $liheId;
 
     /**
+     * @todo remove default value when data fix is done on iresa side
+     *
      * @Assert\Type(type="string")
      *
      * @JMS\Type("string")
      * @JMS\SerializedName("PartnerCode")
      */
-    public string $partnerCode;
+    public string $partnerCode = '';
 
     /**
      * @Assert\Type(type="boolean")

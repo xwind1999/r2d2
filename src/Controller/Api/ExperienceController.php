@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ExperienceController
 {
     /**
-     * @Route("/api/experience", methods={"POST"}, format="json")
+     * @Route("/internal/experience", methods={"POST"}, format="json")
      *
      * @SWG\Tag(name="experience")
      * @SWG\Parameter(
@@ -53,7 +53,7 @@ class ExperienceController
     }
 
     /**
-     * @Route("/api/experience/{uuid}", methods={"GET"}, format="json")
+     * @Route("/internal/experience/{uuid}", methods={"GET"}, format="json")
      *
      * @SWG\Tag(name="experience")
      * @SWG\Parameter(
@@ -83,7 +83,7 @@ class ExperienceController
     }
 
     /**
-     * @Route("/api/experience/{uuid}", methods={"DELETE"}, format="json")
+     * @Route("/internal/experience/{uuid}", methods={"DELETE"}, format="json")
      *
      * @SWG\Tag(name="experience")
      * @SWG\Parameter(
@@ -112,7 +112,7 @@ class ExperienceController
     }
 
     /**
-     * @Route("/api/experience/{uuid}", methods={"PUT"}, format="json")
+     * @Route("/internal/experience/{uuid}", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="experience")
      * @SWG\Parameter(

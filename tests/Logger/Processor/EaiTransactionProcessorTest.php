@@ -23,7 +23,7 @@ class EaiTransactionProcessorTest extends TestCase
         $processor = new EaiTransactionProcessor($requestStack->reveal());
         $this->assertEquals(
             ['test' => 'test2', 'extra' => ['eai_transaction_id' => 'eai-transaction-is-1234567']],
-            $processor->addInfo(['test' => 'test2'])
+            $processor(['test' => 'test2'])
         );
     }
 
@@ -34,7 +34,7 @@ class EaiTransactionProcessorTest extends TestCase
         $processor = new EaiTransactionProcessor($requestStack->reveal());
         $this->assertEquals(
             ['test' => 'test2', 'test2' => 'test3'],
-            $processor->addInfo(['test' => 'test2', 'test2' => 'test3'])
+            $processor(['test' => 'test2', 'test2' => 'test3'])
         );
     }
 
@@ -47,7 +47,7 @@ class EaiTransactionProcessorTest extends TestCase
         $processor = new EaiTransactionProcessor($requestStack->reveal());
         $this->assertEquals(
             ['test' => 'test2', 'test2' => 'test3'],
-            $processor->addInfo(['test' => 'test2', 'test2' => 'test3'])
+            $processor(['test' => 'test2', 'test2' => 'test3'])
         );
     }
 
@@ -62,7 +62,7 @@ class EaiTransactionProcessorTest extends TestCase
         $processor = new EaiTransactionProcessor($requestStack->reveal());
         $this->assertEquals(
             ['test' => 'test2', 'test2' => 'test3'],
-            $processor->addInfo(['test' => 'test2', 'test2' => 'test3'])
+            $processor(['test' => 'test2', 'test2' => 'test3'])
         );
     }
 }

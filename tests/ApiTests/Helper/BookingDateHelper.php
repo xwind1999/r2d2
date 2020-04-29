@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class BookingDateHelper
 {
-    const API_BASE_URL = '/api/booking-date';
+    const API_BASE_URL = '/internal/booking-date';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;
