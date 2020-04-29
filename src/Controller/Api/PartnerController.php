@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class PartnerController
 {
     /**
-     * @Route("/api/partner", methods={"POST"}, format="json")
+     * @Route("/internal/partner", methods={"POST"}, format="json")
      *
      * @SWG\Tag(name="partner")
      * @SWG\Parameter(
@@ -45,7 +45,7 @@ class PartnerController
     }
 
     /**
-     * @Route("/api/partner/{uuid}", methods={"GET"}, format="json")
+     * @Route("/internal/partner/{uuid}", methods={"GET"}, format="json")
      *
      * @SWG\Tag(name="partner")
      * @SWG\Parameter(
@@ -75,7 +75,7 @@ class PartnerController
     }
 
     /**
-     * @Route("/api/partner/{uuid}", methods={"DELETE"}, format="json")
+     * @Route("/internal/partner/{uuid}", methods={"DELETE"}, format="json")
      *
      * @SWG\Tag(name="partner")
      * @SWG\Parameter(
@@ -104,7 +104,7 @@ class PartnerController
     }
 
     /**
-     * @Route("/api/partner/{uuid}", methods={"PUT"}, format="json")
+     * @Route("/internal/partner/{uuid}", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="partner")
      * @SWG\Parameter(

@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class RoomPriceController
 {
     /**
-     * @Route("/api/room-price", methods={"POST"}, format="json")
+     * @Route("/internal/room-price", methods={"POST"}, format="json")
      *
      * @SWG\Tag(name="room-price")
      * @SWG\Parameter(
@@ -45,7 +45,7 @@ class RoomPriceController
     }
 
     /**
-     * @Route("/api/room-price/{uuid}", methods={"GET"}, format="json")
+     * @Route("/internal/room-price/{uuid}", methods={"GET"}, format="json")
      *
      * @SWG\Tag(name="room-price")
      * @SWG\Parameter(
@@ -75,7 +75,7 @@ class RoomPriceController
     }
 
     /**
-     * @Route("/api/room-price/{uuid}", methods={"DELETE"}, format="json")
+     * @Route("/internal/room-price/{uuid}", methods={"DELETE"}, format="json")
      *
      * @SWG\Tag(name="room-price")
      * @SWG\Parameter(
@@ -104,7 +104,7 @@ class RoomPriceController
     }
 
     /**
-     * @Route("/api/room-price/{uuid}", methods={"PUT"}, format="json")
+     * @Route("/internal/room-price/{uuid}", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="room-price")
      * @SWG\Parameter(

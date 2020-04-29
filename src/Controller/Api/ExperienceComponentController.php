@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ExperienceComponentController
 {
     /**
-     * @Route("/api/experience-component", methods={"POST"}, format="json")
+     * @Route("/internal/experience-component", methods={"POST"}, format="json")
      *
      * @SWG\Tag(name="experience-component")
      * @SWG\Parameter(
@@ -61,7 +61,7 @@ class ExperienceComponentController
     }
 
     /**
-     * @Route("/api/experience-component", methods={"DELETE"}, format="json")
+     * @Route("/internal/experience-component", methods={"DELETE"}, format="json")
      *
      * @SWG\Tag(name="experience-component")
      * @SWG\Parameter(
@@ -94,7 +94,7 @@ class ExperienceComponentController
     }
 
     /**
-     * @Route("/api/experience-component/", methods={"PUT"}, format="json")
+     * @Route("/internal/experience-component/", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="experience-component")
      * @SWG\Parameter(

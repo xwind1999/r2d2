@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class BookingController
 {
     /**
-     * @Route("/api/booking", methods={"POST"}, format="json")
+     * @Route("/internal/booking", methods={"POST"}, format="json")
      *
      * @SWG\Tag(name="booking")
      * @SWG\Parameter(
@@ -45,7 +45,7 @@ class BookingController
     }
 
     /**
-     * @Route("/api/booking/{uuid}", methods={"GET"}, format="json")
+     * @Route("/internal/booking/{uuid}", methods={"GET"}, format="json")
      *
      * @SWG\Tag(name="booking")
      * @SWG\Parameter(
@@ -75,7 +75,7 @@ class BookingController
     }
 
     /**
-     * @Route("/api/booking/{uuid}", methods={"DELETE"}, format="json")
+     * @Route("/internal/booking/{uuid}", methods={"DELETE"}, format="json")
      *
      * @SWG\Tag(name="booking")
      * @SWG\Parameter(
@@ -104,7 +104,7 @@ class BookingController
     }
 
     /**
-     * @Route("/api/booking/{uuid}", methods={"PUT"}, format="json")
+     * @Route("/internal/booking/{uuid}", methods={"PUT"}, format="json")
      *
      * @SWG\Tag(name="booking")
      * @SWG\Parameter(

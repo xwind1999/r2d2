@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class QuickDataController
 {
     /**
-     * @Route("/api/quickdata/GetPackage/1/{engineId}", methods={"GET"}, format="json")
+     * @Route("/quickdata/GetPackage/1/{engineId}", methods={"GET"}, format="json")
      *
      * @SWG\Parameter(
      *     name="engineId",
@@ -58,7 +58,7 @@ class QuickDataController
     }
 
     /**
-     * @Route("/api/quickdata/GetRangeV2/1/{engineId}", methods={"GET"}, format="json")
+     * @Route("/quickdata/GetRangeV2/1/{engineId}", methods={"GET"}, format="json")
      *
      * @SWG\Parameter(
      *     name="engineId",
@@ -100,7 +100,7 @@ class QuickDataController
     }
 
     /**
-     * @Route("/api/quickdata/GetPackageV2/1/{engineId}", methods={"GET"}, format="json")
+     * @Route("/quickdata/GetPackageV2/1/{engineId}", methods={"GET"}, format="json")
      *
      * @SWG\Parameter(
      *     name="engineId",
@@ -142,7 +142,7 @@ class QuickDataController
     }
 
     /**
-     * @Route("/api/quickdata/availabilitypriceperiod/1/{engineId}", methods={"GET"}, format="json")
+     * @Route("/quickdata/availabilitypriceperiod/1/{engineId}", methods={"GET"}, format="json")
      *
      * @SWG\Parameter(
      *     name="engineId",

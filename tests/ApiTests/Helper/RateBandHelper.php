@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class RateBandHelper
 {
-    const API_BASE_URL = '/api/rate-band';
+    const API_BASE_URL = '/internal/rate-band';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;
