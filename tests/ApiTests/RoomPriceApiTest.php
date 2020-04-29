@@ -6,8 +6,6 @@ namespace App\Tests\ApiTests;
 
 class RoomPriceApiTest extends ApiTestCase
 {
-    const API_BASE_URL = '/api/room-price';
-
     public function testCreateSuccess(): string
     {
         $response = self::$roomPriceHelper->create();

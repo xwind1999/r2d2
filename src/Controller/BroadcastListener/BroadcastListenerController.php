@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class BroadcastListenerController
 {
     /**
-     * @Route("/api/broadcast-listener/product", methods={"POST"}, format="json")
+     * @Route("/broadcast-listener/product", methods={"POST"}, format="json")
      *
      * @SWG\Tag(name="broadcast-listener")
      * @SWG\Parameter(
@@ -37,7 +37,7 @@ class BroadcastListenerController
     }
 
     /**
-     * @Route("/api/broadcast-listener/partner", methods={"POST"}, format="json")
+     * @Route("/broadcast-listener/partner", methods={"POST"}, format="json")
      *
      * @SWG\Tag(name="broadcast-listener")
      * @SWG\Parameter(
@@ -58,7 +58,7 @@ class BroadcastListenerController
     }
 
     /**
-     * @Route("/api/broadcast-listener/product-relationship", methods={"POST"}, format="json")
+     * @Route("/broadcast-listener/product-relationship", methods={"POST"}, format="json")
      *
      * @SWG\Tag(name="broadcast-listener")
      * @SWG\Parameter(

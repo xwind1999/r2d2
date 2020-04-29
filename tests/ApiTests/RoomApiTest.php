@@ -6,8 +6,6 @@ namespace App\Tests\ApiTests;
 
 class RoomApiTest extends ApiTestCase
 {
-    const API_BASE_URL = '/api/room';
-
     public function testCreateWithInvalidPartnerGoldenId()
     {
         $roomCreateRequest = self::$roomHelper->getDefault(['partner_golden_id' => '']);

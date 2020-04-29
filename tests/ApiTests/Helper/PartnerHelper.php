@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PartnerHelper
 {
-    const API_BASE_URL = '/api/partner';
+    const API_BASE_URL = '/internal/partner';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;

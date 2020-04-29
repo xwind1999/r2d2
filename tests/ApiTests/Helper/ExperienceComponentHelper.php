@@ -10,7 +10,7 @@ use Symfony\Component\BrowserKit\AbstractBrowser;
 
 class ExperienceComponentHelper
 {
-    const API_BASE_URL = '/api/experience-component';
+    const API_BASE_URL = '/internal/experience-component';
 
     protected AbstractBrowser $client;
     protected Serializer $serializer;

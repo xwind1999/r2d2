@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class BoxExperienceHelper
 {
-    const API_BASE_URL = '/api/box-experience';
+    const API_BASE_URL = '/internal/box-experience';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;

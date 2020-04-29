@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class RoomHelper
 {
-    const API_BASE_URL = '/api/room';
+    const API_BASE_URL = '/internal/room';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;

@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ExperienceHelper
 {
-    const API_BASE_URL = '/api/experience';
+    const API_BASE_URL = '/internal/experience';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;

@@ -6,8 +6,6 @@ namespace App\Tests\ApiTests;
 
 class BoxApiTest extends ApiTestCase
 {
-    protected const API_BASE_URL = '/api/box';
-
     public function testCreateWithExistentGoldenId()
     {
         $payload = self::$boxHelper->getDefault();

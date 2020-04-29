@@ -6,8 +6,6 @@ namespace App\Tests\ApiTests;
 
 class RoomAvailabilityApiTest extends ApiTestCase
 {
-    const API_BASE_URL = '/api/room-availability';
-
     public function testCreateWithInvalidRoomGoldenId()
     {
         $response = self::$roomAvailabilityHelper->create(['room_golden_id' => '']);
