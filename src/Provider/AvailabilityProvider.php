@@ -30,14 +30,14 @@ class AvailabilityProvider
     {
         try {
             /** @psalm-suppress ArgumentTypeCoercion */
-            $response = $this->serializer->deserialize(
+            $response = $this->serializer->deserialize(// @phpstan-ignore-line
                 ($this->cmHub->getAvailability($productId, $dateFrom, $dateTo))->getContent(),
                 sprintf('array<%s>', GetAvailabilityResponse::class),
                 'json'
             );
 
             /** @psalm-suppress InvalidArgument $result */
-            $result = new AvailabilityResponse($response);
+            $result = new AvailabilityResponse($response); // @phpstan-ignore-line
         } catch (HttpExceptionInterface $exception) {
             $result = $this->arraySerializer->fromArray(
                 $exception->getResponse()->toArray(false)['error'],

@@ -1,4 +1,2 @@
 parameters:
     checkMissingIterableValueType: false
-    excludes_analyse:
-            -  src/Provider/AvailabilityProvider.php
