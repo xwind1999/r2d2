@@ -44,6 +44,7 @@ Sandbox.define('/api/room_availabilities', 'GET', function (req, res) {
 
 Sandbox.define('/api/broadcast-listeners/partner', 'POST', function(req, res){
 
+    state.booking = state.partner || [];
     //validate request from EAI about partner information
     if (req.body.id === undefined) {
         return res.json(422, {
@@ -84,6 +85,8 @@ Sandbox.define('/api/broadcast-listeners/partner', 'POST', function(req, res){
                 " "
         })
     }
+
+    state.partner.push(req.body)
 
     return res.json(202, {
         status: "Relationship handled"
