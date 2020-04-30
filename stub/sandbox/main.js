@@ -2,6 +2,7 @@ var moment = require('helpers/moment.min.js');
 state.property = require("./data/property.js").property;
 state.availabilities = state.availabilities || [];
 state.prices = state.prices || [];
+state.booking = state.booking || [];
 
 //set Data in state
  setDataInState();
@@ -204,7 +205,154 @@ Sandbox.define('/api/broadcast-listeners/product-relationship','POST',function (
     })
 });
 
-//test build
+// Booking transactions
+// Booking creation
+Sandbox.define('/api/booking','POST',function (req, res) {
+
+    if (req.body.bookingId === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"bookingId\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    if (req.body.box === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"Box ID\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    if (req.body.experience === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"Experience Value\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    if (req.body.voucher === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"Voucher\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    if (req.body.startDate === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"Start Date\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    if (req.body.endDate === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"End Date\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    if (req.length === 0) {
+        return res.json(204, {
+            status: "No Content",
+            details: "There is no body in request"
+        })
+    }
+
+    if(!req.is('application/json'))
+    {
+        return res.send(400, 'Invalid Content type, expected application/json')
+    }
+
+    if (req.validationErrors()) {
+        return res.json(400,{
+            status: "Bad Request",
+            details:"Not a valid JSON"
+        });
+    }
+
+    state.booking.push(req.body)
+    return res.json(201,{
+        status: "Created"
+    })
+
+
+})
+
+// Booking Confirmation - Complete/Cancelled
+Sandbox.define('/api/booking','PATCH',function (req, res) {
+
+    if (req.body.status === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"status\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    if (req.body.voucher === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"voucher\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    if (req.length === 0) {
+        return res.json(204, {
+            status: "No Content",
+            details: "There is no body in request"
+        })
+    }
+
+    if (req.body.bookingId === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "\"bookingId\": [\n" +
+                "        \"This value should not be blank.\"\n" +
+                "      ]\n" +
+                " "
+        })
+    }
+
+    if(!req.is('application/json'))
+    {
+        return res.send(400, 'Invalid Content type, expected application/json')
+    }
+
+    if (req.validationErrors()) {
+        return res.json(400,{
+            status: "Bad Request",
+            details:"Not a valid JSON"
+        });
+    }
+
+    state.booking.push(req.body)
+    return res.json(201, {
+        status: "Created"
+    })
+})
 
 /*Sandbox.define('/api/room_prices', 'GET', function (req, res) {
     res.set('Access-Control-Allow-Origin', '*');
