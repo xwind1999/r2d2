@@ -87,17 +87,17 @@ class ExperienceManager
      */
     public function replace(ProductRequest $productRequest): void
     {
-        $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partnerGoldenId);
+        $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
 
         try {
-            $experience = $this->repository->findOneByGoldenId($productRequest->goldenId);
+            $experience = $this->repository->findOneByGoldenId($productRequest->id);
         } catch (ExperienceNotFoundException $exception) {
             $experience = new Experience();
         }
 
-        $experience->goldenId = $productRequest->goldenId;
+        $experience->goldenId = $productRequest->id;
         $experience->partner = $partner;
-        $experience->partnerGoldenId = $productRequest->partnerGoldenId;
+        $experience->partnerGoldenId = $productRequest->partner->id;
         $experience->name = $productRequest->name;
         $experience->description = $productRequest->description;
         $experience->peopleNumber = $productRequest->productPeopleNumber;

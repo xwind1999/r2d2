@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\EventSubscriber;
 
+use App\Contract\Request\BroadcastListener\Product\Brand;
+use App\Contract\Request\BroadcastListener\Product\Country;
+use App\Contract\Request\BroadcastListener\Product\Partner;
+use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\BoxBroadcastEvent;
 use App\EventSubscriber\BoxBroadcastSubscriber;
@@ -70,16 +74,24 @@ class BoxBroadcastSubscriberTest extends TestCase
      */
     public function testHandleMessageCatchesException(): void
     {
+        $partner = new Partner();
+        $partner->id = '4321';
+        $universe = new Universe();
+        $universe->id = 'universe';
+        $country = new Country();
+        $country->code = 'FR';
+        $brand = new Brand();
+        $brand->code = 'SBX';
         $productRequest = new ProductRequest();
-        $productRequest->goldenId = '1234';
-        $productRequest->partnerGoldenId = '4321';
+        $productRequest->id = '1234';
+        $productRequest->partner = $partner;
         $productRequest->name = 'box name';
         $productRequest->description = 'Lorem ipsum';
-        $productRequest->universe = 'universe';
+        $productRequest->universe = $universe;
         $productRequest->isReservable = true;
         $productRequest->isSellable = true;
-        $productRequest->country = 'FR';
-        $productRequest->brand = 'SBX';
+        $productRequest->sellableCountry = $country;
+        $productRequest->sellableBrand = $brand;
         $productRequest->status = 'active';
         $productRequest->type = 'mev';
 

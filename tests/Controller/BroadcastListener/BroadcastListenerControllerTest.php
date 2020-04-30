@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Controller\Api;
 
 use App\Contract\Request\BroadcastListener\PartnerRequest;
+use App\Contract\Request\BroadcastListener\Product\Partner;
+use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Controller\BroadcastListener\BroadcastListenerController;
@@ -36,15 +38,19 @@ class BroadcastListenerControllerTest extends TestCase
      */
     public function testHandleProductsSuccessfully()
     {
+        $universe = new Universe();
+        $universe->id = 'product universe';
+        $partner = new Partner();
+        $partner->id = '123456';
         $productRequest = new ProductRequest();
         $productRequest->uuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
-        $productRequest->goldenId = '123456';
+        $productRequest->id = '123456';
         $productRequest->name = 'product name';
         $productRequest->description = 'product description';
-        $productRequest->universe = 'product universe';
+        $productRequest->universe = $universe;
         $productRequest->isReservable = true;
         $productRequest->isSellable = true;
-        $productRequest->partnerGoldenId = '123456';
+        $productRequest->partner = $partner;
 
         $this->messageBus->expects($this->once())
             ->method('dispatch')

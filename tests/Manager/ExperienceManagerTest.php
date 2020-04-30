@@ -139,16 +139,18 @@ class ExperienceManagerTest extends TestCase
     public function testReplace()
     {
         $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $partner = new \App\Contract\Request\BroadcastListener\Product\Partner();
+        $partner->id = '5678';
         $productRequest = new ProductRequest();
-        $productRequest->goldenId = '5678';
-        $productRequest->partnerGoldenId = '5678';
+        $productRequest->id = '5678';
+        $productRequest->partner = $partner;
         $productRequest->name = 'dinner with massage';
         $productRequest->description = 'a fancy dinner with feet massage';
         $productRequest->productPeopleNumber = '2';
         $productRequest->voucherExpirationDuration = 3;
 
-        $this->partnerRepository->findOneByGoldenId($productRequest->goldenId);
-        $this->repository->findOneByGoldenId($productRequest->goldenId);
+        $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
+        $this->repository->findOneByGoldenId($productRequest->id);
 
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
 
@@ -162,17 +164,19 @@ class ExperienceManagerTest extends TestCase
     public function testReplaceCatchesExperienceNotFoundException()
     {
         $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $partner = new \App\Contract\Request\BroadcastListener\Product\Partner();
+        $partner->id = '5678';
         $productRequest = new ProductRequest();
-        $productRequest->goldenId = '5678';
-        $productRequest->partnerGoldenId = '5678';
+        $productRequest->id = '5678';
+        $productRequest->partner = $partner;
         $productRequest->name = 'dinner with massage';
         $productRequest->description = 'a fancy dinner with feet massage';
         $productRequest->productPeopleNumber = '2';
         $productRequest->voucherExpirationDuration = 3;
 
-        $this->partnerRepository->findOneByGoldenId($productRequest->goldenId);
+        $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
         $this->repository
-            ->findOneByGoldenId($productRequest->goldenId)
+            ->findOneByGoldenId($productRequest->id)
             ->shouldBeCalled()
             ->willThrow(new ExperienceNotFoundException())
         ;
