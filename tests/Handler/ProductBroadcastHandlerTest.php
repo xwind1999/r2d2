@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Handler;
 
+use App\Contract\Request\BroadcastListener\Product\Brand;
+use App\Contract\Request\BroadcastListener\Product\Country;
+use App\Contract\Request\BroadcastListener\Product\Partner;
+use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\BoxBroadcastEvent;
 use App\Handler\ProductBroadcastHandler;
@@ -25,11 +29,15 @@ class ProductBroadcastHandlerTest extends TestCase
      */
     public function testHandlerMessageBoxType(): void
     {
+        $country = new Country();
+        $country->code = 'FR';
+        $brand = new Brand();
+        $brand->code = 'SBX';
         $productRequest = new ProductRequest();
         $productRequest->uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
-        $productRequest->goldenId = '1234';
-        $productRequest->brand = 'SBX';
-        $productRequest->country = 'FR';
+        $productRequest->id = '1234';
+        $productRequest->sellableBrand = $brand;
+        $productRequest->sellableCountry = $country;
         $productRequest->status = 'active';
         $productRequest->type = 'MEV';
 
@@ -57,17 +65,25 @@ class ProductBroadcastHandlerTest extends TestCase
      */
     public function testHandlerMessageThrowsNonExistentTypeResolverException(): void
     {
+        $partner = new Partner();
+        $partner->id = '4321';
+        $universe = new Universe();
+        $universe->id = 'universe';
+        $country = new Country();
+        $country->code = 'FR';
+        $brand = new Brand();
+        $brand->code = 'SBX';
         $productRequest = new ProductRequest();
         $productRequest->uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
-        $productRequest->goldenId = '1234';
+        $productRequest->id = '1234';
         $productRequest->name = 'box name';
         $productRequest->description = 'description';
-        $productRequest->universe = 'description';
+        $productRequest->universe = $universe;
         $productRequest->isSellable = true;
         $productRequest->isReservable = true;
-        $productRequest->partnerGoldenId = '4321';
-        $productRequest->brand = 'SBX';
-        $productRequest->country = 'FR';
+        $productRequest->partner = $partner;
+        $productRequest->sellableBrand = $brand;
+        $productRequest->sellableCountry = $country;
         $productRequest->status = 'active';
         $productRequest->type = 'MEV';
 

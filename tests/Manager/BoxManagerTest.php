@@ -6,6 +6,8 @@ namespace App\Tests\Manager;
 
 use App\Contract\Request\Box\BoxCreateRequest;
 use App\Contract\Request\Box\BoxUpdateRequest;
+use App\Contract\Request\BroadcastListener\Product\Brand;
+use App\Contract\Request\BroadcastListener\Product\Country;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Entity\Box;
 use App\Exception\Repository\BoxNotFoundException;
@@ -118,13 +120,17 @@ class BoxManagerTest extends TestCase
     public function testReplace()
     {
         $manager = new BoxManager($this->repository->reveal());
+        $brand = new Brand();
+        $brand->code = 'SBX';
+        $country = new Country();
+        $country->code = 'FR';
         $productRequest = new ProductRequest();
-        $productRequest->goldenId = '1234';
-        $productRequest->brand = 'SBX';
-        $productRequest->country = 'FR';
+        $productRequest->id = '1234';
+        $productRequest->sellableBrand = $brand;
+        $productRequest->sellableCountry = $country;
         $productRequest->status = 'active';
 
-        $this->repository->findOneByGoldenId($productRequest->goldenId);
+        $this->repository->findOneByGoldenId($productRequest->id);
         $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
 
         $this->assertEmpty($manager->replace($productRequest));
@@ -137,14 +143,18 @@ class BoxManagerTest extends TestCase
     public function testReplaceCatchesBoxNotFoundException()
     {
         $manager = new BoxManager($this->repository->reveal());
+        $brand = new Brand();
+        $brand->code = 'SBX';
+        $country = new Country();
+        $country->code = 'FR';
         $productRequest = new ProductRequest();
-        $productRequest->goldenId = '1234';
-        $productRequest->brand = 'SBX';
-        $productRequest->country = 'FR';
+        $productRequest->id = '1234';
+        $productRequest->sellableBrand = $brand;
+        $productRequest->sellableCountry = $country;
         $productRequest->status = 'active';
 
         $this->repository
-            ->findOneByGoldenId($productRequest->goldenId)
+            ->findOneByGoldenId($productRequest->id)
             ->shouldBeCalled()
             ->willThrow(new BoxNotFoundException())
         ;

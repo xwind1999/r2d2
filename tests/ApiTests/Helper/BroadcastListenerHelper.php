@@ -29,19 +29,27 @@ class BroadcastListenerHelper
     {
         $payload = [
             'uuid' => '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-            'golden_id' => bin2hex(random_bytes(12)),
+            'id' => bin2hex(random_bytes(12)),
             'name' => 'product name',
             'description' => 'product description',
-            'universe' => 'product universe',
-            'is_sellable' => true,
-            'is_reservable' => true,
-            'partner_golden_id' => bin2hex(random_bytes(12)),
-            'brand' => 'SBX',
-            'country' => 'FR',
+            'universe' => [
+                'id' => 'product universe',
+            ],
+            'isSellable' => true,
+            'isReservable' => true,
+            'partner' => [
+                'id' => bin2hex(random_bytes(12)),
+            ],
+            'sellableBrand' => [
+                'code' => 'SBX',
+            ],
+            'sellableCountry' => [
+                'code' => 'FR',
+            ],
             'status' => 'active',
             'type' => 'mev',
-            'product_people_number' => '2',
-            'voucher_expiration_duration' => 3,
+            'productPeopleNumber' => '2',
+            'voucherExpirationDuration' => 3,
         ];
 
         return $overrides + $payload;

@@ -71,14 +71,14 @@ class BoxManager
     public function replace(ProductRequest $productRequest): void
     {
         try {
-            $box = $this->repository->findOneByGoldenId($productRequest->goldenId);
+            $box = $this->repository->findOneByGoldenId($productRequest->id);
         } catch (BoxNotFoundException $exception) {
             $box = new Box();
         }
 
-        $box->goldenId = $productRequest->goldenId;
-        $box->brand = $productRequest->brand;
-        $box->country = $productRequest->country;
+        $box->goldenId = $productRequest->id;
+        $box->brand = $productRequest->sellableBrand->code;
+        $box->country = $productRequest->sellableCountry->code;
         $box->status = $productRequest->status;
 
         $this->repository->save($box);
