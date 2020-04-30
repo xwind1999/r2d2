@@ -93,17 +93,17 @@ class RoomManager
      */
     public function replace(ProductRequest $productRequest): void
     {
-        $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partnerGoldenId);
+        $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
 
         try {
-            $component = $this->repository->findOneByGoldenId($productRequest->goldenId);
+            $component = $this->repository->findOneByGoldenId($productRequest->id);
         } catch (RoomNotFoundException $exception) {
             $component = new Room();
         }
 
-        $component->goldenId = $productRequest->goldenId;
+        $component->goldenId = $productRequest->id;
         $component->partner = $partner;
-        $component->partnerGoldenId = $productRequest->partnerGoldenId;
+        $component->partnerGoldenId = $productRequest->partner->id;
         $component->name = $productRequest->name;
         $component->description = $productRequest->description;
         $component->duration = $productRequest->voucherExpirationDuration;

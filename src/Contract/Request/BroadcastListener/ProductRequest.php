@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Contract\Request\BroadcastListener;
 
+use App\Contract\Request\BroadcastListener\Product\Brand;
+use App\Contract\Request\BroadcastListener\Product\Country;
+use App\Contract\Request\BroadcastListener\Product\Partner;
+use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use Clogger\ContextualInterface;
@@ -27,7 +31,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      *
      * @JMS\Type("string")
      */
-    public string $goldenId;
+    public string $id;
 
     /**
      * @Assert\Type(type="string")
@@ -46,18 +50,18 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
     public string $description;
 
     /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="255")
+     * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Universe")
      *
-     * @JMS\Type("string")
+     * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Universe")
      */
-    public string $universe;
+    public Universe $universe;
 
     /**
      * @Assert\Type(type="boolean")
      * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
+     * @JMS\SerializedName("isSellable")
      */
     public bool $isSellable;
 
@@ -66,33 +70,35 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
+     * @JMS\SerializedName("isReservable")
      */
     public bool $isReservable;
 
     /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     * @Assert\NotBlank
+     * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Brand")
+     * @Assert\NotNull
      *
-     * @JMS\Type("string")
+     * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Brand")
+     * @JMS\SerializedName("sellableBrand")
      */
-    public string $partnerGoldenId;
+    public Brand $sellableBrand;
 
     /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="3", max="3")
+     * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Partner")
+     * @Assert\NotNull
      *
-     * @JMS\Type("string")
+     * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Partner")
      */
-    public string $brand;
+    public Partner $partner;
 
     /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="2", max="2")
+     * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Country")
+     * @Assert\NotNull
      *
-     * @JMS\Type("string")
+     * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Country")
+     * @JMS\SerializedName("sellableCountry")
      */
-    public string $country;
+    public Country $sellableCountry;
 
     /**
      * @Assert\Type(type="string")
@@ -117,6 +123,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\Length(min="1", max="2")
      *
      * @JMS\Type("string")
+     * @JMS\SerializedName("productPeopleNumber")
      */
     public ?string $productPeopleNumber = null;
 
@@ -125,21 +132,22 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\PositiveOrZero
      *
      * @JMS\Type("strict_integer")
+     * @JMS\SerializedName("voucherExpirationDuration")
      */
     public ?int $voucherExpirationDuration = null;
 
     public function getContext(): array
     {
         return [
-            'golden_id' => $this->goldenId,
+            'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'universe' => $this->universe,
+            'universe' => $this->universe->id,
             'is_sellable' => $this->isReservable,
             'is_reservable' => $this->isReservable,
-            'partner_golden_id' => $this->partnerGoldenId,
-            'brand' => $this->brand,
-            'country' => $this->country,
+            'partner' => $this->partner->id,
+            'sellable_brand' => $this->sellableBrand->code,
+            'sellable_country' => $this->sellableCountry->code,
             'status' => $this->status,
             'type' => $this->type,
             'product_people_number' => $this->productPeopleNumber,
