@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Event\Http;
 
-use App\Helper\LoggableEventInterface;
+use App\Event\AbstractLoggableEvent;
 
-class ExternalServiceRequestMadeEvent implements LoggableEventInterface
+class ExternalServiceRequestMadeEvent extends AbstractLoggableEvent
 {
     protected const MESSAGE = 'Request made to external service';
 
@@ -24,11 +24,6 @@ class ExternalServiceRequestMadeEvent implements LoggableEventInterface
         $this->method = $method;
         $this->uri = $uri;
         $this->options = $options;
-    }
-
-    public function getMessage(): string
-    {
-        return self::MESSAGE;
     }
 
     public function getContext(): array

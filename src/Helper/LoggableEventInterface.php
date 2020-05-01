@@ -9,4 +9,6 @@ use Clogger\ContextualInterface;
 interface LoggableEventInterface extends ContextualInterface
 {
     public function getMessage(): string;
+
+    public function getLevel(): string;
 }

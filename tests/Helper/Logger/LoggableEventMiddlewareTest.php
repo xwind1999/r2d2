@@ -17,6 +17,7 @@ class LoggableEventMiddlewareTest extends TestCase
         $context = ['any-context' => 'any-value'];
         $objMock = $this->prophesize(LoggableEventInterface::class);
         $objMock->getMessage()->willReturn($message);
+        $objMock->getContext()->willReturn([]);
         $result = $middleware->process('log', $objMock->reveal(), $context);
         $this->assertEquals([$message, $context], $result);
     }
