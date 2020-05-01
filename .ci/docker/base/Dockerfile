@@ -6,6 +6,14 @@ ENV COMPOSER_VERSION 1.10.5
 
 RUN apk add nginx; mkdir -p /run/nginx
 
+RUN sed -i '/xfs/ s/33/82/g' /etc/passwd;\
+    sed -i '/www-data/ s/82/33/g' /etc/passwd; \
+    sed -i '/xfs/ s/33/82/g' /etc/group;\
+    sed -i '/www-data/ s/82/33/g' /etc/group; \
+    mkdir /app; \
+    chown 33.33 /app -R;\
+    chown 33.33 /home/www-data -R;
+
 RUN apk add sudo libxml2-dev icu-dev runit $PHPIZE_DEPS openssh-client curl git bash rabbitmq-c-dev
 
 RUN docker-php-ext-install pcntl soap pdo_mysql sockets intl opcache && pecl install amqp && docker-php-ext-enable amqp

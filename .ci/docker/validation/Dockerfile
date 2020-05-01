@@ -1,4 +1,4 @@
-FROM docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.16
+FROM docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:latest
 
 ENV DB_DATA_PATH="/var/lib/mysql"
 ENV DB_ROOT_PASS="admin123"

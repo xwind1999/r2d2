@@ -17,7 +17,7 @@ variables:
   GIT_DEPTH: 1
 
 default:
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   before_script:
     - echo '10.11.0.178 ie1-i-chef-02' >> /etc/hosts
   tags:
