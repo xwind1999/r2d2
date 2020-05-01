@@ -1,6 +1,6 @@
 generate-api-reference:
   stage: Build Reports
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - composer
   script:
@@ -12,7 +12,7 @@ generate-api-reference:
 
 phpmetrics:
   stage: Build Reports
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - composer
   script:
@@ -42,7 +42,7 @@ mermaid-generate-images:
 
 code-tests-aggregate:
   stage: Build Reports
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - unitTests
     - infection
@@ -56,7 +56,7 @@ code-tests-aggregate:
 
 generate-extra-docs:
   stage: Build Reports
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - composer
   script:

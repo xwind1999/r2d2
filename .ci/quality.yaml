@@ -4,7 +4,7 @@ variables:
 
 unitTests:
   stage: Test
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - composer
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
@@ -17,7 +17,7 @@ unitTests:
 
 Api-Tests:
   stage: Test
-  image: ${VALIDATION_FULL_IMAGE_LATEST}
+  image: ${VALIDATION_IMAGE}
   needs:
     - composer
   variables:
@@ -39,7 +39,7 @@ Api-Tests:
 
 Project-Env-Api-Tests:
   stage: Project Env Validation
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - composer
     - '[DEVINT] Deploy'
@@ -55,7 +55,7 @@ Project-Env-Api-Tests:
 
 Pre-deploy Health Check:
   stage: Pre-deploy Health Check
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   script:
     - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
   only:
@@ -63,7 +63,7 @@ Pre-deploy Health Check:
 
 Post-deploy Health Check:
   stage: Post-deploy Health Check
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   script:
     - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
   only:
@@ -75,7 +75,7 @@ Post-deploy Health Check:
   dependencies:
     - composer
   services:
-    - name: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.16
+    - name: ${BASE_IMAGE}
       alias: r2-d2.localhost
       command: ["bash", "-c", 'rm -rf /app; ln -s /builds/millenniumfalcon/r2-d2-api /app; php /builds/millenniumfalcon/r2-d2-api/bin/console doctrine:schema:update --force; chmod 777 /tmp/db.sqlite; /start.sh']
   before_script:
@@ -131,7 +131,7 @@ build-R2D2-stub-image:
 
 php-cs-fixer:
   stage: Test
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - composer
   script:
