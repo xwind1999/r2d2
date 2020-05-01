@@ -76,7 +76,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Brand")
-     * @Assert\NotNull
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Brand")
      * @JMS\SerializedName("sellableBrand")
@@ -85,7 +84,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Partner")
-     * @Assert\NotNull
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Partner")
      */
@@ -93,7 +91,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Country")
-     * @Assert\NotNull
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Country")
      * @JMS\SerializedName("sellableCountry")
