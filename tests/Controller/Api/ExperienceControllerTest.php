@@ -54,7 +54,7 @@ class ExperienceControllerTest extends TestCase
         $experience->partnerGoldenId = '5678';
         $experience->name = 'dinner with massage';
         $experience->description = 'a fancy dinner with feet massage';
-        $experience->peopleNumber = '1';
+        $experience->peopleNumber = 1;
         $experience->duration = 3;
         $experience->createdAt = new \DateTime();
         $experience->updatedAt = new \DateTime();
@@ -174,7 +174,7 @@ class ExperienceControllerTest extends TestCase
         $experience->partnerGoldenId = '1234';
         $experience->name = '1234';
         $experience->description = '1234';
-        $experience->peopleNumber = '2';
+        $experience->peopleNumber = 2;
         $experience->duration = 3;
         $experience->createdAt = new \DateTime();
         $experience->updatedAt = new \DateTime();

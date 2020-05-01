@@ -57,12 +57,12 @@ abstract class ExperienceResponse extends ResponseContract
     public string $description;
 
     /**
-     * @Assert\Type(type="string")
+     * @Assert\Type(type="integer")
      * @Assert\Length(min="1", max="2")
      *
-     * @JMS\Type("string")
+     * @JMS\Type("integer")
      */
-    public ?string $productPeopleNumber;
+    public ?int $productPeopleNumber;
 
     /**
      * @Assert\Type(type="integer")

@@ -69,9 +69,9 @@ class Experience
     public Collection $experienceComponent;
 
     /**
-     * @ORM\Column(type="string", length=2, nullable=true, options={"fixed": true})
+     * @ORM\Column(type="integer", length=2, nullable=true, options={"fixed": true})
      */
-    public ?string $peopleNumber = null;
+    public ?int $peopleNumber = null;
 
     /**
      * @ORM\Column(type="integer", nullable=true, options={"unsigned"=true})
