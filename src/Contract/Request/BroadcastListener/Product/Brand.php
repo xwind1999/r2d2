@@ -11,7 +11,7 @@ class Brand
 {
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="2", max="2")
+     * @Assert\Length(min="1", max="250")
      * @Assert\NotBlank
      *
      * @JMS\Type("string")

@@ -87,7 +87,7 @@ class ExperienceManager
      */
     public function replace(ProductRequest $productRequest): void
     {
-        $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
+        $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partner ? $productRequest->partner->id : '');
 
         try {
             $experience = $this->repository->findOneByGoldenId($productRequest->id);
@@ -97,7 +97,7 @@ class ExperienceManager
 
         $experience->goldenId = $productRequest->id;
         $experience->partner = $partner;
-        $experience->partnerGoldenId = $productRequest->partner->id;
+        $experience->partnerGoldenId = $productRequest->partner ? $productRequest->partner->id : '';
         $experience->name = $productRequest->name;
         $experience->description = $productRequest->description;
         $experience->peopleNumber = $productRequest->productPeopleNumber;

@@ -51,6 +51,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Universe")
+     * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Universe")
      */
@@ -76,26 +77,29 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Brand")
+     * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Brand")
      * @JMS\SerializedName("sellableBrand")
      */
-    public Brand $sellableBrand;
+    public ?Brand $sellableBrand;
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Partner")
+     * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Partner")
      */
-    public Partner $partner;
+    public ?Partner $partner;
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Country")
+     * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Country")
      * @JMS\SerializedName("sellableCountry")
      */
-    public Country $sellableCountry;
+    public ?Country $sellableCountry;
 
     /**
      * @Assert\Type(type="string")
@@ -142,9 +146,9 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
             'universe' => $this->universe->id,
             'is_sellable' => $this->isReservable,
             'is_reservable' => $this->isReservable,
-            'partner' => $this->partner->id,
-            'sellable_brand' => $this->sellableBrand->code,
-            'sellable_country' => $this->sellableCountry->code,
+            'partner' => $this->partner ? $this->partner->id : '',
+            'sellable_brand' => $this->sellableBrand ? $this->sellableBrand->code : '',
+            'sellable_country' => $this->sellableCountry ? $this->sellableCountry->code : '',
             'status' => $this->status,
             'type' => $this->type,
             'product_people_number' => $this->productPeopleNumber,
