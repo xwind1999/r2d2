@@ -48,7 +48,7 @@ class RoomPriceControllerTest extends TestCase
         $currentDate = new \DateTime();
         $roomPrice = new RoomPrice();
         $roomPrice->uuid = $uuidInterface->reveal();
-        $roomPrice->roomGoldenId = '1234';
+        $roomPrice->componentGoldenId = '1234';
         $roomPrice->rateBandGoldenId = '5678';
         $roomPrice->date = $currentDate;
         $roomPrice->price = 10;
@@ -62,7 +62,7 @@ class RoomPriceControllerTest extends TestCase
 
         $this->assertEquals(RoomPriceGetResponse::class, get_class($return));
         $this->assertEquals($uuid, $return->uuid);
-        $this->assertEquals($roomPrice->roomGoldenId, $return->roomGoldenId);
+        $this->assertEquals($roomPrice->componentGoldenId, $return->componentGoldenId);
         $this->assertEquals($roomPrice->rateBandGoldenId, $return->rateBandGoldenId);
         $this->assertEquals($roomPrice->date, $return->date);
         $this->assertEquals($roomPrice->price, $return->price);
@@ -151,7 +151,7 @@ class RoomPriceControllerTest extends TestCase
         $uuidInterface->toString()->willReturn($uuid);
         $roomPrice = new RoomPrice();
         $roomPrice->uuid = $uuidInterface->reveal();
-        $roomPrice->roomGoldenId = '1234';
+        $roomPrice->componentGoldenId = '1234';
         $roomPrice->rateBandGoldenId = '1234';
         $roomPrice->date = new \DateTime();
         $roomPrice->price = 9990;

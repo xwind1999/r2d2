@@ -13,7 +13,7 @@ x-examples:
       start_date: '2019-10-10'
       end_date: '2019-10-11'
       dates:
-        - room_golden_id: '00123'
+        - component_golden_id: '00123'
           rate_band_golden_id: RATEBAND01
           date: '2019-10-10'
           price: 22200
@@ -33,19 +33,19 @@ x-examples:
       start_date: '2019-10-10'
       end_date: '2019-10-13'
       dates:
-        - room_golden_id: '00123'
+        - component_golden_id: '00123'
           rate_band_golden_id: RATEBAND01
           date: '2019-10-10'
           price: 22200
           is_upsell: true
           guests_count: 2
-        - room_golden_id: '00123'
+        - component_golden_id: '00123'
           rate_band_golden_id: RATEBAND01
           date: '2019-10-11'
           price: 22200
           is_upsell: true
           guests_count: 2
-        - room_golden_id: '00123'
+        - component_golden_id: '00123'
           rate_band_golden_id: RATEBAND01
           date: '2019-10-12'
           price: 22200

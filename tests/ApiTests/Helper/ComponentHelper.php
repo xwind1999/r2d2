@@ -9,9 +9,9 @@ use JMS\Serializer\Serializer;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class RoomHelper
+class ComponentHelper
 {
-    const API_BASE_URL = '/internal/room';
+    const API_BASE_URL = '/internal/component';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;

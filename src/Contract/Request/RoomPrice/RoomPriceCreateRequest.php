@@ -18,7 +18,7 @@ class RoomPriceCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("string")
      */
-    public string $roomGoldenId;
+    public string $componentGoldenId;
 
     /**
      * @Assert\Type(type="string")

@@ -26,7 +26,7 @@ class RoomPriceHelper
     public function getDefault(array $overrides = []): array
     {
         $payload = [
-            'room_golden_id' => '5678',
+            'component_golden_id' => '5678',
             'rate_band_golden_id' => '1234',
             'date' => '2020-01-01',
             'price' => 9990,
@@ -35,10 +35,10 @@ class RoomPriceHelper
         return $overrides + $payload;
     }
 
-    public function addValidRoom(array &$payload)
+    public function addValidComponent(array &$payload)
     {
-        $room = json_decode(ApiTestCase::$roomHelper->create()->getContent());
-        $payload['room_golden_id'] = $room->golden_id;
+        $component = json_decode(ApiTestCase::$componentHelper->create()->getContent());
+        $payload['component_golden_id'] = $component->golden_id;
     }
 
     public function addValidRateBand(array &$payload)
@@ -54,7 +54,7 @@ class RoomPriceHelper
     {
         if (empty($payload)) {
             $payload = $this->getDefault();
-            $this->addValidRoom($payload);
+            $this->addValidComponent($payload);
             $this->addValidRateBand($payload);
         }
         $this->client->request('POST', $this->baseUrl.self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));

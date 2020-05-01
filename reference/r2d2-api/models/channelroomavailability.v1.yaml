@@ -9,7 +9,7 @@ properties:
     format: uuid
   rate_band_golden_id:
     type: string
-  room_golden_id:
+  component_golden_id:
     type: string
   partner_golden_id:
     type: string
@@ -22,7 +22,7 @@ properties:
   stock:
     type: integer
 required:
-  - room_golden_id
+  - component_golden_id
   - partner_golden_id
   - start_date
   - end_date
@@ -31,7 +31,7 @@ x-examples:
   channel-room-availability-01:
     value:
       rate_band_golden_id: RATE_BAND_01
-      room_golden_id: ROOM_01
+      component_golden_id: ROOM_01
       partner_golden_id: PARTNER_01
       start_date: '2019-10-23'
       end_date: '2019-10-24'

@@ -10,14 +10,14 @@ use App\Entity\BookingDate;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Repository\BookingDateRepository;
 use App\Repository\BookingRepository;
+use App\Repository\ComponentRepository;
 use App\Repository\RateBandRepository;
-use App\Repository\RoomRepository;
 
 class BookingDateManager
 {
     protected BookingDateRepository $repository;
 
-    protected RoomRepository $roomRepository;
+    protected ComponentRepository $componentRepository;
 
     protected RateBandRepository $rateBandRepository;
 
@@ -25,12 +25,12 @@ class BookingDateManager
 
     public function __construct(
         BookingDateRepository $repository,
-        RoomRepository $roomRepository,
+        ComponentRepository $componentRepository,
         RateBandRepository $rateBandRepository,
         BookingRepository $bookingRepository
     ) {
         $this->repository = $repository;
-        $this->roomRepository = $roomRepository;
+        $this->componentRepository = $componentRepository;
         $this->rateBandRepository = $rateBandRepository;
         $this->bookingRepository = $bookingRepository;
     }
@@ -38,16 +38,16 @@ class BookingDateManager
     public function create(BookingDateCreateRequest $bookingDateCreateRequest): BookingDate
     {
         $rateBand = $this->rateBandRepository->findOneByGoldenId($bookingDateCreateRequest->rateBandGoldenId);
-        $room = $this->roomRepository->findOneByGoldenId($bookingDateCreateRequest->roomGoldenId);
+        $component = $this->componentRepository->findOneByGoldenId($bookingDateCreateRequest->componentGoldenId);
         $booking = $this->bookingRepository->findOneByGoldenId($bookingDateCreateRequest->bookingGoldenId);
 
         $bookingDate = new BookingDate();
 
         $bookingDate->rateBand = $rateBand;
-        $bookingDate->room = $room;
+        $bookingDate->component = $component;
         $bookingDate->booking = $booking;
         $bookingDate->bookingGoldenId = $bookingDateCreateRequest->bookingGoldenId;
-        $bookingDate->roomGoldenId = $bookingDateCreateRequest->roomGoldenId;
+        $bookingDate->componentGoldenId = $bookingDateCreateRequest->componentGoldenId;
         $bookingDate->rateBandGoldenId = $bookingDateCreateRequest->rateBandGoldenId;
         $bookingDate->date = $bookingDateCreateRequest->date;
         $bookingDate->price = $bookingDateCreateRequest->price;
@@ -82,16 +82,16 @@ class BookingDateManager
     public function update(string $uuid, BookingDateUpdateRequest $bookingDateUpdateRequest): BookingDate
     {
         $rateBand = $this->rateBandRepository->findOneByGoldenId($bookingDateUpdateRequest->rateBandGoldenId);
-        $room = $this->roomRepository->findOneByGoldenId($bookingDateUpdateRequest->roomGoldenId);
+        $component = $this->componentRepository->findOneByGoldenId($bookingDateUpdateRequest->componentGoldenId);
         $booking = $this->bookingRepository->findOneByGoldenId($bookingDateUpdateRequest->bookingGoldenId);
 
         $bookingDate = $this->get($uuid);
 
         $bookingDate->rateBand = $rateBand;
-        $bookingDate->room = $room;
+        $bookingDate->component = $component;
         $bookingDate->booking = $booking;
         $bookingDate->bookingGoldenId = $bookingDateUpdateRequest->bookingGoldenId;
-        $bookingDate->roomGoldenId = $room->goldenId;
+        $bookingDate->componentGoldenId = $component->goldenId;
         $bookingDate->rateBandGoldenId = $rateBand->goldenId;
         $bookingDate->date = $bookingDateUpdateRequest->date;
         $bookingDate->price = $bookingDateUpdateRequest->price;

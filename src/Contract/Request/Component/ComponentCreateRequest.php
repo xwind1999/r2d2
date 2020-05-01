@@ -2,23 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Contract\Response\Room;
+namespace App\Contract\Request\Component;
 
-use App\Contract\ResponseContract;
-use App\Entity\Room;
+use App\Helper\Request\RequestBodyInterface;
+use App\Helper\Request\ValidatableRequest;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 
-abstract class RoomResponse extends ResponseContract
+class ComponentCreateRequest implements RequestBodyInterface, ValidatableRequest
 {
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("string")
-     */
-    public string $uuid;
-
     /**
      * @Assert\Type(type="string")
      * @Assert\Length(min="1", max="45")
@@ -65,10 +57,11 @@ abstract class RoomResponse extends ResponseContract
 
     /**
      * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
      *
      * @JMS\Type("strict_integer")
      */
-    public ?int $voucherExpirationDuration;
+    public int $voucherExpirationDuration;
 
     /**
      * @Assert\Type(type="boolean")
@@ -94,34 +87,4 @@ abstract class RoomResponse extends ResponseContract
      * @JMS\Type("string")
      */
     public string $status;
-
-    /**
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("DateTime")
-     */
-    public \DateTime $createdAt;
-
-    /**
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("DateTime")
-     */
-    public \DateTime $updatedAt;
-
-    public function __construct(Room $room)
-    {
-        $this->uuid = $room->uuid->toString();
-        $this->goldenId = $room->goldenId;
-        $this->partnerGoldenId = $room->partnerGoldenId;
-        $this->name = $room->name;
-        $this->description = $room->description;
-        $this->inventory = $room->inventory;
-        $this->voucherExpirationDuration = $room->duration;
-        $this->isSellable = $room->isSellable;
-        $this->isReservable = $room->isReservable;
-        $this->status = $room->status;
-        $this->createdAt = $room->createdAt;
-        $this->updatedAt = $room->updatedAt;
-    }
 }

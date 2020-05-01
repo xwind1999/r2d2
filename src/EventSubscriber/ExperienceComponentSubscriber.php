@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
+use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
-use App\Exception\Repository\RoomNotFoundException;
 use App\Manager\ExperienceComponentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -38,9 +38,9 @@ class ExperienceComponentSubscriber implements EventSubscriberInterface
                 'No existing Experience for this relationship',
                 $event->getProductRelationshipRequest()->getContext()
             );
-        } catch (RoomNotFoundException $exception) {
+        } catch (ComponentNotFoundException $exception) {
             $this->logger->warning(
-                'No existing Room for this relationship',
+                'No existing Component for this relationship',
                 $event->getProductRelationshipRequest()->getContext()
             );
         }

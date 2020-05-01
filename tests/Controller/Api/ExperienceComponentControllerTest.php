@@ -30,7 +30,7 @@ class ExperienceComponentControllerTest extends TestCase
     {
         $experienceComponentDeleteRequest = new ExperienceComponentDeleteRequest();
         $experienceComponentDeleteRequest->experienceGoldenId = '1234';
-        $experienceComponentDeleteRequest->roomGoldenId = '1234';
+        $experienceComponentDeleteRequest->componentGoldenId = '1234';
         $experienceComponentManager = $this->prophesize(ExperienceComponentManager::class);
         $experienceComponentManager->delete($experienceComponentDeleteRequest)->willThrow(BoxNotFoundException::class);
         $controller = new ExperienceComponentController();
@@ -45,7 +45,7 @@ class ExperienceComponentControllerTest extends TestCase
     {
         $experienceComponentDeleteRequest = new ExperienceComponentDeleteRequest();
         $experienceComponentDeleteRequest->experienceGoldenId = '1234';
-        $experienceComponentDeleteRequest->roomGoldenId = '1234';
+        $experienceComponentDeleteRequest->componentGoldenId = '1234';
         $experienceComponentManager = $this->prophesize(ExperienceComponentManager::class);
         $experienceComponentManager->delete($experienceComponentDeleteRequest)->shouldBeCalled();
         $controller = new ExperienceComponentController();
@@ -68,7 +68,7 @@ class ExperienceComponentControllerTest extends TestCase
         $experienceComponentCreateResponse = $controller->create($experienceComponentCreateRequest, $experienceComponentManager->reveal());
 
         $this->assertEquals($experienceComponent->experienceGoldenId, $experienceComponentCreateResponse->experienceGoldenId);
-        $this->assertEquals($experienceComponent->roomGoldenId, $experienceComponentCreateResponse->roomGoldenId);
+        $this->assertEquals($experienceComponent->componentGoldenId, $experienceComponentCreateResponse->componentGoldenId);
         $this->assertEquals($experienceComponent->externalUpdatedAt, $experienceComponentCreateResponse->externalUpdatedAt);
     }
 
@@ -143,7 +143,7 @@ class ExperienceComponentControllerTest extends TestCase
     {
         $experienceComponent = new ExperienceComponent();
         $experienceComponent->experienceGoldenId = '9012';
-        $experienceComponent->roomGoldenId = '1234';
+        $experienceComponent->componentGoldenId = '1234';
         $experienceComponent->isEnabled = true;
         $experienceComponent->externalUpdatedAt = new \DateTime('2020-05-05');
 

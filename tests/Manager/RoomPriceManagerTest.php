@@ -6,13 +6,13 @@ namespace App\Tests\Manager;
 
 use App\Contract\Request\RoomPrice\RoomPriceCreateRequest;
 use App\Contract\Request\RoomPrice\RoomPriceUpdateRequest;
+use App\Entity\Component;
 use App\Entity\RateBand;
-use App\Entity\Room;
 use App\Entity\RoomPrice;
 use App\Manager\RoomPriceManager;
+use App\Repository\ComponentRepository;
 use App\Repository\RateBandRepository;
 use App\Repository\RoomPriceRepository;
-use App\Repository\RoomRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -29,9 +29,9 @@ class RoomPriceManagerTest extends TestCase
     protected $repository;
 
     /**
-     * @var ObjectProphecy|RoomRepository
+     * @var ComponentRepository|ObjectProphecy
      */
-    protected $roomRepository;
+    protected $componentRepository;
 
     /**
      * @var ObjectProphecy|RateBandRepository
@@ -41,7 +41,7 @@ class RoomPriceManagerTest extends TestCase
     public function setUp(): void
     {
         $this->repository = $this->prophesize(RoomPriceRepository::class);
-        $this->roomRepository = $this->prophesize(RoomRepository::class);
+        $this->componentRepository = $this->prophesize(ComponentRepository::class);
         $this->rateBandRepository = $this->prophesize(RateBandRepository::class);
     }
 
@@ -52,17 +52,17 @@ class RoomPriceManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new RoomPriceManager($this->repository->reveal(), $this->roomRepository->reveal(), $this->rateBandRepository->reveal());
-        $room = new Room();
-        $room->goldenId = '1234';
+        $manager = new RoomPriceManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->rateBandRepository->reveal());
+        $component = new Component();
+        $component->goldenId = '1234';
         $rateBand = new RateBand();
         $rateBand->goldenId = '7895';
-        $this->roomRepository->findOneByGoldenId('1234')->willReturn($room);
+        $this->componentRepository->findOneByGoldenId('1234')->willReturn($component);
         $this->rateBandRepository->findOneByGoldenId('7895')->willReturn($rateBand);
         $roomPriceUpdateRequest = new RoomPriceUpdateRequest();
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $currentDate = new \DateTime();
-        $roomPriceUpdateRequest->roomGoldenId = '1234';
+        $roomPriceUpdateRequest->componentGoldenId = '1234';
         $roomPriceUpdateRequest->rateBandGoldenId = '7895';
         $roomPriceUpdateRequest->date = $currentDate;
         $roomPriceUpdateRequest->price = 10;
@@ -72,7 +72,7 @@ class RoomPriceManagerTest extends TestCase
 
         $roomPrice = new RoomPrice();
         $roomPrice->uuid = $uuidInterface->reveal();
-        $roomPrice->roomGoldenId = '5678';
+        $roomPrice->componentGoldenId = '5678';
         $roomPrice->rateBandGoldenId = '7895';
         $roomPrice->date = $currentDate;
         $roomPrice->price = 10;
@@ -83,7 +83,7 @@ class RoomPriceManagerTest extends TestCase
         $updatedRoomPrice = $manager->update($uuid, $roomPriceUpdateRequest);
 
         $this->assertSame($roomPrice, $updatedRoomPrice);
-        $this->assertEquals('1234', $roomPrice->roomGoldenId);
+        $this->assertEquals('1234', $roomPrice->componentGoldenId);
         $this->assertEquals('7895', $roomPrice->rateBandGoldenId);
         $this->assertEquals($currentDate, $roomPrice->date);
         $this->assertEquals(10, $roomPrice->price);
@@ -96,7 +96,7 @@ class RoomPriceManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new RoomPriceManager($this->repository->reveal(), $this->roomRepository->reveal(), $this->rateBandRepository->reveal());
+        $manager = new RoomPriceManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->rateBandRepository->reveal());
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -116,18 +116,18 @@ class RoomPriceManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new RoomPriceManager($this->repository->reveal(), $this->roomRepository->reveal(), $this->rateBandRepository->reveal());
-        $room = new Room();
-        $room->goldenId = '1234';
+        $manager = new RoomPriceManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->rateBandRepository->reveal());
+        $component = new Component();
+        $component->goldenId = '1234';
         $rateBand = new RateBand();
         $rateBand->goldenId = '5678';
-        $this->roomRepository->findOneByGoldenId('1234')->willReturn($room);
+        $this->componentRepository->findOneByGoldenId('1234')->willReturn($component);
         $this->rateBandRepository->findOneByGoldenId('5678')->willReturn($rateBand);
 
         $currentDate = new \DateTime();
 
         $roomPriceCreateRequest = new RoomPriceCreateRequest();
-        $roomPriceCreateRequest->roomGoldenId = '1234';
+        $roomPriceCreateRequest->componentGoldenId = '1234';
         $roomPriceCreateRequest->rateBandGoldenId = '5678';
         $roomPriceCreateRequest->date = $currentDate;
         $roomPriceCreateRequest->price = 20;
@@ -136,7 +136,7 @@ class RoomPriceManagerTest extends TestCase
 
         $roomPrice = $manager->create($roomPriceCreateRequest);
 
-        $this->assertEquals($roomPriceCreateRequest->roomGoldenId, $roomPrice->roomGoldenId);
+        $this->assertEquals($roomPriceCreateRequest->componentGoldenId, $roomPrice->componentGoldenId);
         $this->assertEquals($roomPriceCreateRequest->rateBandGoldenId, $roomPrice->rateBandGoldenId);
         $this->assertEquals($roomPriceCreateRequest->date, $roomPrice->date);
         $this->assertEquals($roomPriceCreateRequest->price, $roomPrice->price);

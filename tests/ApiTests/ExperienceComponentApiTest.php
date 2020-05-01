@@ -9,7 +9,7 @@ class ExperienceComponentApiTest extends ApiTestCase
     public function testCreateWithNonExistentBoxAndExperience(): void
     {
         $payload = self::$experienceComponentHelper->getDefault([
-            'room_golden_id' => 'non-existent-experience',
+            'component_golden_id' => 'non-existent-experience',
             'experience_golden_id' => 'does-not-exist',
         ]);
         $response = self::$experienceComponentHelper->create($payload);
@@ -28,36 +28,36 @@ class ExperienceComponentApiTest extends ApiTestCase
     /**
      * @depends testCreateSuccess
      */
-    public function testCreateAgainWillFail(\stdClass $roomExperience)
+    public function testCreateAgainWillFail(\stdClass $componentExperience)
     {
         $payload = self::$experienceComponentHelper->getDefault([
-            'room_golden_id' => $roomExperience->room_golden_id,
-            'experience_golden_id' => $roomExperience->experience_golden_id,
+            'component_golden_id' => $componentExperience->component_golden_id,
+            'experience_golden_id' => $componentExperience->experience_golden_id,
         ]);
         $response = self::$experienceComponentHelper->create($payload);
 
         $this->assertEquals(409, $response->getStatusCode());
 
-        return $roomExperience;
+        return $componentExperience;
     }
 
     /**
      * @depends testCreateAgainWillFail
      */
-    public function testDelete(\stdClass $roomExperience): \stdClass
+    public function testDelete(\stdClass $componentExperience): \stdClass
     {
-        $response = self::$experienceComponentHelper->delete($roomExperience->room_golden_id, $roomExperience->experience_golden_id);
+        $response = self::$experienceComponentHelper->delete($componentExperience->component_golden_id, $componentExperience->experience_golden_id);
         $this->assertEquals(204, $response->getStatusCode());
 
-        return $roomExperience;
+        return $componentExperience;
     }
 
     /**
      * @depends testDelete
      */
-    public function testDeleteAgain(\stdClass $roomExperience): void
+    public function testDeleteAgain(\stdClass $componentExperience): void
     {
-        $response = self::$experienceComponentHelper->delete($roomExperience->room_golden_id, $roomExperience->experience_golden_id);
+        $response = self::$experienceComponentHelper->delete($componentExperience->component_golden_id, $componentExperience->experience_golden_id);
         $this->assertEquals(204, $response->getStatusCode());
     }
 

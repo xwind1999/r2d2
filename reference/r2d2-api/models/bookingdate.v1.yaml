@@ -6,7 +6,7 @@ description: Booking Dates are an instance of stock consumption for a room inven
 x-examples:
   booking-date-01:
     value:
-      room_golden_id: '00123'
+      component_golden_id: '00123'
       rate_band_golden_id: RATEBAND01
       date: '2019-10-10'
       price: 22200
@@ -24,7 +24,7 @@ properties:
   booking_golden_id:
     type: string
     description: Booking Golde ID (booking component ID)
-  room_golden_id:
+  component_golden_id:
     type: string
     description: Room Golden ID (room component ID)
   rate_band_uuid:
@@ -57,7 +57,7 @@ properties:
     description: Date of entity update in R2D2
     format: date-time
 required:
-  - room_golden_id
+  - component_golden_id
   - date
   - price
   - is_upsell

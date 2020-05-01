@@ -21,7 +21,7 @@ properties:
     type: string
     format: uuid
     description: Room UUID
-  room_golden_id:
+  component_golden_id:
     type: string
     description: Room component Golden ID
   rate_band_uuid:
@@ -49,6 +49,6 @@ properties:
     description: Date of entity update in R2D2
 required:
   - partner_golden_id
-  - room_golden_id
+  - component_golden_id
   - stock
   - date

@@ -38,7 +38,7 @@ class ExperienceComponentHelper
         if (empty($payload)) {
             $payload = $this->getDefault();
             $this->addValidExperience($payload);
-            $this->addValidRoom($payload);
+            $this->addValidComponent($payload);
         }
 
         $this->client->request(
@@ -50,11 +50,11 @@ class ExperienceComponentHelper
         return $this->client->getResponse();
     }
 
-    public function delete(string $roomGoldenId, string $experienceGoldenId): object
+    public function delete(string $componentGoldenId, string $experienceGoldenId): object
     {
         $payload = [
             'experience_golden_id' => $experienceGoldenId,
-            'room_golden_id' => $roomGoldenId,
+            'component_golden_id' => $componentGoldenId,
         ];
 
         $this->client->request('DELETE',
@@ -72,10 +72,10 @@ class ExperienceComponentHelper
         $payload['experience_golden_id'] = $experience->golden_id;
     }
 
-    private function addValidRoom(array &$payload): void
+    private function addValidComponent(array &$payload): void
     {
-        $room = json_decode(ApiTestCase::$roomHelper->create()->getContent());
+        $component = json_decode(ApiTestCase::$componentHelper->create()->getContent());
 
-        $payload['room_golden_id'] = $room->golden_id;
+        $payload['component_golden_id'] = $component->golden_id;
     }
 }
