@@ -12,10 +12,10 @@ use Doctrine\ORM\Mapping\CustomIdGenerator;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\RoomRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\ComponentRepository")
  * @ORM\Table(indexes={@ORM\Index(columns={"golden_id"})})
  */
-class Room
+class Component
 {
     use TimestampableEntityTrait;
 
@@ -82,7 +82,7 @@ class Room
     /**
      * @var Collection<int, ExperienceComponent>
      *
-     * @ORM\OneToMany(targetEntity="ExperienceComponent", mappedBy="room", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="ExperienceComponent", mappedBy="component", fetch="EXTRA_LAZY")
      */
     public Collection $experienceComponent;
 

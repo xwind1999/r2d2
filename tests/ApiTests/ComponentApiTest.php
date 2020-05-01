@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests;
 
-class RoomApiTest extends ApiTestCase
+class ComponentApiTest extends ApiTestCase
 {
     public function testCreateWithInvalidPartnerGoldenId()
     {
-        $roomCreateRequest = self::$roomHelper->getDefault(['partner_golden_id' => '']);
-        $response = self::$roomHelper->create($roomCreateRequest);
+        $componentCreateRequest = self::$componentHelper->getDefault(['partner_golden_id' => '']);
+        $response = self::$componentHelper->create($componentCreateRequest);
         $this->assertEquals(422, $response->getStatusCode());
     }
 
     public function testCreateWithNonExistentPartner()
     {
-        $roomCreateRequest = self::$roomHelper->getDefault(['partner_golden_id' => 'non-existent-partner']);
-        $response = self::$roomHelper->create($roomCreateRequest);
+        $componentCreateRequest = self::$componentHelper->getDefault(['partner_golden_id' => 'non-existent-partner']);
+        $response = self::$componentHelper->create($componentCreateRequest);
         $this->assertEquals(404, $response->getStatusCode());
     }
 
     public function testCreateSuccess(): string
     {
-        $response = self::$roomHelper->create();
+        $response = self::$componentHelper->create();
         $responseContent = json_decode($response->getContent());
         $this->assertObjectHasAttribute('uuid', $responseContent);
         $this->assertEquals(201, $response->getStatusCode());
@@ -35,7 +35,7 @@ class RoomApiTest extends ApiTestCase
      */
     public function testGet(string $uuid): string
     {
-        $response = self::$roomHelper->get($uuid);
+        $response = self::$componentHelper->get($uuid);
         $responseContent = json_decode($response->getContent());
         $this->assertObjectHasAttribute('uuid', $responseContent);
         $this->assertObjectHasAttribute('created_at', $responseContent);
@@ -49,12 +49,12 @@ class RoomApiTest extends ApiTestCase
      */
     public function testUpdate(string $uuid): string
     {
-        $room = json_decode(self::$roomHelper->get($uuid)->getContent(), true);
+        $component = json_decode(self::$componentHelper->get($uuid)->getContent(), true);
         $payload = [
             'name' => 'updated test room',
             'description' => 'this is a test room, but updated',
-        ] + $room;
-        $response = self::$roomHelper->update($uuid, $payload);
+        ] + $component;
+        $response = self::$componentHelper->update($uuid, $payload);
         $responseContent = json_decode($response->getContent());
         $this->assertEquals($payload['name'], $responseContent->name);
         $this->assertEquals(200, $response->getStatusCode());
@@ -67,7 +67,7 @@ class RoomApiTest extends ApiTestCase
      */
     public function testDelete(string $uuid): string
     {
-        $response = self::$roomHelper->delete($uuid);
+        $response = self::$componentHelper->delete($uuid);
         $responseContent = json_decode($response->getContent());
         $this->assertNull($responseContent);
         $this->assertEquals(204, $response->getStatusCode());
@@ -80,7 +80,7 @@ class RoomApiTest extends ApiTestCase
      */
     public function testGetAfterDelete(string $uuid)
     {
-        $response = self::$roomHelper->get($uuid);
+        $response = self::$componentHelper->get($uuid);
         $this->assertEquals(404, $response->getStatusCode());
     }
 }

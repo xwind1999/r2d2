@@ -8,17 +8,17 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentCreateRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentDeleteRequest;
 use App\Contract\Request\ExperienceComponent\ExperienceComponentUpdateRequest;
+use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
-use App\Entity\Room;
 use App\Exception\Manager\ExperienceComponent\RelationshipAlreadyExistsException;
+use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ExperienceComponentNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
-use App\Exception\Repository\RoomNotFoundException;
 use App\Manager\ExperienceComponentManager;
+use App\Repository\ComponentRepository;
 use App\Repository\ExperienceComponentRepository;
 use App\Repository\ExperienceRepository;
-use App\Repository\RoomRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -34,9 +34,9 @@ class ExperienceComponentManagerTest extends TestCase
     protected $experienceComponentRepository;
 
     /**
-     * @var ObjectProphecy|RoomRepository
+     * @var ComponentRepository|ObjectProphecy
      */
-    protected $roomRepository;
+    protected $componentRepository;
 
     /**
      * @var ExperienceRepository|ObjectProphecy
@@ -46,7 +46,7 @@ class ExperienceComponentManagerTest extends TestCase
     public function setUp(): void
     {
         $this->experienceComponentRepository = $this->prophesize(ExperienceComponentRepository::class);
-        $this->roomRepository = $this->prophesize(RoomRepository::class);
+        $this->componentRepository = $this->prophesize(ComponentRepository::class);
         $this->experienceRepository = $this->prophesize(ExperienceRepository::class);
     }
 
@@ -58,25 +58,25 @@ class ExperienceComponentManagerTest extends TestCase
     {
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
-            $this->roomRepository->reveal(),
+            $this->componentRepository->reveal(),
             $this->experienceRepository->reveal()
         );
 
         $experienceComponent = new ExperienceComponent();
-        $room = new Room();
-        $room->goldenId = '1234';
+        $component = new Component();
+        $component->goldenId = '1234';
         $experience = new Experience();
         $experienceComponentDeleteRequest = new ExperienceComponentDeleteRequest();
         $experienceComponentDeleteRequest->experienceGoldenId = '1234';
-        $experienceComponentDeleteRequest->roomGoldenId = '1234';
+        $experienceComponentDeleteRequest->componentGoldenId = '1234';
 
-        $this->roomRepository->findOneByGoldenId($experienceComponentDeleteRequest->roomGoldenId)->willReturn($room);
+        $this->componentRepository->findOneByGoldenId($experienceComponentDeleteRequest->componentGoldenId)->willReturn($component);
         $this->experienceRepository
             ->findOneByGoldenId($experienceComponentDeleteRequest->experienceGoldenId)
             ->willReturn($experience)
         ;
 
-        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room)->willReturn($experienceComponent);
+        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component)->willReturn($experienceComponent);
 
         $this->experienceComponentRepository->delete($experienceComponent)->shouldBeCalled();
 
@@ -91,25 +91,25 @@ class ExperienceComponentManagerTest extends TestCase
     {
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
-            $this->roomRepository->reveal(),
+            $this->componentRepository->reveal(),
             $this->experienceRepository->reveal()
         );
 
         $experienceComponent = new ExperienceComponent();
-        $room = new Room();
-        $room->goldenId = '1234';
+        $component = new Component();
+        $component->goldenId = '1234';
         $experience = new Experience();
         $experienceComponentDeleteRequest = new ExperienceComponentDeleteRequest();
         $experienceComponentDeleteRequest->experienceGoldenId = '1234';
-        $experienceComponentDeleteRequest->roomGoldenId = '1234';
+        $experienceComponentDeleteRequest->componentGoldenId = '1234';
 
-        $this->roomRepository->findOneByGoldenId($experienceComponentDeleteRequest->roomGoldenId)->willReturn($room);
+        $this->componentRepository->findOneByGoldenId($experienceComponentDeleteRequest->componentGoldenId)->willReturn($component);
         $this->experienceRepository
             ->findOneByGoldenId($experienceComponentDeleteRequest->experienceGoldenId)
             ->willReturn($experience)
         ;
 
-        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room)->willReturn(null);
+        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component)->willReturn(null);
 
         $this->experienceComponentRepository->delete($experienceComponent)->shouldNotBeCalled();
 
@@ -124,13 +124,13 @@ class ExperienceComponentManagerTest extends TestCase
     {
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
-            $this->roomRepository->reveal(),
+            $this->componentRepository->reveal(),
             $this->experienceRepository->reveal()
         );
 
-        $room = new Room();
-        $room->goldenId = '5678';
-        $this->roomRepository->findOneByGoldenId('5678')->willReturn($room);
+        $component = new Component();
+        $component->goldenId = '5678';
+        $this->componentRepository->findOneByGoldenId('5678')->willReturn($component);
 
         $experience = new Experience();
         $experience->goldenId = '9012';
@@ -139,16 +139,16 @@ class ExperienceComponentManagerTest extends TestCase
         $currentDate = new \DateTime();
         $experienceComponentCreateRequest = new ExperienceComponentCreateRequest();
 
-        $experienceComponentCreateRequest->roomGoldenId = '5678';
+        $experienceComponentCreateRequest->componentGoldenId = '5678';
         $experienceComponentCreateRequest->experienceGoldenId = '9012';
         $experienceComponentCreateRequest->isEnabled = true;
         $experienceComponentCreateRequest->externalUpdatedAt = $currentDate;
 
-        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room)->willReturn(null);
+        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component)->willReturn(null);
         $this->experienceComponentRepository->save(Argument::type(ExperienceComponent::class))->shouldBeCalled();
 
         $booking = $manager->create($experienceComponentCreateRequest);
-        $this->assertEquals($experienceComponentCreateRequest->roomGoldenId, $booking->roomGoldenId);
+        $this->assertEquals($experienceComponentCreateRequest->componentGoldenId, $booking->componentGoldenId);
         $this->assertEquals($experienceComponentCreateRequest->experienceGoldenId, $booking->experienceGoldenId);
         $this->assertEquals($experienceComponentCreateRequest->externalUpdatedAt, $booking->externalUpdatedAt);
     }
@@ -161,13 +161,13 @@ class ExperienceComponentManagerTest extends TestCase
     {
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
-            $this->roomRepository->reveal(),
+            $this->componentRepository->reveal(),
             $this->experienceRepository->reveal()
         );
 
-        $room = new Room();
-        $room->goldenId = '1234';
-        $this->roomRepository->findOneByGoldenId('1234')->willReturn($room);
+        $component = new Component();
+        $component->goldenId = '1234';
+        $this->componentRepository->findOneByGoldenId('1234')->willReturn($component);
 
         $experience = new Experience();
         $experience->goldenId = '7895';
@@ -175,24 +175,24 @@ class ExperienceComponentManagerTest extends TestCase
 
         $date = new \DateTime();
         $experienceComponentUpdateRequest = new ExperienceComponentUpdateRequest();
-        $experienceComponentUpdateRequest->roomGoldenId = '1234';
+        $experienceComponentUpdateRequest->componentGoldenId = '1234';
         $experienceComponentUpdateRequest->experienceGoldenId = '7895';
         $experienceComponentUpdateRequest->isEnabled = false;
         $experienceComponentUpdateRequest->externalUpdatedAt = $date;
 
         $experienceComponent = new ExperienceComponent();
-        $experienceComponent->roomGoldenId = '1234';
+        $experienceComponent->componentGoldenId = '1234';
         $experienceComponent->experienceGoldenId = '7895';
         $experienceComponent->isEnabled = true;
         $experienceComponent->externalUpdatedAt = $date;
-        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room)->willReturn($experienceComponent);
+        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component)->willReturn($experienceComponent);
 
         $this->experienceComponentRepository->save(Argument::type(ExperienceComponent::class))->shouldBeCalled();
 
         $updatedExperienceComponent = $manager->update($experienceComponentUpdateRequest);
 
         $this->assertSame($experienceComponent, $updatedExperienceComponent);
-        $this->assertEquals('1234', $experienceComponent->roomGoldenId);
+        $this->assertEquals('1234', $experienceComponent->componentGoldenId);
         $this->assertEquals('7895', $experienceComponent->experienceGoldenId);
         $this->assertEquals(false, $experienceComponent->isEnabled);
         $this->assertEquals($date, $experienceComponent->externalUpdatedAt);
@@ -206,24 +206,24 @@ class ExperienceComponentManagerTest extends TestCase
     {
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
-            $this->roomRepository->reveal(),
+            $this->componentRepository->reveal(),
             $this->experienceRepository->reveal()
         );
-        $room = new Room();
-        $room->goldenId = '1234';
-        $this->roomRepository->findOneByGoldenId('1234')->willReturn($room);
+        $component = new Component();
+        $component->goldenId = '1234';
+        $this->componentRepository->findOneByGoldenId('1234')->willReturn($component);
 
         $experience = new Experience();
         $experience->goldenId = '7895';
         $this->experienceRepository->findOneByGoldenId('7895')->willReturn($experience);
 
         $experienceComponentUpdateRequest = new ExperienceComponentUpdateRequest();
-        $experienceComponentUpdateRequest->roomGoldenId = '1234';
+        $experienceComponentUpdateRequest->componentGoldenId = '1234';
         $experienceComponentUpdateRequest->experienceGoldenId = '7895';
         $experienceComponentUpdateRequest->isEnabled = true;
         $experienceComponentUpdateRequest->externalUpdatedAt = new \DateTime();
 
-        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room)->willReturn(null);
+        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component)->willReturn(null);
         $this->experienceComponentRepository->save(Argument::type(ExperienceComponent::class))->shouldNotBeCalled();
         $this->expectException(ExperienceComponentNotFoundException::class);
         $manager->update($experienceComponentUpdateRequest);
@@ -237,13 +237,13 @@ class ExperienceComponentManagerTest extends TestCase
     {
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
-            $this->roomRepository->reveal(),
+            $this->componentRepository->reveal(),
             $this->experienceRepository->reveal()
         );
 
-        $room = new Room();
-        $room->goldenId = '5678';
-        $this->roomRepository->findOneByGoldenId('5678')->willReturn($room);
+        $component = new Component();
+        $component->goldenId = '5678';
+        $this->componentRepository->findOneByGoldenId('5678')->willReturn($component);
 
         $experience = new Experience();
         $experience->goldenId = '9012';
@@ -252,12 +252,12 @@ class ExperienceComponentManagerTest extends TestCase
         $currentDate = new \DateTime();
         $experienceComponentCreateRequest = new ExperienceComponentCreateRequest();
 
-        $experienceComponentCreateRequest->roomGoldenId = '5678';
+        $experienceComponentCreateRequest->componentGoldenId = '5678';
         $experienceComponentCreateRequest->experienceGoldenId = '9012';
         $experienceComponentCreateRequest->externalUpdatedAt = $currentDate;
 
         $this->expectException(RelationshipAlreadyExistsException::class);
-        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room)->willReturn(new ExperienceComponent());
+        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component)->willReturn(new ExperienceComponent());
         $booking = $manager->create($experienceComponentCreateRequest);
     }
 
@@ -269,15 +269,15 @@ class ExperienceComponentManagerTest extends TestCase
     {
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
-            $this->roomRepository->reveal(),
+            $this->componentRepository->reveal(),
             $this->experienceRepository->reveal()
         );
-        $this->roomRepository->findOneByGoldenId('5678')->willThrow(RoomNotFoundException::class);
+        $this->componentRepository->findOneByGoldenId('5678')->willThrow(ComponentNotFoundException::class);
 
         $experienceComponentCreateRequest = new ExperienceComponentCreateRequest();
-        $experienceComponentCreateRequest->roomGoldenId = '5678';
+        $experienceComponentCreateRequest->componentGoldenId = '5678';
 
-        $this->expectException(RoomNotFoundException::class);
+        $this->expectException(ComponentNotFoundException::class);
         $manager->create($experienceComponentCreateRequest);
     }
 
@@ -289,13 +289,13 @@ class ExperienceComponentManagerTest extends TestCase
     {
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
-            $this->roomRepository->reveal(),
+            $this->componentRepository->reveal(),
             $this->experienceRepository->reveal()
         );
 
-        $room = new Room();
-        $room->goldenId = '5678';
-        $this->roomRepository->findOneByGoldenId('5678')->willReturn($room);
+        $component = new Component();
+        $component->goldenId = '5678';
+        $this->componentRepository->findOneByGoldenId('5678')->willReturn($component);
 
         $this->experienceRepository
             ->findOneByGoldenId('9012')
@@ -304,7 +304,7 @@ class ExperienceComponentManagerTest extends TestCase
 
         $experienceComponentCreateRequest = new ExperienceComponentCreateRequest();
 
-        $experienceComponentCreateRequest->roomGoldenId = '5678';
+        $experienceComponentCreateRequest->componentGoldenId = '5678';
         $experienceComponentCreateRequest->experienceGoldenId = '9012';
 
         $this->expectException(ExperienceNotFoundException::class);
@@ -319,13 +319,13 @@ class ExperienceComponentManagerTest extends TestCase
     {
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
-            $this->roomRepository->reveal(),
+            $this->componentRepository->reveal(),
             $this->experienceRepository->reveal()
         );
 
-        $room = new Room();
-        $room->goldenId = '1234';
-        $this->roomRepository->findOneByGoldenId('1234')->willReturn($room);
+        $component = new Component();
+        $component->goldenId = '1234';
+        $this->componentRepository->findOneByGoldenId('1234')->willReturn($component);
 
         $experience = new Experience();
         $experience->goldenId = '7895';
@@ -338,11 +338,11 @@ class ExperienceComponentManagerTest extends TestCase
         $relationshipRequest->isEnabled = false;
 
         $experienceComponent = new ExperienceComponent();
-        $experienceComponent->roomGoldenId = '1234';
+        $experienceComponent->componentGoldenId = '1234';
         $experienceComponent->experienceGoldenId = '7895';
         $experienceComponent->isEnabled = true;
         $experienceComponent->externalUpdatedAt = $date;
-        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $room)->willReturn($experienceComponent);
+        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component)->willReturn($experienceComponent);
 
         $this->experienceComponentRepository->save(Argument::type(ExperienceComponent::class))->shouldBeCalled();
 

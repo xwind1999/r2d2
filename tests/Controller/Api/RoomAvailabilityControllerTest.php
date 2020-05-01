@@ -47,7 +47,7 @@ class RoomAvailabilityControllerTest extends TestCase
         $uuidInterface->toString()->willReturn($uuid);
         $roomAvailability = new RoomAvailability();
         $roomAvailability->uuid = $uuidInterface->reveal();
-        $roomAvailability->roomGoldenId = '1234';
+        $roomAvailability->componentGoldenId = '1234';
         $roomAvailability->rateBandGoldenId = '5678';
         $roomAvailability->stock = 2;
         $roomAvailability->date = new \DateTime();
@@ -61,7 +61,7 @@ class RoomAvailabilityControllerTest extends TestCase
         $return = $controller->get(Uuid::fromString($uuid), $roomAvailabilityManager->reveal());
         $this->assertEquals(RoomAvailabilityGetResponse::class, get_class($return));
         $this->assertEquals($uuid, $return->uuid);
-        $this->assertEquals($roomAvailability->roomGoldenId, $return->roomGoldenId);
+        $this->assertEquals($roomAvailability->componentGoldenId, $return->componentGoldenId);
         $this->assertEquals($roomAvailability->rateBandGoldenId, $return->rateBandGoldenId);
         $this->assertEquals($roomAvailability->stock, $return->stock);
         $this->assertEquals($roomAvailability->date, $return->date);
@@ -149,7 +149,7 @@ class RoomAvailabilityControllerTest extends TestCase
         $uuidInterface->toString()->willReturn($uuid);
         $rateBand = new RoomAvailability();
         $rateBand->uuid = $uuidInterface->reveal();
-        $rateBand->roomGoldenId = '1234';
+        $rateBand->componentGoldenId = '1234';
         $rateBand->rateBandGoldenId = 'rb1234';
         $rateBand->stock = 2;
         $rateBand->date = new \DateTime();

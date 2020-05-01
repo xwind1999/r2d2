@@ -18,7 +18,7 @@ class ExperienceComponentDeleteRequest implements RequestBodyInterface, Validata
      *
      * @JMS\Type("string")
      */
-    public string $roomGoldenId;
+    public string $componentGoldenId;
 
     /**
      * @Assert\Type(type="string")

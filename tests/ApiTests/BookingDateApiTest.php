@@ -8,7 +8,7 @@ class BookingDateApiTest extends ApiTestCase
 {
     public function testCreateWithInvalidBookingGoldenId()
     {
-        $payload = self::$boxHelper->getDefault(['booking_golden_id' => '']);
+        $payload = self::$bookingDateHelper->getDefault(['booking_golden_id' => '']);
         $response = self::$bookingDateHelper->create($payload);
         $this->assertEquals(422, $response->getStatusCode());
     }

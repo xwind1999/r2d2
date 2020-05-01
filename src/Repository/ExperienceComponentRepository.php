@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
-use App\Entity\Room;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -35,8 +35,8 @@ class ExperienceComponentRepository extends ServiceEntityRepository
         $this->_em->flush();
     }
 
-    public function findOneByExperienceComponent(Experience $experience, Room $room): ?ExperienceComponent
+    public function findOneByExperienceComponent(Experience $experience, Component $component): ?ExperienceComponent
     {
-        return $this->findOneBy(['experience' => $experience, 'room' => $room]);
+        return $this->findOneBy(['experience' => $experience, 'component' => $component]);
     }
 }

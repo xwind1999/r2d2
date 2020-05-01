@@ -30,7 +30,7 @@ paths:
                 response-broadcast-channel-room-availabilities-01:
                   value:
                     rate_band_golden_id: RATE_BAND_01
-                    room_golden_id: ROOM_01
+                    component_golden_id: ROOM_01
                     partner_golden_id: PARTNER_01
                     start_date: '2019-10-23'
                     end_date: '2019-10-24'
@@ -139,7 +139,7 @@ paths:
               request-broadcast-channel-room-availabilities-01:
                 value:
                   rate_band_golden_id: RATE_BAND_01
-                  room_golden_id: ROOM_01
+                  component_golden_id: ROOM_01
                   partner_golden_id: PARTNER_01
                   start_date: '2019-10-23'
                   end_date: '2019-10-24'
@@ -640,7 +640,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: room_golden_id
+          name: component_golden_id
         - schema:
             type: string
           in: query
@@ -992,7 +992,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: room_golden_id
+          name: component_golden_id
         - schema:
             type: string
           in: query
@@ -1276,7 +1276,7 @@ paths:
                         start_date: '2019-10-10'
                         end_date: '2019-10-11'
                         dates:
-                          - room_golden_id: '00123'
+                          - component_golden_id: '00123'
                             rate_band_golden_id: RATEBAND01
                             date: '2019-10-10'
                             price: 22200
@@ -1360,7 +1360,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: room_golden_id
+          name: component_golden_id
         - schema:
             type: string
           in: query

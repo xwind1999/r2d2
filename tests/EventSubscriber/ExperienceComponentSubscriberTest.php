@@ -7,9 +7,9 @@ namespace App\Tests\EventSubscriber;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\EventSubscriber\ExperienceComponentSubscriber;
+use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
-use App\Exception\Repository\RoomNotFoundException;
 use App\Manager\ExperienceComponentManager;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -67,7 +67,7 @@ class ExperienceComponentSubscriberTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::handleMessage
-     * @covers \App\Exception\Repository\RoomNotFoundException
+     * @covers \App\Exception\Repository\ComponentNotFoundException
      * @covers \App\Exception\Repository\ExperienceNotFoundException
      * @covers \App\Contract\Request\BroadcastListener\ProductRelationshipRequest::getContext
      *
@@ -102,7 +102,7 @@ class ExperienceComponentSubscriberTest extends TestCase
     public function sampleException(): array
     {
         return [
-            [new RoomNotFoundException()],
+            [new ComponentNotFoundException()],
             [new ExperienceNotFoundException()],
         ];
     }

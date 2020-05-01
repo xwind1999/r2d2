@@ -8,35 +8,35 @@ use App\Contract\Request\RoomAvailability\RoomAvailabilityCreateRequest;
 use App\Contract\Request\RoomAvailability\RoomAvailabilityUpdateRequest;
 use App\Entity\RoomAvailability;
 use App\Exception\Repository\EntityNotFoundException;
+use App\Repository\ComponentRepository;
 use App\Repository\RateBandRepository;
 use App\Repository\RoomAvailabilityRepository;
-use App\Repository\RoomRepository;
 
 class RoomAvailabilityManager
 {
     protected RoomAvailabilityRepository $repository;
 
-    protected RoomRepository $roomRepository;
+    protected ComponentRepository $componentRepository;
 
     protected RateBandRepository $rateBandRepository;
 
-    public function __construct(RoomAvailabilityRepository $repository, RoomRepository $roomRepository, RateBandRepository $rateBandRepository)
+    public function __construct(RoomAvailabilityRepository $repository, ComponentRepository $componentRepository, RateBandRepository $rateBandRepository)
     {
         $this->repository = $repository;
-        $this->roomRepository = $roomRepository;
+        $this->componentRepository = $componentRepository;
         $this->rateBandRepository = $rateBandRepository;
     }
 
     public function create(RoomAvailabilityCreateRequest $roomAvailabilityCreateRequest): RoomAvailability
     {
         $rateBand = $this->rateBandRepository->findOneByGoldenId($roomAvailabilityCreateRequest->rateBandGoldenId);
-        $room = $this->roomRepository->findOneByGoldenId($roomAvailabilityCreateRequest->roomGoldenId);
+        $component = $this->componentRepository->findOneByGoldenId($roomAvailabilityCreateRequest->componentGoldenId);
 
         $roomAvailability = new RoomAvailability();
 
         $roomAvailability->rateBand = $rateBand;
-        $roomAvailability->room = $room;
-        $roomAvailability->roomGoldenId = $roomAvailabilityCreateRequest->roomGoldenId;
+        $roomAvailability->component = $component;
+        $roomAvailability->componentGoldenId = $roomAvailabilityCreateRequest->componentGoldenId;
         $roomAvailability->rateBandGoldenId = $roomAvailabilityCreateRequest->rateBandGoldenId;
         $roomAvailability->stock = $roomAvailabilityCreateRequest->stock;
         $roomAvailability->date = $roomAvailabilityCreateRequest->date;
@@ -70,13 +70,13 @@ class RoomAvailabilityManager
     public function update(string $uuid, RoomAvailabilityUpdateRequest $roomAvailabilityUpdateRequest): RoomAvailability
     {
         $rateBand = $this->rateBandRepository->findOneByGoldenId($roomAvailabilityUpdateRequest->rateBandGoldenId);
-        $room = $this->roomRepository->findOneByGoldenId($roomAvailabilityUpdateRequest->roomGoldenId);
+        $component = $this->componentRepository->findOneByGoldenId($roomAvailabilityUpdateRequest->componentGoldenId);
 
         $roomAvailability = $this->get($uuid);
 
         $roomAvailability->rateBand = $rateBand;
-        $roomAvailability->room = $room;
-        $roomAvailability->roomGoldenId = $roomAvailabilityUpdateRequest->roomGoldenId;
+        $roomAvailability->component = $component;
+        $roomAvailability->componentGoldenId = $roomAvailabilityUpdateRequest->componentGoldenId;
         $roomAvailability->rateBandGoldenId = $roomAvailabilityUpdateRequest->rateBandGoldenId;
         $roomAvailability->stock = $roomAvailabilityUpdateRequest->stock;
         $roomAvailability->date = $roomAvailabilityUpdateRequest->date;

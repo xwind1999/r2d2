@@ -27,7 +27,7 @@ class BookingDateCreateRequest implements RequestBodyInterface, ValidatableReque
      *
      * @JMS\Type("string")
      */
-    public string $roomGoldenId;
+    public string $componentGoldenId;
 
     /**
      * @Assert\Type(type="string")

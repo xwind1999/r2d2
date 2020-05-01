@@ -18,7 +18,7 @@ abstract class AbstractExperienceComponentResponse extends ResponseContract
      *
      * @JMS\Type("string")
      */
-    public string $roomGoldenId;
+    public string $componentGoldenId;
 
     /**
      * @Assert\Type(type="string")
@@ -47,7 +47,7 @@ abstract class AbstractExperienceComponentResponse extends ResponseContract
 
     public function __construct(ExperienceComponent $experienceComponent)
     {
-        $this->roomGoldenId = $experienceComponent->roomGoldenId;
+        $this->componentGoldenId = $experienceComponent->componentGoldenId;
         $this->experienceGoldenId = $experienceComponent->experienceGoldenId;
         $this->isEnabled = $experienceComponent->isEnabled;
         $this->externalUpdatedAt = $experienceComponent->externalUpdatedAt;

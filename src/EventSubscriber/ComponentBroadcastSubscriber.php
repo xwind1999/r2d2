@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Event\Product\ComponentBroadcastEvent;
-use App\Manager\RoomManager;
+use App\Manager\ComponentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ComponentBroadcastSubscriber implements EventSubscriberInterface
 {
     private LoggerInterface $logger;
-    private RoomManager $manager;
+    private ComponentManager $manager;
 
-    public function __construct(LoggerInterface $logger, RoomManager $manager)
+    public function __construct(LoggerInterface $logger, ComponentManager $manager)
     {
         $this->logger = $logger;
         $this->manager = $manager;

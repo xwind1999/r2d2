@@ -8,13 +8,13 @@ use App\Contract\Request\BookingDate\BookingDateCreateRequest;
 use App\Contract\Request\BookingDate\BookingDateUpdateRequest;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
+use App\Entity\Component;
 use App\Entity\RateBand;
-use App\Entity\Room;
 use App\Manager\BookingDateManager;
 use App\Repository\BookingDateRepository;
 use App\Repository\BookingRepository;
+use App\Repository\ComponentRepository;
 use App\Repository\RateBandRepository;
-use App\Repository\RoomRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -31,9 +31,9 @@ class BookingDateManagerTest extends TestCase
     protected $repository;
 
     /**
-     * @var ObjectProphecy|RoomRepository
+     * @var ComponentRepository|ObjectProphecy
      */
-    protected $roomRepository;
+    protected $componentRepository;
 
     /**
      * @var ObjectProphecy|RateBandRepository
@@ -48,7 +48,7 @@ class BookingDateManagerTest extends TestCase
     public function setUp(): void
     {
         $this->repository = $this->prophesize(BookingDateRepository::class);
-        $this->roomRepository = $this->prophesize(RoomRepository::class);
+        $this->componentRepository = $this->prophesize(ComponentRepository::class);
         $this->rateBandRepository = $this->prophesize(RateBandRepository::class);
         $this->bookingRepository = $this->prophesize(BookingRepository::class);
     }
@@ -60,11 +60,11 @@ class BookingDateManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new BookingDateManager($this->repository->reveal(), $this->roomRepository->reveal(), $this->rateBandRepository->reveal(), $this->bookingRepository->reveal());
+        $manager = new BookingDateManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->rateBandRepository->reveal(), $this->bookingRepository->reveal());
 
-        $room = new Room();
-        $room->goldenId = '1234';
-        $this->roomRepository->findOneByGoldenId('1234')->willReturn($room);
+        $component = new Component();
+        $component->goldenId = '1234';
+        $this->componentRepository->findOneByGoldenId('1234')->willReturn($component);
 
         $rateBand = new RateBand();
         $rateBand->goldenId = '7895';
@@ -78,7 +78,7 @@ class BookingDateManagerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $currentDate = new \DateTime();
         $bookingDateUpdateRequest->bookingGoldenId = '5566';
-        $bookingDateUpdateRequest->roomGoldenId = '1234';
+        $bookingDateUpdateRequest->componentGoldenId = '1234';
         $bookingDateUpdateRequest->rateBandGoldenId = '7895';
         $bookingDateUpdateRequest->date = $currentDate;
         $bookingDateUpdateRequest->price = 10;
@@ -102,7 +102,7 @@ class BookingDateManagerTest extends TestCase
         $updatedBookingDate = $manager->update($uuid, $bookingDateUpdateRequest);
 
         $this->assertSame($bookingDate, $updatedBookingDate);
-        $this->assertEquals('1234', $bookingDate->roomGoldenId);
+        $this->assertEquals('1234', $bookingDate->componentGoldenId);
         $this->assertEquals('7895', $bookingDate->rateBandGoldenId);
         $this->assertEquals(10, $bookingDate->price);
         $this->assertEquals($currentDate, $bookingDate->date);
@@ -117,7 +117,7 @@ class BookingDateManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new BookingDateManager($this->repository->reveal(), $this->roomRepository->reveal(), $this->rateBandRepository->reveal(), $this->bookingRepository->reveal());
+        $manager = new BookingDateManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->rateBandRepository->reveal(), $this->bookingRepository->reveal());
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -137,11 +137,11 @@ class BookingDateManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new BookingDateManager($this->repository->reveal(), $this->roomRepository->reveal(), $this->rateBandRepository->reveal(), $this->bookingRepository->reveal());
+        $manager = new BookingDateManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->rateBandRepository->reveal(), $this->bookingRepository->reveal());
 
-        $room = new Room();
-        $room->goldenId = '1234';
-        $this->roomRepository->findOneByGoldenId('5678')->willReturn($room);
+        $component = new Component();
+        $component->goldenId = '1234';
+        $this->componentRepository->findOneByGoldenId('5678')->willReturn($component);
 
         $rateBand = new RateBand();
         $rateBand->goldenId = '7895';
@@ -155,7 +155,7 @@ class BookingDateManagerTest extends TestCase
 
         $bookingDateCreateRequest = new BookingDateCreateRequest();
         $bookingDateCreateRequest->bookingGoldenId = '1234';
-        $bookingDateCreateRequest->roomGoldenId = '5678';
+        $bookingDateCreateRequest->componentGoldenId = '5678';
         $bookingDateCreateRequest->rateBandGoldenId = '7895';
         $bookingDateCreateRequest->date = $currentDate;
         $bookingDateCreateRequest->price = 20;
@@ -166,7 +166,7 @@ class BookingDateManagerTest extends TestCase
 
         $bookingDate = $manager->create($bookingDateCreateRequest);
 
-        $this->assertEquals($bookingDateCreateRequest->roomGoldenId, $bookingDate->roomGoldenId);
+        $this->assertEquals($bookingDateCreateRequest->componentGoldenId, $bookingDate->componentGoldenId);
         $this->assertEquals($bookingDateCreateRequest->rateBandGoldenId, $bookingDate->rateBandGoldenId);
         $this->assertEquals($bookingDateCreateRequest->date, $bookingDate->date);
         $this->assertEquals($bookingDateCreateRequest->isUpsell, $bookingDate->isUpsell);

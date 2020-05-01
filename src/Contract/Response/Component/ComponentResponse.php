@@ -2,15 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Contract\Request\Room;
+namespace App\Contract\Response\Component;
 
-use App\Helper\Request\RequestBodyInterface;
-use App\Helper\Request\ValidatableRequest;
+use App\Contract\ResponseContract;
+use App\Entity\Component;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class RoomCreateRequest implements RequestBodyInterface, ValidatableRequest
+abstract class ComponentResponse extends ResponseContract
 {
+    /**
+     * @Assert\Type(type="string")
+     * @Assert\NotBlank
+     *
+     * @JMS\Type("string")
+     */
+    public string $uuid;
+
     /**
      * @Assert\Type(type="string")
      * @Assert\Length(min="1", max="45")
@@ -57,11 +65,10 @@ class RoomCreateRequest implements RequestBodyInterface, ValidatableRequest
 
     /**
      * @Assert\Type(type="integer")
-     * @Assert\PositiveOrZero
      *
      * @JMS\Type("strict_integer")
      */
-    public int $voucherExpirationDuration;
+    public ?int $voucherExpirationDuration;
 
     /**
      * @Assert\Type(type="boolean")
@@ -87,4 +94,34 @@ class RoomCreateRequest implements RequestBodyInterface, ValidatableRequest
      * @JMS\Type("string")
      */
     public string $status;
+
+    /**
+     * @Assert\NotBlank
+     *
+     * @JMS\Type("DateTime")
+     */
+    public \DateTime $createdAt;
+
+    /**
+     * @Assert\NotBlank
+     *
+     * @JMS\Type("DateTime")
+     */
+    public \DateTime $updatedAt;
+
+    public function __construct(Component $component)
+    {
+        $this->uuid = $component->uuid->toString();
+        $this->goldenId = $component->goldenId;
+        $this->partnerGoldenId = $component->partnerGoldenId;
+        $this->name = $component->name;
+        $this->description = $component->description;
+        $this->inventory = $component->inventory;
+        $this->voucherExpirationDuration = $component->duration;
+        $this->isSellable = $component->isSellable;
+        $this->isReservable = $component->isReservable;
+        $this->status = $component->status;
+        $this->createdAt = $component->createdAt;
+        $this->updatedAt = $component->updatedAt;
+    }
 }
