@@ -1,7 +1,7 @@
 variables:
   BASE_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base
   VALIDATION_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-validation
-  BASE_IMAGE_VERSION: 0.0.15
+  BASE_IMAGE_VERSION: 0.0.16
   BASE_FULL_IMAGE: ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
   VALIDATION_FULL_IMAGE: ${VALIDATION_IMAGE}:${BASE_IMAGE_VERSION}
   VALIDATION_FULL_IMAGE_LATEST: ${VALIDATION_IMAGE}:latest
@@ -12,6 +12,7 @@ build-base-image:
   image: docker:dind
   only:
     - CI-master
+    - fix-images
   script:
     - >
       docker build --pull

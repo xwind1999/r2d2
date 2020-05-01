@@ -116,13 +116,13 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
     public string $type;
 
     /**
-     * @Assert\Type(type="string")
+     * @Assert\Type(type="integer")
      * @Assert\Length(min="1", max="2")
      *
-     * @JMS\Type("string")
+     * @JMS\Type("integer")
      * @JMS\SerializedName("productPeopleNumber")
      */
-    public ?string $productPeopleNumber = null;
+    public ?int $productPeopleNumber = null;
 
     /**
      * @Assert\Type(type="integer")
