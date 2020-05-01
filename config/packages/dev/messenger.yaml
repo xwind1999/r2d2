@@ -4,22 +4,22 @@ framework:
         transports:
         # https://symfony.com/doc/current/messenger.html#transports
             broadcast-listeners-partner:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                dsn: 'doctrine://default'
                 options:
                     queue_name: broadcast-listeners-partner
 
             broadcast-listeners-product:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                dsn: 'doctrine://default'
                 options:
                     queue_name: broadcast-listeners-product
 
             broadcast-listeners-product-relationship:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                dsn: 'doctrine://default'
                 options:
                     queue_name: broadcast-listeners-product-relationship
 
             failed-broadcast-listeners:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                dsn: 'doctrine://default'
                 options:
                     queue_name: failed-broadcast-listeners
         # sync: 'sync://'
