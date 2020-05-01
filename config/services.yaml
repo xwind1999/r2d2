@@ -6,6 +6,11 @@
 parameters:
     clients.quickdata:
         base_uri: '%env(QUICKDATA_URL)%'
+    clients.cmhub:
+        base_uri: '%env(CMHUB_URL)%'
+        auth_basic:
+            user: '%env(CMHUB_USER)%'
+            password: '%env(CMHUB_PASSWORD)%'
 
 services:
     # default configuration for services in *this* file
@@ -107,3 +112,8 @@ services:
             - { name: monolog.processor }
 
     Ramsey\Uuid\UuidFactory: ~
+
+    App\CMHub\CMHub:
+        arguments:
+            - '%clients.cmhub%'
+            - '@App\Http\HttpClientFactory'
