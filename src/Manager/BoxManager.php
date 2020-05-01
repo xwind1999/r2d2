@@ -77,8 +77,8 @@ class BoxManager
         }
 
         $box->goldenId = $productRequest->id;
-        $box->brand = $productRequest->sellableBrand->code;
-        $box->country = $productRequest->sellableCountry->code;
+        $box->brand = $productRequest->sellableBrand ? $productRequest->sellableBrand->code : null;
+        $box->country = $productRequest->sellableCountry ? $productRequest->sellableCountry->code : null;
         $box->status = $productRequest->status;
 
         $this->repository->save($box);
