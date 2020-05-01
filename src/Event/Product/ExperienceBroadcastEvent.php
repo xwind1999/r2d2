@@ -4,27 +4,9 @@ declare(strict_types=1);
 
 namespace App\Event\Product;
 
-use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Event\Product\Contract\ProductRequestEventInterface;
-use Symfony\Contracts\EventDispatcher\Event;
-
-class ExperienceBroadcastEvent extends Event implements ProductRequestEventInterface
+class ExperienceBroadcastEvent extends AbstractProductBroadcastEvent
 {
     public const EVENT_NAME = 'broadcast.experience';
-    private ProductRequest $productRequest;
 
-    public function __construct(ProductRequest $productRequest)
-    {
-        $this->productRequest = $productRequest;
-    }
-
-    public function getProductRequest(): ProductRequest
-    {
-        return $this->productRequest;
-    }
-
-    public function getEventName(): string
-    {
-        return self::EVENT_NAME;
-    }
+    protected const LOG_MESSAGE = 'Experience Broadcast Event';
 }
