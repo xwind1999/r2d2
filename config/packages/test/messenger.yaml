@@ -1,0 +1,31 @@
+framework:
+    messenger:
+
+        transports:
+        # https://symfony.com/doc/current/messenger.html#transports
+            broadcast-listeners-partner:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: broadcast-listeners-partner
+
+            broadcast-listeners-product:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: broadcast-listeners-product
+
+            broadcast-listeners-product-relationship:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: broadcast-listeners-product-relationship
+
+            failed-broadcast-listeners:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: failed-broadcast-listeners
+        # sync: 'sync://'
+
+        routing:
+        # Route your messages to the transports
+            'App\Contract\Request\BroadcastListener\PartnerRequest': broadcast-listeners-partner
+            'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
+            'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
