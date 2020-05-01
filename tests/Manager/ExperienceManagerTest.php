@@ -56,7 +56,7 @@ class ExperienceManagerTest extends TestCase
         $experienceUpdateRequest->partnerGoldenId = '5678';
         $experienceUpdateRequest->name = 'dinner with massage';
         $experienceUpdateRequest->description = 'a fancy dinner with feet massage';
-        $experienceUpdateRequest->productPeopleNumber = '1';
+        $experienceUpdateRequest->productPeopleNumber = 1;
         $experienceUpdateRequest->voucherExpirationDuration = 2;
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -68,7 +68,7 @@ class ExperienceManagerTest extends TestCase
         $experience->partnerGoldenId = '5678';
         $experience->name = '7895';
         $experience->description = '12365488';
-        $experience->peopleNumber = '2';
+        $experience->peopleNumber = 2;
         $experience->duration = 3;
         $this->repository->findOne($uuid)->willReturn($experience);
 
@@ -119,7 +119,7 @@ class ExperienceManagerTest extends TestCase
         $experienceCreateRequest->partnerGoldenId = '5678';
         $experienceCreateRequest->name = 'dinner with massage';
         $experienceCreateRequest->description = 'a fancy dinner with feet massage';
-        $experienceCreateRequest->productPeopleNumber = '2';
+        $experienceCreateRequest->productPeopleNumber = 2;
         $experienceCreateRequest->voucherExpirationDuration = 3;
 
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
@@ -146,7 +146,7 @@ class ExperienceManagerTest extends TestCase
         $productRequest->partner = $partner;
         $productRequest->name = 'dinner with massage';
         $productRequest->description = 'a fancy dinner with feet massage';
-        $productRequest->productPeopleNumber = '2';
+        $productRequest->productPeopleNumber = 2;
         $productRequest->voucherExpirationDuration = 3;
 
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
@@ -171,7 +171,7 @@ class ExperienceManagerTest extends TestCase
         $productRequest->partner = $partner;
         $productRequest->name = 'dinner with massage';
         $productRequest->description = 'a fancy dinner with feet massage';
-        $productRequest->productPeopleNumber = '2';
+        $productRequest->productPeopleNumber = 2;
         $productRequest->voucherExpirationDuration = 3;
 
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
