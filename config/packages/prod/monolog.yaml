@@ -16,4 +16,4 @@ monolog:
             path: "%kernel.logs_dir%/r2d2.log"
             level: debug
             formatter: Monolog\Formatter\LogstashFormatter
-            channels: ['!event', '!doctrine', '!php', '!request', '!messenger']
+            channels: ['!event', '!doctrine', '!php', '!request']
