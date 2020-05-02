@@ -9,7 +9,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class BadResponseReceivedEvent extends AbstractLoggableEvent
 {
-    protected const MESSAGE = 'Bad response received from external service';
+    protected const LOG_MESSAGE = 'Bad response received from external service';
 
     protected const LOG_LEVEL = 'error';
 

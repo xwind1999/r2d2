@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Event\Product\ComponentBroadcastEvent;
+use App\Exception\Repository\PartnerNotFoundException;
 use App\Manager\ComponentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,8 +32,17 @@ class ComponentBroadcastSubscriber implements EventSubscriberInterface
     {
         try {
             $this->manager->replace($event->getProductRequest());
+        } catch (PartnerNotFoundException $exception) {
+            $this->logger->warning(
+                'No existing Partner for this component',
+                $event->getProductRequest()->getContext()
+            );
+
+            throw $exception;
         } catch (\Exception $exception) {
-            $this->logger->warning($exception->getMessage(), $event->getProductRequest()->getContext());
+            $this->logger->error($exception->getMessage(), $event->getProductRequest()->getContext());
+
+            throw $exception;
         }
     }
 }

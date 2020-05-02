@@ -9,7 +9,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class WellFormedResponseReceivedEvent extends AbstractLoggableEvent
 {
-    protected const MESSAGE = 'Correctly formed response received';
+    protected const LOG_MESSAGE = 'Correctly formed response received';
 
     protected string $clientId;
 

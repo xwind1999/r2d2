@@ -33,6 +33,8 @@ class ExperienceBroadcastSubscriber implements EventSubscriberInterface
             $this->experienceManager->replace($event->getProductRequest());
         } catch (\Exception $exception) {
             $this->logger->warning($exception->getMessage(), $event->getProductRequest()->getContext());
+
+            throw $exception;
         }
     }
 }

@@ -8,7 +8,6 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\EventSubscriber\ExperienceComponentSubscriber;
 use App\Exception\Repository\ComponentNotFoundException;
-use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceComponentManager;
 use PHPUnit\Framework\TestCase;
@@ -73,7 +72,7 @@ class ExperienceComponentSubscriberTest extends TestCase
      *
      * @dataProvider sampleException
      */
-    public function testHandleMessageThrowsRoomNotFoundException(EntityNotFoundException $exception): void
+    public function testHandleMessageThrowsRoomNotFoundException(\Exception $exception, string $logLevel): void
     {
         $experienceComponentSubscriber = new ExperienceComponentSubscriber($this->logger, $this->experienceComponentManager);
 
@@ -82,7 +81,7 @@ class ExperienceComponentSubscriberTest extends TestCase
             ->method('replace')
             ->willThrowException($exception)
         ;
-        $this->logger->expects($this->once())->method('warning')->willReturn(null);
+        $this->logger->expects($this->once())->method($logLevel)->willReturn(null);
 
         $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->childProduct = '111';
@@ -96,14 +95,17 @@ class ExperienceComponentSubscriberTest extends TestCase
             ->method('getProductRelationshipRequest')
             ->willReturn($relationshipRequest)
         ;
+
+        $this->expectException(get_class($exception));
         $experienceComponentSubscriber->handleMessage($this->experienceComponentEvent);
     }
 
     public function sampleException(): array
     {
         return [
-            [new ComponentNotFoundException()],
-            [new ExperienceNotFoundException()],
+            [new ComponentNotFoundException(), 'warning'],
+            [new ExperienceNotFoundException(), 'warning'],
+            [new \Exception(), 'error'],
         ];
     }
 }
