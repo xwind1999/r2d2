@@ -19,14 +19,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
     /**
      * @Assert\Type(type="string")
      * @Assert\Length(min="1", max="45")
-     *
-     * @JMS\Type("string")
-     */
-    public string $uuid;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
      * @Assert\NotBlank
      *
      * @JMS\Type("string")
@@ -82,7 +74,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Brand")
      * @JMS\SerializedName("sellableBrand")
      */
-    public ?Brand $sellableBrand;
+    public ?Brand $sellableBrand = null;
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Partner")
@@ -90,7 +82,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Partner")
      */
-    public ?Partner $partner;
+    public ?Partner $partner = null;
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Country")
@@ -99,7 +91,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Country")
      * @JMS\SerializedName("sellableCountry")
      */
-    public ?Country $sellableCountry;
+    public ?Country $sellableCountry = null;
 
     /**
      * @Assert\Type(type="string")

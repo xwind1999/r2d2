@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\Event\ProductRelationship;
 
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
-use App\Event\AbstractLoggableEvent;
+use Clogger\ContextualInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
-abstract class AbstractRelationshipBroadcastEvent extends AbstractLoggableEvent implements ProductRelationshipEventInterface
+abstract class AbstractRelationshipBroadcastEvent extends Event implements ProductRelationshipEventInterface, ContextualInterface
 {
-    public const EVENT_NAME = 'product-relationship';
-
     protected const LOG_MESSAGE = 'Product Relationship Broadcast Event';
-
-    protected const LOG_LEVEL = 'info';
 
     private ProductRelationshipRequest $relationshipRequest;
 
@@ -25,11 +22,6 @@ abstract class AbstractRelationshipBroadcastEvent extends AbstractLoggableEvent 
     public function getProductRelationshipRequest(): ProductRelationshipRequest
     {
         return $this->relationshipRequest;
-    }
-
-    public function getEventName(): string
-    {
-        return static::EVENT_NAME;
     }
 
     /**

@@ -31,7 +31,7 @@ class ProductBroadcastHandler implements MessageHandlerInterface
     {
         try {
             $event = $this->productTypeResolver->resolve($productRequest);
-            $this->eventDispatcher->dispatch($event, $event->getEventName());
+            $this->eventDispatcher->dispatch($event);
         } catch (NonExistentTypeResolverExcepetion $exception) {
             $this->logger->warning($exception->getMessage(), $productRequest->getContext());
         }

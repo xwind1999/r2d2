@@ -47,7 +47,7 @@ class ExperienceComponentSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
-            [ExperienceComponentRelationshipBroadcastEvent::EVENT_NAME => ['handleMessage']],
+            [ExperienceComponentRelationshipBroadcastEvent::class => ['handleMessage']],
             ExperienceComponentSubscriber::getSubscribedEvents()
         );
     }

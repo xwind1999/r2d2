@@ -16,7 +16,6 @@ class BoxBroadcastEventTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::getProductRequest
-     * @covers ::getEventName
      */
     public function testEvent(): void
     {
@@ -24,6 +23,5 @@ class BoxBroadcastEventTest extends TestCase
 
         $event = new BoxBroadcastEvent($productRequest->reveal());
         $this->assertInstanceOf(ProductRequest::class, $event->getProductRequest());
-        $this->assertEquals('broadcast.box', $event->getEventName());
     }
 }

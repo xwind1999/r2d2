@@ -47,7 +47,7 @@ class BoxExperienceSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
-            [BoxExperienceRelationshipBroadcastEvent::EVENT_NAME => ['handleMessage']],
+            [BoxExperienceRelationshipBroadcastEvent::class => ['handleMessage']],
             BoxExperienceSubscriber::getSubscribedEvents()
         );
     }
