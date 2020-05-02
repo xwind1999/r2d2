@@ -38,11 +38,19 @@ class BoxExperienceSubscriber implements EventSubscriberInterface
                 'No existing Box for this relationship',
                 $event->getProductRelationshipRequest()->getContext()
             );
+
+            throw $exception;
         } catch (ExperienceNotFoundException $exception) {
             $this->logger->warning(
                 'No existing Experience for this relationship',
                 $event->getProductRelationshipRequest()->getContext()
             );
+
+            throw $exception;
+        } catch (\Exception $exception) {
+            $this->logger->error($exception->getMessage(), $event->getProductRelationshipRequest()->getContext());
+
+            throw $exception;
         }
     }
 }

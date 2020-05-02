@@ -8,7 +8,7 @@ use App\Event\AbstractLoggableEvent;
 
 class ExternalServiceRequestMadeEvent extends AbstractLoggableEvent
 {
-    protected const MESSAGE = 'Request made to external service';
+    protected const LOG_MESSAGE = 'Request made to external service';
 
     protected string $clientId;
 

@@ -33,6 +33,8 @@ class BoxBroadcastSubscriber implements EventSubscriberInterface
             $this->boxManager->replace($event->getProductRequest());
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage(), $event->getProductRequest()->getContext());
+
+            throw $exception;
         }
     }
 }
