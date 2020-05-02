@@ -5,15 +5,15 @@ monolog:
             action_level: info
             excluded_http_codes: [{ 404: ['^/$'] }]
             handler: r2d2_errors
-            channels: ['request']
+            channels: ['request', 'messenger']
         r2d2_errors:
             type: stream
             path: "%kernel.logs_dir%/r2d2.log"
             formatter: Monolog\Formatter\LogstashFormatter
-            channels: ['request']
+            channels: ['request', 'messenger']
         file_log:
             type: stream
             path: "%kernel.logs_dir%/r2d2.log"
             level: debug
             formatter: Monolog\Formatter\LogstashFormatter
-            channels: ['!event', '!doctrine', '!php', '!request']
+            channels: ['!event', '!doctrine', '!php', '!request', '!messenger']
