@@ -49,7 +49,7 @@ class ComponentBroadcastSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
-            [ComponentBroadcastEvent::EVENT_NAME => ['handleMessage']],
+            [ComponentBroadcastEvent::class => ['handleMessage']],
             ComponentBroadcastSubscriber::getSubscribedEvents()
         );
     }

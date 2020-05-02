@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\Event\Product;
 
 use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Event\AbstractLoggableEvent;
 use App\Event\Product\Contract\ProductRequestEventInterface;
+use Clogger\ContextualInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
-abstract class AbstractProductBroadcastEvent extends AbstractLoggableEvent implements ProductRequestEventInterface
+abstract class AbstractProductBroadcastEvent extends Event implements ProductRequestEventInterface, ContextualInterface
 {
-    public const EVENT_NAME = 'product.broadcast';
-
-    protected const LOG_MESSAGE = 'Product Broadcast Event';
-
     private ProductRequest $productRequest;
 
     public function __construct(ProductRequest $productRequest)
@@ -24,11 +21,6 @@ abstract class AbstractProductBroadcastEvent extends AbstractLoggableEvent imple
     public function getProductRequest(): ProductRequest
     {
         return $this->productRequest;
-    }
-
-    public function getEventName(): string
-    {
-        return static::EVENT_NAME;
     }
 
     /**

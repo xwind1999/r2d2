@@ -23,7 +23,7 @@ class ComponentBroadcastSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ComponentBroadcastEvent::EVENT_NAME => ['handleMessage'],
+            ComponentBroadcastEvent::class => ['handleMessage'],
         ];
     }
 

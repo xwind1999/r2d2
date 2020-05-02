@@ -31,7 +31,7 @@ class ProductRelationshipBroadcastHandler implements MessageHandlerInterface
     {
         try {
             $productRelationshipEvent = $this->productRelationshipTypeResolver->resolve($relationshipRequest);
-            $this->eventDispatcher->dispatch($productRelationshipEvent, $productRelationshipEvent->getEventName());
+            $this->eventDispatcher->dispatch($productRelationshipEvent);
         } catch (NonExistentTypeResolverExcepetion $exception) {
             $this->logger->warning($exception->getMessage(), $relationshipRequest->getContext());
         }

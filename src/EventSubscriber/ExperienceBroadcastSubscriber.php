@@ -23,7 +23,7 @@ class ExperienceBroadcastSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ExperienceBroadcastEvent::EVENT_NAME => ['handleMessage'],
+            ExperienceBroadcastEvent::class => ['handleMessage'],
         ];
     }
 

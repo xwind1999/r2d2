@@ -16,7 +16,6 @@ class ExperienceBroadcastEventTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::getProductRequest
-     * @covers ::getEventName
      */
     public function testEvent(): void
     {
@@ -24,6 +23,5 @@ class ExperienceBroadcastEventTest extends TestCase
 
         $event = new ExperienceBroadcastEvent($productRequest->reveal());
         $this->assertInstanceOf(ProductRequest::class, $event->getProductRequest());
-        $this->assertEquals('broadcast.experience', $event->getEventName());
     }
 }

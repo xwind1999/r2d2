@@ -13,6 +13,7 @@ use App\Event\Product\BoxBroadcastEvent;
 use App\Handler\ProductBroadcastHandler;
 use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
 use App\Resolver\ProductTypeResolver;
+use phpDocumentor\Reflection\Types\Void_;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,7 +26,6 @@ class ProductBroadcastHandlerTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::__invoke
-     * @covers \App\Event\Product\BoxBroadcastEvent::getEventName
      */
     public function testHandlerMessageBoxType(): void
     {
@@ -34,7 +34,6 @@ class ProductBroadcastHandlerTest extends TestCase
         $brand = new Brand();
         $brand->code = 'SBX';
         $productRequest = new ProductRequest();
-        $productRequest->uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $productRequest->id = '1234';
         $productRequest->sellableBrand = $brand;
         $productRequest->sellableCountry = $country;
@@ -47,7 +46,7 @@ class ProductBroadcastHandlerTest extends TestCase
         $boxEvent = new BoxBroadcastEvent($productRequest);
 
         $productTypeResolver->resolve($productRequest)->shouldBeCalled()->willReturn($boxEvent);
-        $eventDispatcher->dispatch($boxEvent, $boxEvent->getEventName())->shouldBeCalled()->willReturn($boxEvent);
+        $eventDispatcher->dispatch($boxEvent)->shouldBeCalled()->willReturn($boxEvent);
 
         $productBroadcastHandler = new ProductBroadcastHandler(
             $logger->reveal(),
@@ -74,7 +73,6 @@ class ProductBroadcastHandlerTest extends TestCase
         $brand = new Brand();
         $brand->code = 'SBX';
         $productRequest = new ProductRequest();
-        $productRequest->uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $productRequest->id = '1234';
         $productRequest->name = 'box name';
         $productRequest->description = 'description';

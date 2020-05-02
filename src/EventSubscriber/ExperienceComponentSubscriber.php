@@ -25,7 +25,7 @@ class ExperienceComponentSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ExperienceComponentRelationshipBroadcastEvent::EVENT_NAME => ['handleMessage'],
+            ExperienceComponentRelationshipBroadcastEvent::class => ['handleMessage'],
         ];
     }
 

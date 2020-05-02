@@ -25,7 +25,7 @@ class BoxExperienceSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            BoxExperienceRelationshipBroadcastEvent::EVENT_NAME => ['handleMessage'],
+            BoxExperienceRelationshipBroadcastEvent::class => ['handleMessage'],
         ];
     }
 

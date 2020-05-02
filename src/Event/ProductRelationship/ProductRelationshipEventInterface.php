@@ -9,6 +9,4 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 interface ProductRelationshipEventInterface
 {
     public function getProductRelationshipRequest(): ProductRelationshipRequest;
-
-    public function getEventName(): string;
 }

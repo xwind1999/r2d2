@@ -6,7 +6,4 @@ namespace App\Event\Product;
 
 class BoxBroadcastEvent extends AbstractProductBroadcastEvent
 {
-    public const EVENT_NAME = 'broadcast.box';
-
-    protected const LOG_MESSAGE = 'Box Broadcast Event';
 }
