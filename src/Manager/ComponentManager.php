@@ -110,6 +110,8 @@ class ComponentManager
         $component->isReservable = $productRequest->isReservable;
         $component->isSellable = $productRequest->isSellable;
         $component->status = $productRequest->status;
+        $component->roomStockType = $productRequest->roomStockType;
+        $component->inventory = $productRequest->stockAllotment;
 
         $this->repository->save($component);
     }

@@ -55,9 +55,9 @@ class Component
     public string $description;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
-    public int $inventory;
+    public ?int $inventory = null;
 
     /**
      * @ORM\Column(type="integer", nullable=true, options={"unsigned"=true})
@@ -85,6 +85,11 @@ class Component
      * @ORM\OneToMany(targetEntity="ExperienceComponent", mappedBy="component", fetch="EXTRA_LAZY")
      */
     public Collection $experienceComponent;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    public ?string $roomStockType = null;
 
     public function __construct()
     {

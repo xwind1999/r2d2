@@ -50,6 +50,8 @@ class BroadcastListenerHelper
             'type' => 'mev',
             'productPeopleNumber' => '2',
             'voucherExpirationDuration' => 3,
+            'roomStockType' => 'on_request',
+            'stockAllotment' => 5,
         ];
 
         return $overrides + $payload;
