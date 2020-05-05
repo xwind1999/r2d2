@@ -61,7 +61,7 @@ class ComponentCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("strict_integer")
      */
-    public int $voucherExpirationDuration;
+    public ?int $voucherExpirationDuration = null;
 
     /**
      * @Assert\Type(type="boolean")
