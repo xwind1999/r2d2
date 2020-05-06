@@ -6,7 +6,7 @@ namespace App\Tests\QuickData;
 
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\ComponentBroadcastEvent;
-use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
+use App\Exception\Resolver\UnprocessableProductTypeException;
 use App\Resolver\ProductTypeResolver;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -58,7 +58,7 @@ class ProductTypeResolverTest extends TestCase
     {
         $this->productRequest->type = 'Invalid-type';
 
-        $this->expectException(NonExistentTypeResolverExcepetion::class);
+        $this->expectException(UnprocessableProductTypeException::class);
 
         $relationshipTypeResolver = new ProductTypeResolver();
         $relationshipTypeResolver->resolve($this->productRequest->reveal());

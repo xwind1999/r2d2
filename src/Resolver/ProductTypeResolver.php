@@ -9,7 +9,7 @@ use App\Event\Product\BoxBroadcastEvent;
 use App\Event\Product\ComponentBroadcastEvent;
 use App\Event\Product\Contract\ProductRequestEventInterface;
 use App\Event\Product\ExperienceBroadcastEvent;
-use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
+use App\Exception\Resolver\UnprocessableProductTypeException;
 
 class ProductTypeResolver
 {
@@ -21,7 +21,7 @@ class ProductTypeResolver
     protected const COMPONENT_TYPE = 'COMPONENT';
 
     /**
-     * @throws NonExistentTypeResolverExcepetion
+     * @throws UnprocessableProductTypeException
      */
     public function resolve(ProductRequest $productRequest): ProductRequestEventInterface
     {
@@ -38,6 +38,6 @@ class ProductTypeResolver
             return new ComponentBroadcastEvent($productRequest);
         }
 
-        throw new NonExistentTypeResolverExcepetion();
+        throw new UnprocessableProductTypeException();
     }
 }
