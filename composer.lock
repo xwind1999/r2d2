@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8879b8397d4f16398bae394980e83192",
+    "content-hash": "e1e5e1e2bc49932db4c6d95b81c4d81e",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -2484,16 +2484,16 @@
         },
         {
             "name": "joaojacome/clogger-php",
-            "version": "v0.1.0",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joaojacome/clogger-php.git",
-                "reference": "05479ec12797bb3bfe482ad23a51ab9c172ce5a4"
+                "reference": "3e64af87362be6e0a6912087cf6f7962b6d5bf28"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joaojacome/clogger-php/zipball/05479ec12797bb3bfe482ad23a51ab9c172ce5a4",
-                "reference": "05479ec12797bb3bfe482ad23a51ab9c172ce5a4",
+                "url": "https://api.github.com/repos/joaojacome/clogger-php/zipball/3e64af87362be6e0a6912087cf6f7962b6d5bf28",
+                "reference": "3e64af87362be6e0a6912087cf6f7962b6d5bf28",
                 "shasum": ""
             },
             "require": {
@@ -2524,7 +2524,7 @@
                 }
             ],
             "description": "A logger preprocessor",
-            "time": "2020-01-31T13:13:48+00:00"
+            "time": "2020-05-06T14:48:38+00:00"
         },
         {
             "name": "laminas/laminas-code",

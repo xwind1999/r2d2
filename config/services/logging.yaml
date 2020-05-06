@@ -1,0 +1,33 @@
+services:
+    Clogger\Middleware\Context\ContextMiddleware: ~
+    Clogger\Middleware\Exception\ExceptionCodeMiddleware: ~
+    Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware: ~
+    Clogger\Middleware\Exception\StackTraceMiddleware: ~
+    App\Helper\Logger\LoggableEventMiddleware: ~
+
+    Clogger\MiddlewareStack:
+        arguments:
+            - '@Clogger\Middleware\Context\ContextMiddleware'
+            - '@App\Helper\Logger\ContextMessageNormalizer'
+            - '@App\Helper\Logger\LoggableEventMiddleware'
+            - '@Clogger\Middleware\Exception\StackTraceMiddleware'
+            - '@Clogger\Middleware\Exception\ExceptionCodeMiddleware'
+            - '@Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware'
+
+    logger:
+        class: Clogger\Clogger
+        arguments:
+            - '@monolog.logger'
+            - '@Clogger\MiddlewareStack'
+
+    clogger.message:
+        class: Clogger\Clogger
+        decorates: 'monolog.logger.messenger'
+        arguments:
+            - '@clogger.message.inner'
+            - '@Clogger\MiddlewareStack'
+
+    App\Logger\Processor\:
+        resource: '%kernel.project_dir%/src/Logger/Processor'
+        tags:
+            - { name: monolog.processor }
