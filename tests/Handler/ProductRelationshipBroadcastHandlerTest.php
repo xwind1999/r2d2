@@ -6,8 +6,8 @@ namespace App\Tests\Handler;
 
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
+use App\Exception\Resolver\UnprocessableProductRelationshipTypeException;
 use App\Handler\ProductRelationshipBroadcastHandler;
-use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
 use App\Resolver\ProductRelationshipTypeResolver;
 use phpDocumentor\Reflection\Types\Void_;
 use PHPUnit\Framework\TestCase;
@@ -95,7 +95,7 @@ class ProductRelationshipBroadcastHandlerTest extends TestCase
         $this->productRelationshipTypeResolver
             ->expects($this->once())
             ->method('resolve')
-            ->willThrowException(new NonExistentTypeResolverExcepetion())
+            ->willThrowException(new UnprocessableProductRelationshipTypeException())
         ;
         $this->logger->expects($this->once())->method('warning')->willReturn(Void_::class);
 

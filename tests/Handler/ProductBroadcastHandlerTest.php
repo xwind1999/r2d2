@@ -10,11 +10,12 @@ use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\BoxBroadcastEvent;
+use App\Exception\Resolver\UnprocessableProductTypeException;
 use App\Handler\ProductBroadcastHandler;
-use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
 use App\Resolver\ProductTypeResolver;
 use phpDocumentor\Reflection\Types\Void_;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -89,7 +90,7 @@ class ProductBroadcastHandlerTest extends TestCase
         $productTypeResolver = $this->prophesize(ProductTypeResolver::class);
         $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
 
-        $productTypeResolver->resolve($productRequest)->shouldBeCalled()->willThrow(new NonExistentTypeResolverExcepetion());
+        $productTypeResolver->resolve($productRequest)->shouldBeCalled()->willThrow(new UnprocessableProductTypeException());
 
         $productBroadcastHandler = new ProductBroadcastHandler(
             $logger->reveal(),
@@ -97,7 +98,7 @@ class ProductBroadcastHandlerTest extends TestCase
             $eventDispatcher->reveal())
         ;
 
-        $logger->warning('', $productRequest->getContext())->shouldBeCalled()->willReturn(Void_::class);
+        $logger->warning(Argument::any(), $productRequest->getContext())->shouldBeCalled()->willReturn(Void_::class);
 
         $this->assertEquals(null, $productBroadcastHandler->__invoke($productRequest));
     }

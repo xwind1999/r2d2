@@ -8,7 +8,7 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\Event\ProductRelationship\ProductRelationshipEventInterface;
-use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
+use App\Exception\Resolver\UnprocessableProductRelationshipTypeException;
 
 class ProductRelationshipTypeResolver
 {
@@ -16,7 +16,7 @@ class ProductRelationshipTypeResolver
     protected const BOX_EXPERIENCE_TYPE = 'BOX-EXPERIENCE';
 
     /**
-     * @throws NonExistentTypeResolverExcepetion
+     * @throws UnprocessableProductRelationshipTypeException
      */
     public function resolve(ProductRelationshipRequest $relationshipRequest): ProductRelationshipEventInterface
     {
@@ -30,6 +30,6 @@ class ProductRelationshipTypeResolver
             return new BoxExperienceRelationshipBroadcastEvent($relationshipRequest);
         }
 
-        throw new NonExistentTypeResolverExcepetion();
+        throw new UnprocessableProductRelationshipTypeException();
     }
 }
