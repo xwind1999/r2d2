@@ -33,7 +33,7 @@ class ProductBroadcastHandler implements MessageHandlerInterface
             $event = $this->productTypeResolver->resolve($productRequest);
             $this->eventDispatcher->dispatch($event);
         } catch (UnprocessableProductTypeException $exception) {
-            $this->logger->warning($exception->getMessage(), $productRequest->getContext());
+            $this->logger->warning($exception, $productRequest->getContext());
         }
     }
 }

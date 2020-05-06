@@ -33,7 +33,7 @@ class ProductRelationshipBroadcastHandler implements MessageHandlerInterface
             $productRelationshipEvent = $this->productRelationshipTypeResolver->resolve($relationshipRequest);
             $this->eventDispatcher->dispatch($productRelationshipEvent);
         } catch (UnprocessableProductRelationshipTypeException $exception) {
-            $this->logger->warning($exception->getMessage(), $relationshipRequest->getContext());
+            $this->logger->warning($exception, $relationshipRequest->getContext());
         }
     }
 }
