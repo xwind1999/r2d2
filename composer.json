@@ -10,7 +10,7 @@
         "gedmo/doctrine-extensions": "^2.4",
         "globtec/phpadr": "dev-master",
         "jms/serializer-bundle": "^3.5",
-        "joaojacome/clogger-php": "0.1.0",
+        "joaojacome/clogger-php": "0.2.0",
         "laminas/laminas-diagnostics": "^1.6",
         "liip/monitor-bundle": "^2.12",
         "nelmio/api-doc-bundle": "^3.6",
