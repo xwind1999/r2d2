@@ -90,3 +90,8 @@ services:
         arguments:
             - '%clients.cmhub%'
             - '@App\Http\HttpClientFactory'
+
+    App\Logger\Processor\:
+        resource: '../src/Logger/Processor'
+        tags:
+            - { name: monolog.processor }
