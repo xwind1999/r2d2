@@ -20,15 +20,18 @@ Api-Tests:
   image: ${VALIDATION_IMAGE}
   needs:
     - composer
+  services:
+    - name: mysql:8.0
+      alias: mysql
   variables:
-    DATABASE_URL: "mysql://root:admin123@127.0.0.1/r2d2?serverVersion=5.7"
-    DATABASE_NAME: r2d2
+    MYSQL_DATABASE: r2d2
+    MYSQL_ROOT_PASSWORD: admin123
+    MYSQL_USER: root
+    DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_ROOT_PASSWORD}@mysql/${MYSQL_DATABASE}?serverVersion=8.0"
   script:
-    - nohup mysqld_safe &
-    - sleep 5
-    - bin/console doctrine:database:create -e test --if-not-exists --no-interaction
+    - until bin/console doctrine:database:create -e test --if-not-exists --no-interaction; do sleep 1; done
     - bin/console doctrine:schema:update --force
-    - java -jar /schemaspy.jar -t mysql -o report/html/db -u root -p admin123 -host 127.0.0.1 -db r2d2 -s r2d2 -vizjs -degree 2 -imageformat png
+    - java -jar /schemaspy.jar -dp /mysql/mysql-connector-java-8.0.20.jar -t mysql -o report/html/db -u root -p admin123 -host mysql -db r2d2 -s r2d2 -vizjs -degree 2 -imageformat png
     - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
   artifacts:
     expire_in: 1 day
