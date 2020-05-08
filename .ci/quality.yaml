@@ -128,6 +128,8 @@ build-R2D2-stub-image:
   only:
      changes:
        - stub/sandbox/main.js
+    - master
+    - branches
   script:
     - docker build -t ${BASE_IMAGE_Stub}:latest -f stub/Dockerfile .
     - docker push ${BASE_IMAGE_Stub}:latest
