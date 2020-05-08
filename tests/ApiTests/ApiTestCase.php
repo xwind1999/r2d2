@@ -14,7 +14,6 @@ use App\Tests\ApiTests\Helper\ExperienceComponentHelper;
 use App\Tests\ApiTests\Helper\ExperienceHelper;
 use App\Tests\ApiTests\Helper\HealthCheckHelper;
 use App\Tests\ApiTests\Helper\PartnerHelper;
-use App\Tests\ApiTests\Helper\RateBandHelper;
 use App\Tests\ApiTests\Helper\RoomAvailabilityHelper;
 use App\Tests\ApiTests\Helper\RoomPriceHelper;
 use JMS\Serializer\Serializer;
@@ -34,8 +33,6 @@ class ApiTestCase extends WebTestCase
     public static BroadcastListenerHelper $broadcastListenerHelper;
 
     public static ExperienceHelper $experienceHelper;
-
-    public static RateBandHelper $rateBandHelper;
 
     public static ComponentHelper $componentHelper;
 
@@ -77,7 +74,6 @@ class ApiTestCase extends WebTestCase
         static::$partnerHelper = new PartnerHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$broadcastListenerHelper = new BroadcastListenerHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$experienceHelper = new ExperienceHelper(clone static::$client, static::$serializer, static::$baseUrl);
-        static::$rateBandHelper = new RateBandHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$componentHelper = new ComponentHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$roomPriceHelper = new RoomPriceHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$roomAvailabilityHelper = new RoomAvailabilityHelper(clone static::$client, static::$serializer, static::$baseUrl);

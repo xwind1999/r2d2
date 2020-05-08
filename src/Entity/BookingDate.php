@@ -48,17 +48,6 @@ class BookingDate
     public string $componentGoldenId;
 
     /**
-     * @ORM\ManyToOne(targetEntity="RateBand")
-     * @ORM\JoinColumn(name="rate_band_uuid", referencedColumnName="uuid", nullable=false)
-     */
-    public RateBand $rateBand;
-
-    /**
-     * @ORM\Column(type="string", length=45, nullable=true)
-     */
-    public ?string $rateBandGoldenId;
-
-    /**
      * @ORM\Column(type="date")
      */
     public \DateTime $date;

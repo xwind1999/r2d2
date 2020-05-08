@@ -21,15 +21,6 @@ class RoomPriceCreateRequest implements RequestBodyInterface, ValidatableRequest
     public string $componentGoldenId;
 
     /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("string")
-     */
-    public string $rateBandGoldenId;
-
-    /**
      * @Assert\Type(type="DateTime")
      * @Assert\NotBlank
      *

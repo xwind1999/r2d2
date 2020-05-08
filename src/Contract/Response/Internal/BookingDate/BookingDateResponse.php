@@ -38,14 +38,6 @@ abstract class BookingDateResponse extends ResponseContract
     public string $componentGoldenId;
 
     /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     *
-     * @JMS\Type("string")
-     */
-    public ?string $rateBandGoldenId;
-
-    /**
      * @Assert\Type(type="DateTime")
      * @Assert\Length(min="1")
      * @Assert\NotBlank
@@ -98,7 +90,6 @@ abstract class BookingDateResponse extends ResponseContract
         $this->uuid = $bookingDate->uuid->toString();
         $this->bookingGoldenId = $bookingDate->bookingGoldenId;
         $this->componentGoldenId = $bookingDate->componentGoldenId;
-        $this->rateBandGoldenId = $bookingDate->rateBandGoldenId;
         $this->date = $bookingDate->date;
         $this->price = $bookingDate->price;
         $this->isUpsell = $bookingDate->isUpsell;

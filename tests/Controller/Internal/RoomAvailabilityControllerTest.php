@@ -48,7 +48,6 @@ class RoomAvailabilityControllerTest extends TestCase
         $roomAvailability = new RoomAvailability();
         $roomAvailability->uuid = $uuidInterface->reveal();
         $roomAvailability->componentGoldenId = '1234';
-        $roomAvailability->rateBandGoldenId = '5678';
         $roomAvailability->stock = 2;
         $roomAvailability->date = new \DateTime();
         $roomAvailability->type = 'instant';
@@ -62,7 +61,6 @@ class RoomAvailabilityControllerTest extends TestCase
         $this->assertEquals(RoomAvailabilityGetResponse::class, get_class($return));
         $this->assertEquals($uuid, $return->uuid);
         $this->assertEquals($roomAvailability->componentGoldenId, $return->componentGoldenId);
-        $this->assertEquals($roomAvailability->rateBandGoldenId, $return->rateBandGoldenId);
         $this->assertEquals($roomAvailability->stock, $return->stock);
         $this->assertEquals($roomAvailability->date, $return->date);
         $this->assertEquals($roomAvailability->type, $return->type);
@@ -147,16 +145,15 @@ class RoomAvailabilityControllerTest extends TestCase
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $uuidInterface = $this->prophesize(UuidInterface::class);
         $uuidInterface->toString()->willReturn($uuid);
-        $rateBand = new RoomAvailability();
-        $rateBand->uuid = $uuidInterface->reveal();
-        $rateBand->componentGoldenId = '1234';
-        $rateBand->rateBandGoldenId = 'rb1234';
-        $rateBand->stock = 2;
-        $rateBand->date = new \DateTime();
-        $rateBand->type = 'instant';
-        $rateBand->createdAt = new \DateTime();
-        $rateBand->updatedAt = new \DateTime();
+        $roomAvailability = new RoomAvailability();
+        $roomAvailability->uuid = $uuidInterface->reveal();
+        $roomAvailability->componentGoldenId = '1234';
+        $roomAvailability->stock = 2;
+        $roomAvailability->date = new \DateTime();
+        $roomAvailability->type = 'instant';
+        $roomAvailability->createdAt = new \DateTime();
+        $roomAvailability->updatedAt = new \DateTime();
 
-        yield [$uuid, $rateBand];
+        yield [$uuid, $roomAvailability];
     }
 }
