@@ -6,30 +6,31 @@ namespace App\Tests\EventSubscriber;
 
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
-use App\EventSubscriber\ExperienceComponentSubscriber;
+use App\EventSubscriber\ProductRelationshipBroadcast\ExperienceComponentRelationshipSubscriber;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceComponentManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * @coversDefaultClass \App\EventSubscriber\ExperienceComponentSubscriber
+ * @coversDefaultClass \App\EventSubscriber\ProductRelationshipBroadcast\ExperienceComponentRelationshipSubscriber
  */
-class ExperienceComponentSubscriberTest extends TestCase
+class ExperienceComponentRelationshipSubscriberTest extends TestCase
 {
     /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var LoggerInterface|MockObject
      */
     private $logger;
 
     /**
-     * @var ExperienceComponentManager|\PHPUnit\Framework\MockObject\MockObject
+     * @var ExperienceComponentManager|MockObject
      */
     private $experienceComponentManager;
 
     /**
-     * @var ExperienceComponentRelationshipBroadcastEvent|\PHPUnit\Framework\MockObject\MockObject
+     * @var ExperienceComponentRelationshipBroadcastEvent|MockObject
      */
     private $experienceComponentEvent;
 
@@ -47,7 +48,7 @@ class ExperienceComponentSubscriberTest extends TestCase
     {
         $this->assertEquals(
             [ExperienceComponentRelationshipBroadcastEvent::class => ['handleMessage']],
-            ExperienceComponentSubscriber::getSubscribedEvents()
+            ExperienceComponentRelationshipSubscriber::getSubscribedEvents()
         );
     }
 
@@ -58,7 +59,7 @@ class ExperienceComponentSubscriberTest extends TestCase
     public function testHandleMessage(): void
     {
         $this->experienceComponentManager->expects($this->once())->method('replace')->willReturnSelf();
-        $experienceComponentSubscriber = new ExperienceComponentSubscriber($this->logger, $this->experienceComponentManager);
+        $experienceComponentSubscriber = new ExperienceComponentRelationshipSubscriber($this->logger, $this->experienceComponentManager);
 
         $this->assertEquals(null, $experienceComponentSubscriber->handleMessage($this->experienceComponentEvent));
     }
@@ -74,7 +75,7 @@ class ExperienceComponentSubscriberTest extends TestCase
      */
     public function testHandleMessageThrowsRoomNotFoundException(\Exception $exception, string $logLevel): void
     {
-        $experienceComponentSubscriber = new ExperienceComponentSubscriber($this->logger, $this->experienceComponentManager);
+        $experienceComponentSubscriber = new ExperienceComponentRelationshipSubscriber($this->logger, $this->experienceComponentManager);
 
         $this->experienceComponentManager
             ->expects($this->once())

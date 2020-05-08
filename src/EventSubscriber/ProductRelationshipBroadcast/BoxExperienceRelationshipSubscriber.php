@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\EventSubscriber;
+namespace App\EventSubscriber\ProductRelationshipBroadcast;
 
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
 use App\Exception\Repository\BoxNotFoundException;
@@ -11,7 +11,7 @@ use App\Manager\BoxExperienceManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class BoxExperienceSubscriber implements EventSubscriberInterface
+class BoxExperienceRelationshipSubscriber implements EventSubscriberInterface
 {
     private LoggerInterface $logger;
     private BoxExperienceManager $boxExperienceManager;

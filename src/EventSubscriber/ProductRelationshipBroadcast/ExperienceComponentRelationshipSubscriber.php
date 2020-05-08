@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\EventSubscriber;
+namespace App\EventSubscriber\ProductRelationshipBroadcast;
 
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\Exception\Repository\ComponentNotFoundException;
@@ -11,7 +11,7 @@ use App\Manager\ExperienceComponentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ExperienceComponentSubscriber implements EventSubscriberInterface
+class ExperienceComponentRelationshipSubscriber implements EventSubscriberInterface
 {
     private LoggerInterface $logger;
     private ExperienceComponentManager $experienceComponentManager;

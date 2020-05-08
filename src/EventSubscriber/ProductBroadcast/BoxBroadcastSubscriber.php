@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\EventSubscriber;
+namespace App\EventSubscriber\ProductBroadcast;
 
 use App\Event\Product\BoxBroadcastEvent;
 use App\Manager\BoxManager;

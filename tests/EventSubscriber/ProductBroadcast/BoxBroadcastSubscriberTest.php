@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\EventSubscriber;
+namespace App\Tests\EventSubscriber\ProductBroadcast;
 
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
@@ -10,14 +10,14 @@ use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\BoxBroadcastEvent;
-use App\EventSubscriber\BoxBroadcastSubscriber;
+use App\EventSubscriber\ProductBroadcast\BoxBroadcastSubscriber;
 use App\Manager\BoxManager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 
 /**
- * @coversDefaultClass \App\EventSubscriber\BoxBroadcastSubscriber
+ * @coversDefaultClass \App\EventSubscriber\ProductBroadcast\BoxBroadcastSubscriber
  */
 class BoxBroadcastSubscriberTest extends TestCase
 {

@@ -6,30 +6,31 @@ namespace App\Tests\EventSubscriber;
 
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
-use App\EventSubscriber\BoxExperienceSubscriber;
+use App\EventSubscriber\ProductRelationshipBroadcast\BoxExperienceRelationshipSubscriber;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\BoxExperienceManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * @coversDefaultClass \App\EventSubscriber\BoxExperienceSubscriber
+ * @coversDefaultClass \App\EventSubscriber\ProductRelationshipBroadcast\BoxExperienceRelationshipSubscriber
  */
-class BoxExperienceSubscriberTest extends TestCase
+class BoxExperienceRelationshipSubscriberTest extends TestCase
 {
     /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var LoggerInterface|MockObject
      */
     private $logger;
 
     /**
-     * @var BoxExperienceManager|\PHPUnit\Framework\MockObject\MockObject
+     * @var BoxExperienceManager|MockObject
      */
     private $boxExperienceManager;
 
     /**
-     * @var BoxExperienceRelationshipBroadcastEvent|\PHPUnit\Framework\MockObject\MockObject
+     * @var BoxExperienceRelationshipBroadcastEvent|MockObject
      */
     private $boxExperienceEvent;
 
@@ -47,7 +48,7 @@ class BoxExperienceSubscriberTest extends TestCase
     {
         $this->assertEquals(
             [BoxExperienceRelationshipBroadcastEvent::class => ['handleMessage']],
-            BoxExperienceSubscriber::getSubscribedEvents()
+            BoxExperienceRelationshipSubscriber::getSubscribedEvents()
         );
     }
 
@@ -58,7 +59,7 @@ class BoxExperienceSubscriberTest extends TestCase
     public function testHandleMessage(): void
     {
         $this->boxExperienceManager->expects($this->once())->method('replace')->willReturnSelf();
-        $boxExperienceSubscriber = new BoxExperienceSubscriber($this->logger, $this->boxExperienceManager);
+        $boxExperienceSubscriber = new BoxExperienceRelationshipSubscriber($this->logger, $this->boxExperienceManager);
 
         $this->assertEquals(null, $boxExperienceSubscriber->handleMessage($this->boxExperienceEvent));
     }
@@ -74,7 +75,7 @@ class BoxExperienceSubscriberTest extends TestCase
      */
     public function testHandleMessageThrowsBoxNotFoundException(\Exception $exception, string $logLevel): void
     {
-        $boxExperienceSubscriber = new BoxExperienceSubscriber($this->logger, $this->boxExperienceManager);
+        $boxExperienceSubscriber = new BoxExperienceRelationshipSubscriber($this->logger, $this->boxExperienceManager);
 
         $this->boxExperienceManager
             ->expects($this->once())
