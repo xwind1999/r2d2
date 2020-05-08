@@ -2,9 +2,10 @@ var moment = require('helpers/moment.min.js');
 state.property = require("./data/property.js").property;
 state.availabilities = state.availabilities || [];
 state.prices = state.prices || [];
+state.booking = state.booking || [];
 
 //set Data in state
- setDataInState();
+setDataInState();
 
 Sandbox.define('/api/room_availabilities', 'OPTIONS', function (req, res) {
     res.set('Access-Control-Allow-Origin', '*');
@@ -41,98 +42,265 @@ Sandbox.define('/api/room_availabilities', 'GET', function (req, res) {
     }
 });
 
-Sandbox.define('/api/broadcast_listeners/partners', 'POST', function(req, res){
+Sandbox.define('/broadcast-listeners/partner', 'POST', function(req, res){
 
-    // validate username is present
-    if (req.body.golden_id === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing golden_id"
+    state.partner = state.partner || [];
+    //validate request from EAI about partner information
+    if (req.body.id === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "id : This field cant be null"
         })
     }
 
-    if (req.body.currency === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing currency"
+    if (req.body.status === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "status : This field cant be null"
         })
     }
 
-    if (req.body.cease_date === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing case date"
+    if (req.body.currencyCode === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "currencyCode : This field cant be null"
         })
     }
 
-    return res.json({
-        status: "ok"
+    if (req.body.isChannelManagerEnabled === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "isChannelManagerEnabled : This field cant be null"
+        })
+    }
+
+    state.partner.push(req.body)
+
+    return res.json(202, {
+        status: "Relationship handled"
     })
 });
 
-Sandbox.define('/api/broadcast_listeners/products', 'POST', function(req, res){
+Sandbox.define('/broadcast-listeners/product', 'POST', function(req, res) {
 
-    // validate username is present
-    if (req.body.golden_id === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing golden_id"
+    state.box = state.box || [];
+    state.experience = state.experience || [];
+    state.component = state.component || [];
+
+    // validate request from EAI about Product information
+    if (req.body.id === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "id : This field cant be null"
         })
     }
 
-    if (req.body.name === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing name"
+    if (req.body.isSellable === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "isSellable : This field cant be null"
         })
     }
 
-    if (req.body.description === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing description"
+    if (req.body.isReservable === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "isReservable : This field cant be null"
         })
     }
 
-    return res.json({
-        status: "ok"
+    if (req.body.status === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "status : This field cant be null"
+        })
+    }
+
+    if (req.body.type === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "type : This field cant be null"
+        })
+    }
+
+    if (req.body.type === "dev" || req.body.type === "mev" || req.body.type === "mlv") {
+        state.box.push(req.body)
+    } else if (req.body.type === "component") {
+        state.component.push(req.body)
+    } else
+        state.experience.push(req.body)
+
+    return res.json(202, {
+        status: "Relationship handled"
     })
 });
 
-Sandbox.define('/api/broadcast_listeners/channel_room_availabilities', 'POST', function(req, res){
+Sandbox.define('/broadcast-listeners/product-relationship','POST',function (req, res) {
 
-    // validate username is present
-    if (req.body.partner_golden_id === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing partner_golden_id"
+    state.box_experience = state.box_experience || [];
+    state.experience_component = state.experience_component || [];
+
+
+    // validate request from EAI about Product-relationship
+    if (req.body.parentProduct === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "parentProduct : This field cant be null"
         })
     }
 
-    if (req.body.stock === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing stock"
+    if (req.body.childProduct === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "childProduct : This field cant be null"
         })
     }
 
-    if (req.body.room_golden_id === undefined) {
-        return res.json(400, {
-            status: "error",
-            details: "Missing room_golden_id"
+    if (req.body.isEnabled === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "isEnabled : This field cant be null"
         })
     }
 
-    return res.json({
-        status: "ok"
+    if (req.body.relationshipType === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "relationshipType : This field cant be null"
+        })
+    }
+
+    if (req.body.sortOrder === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "sortOrder : This field cant be null"
+        })
+    }
+
+    if (req.body.relationshipType === "box-experience")
+        state.box_experience.push(req.body)
+    else
+        state.experience_component.push(req.body)
+
+    return res.json(202, {
+        status: "Relationship handled"
     })
 });
-//test build
-Sandbox.define('/api/room_prices', 'OPTIONS', function (req, res) {
-    res.set('Access-Control-Allow-Origin', '*');
-});
 
-Sandbox.define('/api/room_prices', 'GET', function (req, res) {
+// Booking transactions
+// Booking creation
+Sandbox.define('/api/booking','POST',function (req, res) {
+
+    if(req.body === null) {
+        return res.json(204, {
+            status: "No Content",
+            details: "There is no json body in request"
+        })
+    }
+
+    if(!req.is('application/json'))
+    {
+        return res.json(400, {
+            details: "Invalid Content type, expected application/json"
+        })
+    }
+
+    if (req.body.bookingId === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "bookingId : This field cant be null"
+        })
+    }
+
+    if (req.body.box === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "box : This field cant be null"
+        })
+    }
+
+    if (req.body.experience === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "experience : This field cant be null"
+        })
+    }
+
+    if (req.body.voucher === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "voucher : This field cant be null"
+        })
+    }
+
+    if (req.body.startDate === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "startDate : This field cant be null"
+        })
+    }
+
+    if (req.body.endDate === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "endDate : This field cant be null"
+        })
+    }
+
+    if (req.validationErrors()) {
+        return res.json(400,{
+            status: "Bad Request",
+            details:"Not a valid JSON"
+        });
+    }
+
+    state.booking.push(req.body)
+
+    return res.json(201,{
+        status: "Booking Created"
+    })
+
+
+})
+
+// Booking Confirmation - Complete/Cancelled
+Sandbox.define('/api/booking','PATCH',function (req, res) {
+
+    if(req.body === null) {
+        return res.json(204, {
+            status: "No Content",
+            details: "There is no json body in request"
+        })
+    }
+
+    if(!req.is('application/json'))
+    {
+        return res.json(400, {
+            details: "Invalid Content type, expected application/json"
+        })
+    }
+
+    if (req.body.bookingId === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "bookingId : This field cant be null"
+        })
+    }
+
+    if (req.body.status === undefined) {
+        return res.json(422, {
+            status: "Error: Unprocessable Entity",
+            details: "status : This field cant be null"
+        })
+    }
+
+    state.booking.push(req.body)
+    return res.json(201, {
+        status: "Booking Updated"
+    })
+})
+
+/*Sandbox.define('/api/room_prices', 'GET', function (req, res) {
     res.set('Access-Control-Allow-Origin', '*');
     res.status(200);
     var responseArray = [];
@@ -144,7 +312,10 @@ Sandbox.define('/api/room_prices', 'GET', function (req, res) {
         }
     }
     return res.json(responseArray);
-});
+});Sandbox.define('/api/room_prices', 'OPTIONS', function (req, res) {
+    res.set('Access-Control-Allow-Origin', '*');
+});*/
+
 
 
 function calculateDaysBetweenStartDateAndEndDate(start, end) {
@@ -155,33 +326,33 @@ function calculateDaysBetweenStartDateAndEndDate(start, end) {
 function setDataInState()
 {
 // populate state of availability and prices of each room if needed
-state.property.rooms.forEach(function (room) {
-    if (!state.availabilities[room.id]) {
-        state.availabilities[room.id] = [];
-        for (var i = 0; i < 60; i++) {
-            var newDate = moment().add(i, 'days').format('YYYY-MM-DD');
-            state.availabilities[room.id][newDate] = {
-                date: newDate,
-                partner_golden_id: 'partner'+ i,
-                room_golden_id: 'room' + i,
-                rate_band_golden_id: 'rate' + i,
-                stock: 5,
-            };
-        }
-    }
-    if (!state.prices[room.id]) {
-        state.prices[room.id] = [];
-        for (var i = 0; i < 60; i++) {
-            var newDate = moment().add(i, 'days').format('YYYY-MM-DD');
-            state.prices[room.id][newDate] = {
-                date: newDate,
-                partner_golden_id: 'partner'+ i,
-                room_golden_id: 'room' + i,
-                rate_band_golden_id: 'rate' + i,
-                price: 67.90 + i,
-                currency: 'EUR'
+    state.property.rooms.forEach(function (room) {
+        if (!state.availabilities[room.id]) {
+            state.availabilities[room.id] = [];
+            for (var i = 0; i < 60; i++) {
+                var newDate = moment().add(i, 'days').format('YYYY-MM-DD');
+                state.availabilities[room.id][newDate] = {
+                    date: newDate,
+                    partner_golden_id: 'partner'+ i,
+                    room_golden_id: 'room' + i,
+                    rate_band_golden_id: 'rate' + i,
+                    stock: 5,
+                };
             }
         }
-    }
-});
+        if (!state.prices[room.id]) {
+            state.prices[room.id] = [];
+            for (var i = 0; i < 60; i++) {
+                var newDate = moment().add(i, 'days').format('YYYY-MM-DD');
+                state.prices[room.id][newDate] = {
+                    date: newDate,
+                    partner_golden_id: 'partner'+ i,
+                    room_golden_id: 'room' + i,
+                    rate_band_golden_id: 'rate' + i,
+                    price: 67.90 + i,
+                    currency: 'EUR'
+                }
+            }
+        }
+    });
 }
