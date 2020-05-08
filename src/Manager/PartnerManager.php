@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Contract\Request\BroadcastListener\PartnerRequest;
-use App\Contract\Request\Partner\PartnerCreateRequest;
-use App\Contract\Request\Partner\PartnerUpdateRequest;
+use App\Contract\Request\Internal\Partner\PartnerCreateRequest;
+use App\Contract\Request\Internal\Partner\PartnerUpdateRequest;
 use App\Entity\Partner;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\PartnerNotFoundException;

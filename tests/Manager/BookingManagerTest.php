@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
-use App\Contract\Request\Booking\BookingCreateRequest;
-use App\Contract\Request\Booking\BookingUpdateRequest;
+use App\Contract\Request\Internal\Booking\BookingCreateRequest;
+use App\Contract\Request\Internal\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
 use App\Entity\Experience;
 use App\Entity\Guest;

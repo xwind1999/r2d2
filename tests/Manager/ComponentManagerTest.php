@@ -6,8 +6,8 @@ namespace App\Tests\Manager;
 
 use App\Contract\Request\BroadcastListener\Product\Partner as PartnerDTO;
 use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Contract\Request\Component\ComponentCreateRequest;
-use App\Contract\Request\Component\ComponentUpdateRequest;
+use App\Contract\Request\Internal\Component\ComponentCreateRequest;
+use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
 use App\Entity\Component;
 use App\Entity\Partner;
 use App\Exception\Repository\ComponentNotFoundException;

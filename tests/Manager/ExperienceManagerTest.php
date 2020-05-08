@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Manager;
 
 use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Contract\Request\Experience\ExperienceCreateRequest;
-use App\Contract\Request\Experience\ExperienceUpdateRequest;
+use App\Contract\Request\Internal\Experience\ExperienceCreateRequest;
+use App\Contract\Request\Internal\Experience\ExperienceUpdateRequest;
 use App\Entity\Experience;
 use App\Entity\Partner;
 use App\Exception\Repository\ExperienceNotFoundException;

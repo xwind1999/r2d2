@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
-use App\Contract\Request\Box\BoxCreateRequest;
-use App\Contract\Request\Box\BoxUpdateRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
+use App\Contract\Request\Internal\Box\BoxCreateRequest;
+use App\Contract\Request\Internal\Box\BoxUpdateRequest;
 use App\Entity\Box;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\EntityNotFoundException;
