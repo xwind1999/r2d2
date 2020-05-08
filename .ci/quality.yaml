@@ -1,6 +1,6 @@
 variables:
   PACT_BROKER: http://pactbroker.production.smartbox.com:30336/
-  BASE_IMAGE_Stub: docker-registry.production.smartbox.com/millenium-falcon/r2d2-stub
+  BASE_IMAGE_Stub: docker-registry.production.smartbox.com/millenium-falcon/r2d2mock
 
 unitTests:
   stage: Test
@@ -126,7 +126,7 @@ build-R2D2-stub-image:
   stage: Build
   image: docker:dind
   only:
-     changes:
+    changes:
        - stub/sandbox/main.js
   script:
     - docker build -t ${BASE_IMAGE_Stub}:latest -f stub/Dockerfile .
