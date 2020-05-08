@@ -8,7 +8,7 @@ use App\Contract\Request\Internal\Component\ComponentCreateRequest;
 use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
 use App\Contract\Response\Internal\Component\ComponentGetResponse;
 use App\Contract\Response\Internal\Component\ComponentUpdateResponse;
-use App\Controller\Api\ComponentController;
+use App\Controller\Internal\ComponentController;
 use App\Entity\Component;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\ComponentNotFoundException;
@@ -18,7 +18,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @coversDefaultClass \App\Controller\Api\ComponentController
+ * @coversDefaultClass \App\Controller\Internal\ComponentController
  */
 class ComponentControllerTest extends TestCase
 {

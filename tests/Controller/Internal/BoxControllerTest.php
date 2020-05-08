@@ -8,7 +8,7 @@ use App\Contract\Request\Internal\Box\BoxCreateRequest;
 use App\Contract\Request\Internal\Box\BoxUpdateRequest;
 use App\Contract\Response\Internal\Box\BoxGetResponse;
 use App\Contract\Response\Internal\Box\BoxUpdateResponse;
-use App\Controller\Api\BoxController;
+use App\Controller\Internal\BoxController;
 use App\Entity\Box;
 use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
@@ -21,7 +21,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @coversDefaultClass \App\Controller\Api\BoxController
+ * @coversDefaultClass \App\Controller\Internal\BoxController
  */
 class BoxControllerTest extends TestCase
 {

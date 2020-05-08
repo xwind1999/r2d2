@@ -8,7 +8,7 @@ use App\Contract\Request\Internal\BookingDate\BookingDateCreateRequest;
 use App\Contract\Request\Internal\BookingDate\BookingDateUpdateRequest;
 use App\Contract\Response\Internal\BookingDate\BookingDateGetResponse;
 use App\Contract\Response\Internal\BookingDate\BookingDateUpdateResponse;
-use App\Controller\Api\BookingDateController;
+use App\Controller\Internal\BookingDateController;
 use App\Entity\BookingDate;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\BookingDateNotFoundException;
@@ -18,7 +18,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @coversDefaultClass \App\Controller\Api\BookingDateController
+ * @coversDefaultClass \App\Controller\Internal\BookingDateController
  */
 class BookingDateControllerTest extends TestCase
 {

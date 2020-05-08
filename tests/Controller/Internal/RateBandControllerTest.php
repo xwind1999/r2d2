@@ -8,7 +8,7 @@ use App\Contract\Request\Internal\RateBand\RateBandCreateRequest;
 use App\Contract\Request\Internal\RateBand\RateBandUpdateRequest;
 use App\Contract\Response\Internal\RateBand\RateBandGetResponse;
 use App\Contract\Response\Internal\RateBand\RateBandUpdateResponse;
-use App\Controller\Api\RateBandController;
+use App\Controller\Internal\RateBandController;
 use App\Entity\RateBand;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\RateBandNotFoundException;
@@ -18,7 +18,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @coversDefaultClass \App\Controller\Api\RateBandController
+ * @coversDefaultClass \App\Controller\Internal\RateBandController
  */
 class RateBandControllerTest extends TestCase
 {

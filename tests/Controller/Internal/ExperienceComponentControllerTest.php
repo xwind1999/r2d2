@@ -8,7 +8,7 @@ use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentCreateR
 use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentDeleteRequest;
 use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentUpdateRequest;
 use App\Contract\Response\Internal\ExperienceComponent\ExperienceComponentUpdateResponse;
-use App\Controller\Api\ExperienceComponentController;
+use App\Controller\Internal\ExperienceComponentController;
 use App\Entity\ExperienceComponent;
 use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
@@ -19,7 +19,7 @@ use App\Manager\ExperienceComponentManager;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \App\Controller\Api\ExperienceComponentController
+ * @coversDefaultClass \App\Controller\Internal\ExperienceComponentController
  */
 class ExperienceComponentControllerTest extends TestCase
 {

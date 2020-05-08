@@ -8,7 +8,7 @@ use App\Contract\Request\Internal\RoomPrice\RoomPriceCreateRequest;
 use App\Contract\Request\Internal\RoomPrice\RoomPriceUpdateRequest;
 use App\Contract\Response\Internal\RoomPrice\RoomPriceGetResponse;
 use App\Contract\Response\Internal\RoomPrice\RoomPriceUpdateResponse;
-use App\Controller\Api\RoomPriceController;
+use App\Controller\Internal\RoomPriceController;
 use App\Entity\RoomPrice;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\RoomPriceNotFoundException;
@@ -18,7 +18,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @coversDefaultClass \App\Controller\Api\RoomPriceController
+ * @coversDefaultClass \App\Controller\Internal\RoomPriceController
  */
 class RoomPriceControllerTest extends TestCase
 {

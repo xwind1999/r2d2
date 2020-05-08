@@ -8,7 +8,7 @@ use App\Contract\Request\Internal\Booking\BookingCreateRequest;
 use App\Contract\Request\Internal\Booking\BookingUpdateRequest;
 use App\Contract\Response\Internal\Booking\BookingGetResponse;
 use App\Contract\Response\Internal\Booking\BookingUpdateResponse;
-use App\Controller\Api\BookingController;
+use App\Controller\Internal\BookingController;
 use App\Entity\Booking;
 use App\Entity\Guest;
 use App\Exception\Http\ResourceNotFoundException;
@@ -20,7 +20,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @coversDefaultClass \App\Controller\Api\BookingController
+ * @coversDefaultClass \App\Controller\Internal\BookingController
  */
 class BookingControllerTest extends TestCase
 {
