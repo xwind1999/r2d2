@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
-use App\Contract\Request\Experience\ExperienceCreateRequest;
-use App\Contract\Request\Experience\ExperienceUpdateRequest;
-use App\Contract\Response\Experience\ExperienceCreateResponse;
-use App\Contract\Response\Experience\ExperienceGetResponse;
-use App\Contract\Response\Experience\ExperienceUpdateResponse;
+use App\Contract\Request\Internal\Experience\ExperienceCreateRequest;
+use App\Contract\Request\Internal\Experience\ExperienceUpdateRequest;
+use App\Contract\Response\Internal\Experience\ExperienceCreateResponse;
+use App\Contract\Response\Internal\Experience\ExperienceGetResponse;
+use App\Contract\Response\Internal\Experience\ExperienceUpdateResponse;
 use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;

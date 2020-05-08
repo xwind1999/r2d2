@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
-use App\Contract\Request\Box\BoxCreateRequest;
-use App\Contract\Request\Box\BoxUpdateRequest;
-use App\Contract\Response\Box\BoxCreateResponse;
-use App\Contract\Response\Box\BoxGetResponse;
-use App\Contract\Response\Box\BoxUpdateResponse;
+use App\Contract\Request\Internal\Box\BoxCreateRequest;
+use App\Contract\Request\Internal\Box\BoxUpdateRequest;
+use App\Contract\Response\Internal\Box\BoxCreateResponse;
+use App\Contract\Response\Internal\Box\BoxGetResponse;
+use App\Contract\Response\Internal\Box\BoxUpdateResponse;
 use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;

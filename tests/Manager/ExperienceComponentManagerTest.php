@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Manager;
 
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
-use App\Contract\Request\ExperienceComponent\ExperienceComponentCreateRequest;
-use App\Contract\Request\ExperienceComponent\ExperienceComponentDeleteRequest;
-use App\Contract\Request\ExperienceComponent\ExperienceComponentUpdateRequest;
+use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentCreateRequest;
+use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentDeleteRequest;
+use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentUpdateRequest;
 use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\ExperienceComponent;

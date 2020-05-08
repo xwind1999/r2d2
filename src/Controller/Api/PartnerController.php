@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
-use App\Contract\Request\Partner\PartnerCreateRequest;
-use App\Contract\Request\Partner\PartnerUpdateRequest;
-use App\Contract\Response\Partner\PartnerCreateResponse;
-use App\Contract\Response\Partner\PartnerGetResponse;
-use App\Contract\Response\Partner\PartnerUpdateResponse;
+use App\Contract\Request\Internal\Partner\PartnerCreateRequest;
+use App\Contract\Request\Internal\Partner\PartnerUpdateRequest;
+use App\Contract\Response\Internal\Partner\PartnerCreateResponse;
+use App\Contract\Response\Internal\Partner\PartnerGetResponse;
+use App\Contract\Response\Internal\Partner\PartnerUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;

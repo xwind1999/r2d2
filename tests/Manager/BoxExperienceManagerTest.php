@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
-use App\Contract\Request\BoxExperience\BoxExperienceCreateRequest;
-use App\Contract\Request\BoxExperience\BoxExperienceDeleteRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
+use App\Contract\Request\Internal\BoxExperience\BoxExperienceCreateRequest;
+use App\Contract\Request\Internal\BoxExperience\BoxExperienceDeleteRequest;
 use App\Entity\Box;
 use App\Entity\BoxExperience;
 use App\Entity\Experience;

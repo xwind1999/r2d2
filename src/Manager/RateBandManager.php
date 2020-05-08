@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
-use App\Contract\Request\RateBand\RateBandCreateRequest;
-use App\Contract\Request\RateBand\RateBandUpdateRequest;
+use App\Contract\Request\Internal\RateBand\RateBandCreateRequest;
+use App\Contract\Request\Internal\RateBand\RateBandUpdateRequest;
 use App\Entity\RateBand;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Repository\PartnerRepository;

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
-use App\Contract\Request\RateBand\RateBandCreateRequest;
-use App\Contract\Request\RateBand\RateBandUpdateRequest;
-use App\Contract\Response\RateBand\RateBandCreateResponse;
-use App\Contract\Response\RateBand\RateBandGetResponse;
-use App\Contract\Response\RateBand\RateBandUpdateResponse;
+use App\Contract\Request\Internal\RateBand\RateBandCreateRequest;
+use App\Contract\Request\Internal\RateBand\RateBandUpdateRequest;
+use App\Contract\Response\Internal\RateBand\RateBandCreateResponse;
+use App\Contract\Response\Internal\RateBand\RateBandGetResponse;
+use App\Contract\Response\Internal\RateBand\RateBandUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;

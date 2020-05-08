@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
-use App\Contract\Request\ExperienceComponent\ExperienceComponentCreateRequest;
-use App\Contract\Request\ExperienceComponent\ExperienceComponentDeleteRequest;
-use App\Contract\Request\ExperienceComponent\ExperienceComponentUpdateRequest;
-use App\Contract\Response\ExperienceComponent\ExperienceComponentCreateResponse;
-use App\Contract\Response\ExperienceComponent\ExperienceComponentUpdateResponse;
+use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentCreateRequest;
+use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentDeleteRequest;
+use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentUpdateRequest;
+use App\Contract\Response\Internal\ExperienceComponent\ExperienceComponentCreateResponse;
+use App\Contract\Response\Internal\ExperienceComponent\ExperienceComponentUpdateResponse;
 use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Manager\ExperienceComponent\RelationshipAlreadyExistsException;
