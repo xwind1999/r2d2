@@ -30,15 +30,6 @@ class BookingDateCreateRequest implements RequestBodyInterface, ValidatableReque
     public string $componentGoldenId;
 
     /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("string")
-     */
-    public string $rateBandGoldenId;
-
-    /**
      * @Assert\Type(type="DateTime")
      * @Assert\NotBlank
      *

@@ -29,15 +29,6 @@ abstract class RoomPriceResponse extends ResponseContract
     public string $componentGoldenId;
 
     /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("string")
-     */
-    public string $rateBandGoldenId;
-
-    /**
      * @Assert\Type(type="DateTime")
      * @Assert\Length(min="1")
      * @Assert\NotBlank
@@ -73,7 +64,6 @@ abstract class RoomPriceResponse extends ResponseContract
     {
         $this->uuid = $roomPrice->uuid->toString();
         $this->componentGoldenId = $roomPrice->componentGoldenId;
-        $this->rateBandGoldenId = $roomPrice->rateBandGoldenId;
         $this->date = $roomPrice->date;
         $this->price = $roomPrice->price;
         $this->createdAt = $roomPrice->createdAt;

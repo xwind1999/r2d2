@@ -27,7 +27,6 @@ class RoomAvailabilityHelper
     {
         $payload = [
             'component_golden_id' => '1234',
-            'rate_band_golden_id' => '5678',
             'stock' => 2,
             'date' => '2020-01-01',
             'type' => 'instant',
@@ -42,12 +41,6 @@ class RoomAvailabilityHelper
         $payload['component_golden_id'] = $component->golden_id;
     }
 
-    public function addValidRateBand(array &$payload)
-    {
-        $rateBand = json_decode(ApiTestCase::$rateBandHelper->create()->getContent());
-        $payload['rate_band_golden_id'] = $rateBand->golden_id;
-    }
-
     /**
      * @return JsonResponse|object
      */
@@ -56,7 +49,6 @@ class RoomAvailabilityHelper
         if (empty($payload)) {
             $payload = $this->getDefault();
             $this->addValidComponent($payload);
-            $this->addValidRateBand($payload);
         }
         $this->client->request('POST', $this->baseUrl.self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
