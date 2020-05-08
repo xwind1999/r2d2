@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Controller\Api;
+namespace App\Tests\Controller\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\Product\Partner;

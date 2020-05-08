@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
-use App\Contract\Request\RoomPrice\RoomPriceCreateRequest;
-use App\Contract\Request\RoomPrice\RoomPriceUpdateRequest;
-use App\Contract\Response\RoomPrice\RoomPriceCreateResponse;
-use App\Contract\Response\RoomPrice\RoomPriceGetResponse;
-use App\Contract\Response\RoomPrice\RoomPriceUpdateResponse;
+use App\Contract\Request\Internal\RoomPrice\RoomPriceCreateRequest;
+use App\Contract\Request\Internal\RoomPrice\RoomPriceUpdateRequest;
+use App\Contract\Response\Internal\RoomPrice\RoomPriceCreateResponse;
+use App\Contract\Response\Internal\RoomPrice\RoomPriceGetResponse;
+use App\Contract\Response\Internal\RoomPrice\RoomPriceUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;

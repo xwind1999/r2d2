@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
-use App\Contract\Request\BookingDate\BookingDateCreateRequest;
-use App\Contract\Request\BookingDate\BookingDateUpdateRequest;
+use App\Contract\Request\Internal\BookingDate\BookingDateCreateRequest;
+use App\Contract\Request\Internal\BookingDate\BookingDateUpdateRequest;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
 use App\Entity\Component;

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
-use App\Contract\Request\RoomAvailability\RoomAvailabilityCreateRequest;
-use App\Contract\Request\RoomAvailability\RoomAvailabilityUpdateRequest;
-use App\Contract\Response\RoomAvailability\RoomAvailabilityCreateResponse;
-use App\Contract\Response\RoomAvailability\RoomAvailabilityGetResponse;
-use App\Contract\Response\RoomAvailability\RoomAvailabilityUpdateResponse;
+use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityCreateRequest;
+use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityUpdateRequest;
+use App\Contract\Response\Internal\RoomAvailability\RoomAvailabilityCreateResponse;
+use App\Contract\Response\Internal\RoomAvailability\RoomAvailabilityGetResponse;
+use App\Contract\Response\Internal\RoomAvailability\RoomAvailabilityUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;

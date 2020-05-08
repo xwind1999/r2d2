@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
-use App\Contract\Request\BoxExperience\BoxExperienceCreateRequest;
-use App\Contract\Request\BoxExperience\BoxExperienceDeleteRequest;
-use App\Contract\Response\BoxExperience\BoxExperienceCreateResponse;
+use App\Contract\Request\Internal\BoxExperience\BoxExperienceCreateRequest;
+use App\Contract\Request\Internal\BoxExperience\BoxExperienceDeleteRequest;
+use App\Contract\Response\Internal\BoxExperience\BoxExperienceCreateResponse;
 use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Manager\BoxExperience\RelationshipAlreadyExistsException;

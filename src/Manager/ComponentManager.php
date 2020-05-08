@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Contract\Request\Component\ComponentCreateRequest;
-use App\Contract\Request\Component\ComponentUpdateRequest;
+use App\Contract\Request\Internal\Component\ComponentCreateRequest;
+use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
 use App\Entity\Component;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\EntityNotFoundException;

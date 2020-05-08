@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
-use App\Contract\Request\RoomPrice\RoomPriceCreateRequest;
-use App\Contract\Request\RoomPrice\RoomPriceUpdateRequest;
+use App\Contract\Request\Internal\RoomPrice\RoomPriceCreateRequest;
+use App\Contract\Request\Internal\RoomPrice\RoomPriceUpdateRequest;
 use App\Entity\Component;
 use App\Entity\RateBand;
 use App\Entity\RoomPrice;

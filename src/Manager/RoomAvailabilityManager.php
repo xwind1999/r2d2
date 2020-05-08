@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
-use App\Contract\Request\RoomAvailability\RoomAvailabilityCreateRequest;
-use App\Contract\Request\RoomAvailability\RoomAvailabilityUpdateRequest;
+use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityCreateRequest;
+use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityUpdateRequest;
 use App\Entity\RoomAvailability;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Repository\ComponentRepository;

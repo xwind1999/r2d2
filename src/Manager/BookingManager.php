@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
-use App\Contract\Request\Booking\BookingCreateRequest;
-use App\Contract\Request\Booking\BookingUpdateRequest;
+use App\Contract\Request\Internal\Booking\BookingCreateRequest;
+use App\Contract\Request\Internal\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
 use App\Entity\Guest;
 use App\Exception\Repository\EntityNotFoundException;

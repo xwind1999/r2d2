@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
-use App\Contract\Request\RoomAvailability\RoomAvailabilityCreateRequest;
-use App\Contract\Request\RoomAvailability\RoomAvailabilityUpdateRequest;
+use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityCreateRequest;
+use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityUpdateRequest;
 use App\Entity\Component;
 use App\Entity\RateBand;
 use App\Entity\RoomAvailability;

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
-use App\Contract\Request\BookingDate\BookingDateCreateRequest;
-use App\Contract\Request\BookingDate\BookingDateUpdateRequest;
-use App\Contract\Response\BookingDate\BookingDateCreateResponse;
-use App\Contract\Response\BookingDate\BookingDateGetResponse;
-use App\Contract\Response\BookingDate\BookingDateUpdateResponse;
+use App\Contract\Request\Internal\BookingDate\BookingDateCreateRequest;
+use App\Contract\Request\Internal\BookingDate\BookingDateUpdateRequest;
+use App\Contract\Response\Internal\BookingDate\BookingDateCreateResponse;
+use App\Contract\Response\Internal\BookingDate\BookingDateGetResponse;
+use App\Contract\Response\Internal\BookingDate\BookingDateUpdateResponse;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;

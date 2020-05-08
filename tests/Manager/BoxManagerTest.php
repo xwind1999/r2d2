@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
-use App\Contract\Request\Box\BoxCreateRequest;
-use App\Contract\Request\Box\BoxUpdateRequest;
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
 use App\Contract\Request\BroadcastListener\ProductRequest;
+use App\Contract\Request\Internal\Box\BoxCreateRequest;
+use App\Contract\Request\Internal\Box\BoxUpdateRequest;
 use App\Entity\Box;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Manager\BoxManager;
