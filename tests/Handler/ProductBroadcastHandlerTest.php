@@ -10,10 +10,12 @@ use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\BoxBroadcastEvent;
+use App\Exception\Resolver\UnprocessableProductTypeException;
 use App\Handler\ProductBroadcastHandler;
-use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
 use App\Resolver\ProductTypeResolver;
+use phpDocumentor\Reflection\Types\Void_;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -25,7 +27,6 @@ class ProductBroadcastHandlerTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::__invoke
-     * @covers \App\Event\Product\BoxBroadcastEvent::getEventName
      */
     public function testHandlerMessageBoxType(): void
     {
@@ -34,7 +35,6 @@ class ProductBroadcastHandlerTest extends TestCase
         $brand = new Brand();
         $brand->code = 'SBX';
         $productRequest = new ProductRequest();
-        $productRequest->uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $productRequest->id = '1234';
         $productRequest->sellableBrand = $brand;
         $productRequest->sellableCountry = $country;
@@ -47,7 +47,7 @@ class ProductBroadcastHandlerTest extends TestCase
         $boxEvent = new BoxBroadcastEvent($productRequest);
 
         $productTypeResolver->resolve($productRequest)->shouldBeCalled()->willReturn($boxEvent);
-        $eventDispatcher->dispatch($boxEvent, $boxEvent->getEventName())->shouldBeCalled()->willReturn($boxEvent);
+        $eventDispatcher->dispatch($boxEvent)->shouldBeCalled()->willReturn($boxEvent);
 
         $productBroadcastHandler = new ProductBroadcastHandler(
             $logger->reveal(),
@@ -74,7 +74,6 @@ class ProductBroadcastHandlerTest extends TestCase
         $brand = new Brand();
         $brand->code = 'SBX';
         $productRequest = new ProductRequest();
-        $productRequest->uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $productRequest->id = '1234';
         $productRequest->name = 'box name';
         $productRequest->description = 'description';
@@ -91,7 +90,7 @@ class ProductBroadcastHandlerTest extends TestCase
         $productTypeResolver = $this->prophesize(ProductTypeResolver::class);
         $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
 
-        $productTypeResolver->resolve($productRequest)->shouldBeCalled()->willThrow(new NonExistentTypeResolverExcepetion());
+        $productTypeResolver->resolve($productRequest)->shouldBeCalled()->willThrow(new UnprocessableProductTypeException());
 
         $productBroadcastHandler = new ProductBroadcastHandler(
             $logger->reveal(),
@@ -99,7 +98,7 @@ class ProductBroadcastHandlerTest extends TestCase
             $eventDispatcher->reveal())
         ;
 
-        $logger->warning('', $productRequest->getContext())->shouldBeCalled()->willReturn(Void_::class);
+        $logger->warning(Argument::any(), $productRequest->getContext())->shouldBeCalled()->willReturn(Void_::class);
 
         $this->assertEquals(null, $productBroadcastHandler->__invoke($productRequest));
     }

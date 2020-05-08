@@ -25,7 +25,7 @@ class ExperienceComponentSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ExperienceComponentRelationshipBroadcastEvent::EVENT_NAME => ['handleMessage'],
+            ExperienceComponentRelationshipBroadcastEvent::class => ['handleMessage'],
         ];
     }
 
@@ -38,11 +38,22 @@ class ExperienceComponentSubscriber implements EventSubscriberInterface
                 'No existing Experience for this relationship',
                 $event->getProductRelationshipRequest()->getContext()
             );
+
+            throw $exception;
         } catch (ComponentNotFoundException $exception) {
             $this->logger->warning(
                 'No existing Component for this relationship',
                 $event->getProductRelationshipRequest()->getContext()
             );
+
+            throw $exception;
+        } catch (\Exception $exception) {
+            $this->logger->error(
+                'No existing Component for this relationship',
+                $event->getProductRelationshipRequest()->getContext()
+            );
+
+            throw $exception;
         }
     }
 }

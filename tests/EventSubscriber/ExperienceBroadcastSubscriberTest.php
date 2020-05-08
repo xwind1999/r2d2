@@ -49,7 +49,7 @@ class ExperienceBroadcastSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
-            [ExperienceBroadcastEvent::EVENT_NAME => ['handleMessage']],
+            [ExperienceBroadcastEvent::class => ['handleMessage']],
             ExperienceBroadcastSubscriber::getSubscribedEvents()
         );
     }
@@ -100,6 +100,7 @@ class ExperienceBroadcastSubscriberTest extends TestCase
         $this->experienceManager->replace($productRequest)->shouldBeCalled()->willThrow(new \Exception());
         $experienceSubscriber = new ExperienceBroadcastSubscriber($this->logger->reveal(), $this->experienceManager->reveal());
 
+        $this->expectException(\Exception::class);
         $this->assertEmpty($experienceSubscriber->handleMessage($this->experienceEvent->reveal()));
     }
 }

@@ -23,7 +23,7 @@ class BoxBroadcastSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            BoxBroadcastEvent::EVENT_NAME => ['handleMessage'],
+            BoxBroadcastEvent::class => ['handleMessage'],
         ];
     }
 
@@ -32,7 +32,9 @@ class BoxBroadcastSubscriber implements EventSubscriberInterface
         try {
             $this->boxManager->replace($event->getProductRequest());
         } catch (\Exception $exception) {
-            $this->logger->warning($exception->getMessage(), $event->getProductRequest()->getContext());
+            $this->logger->error($exception->getMessage(), $event->getProductRequest()->getContext());
+
+            throw $exception;
         }
     }
 }

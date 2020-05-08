@@ -16,6 +16,8 @@ class LoggableEventMiddleware implements MiddlewareInterface
     public function process($level, $message, array $context): array
     {
         if ($message instanceof LoggableEventInterface) {
+            /** @var LoggableEventInterface $message */
+            $context = array_merge($context, $message->getContext());
             $message = $message->getMessage();
         }
 

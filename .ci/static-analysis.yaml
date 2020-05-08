@@ -1,6 +1,6 @@
 phpstan:
   stage: Static analysis
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - composer
   script:
@@ -8,7 +8,7 @@ phpstan:
 
 psalm:
   stage: Static analysis
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - composer
   script:
@@ -16,7 +16,7 @@ psalm:
 
 infection:
   stage: Static analysis
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   dependencies:
     - composer
     - unitTests

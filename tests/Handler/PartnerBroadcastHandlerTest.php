@@ -56,6 +56,7 @@ class PartnerBroadcastHandlerTest extends TestCase
         $manager = $this->prophesize(PartnerManager::class);
         $manager->replace($partnerRequest)->shouldBeCalled()->willThrow(new \Exception());
         $partnerBroadcastHandler = new PartnerBroadcastHandler($logger->reveal(), $manager->reveal());
+        $this->expectException(\Exception::class);
         $this->assertEmpty($partnerBroadcastHandler->__invoke($partnerRequest));
     }
 }

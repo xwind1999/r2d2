@@ -9,6 +9,7 @@ class BroadcastListenerApiTest extends ApiTestCase
     public function testHandleProducts(): int
     {
         $response = self::$broadcastListenerHelper->testProducts();
+        print_r($response->getContent());
         $this->assertEquals(202, $response->getStatusCode());
 
         return $response->getStatusCode();

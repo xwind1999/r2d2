@@ -57,11 +57,10 @@ abstract class ComponentResponse extends ResponseContract
 
     /**
      * @Assert\Type(type="integer")
-     * @Assert\NotBlank
      *
      * @JMS\Type("strict_integer")
      */
-    public int $inventory;
+    public ?int $inventory;
 
     /**
      * @Assert\Type(type="integer")

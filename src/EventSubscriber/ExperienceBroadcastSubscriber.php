@@ -23,7 +23,7 @@ class ExperienceBroadcastSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ExperienceBroadcastEvent::EVENT_NAME => ['handleMessage'],
+            ExperienceBroadcastEvent::class => ['handleMessage'],
         ];
     }
 
@@ -33,6 +33,8 @@ class ExperienceBroadcastSubscriber implements EventSubscriberInterface
             $this->experienceManager->replace($event->getProductRequest());
         } catch (\Exception $exception) {
             $this->logger->warning($exception->getMessage(), $event->getProductRequest()->getContext());
+
+            throw $exception;
         }
     }
 }

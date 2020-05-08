@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Event\Http;
 
-use App\Helper\LoggableEventInterface;
+use App\Event\AbstractLoggableEvent;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class BadResponseReceivedEvent implements LoggableEventInterface
+class BadResponseReceivedEvent extends AbstractLoggableEvent
 {
-    protected const MESSAGE = 'Bad response received from external service';
+    protected const LOG_MESSAGE = 'Bad response received from external service';
+
+    protected const LOG_LEVEL = 'error';
 
     protected string $clientId;
 
@@ -31,11 +33,6 @@ class BadResponseReceivedEvent implements LoggableEventInterface
         $this->options = $options;
         $this->duration = $duration;
         $this->response = $response;
-    }
-
-    public function getMessage(): string
-    {
-        return self::MESSAGE;
     }
 
     public function getContext(): array

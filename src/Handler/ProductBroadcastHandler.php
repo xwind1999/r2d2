@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Handler;
 
 use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
+use App\Exception\Resolver\UnprocessableProductTypeException;
 use App\Resolver\ProductTypeResolver;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -31,9 +31,9 @@ class ProductBroadcastHandler implements MessageHandlerInterface
     {
         try {
             $event = $this->productTypeResolver->resolve($productRequest);
-            $this->eventDispatcher->dispatch($event, $event->getEventName());
-        } catch (NonExistentTypeResolverExcepetion $exception) {
-            $this->logger->warning($exception->getMessage(), $productRequest->getContext());
+            $this->eventDispatcher->dispatch($event);
+        } catch (UnprocessableProductTypeException $exception) {
+            $this->logger->warning($exception, $productRequest->getContext());
         }
     }
 }

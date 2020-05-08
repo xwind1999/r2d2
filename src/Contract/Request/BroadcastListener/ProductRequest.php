@@ -19,14 +19,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
     /**
      * @Assert\Type(type="string")
      * @Assert\Length(min="1", max="45")
-     *
-     * @JMS\Type("string")
-     */
-    public string $uuid;
-
-    /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="45")
      * @Assert\NotBlank
      *
      * @JMS\Type("string")
@@ -51,10 +43,11 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Universe")
+     * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Universe")
      */
-    public Universe $universe;
+    public ?Universe $universe = null;
 
     /**
      * @Assert\Type(type="boolean")
@@ -76,26 +69,29 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Brand")
+     * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Brand")
      * @JMS\SerializedName("sellableBrand")
      */
-    public Brand $sellableBrand;
+    public ?Brand $sellableBrand = null;
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Partner")
+     * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Partner")
      */
-    public Partner $partner;
+    public ?Partner $partner = null;
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Country")
+     * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Country")
      * @JMS\SerializedName("sellableCountry")
      */
-    public Country $sellableCountry;
+    public ?Country $sellableCountry = null;
 
     /**
      * @Assert\Type(type="string")
@@ -133,22 +129,42 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      */
     public ?int $voucherExpirationDuration = null;
 
+    /**
+     * @Assert\Type(type="string")
+     * @Assert\Length(min="1", max="10")
+     *
+     * @JMS\Type("string")
+     * @JMS\SerializedName("roomStockType")
+     */
+    public ?string $roomStockType = null;
+
+    /**
+     * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
+     *
+     * @JMS\Type("strict_integer")
+     * @JMS\SerializedName("stockAllotment")
+     */
+    public ?int $stockAllotment = null;
+
     public function getContext(): array
     {
         return [
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'universe' => $this->universe->id,
+            'universe' => $this->universe ? $this->universe->id : '',
             'is_sellable' => $this->isReservable,
             'is_reservable' => $this->isReservable,
-            'partner' => $this->partner->id,
-            'sellable_brand' => $this->sellableBrand->code,
-            'sellable_country' => $this->sellableCountry->code,
+            'partner' => $this->partner ? $this->partner->id : '',
+            'sellable_brand' => $this->sellableBrand ? $this->sellableBrand->code : '',
+            'sellable_country' => $this->sellableCountry ? $this->sellableCountry->code : '',
             'status' => $this->status,
             'type' => $this->type,
             'product_people_number' => $this->productPeopleNumber,
             'voucher_expiration_duration' => $this->voucherExpirationDuration,
+            'room_stock_type' => $this->roomStockType,
+            'stock_allotment' => $this->stockAllotment,
         ];
     }
 }

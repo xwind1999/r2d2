@@ -25,7 +25,7 @@ class BoxExperienceSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            BoxExperienceRelationshipBroadcastEvent::EVENT_NAME => ['handleMessage'],
+            BoxExperienceRelationshipBroadcastEvent::class => ['handleMessage'],
         ];
     }
 
@@ -38,11 +38,19 @@ class BoxExperienceSubscriber implements EventSubscriberInterface
                 'No existing Box for this relationship',
                 $event->getProductRelationshipRequest()->getContext()
             );
+
+            throw $exception;
         } catch (ExperienceNotFoundException $exception) {
             $this->logger->warning(
                 'No existing Experience for this relationship',
                 $event->getProductRelationshipRequest()->getContext()
             );
+
+            throw $exception;
+        } catch (\Exception $exception) {
+            $this->logger->error($exception->getMessage(), $event->getProductRelationshipRequest()->getContext());
+
+            throw $exception;
         }
     }
 }

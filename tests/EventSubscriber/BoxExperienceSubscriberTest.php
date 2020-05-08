@@ -8,7 +8,6 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
 use App\EventSubscriber\BoxExperienceSubscriber;
 use App\Exception\Repository\BoxNotFoundException;
-use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\BoxExperienceManager;
 use PHPUnit\Framework\TestCase;
@@ -47,7 +46,7 @@ class BoxExperienceSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
-            [BoxExperienceRelationshipBroadcastEvent::EVENT_NAME => ['handleMessage']],
+            [BoxExperienceRelationshipBroadcastEvent::class => ['handleMessage']],
             BoxExperienceSubscriber::getSubscribedEvents()
         );
     }
@@ -73,7 +72,7 @@ class BoxExperienceSubscriberTest extends TestCase
      *
      * @dataProvider sampleException
      */
-    public function testHandleMessageThrowsBoxNotFoundException(EntityNotFoundException $exception): void
+    public function testHandleMessageThrowsBoxNotFoundException(\Exception $exception, string $logLevel): void
     {
         $boxExperienceSubscriber = new BoxExperienceSubscriber($this->logger, $this->boxExperienceManager);
 
@@ -82,7 +81,7 @@ class BoxExperienceSubscriberTest extends TestCase
             ->method('replace')
             ->willThrowException($exception)
         ;
-        $this->logger->expects($this->once())->method('warning')->willReturn(null);
+        $this->logger->expects($this->once())->method($logLevel)->willReturn(null);
 
         $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->childProduct = '111';
@@ -96,14 +95,16 @@ class BoxExperienceSubscriberTest extends TestCase
             ->method('getProductRelationshipRequest')
             ->willReturn($relationshipRequest)
         ;
+        $this->expectException(get_class($exception));
         $boxExperienceSubscriber->handleMessage($this->boxExperienceEvent);
     }
 
     public function sampleException(): array
     {
         return [
-            [new BoxNotFoundException()],
-            [new ExperienceNotFoundException()],
+            [new BoxNotFoundException(), 'warning'],
+            [new ExperienceNotFoundException(), 'warning'],
+            [new \Exception(), 'error'],
         ];
     }
 }

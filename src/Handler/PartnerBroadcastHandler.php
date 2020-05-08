@@ -26,6 +26,8 @@ class PartnerBroadcastHandler implements MessageHandlerInterface
             $this->partnerManager->replace($partnerRequest);
         } catch (\Exception $exception) {
             $this->logger->warning($exception->getMessage(), $partnerRequest->getContext());
+
+            throw $exception;
         }
     }
 }

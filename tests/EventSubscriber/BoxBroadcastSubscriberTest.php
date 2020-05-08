@@ -49,7 +49,7 @@ class BoxBroadcastSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
-            [BoxBroadcastEvent::EVENT_NAME => ['handleMessage']],
+            [BoxBroadcastEvent::class => ['handleMessage']],
             BoxBroadcastSubscriber::getSubscribedEvents()
         );
     }
@@ -100,6 +100,7 @@ class BoxBroadcastSubscriberTest extends TestCase
         $this->boxManager->replace($productRequest)->shouldBeCalled()->willThrow(new \Exception());
         $boxSubscriber = new BoxBroadcastSubscriber($this->logger->reveal(), $this->boxManager->reveal());
 
+        $this->expectException(\Exception::class);
         $this->assertEmpty($boxSubscriber->handleMessage($this->boxEvent->reveal()));
     }
 }

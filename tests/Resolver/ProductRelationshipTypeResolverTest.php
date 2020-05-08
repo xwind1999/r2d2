@@ -7,7 +7,7 @@ namespace App\Tests\QuickData;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
-use App\Resolver\Exception\NonExistentTypeResolverExcepetion;
+use App\Exception\Resolver\UnprocessableProductRelationshipTypeException;
 use App\Resolver\ProductRelationshipTypeResolver;
 use PHPUnit\Framework\TestCase;
 
@@ -50,7 +50,7 @@ class ProductRelationshipTypeResolverTest extends TestCase
         $relationshipRequest = $this->createMock(ProductRelationshipRequest::class);
         $relationshipRequest->relationshipType = 'Component';
 
-        $this->expectException(NonExistentTypeResolverExcepetion::class);
+        $this->expectException(UnprocessableProductRelationshipTypeException::class);
 
         $relationshipTypeResolver = new ProductRelationshipTypeResolver();
         $relationshipTypeResolver->resolve($relationshipRequest);

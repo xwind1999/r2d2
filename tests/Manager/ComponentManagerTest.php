@@ -169,6 +169,7 @@ class ComponentManagerTest extends TestCase
         $productRequest->isReservable = true;
         $productRequest->voucherExpirationDuration = 3;
         $productRequest->status = 'test Status';
+        $productRequest->roomStockType = 'on_request';
 
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
         $this->repository->findOneByGoldenId($productRequest->id);
@@ -196,6 +197,7 @@ class ComponentManagerTest extends TestCase
         $productRequest->isReservable = true;
         $productRequest->voucherExpirationDuration = 3;
         $productRequest->status = 'test Status';
+        $productRequest->roomStockType = 'allotment';
 
         $this->partnerRepository->findOneByGoldenId($productRequest->id);
         $this->repository

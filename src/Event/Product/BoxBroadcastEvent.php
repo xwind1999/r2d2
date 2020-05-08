@@ -4,27 +4,6 @@ declare(strict_types=1);
 
 namespace App\Event\Product;
 
-use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Event\Product\Contract\ProductRequestEventInterface;
-use Symfony\Contracts\EventDispatcher\Event;
-
-class BoxBroadcastEvent extends Event implements ProductRequestEventInterface
+class BoxBroadcastEvent extends AbstractProductBroadcastEvent
 {
-    public const EVENT_NAME = 'broadcast.box';
-    private ProductRequest $productRequest;
-
-    public function __construct(ProductRequest $productRequest)
-    {
-        $this->productRequest = $productRequest;
-    }
-
-    public function getProductRequest(): ProductRequest
-    {
-        return $this->productRequest;
-    }
-
-    public function getEventName(): string
-    {
-        return self::EVENT_NAME;
-    }
 }

@@ -11,6 +11,7 @@ use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\ComponentBroadcastEvent;
 use App\EventSubscriber\ComponentBroadcastSubscriber;
+use App\Exception\Repository\PartnerNotFoundException;
 use App\Manager\ComponentManager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -49,7 +50,7 @@ class ComponentBroadcastSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
-            [ComponentBroadcastEvent::EVENT_NAME => ['handleMessage']],
+            [ComponentBroadcastEvent::class => ['handleMessage']],
             ComponentBroadcastSubscriber::getSubscribedEvents()
         );
     }
@@ -71,8 +72,10 @@ class ComponentBroadcastSubscriberTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::handleMessage
+     *
+     * @dataProvider sampleException
      */
-    public function testHandleMessageCatchesException(): void
+    public function testHandleMessageCatchesException(\Exception $exception, string $logLevel): void
     {
         $partner = new Partner();
         $partner->id = '4321';
@@ -98,9 +101,18 @@ class ComponentBroadcastSubscriberTest extends TestCase
 
         $this->event->getProductRequest()->shouldBeCalled()->willReturn($productRequest);
 
-        $this->manager->replace($productRequest)->shouldBeCalled()->willThrow(new \Exception());
+        $this->manager->replace($productRequest)->shouldBeCalled()->willThrow($exception);
         $subscriber = new ComponentBroadcastSubscriber($this->logger->reveal(), $this->manager->reveal());
 
+        $this->expectException(get_class($exception));
         $this->assertEmpty($subscriber->handleMessage($this->event->reveal()));
+    }
+
+    public function sampleException(): array
+    {
+        return [
+            [new PartnerNotFoundException(), 'warning'],
+            [new \Exception(), 'error'],
+        ];
     }
 }

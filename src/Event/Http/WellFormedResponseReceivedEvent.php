@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Event\Http;
 
-use App\Helper\LoggableEventInterface;
+use App\Event\AbstractLoggableEvent;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class WellFormedResponseReceivedEvent implements LoggableEventInterface
+class WellFormedResponseReceivedEvent extends AbstractLoggableEvent
 {
-    private const MESSAGE = 'Correctly formed response received';
+    protected const LOG_MESSAGE = 'Correctly formed response received';
 
     protected string $clientId;
 
@@ -31,11 +31,6 @@ class WellFormedResponseReceivedEvent implements LoggableEventInterface
         $this->options = $options;
         $this->duration = $duration;
         $this->response = $response;
-    }
-
-    public function getMessage(): string
-    {
-        return self::MESSAGE;
     }
 
     public function getContext(): array

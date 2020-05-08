@@ -1,0 +1,43 @@
+framework:
+    messenger:
+
+        transports:
+        # https://symfony.com/doc/current/messenger.html#transports
+            broadcast-listeners-partner:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        'broadcast-listeners-partner': ~
+                    exchange:
+                        type: direct
+
+            broadcast-listeners-product:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        'broadcast-listeners-product': ~
+                    exchange:
+                        type: direct
+
+            broadcast-listeners-product-relationship:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        'broadcast-listeners-product-relationship': ~
+                    exchange:
+                        type: direct
+
+            failed-broadcast-listeners:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        'failed-broadcast-listeners': ~
+                    exchange:
+                        type: direct
+        # sync: 'sync://'
+
+        routing:
+        # Route your messages to the transports
+            'App\Contract\Request\BroadcastListener\PartnerRequest': broadcast-listeners-partner
+            'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
+            'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship

@@ -93,7 +93,7 @@ class ComponentManager
      */
     public function replace(ProductRequest $productRequest): void
     {
-        $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
+        $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partner ? $productRequest->partner->id : '');
 
         try {
             $component = $this->repository->findOneByGoldenId($productRequest->id);
@@ -103,13 +103,15 @@ class ComponentManager
 
         $component->goldenId = $productRequest->id;
         $component->partner = $partner;
-        $component->partnerGoldenId = $productRequest->partner->id;
+        $component->partnerGoldenId = $productRequest->partner ? $productRequest->partner->id : '';
         $component->name = $productRequest->name;
         $component->description = $productRequest->description;
         $component->duration = $productRequest->voucherExpirationDuration;
         $component->isReservable = $productRequest->isReservable;
         $component->isSellable = $productRequest->isSellable;
         $component->status = $productRequest->status;
+        $component->roomStockType = $productRequest->roomStockType;
+        $component->inventory = $productRequest->stockAllotment;
 
         $this->repository->save($component);
     }

@@ -1,8 +1,6 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
+imports:
+    - { resource: services/logging.yaml }
 
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     clients.quickdata:
         base_uri: '%env(QUICKDATA_URL)%'
@@ -18,7 +16,6 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
-            Psr\Log\LoggerInterface: '@Clogger\Clogger'
             Ramsey\Uuid\UuidFactoryInterface: '@Ramsey\Uuid\UuidFactory'
 
     Monolog\Formatter\LogstashFormatter:
@@ -60,25 +57,6 @@ services:
         resource: '../src/EventSubscriber'
         tags: ['kernel.event_subscriber']
 
-    Clogger\Middleware\Context\ContextMiddleware: ~
-
-    Clogger\Middleware\Exception\ExceptionCodeMiddleware: ~
-
-    Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware: ~
-
-    Clogger\Middleware\Exception\StackTraceMiddleware: ~
-
-    App\Helper\Logger\LoggableEventMiddleware: ~
-
-    Clogger\Clogger:
-        arguments:
-            - '@logger'
-            - '@Clogger\Middleware\Context\ContextMiddleware'
-            - '@App\Helper\Logger\LoggableEventMiddleware'
-            - '@Clogger\Middleware\Exception\StackTraceMiddleware'
-            - '@Clogger\Middleware\Exception\ExceptionCodeMiddleware'
-            - '@Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware'
-
     Nelmio\ApiDocBundle\ApiDocGenerator: '@nelmio_api_doc.generator.default'
 
     Gedmo\Timestampable\TimestampableListener:
@@ -106,14 +84,14 @@ services:
             - '%clients.quickdata%'
             - '@App\Http\HttpClientFactory'
 
-    App\Logger\Processor\:
-        resource: '../src/Logger/Processor'
-        tags:
-            - { name: monolog.processor }
-
     Ramsey\Uuid\UuidFactory: ~
 
     App\CMHub\CMHub:
         arguments:
             - '%clients.cmhub%'
             - '@App\Http\HttpClientFactory'
+
+    App\Logger\Processor\:
+        resource: '../src/Logger/Processor'
+        tags:
+            - { name: monolog.processor }

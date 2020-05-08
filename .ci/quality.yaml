@@ -4,7 +4,7 @@ variables:
 
 unitTests:
   stage: Test
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - composer
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
@@ -17,18 +17,21 @@ unitTests:
 
 Api-Tests:
   stage: Test
-  image: ${VALIDATION_FULL_IMAGE_LATEST}
+  image: ${VALIDATION_IMAGE}
   needs:
     - composer
+  services:
+    - name: mysql:8.0
+      alias: mysql
   variables:
-    DATABASE_URL: "mysql://root:admin123@127.0.0.1/r2d2?serverVersion=5.7"
-    DATABASE_NAME: r2d2
+    MYSQL_DATABASE: r2d2
+    MYSQL_ROOT_PASSWORD: admin123
+    MYSQL_USER: root
+    DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_ROOT_PASSWORD}@mysql/${MYSQL_DATABASE}?serverVersion=8.0"
   script:
-    - nohup mysqld_safe &
-    - sleep 5
-    - bin/console doctrine:database:create -e test --if-not-exists --no-interaction
+    - until bin/console doctrine:database:create -e test --if-not-exists --no-interaction; do sleep 1; done
     - bin/console doctrine:schema:update --force
-    - java -jar /schemaspy.jar -t mysql -o report/html/db -u root -p admin123 -host 127.0.0.1 -db r2d2 -s r2d2 -vizjs -degree 2 -imageformat png
+    - java -jar /schemaspy.jar -dp /mysql/mysql-connector-java-8.0.20.jar -t mysql -o report/html/db -u root -p admin123 -host mysql -db r2d2 -s r2d2 -vizjs -degree 2 -imageformat png
     - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
   artifacts:
     expire_in: 1 day
@@ -39,7 +42,7 @@ Api-Tests:
 
 Project-Env-Api-Tests:
   stage: Project Env Validation
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - composer
     - '[DEVINT] Deploy'
@@ -55,7 +58,7 @@ Project-Env-Api-Tests:
 
 Pre-deploy Health Check:
   stage: Pre-deploy Health Check
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   script:
     - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
   only:
@@ -63,7 +66,7 @@ Pre-deploy Health Check:
 
 Post-deploy Health Check:
   stage: Post-deploy Health Check
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   script:
     - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
   only:
@@ -75,7 +78,7 @@ Post-deploy Health Check:
   dependencies:
     - composer
   services:
-    - name: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:0.0.16
+    - name: ${BASE_IMAGE}
       alias: r2-d2.localhost
       command: ["bash", "-c", 'rm -rf /app; ln -s /builds/millenniumfalcon/r2-d2-api /app; php /builds/millenniumfalcon/r2-d2-api/bin/console doctrine:schema:update --force; chmod 777 /tmp/db.sqlite; /start.sh']
   before_script:
@@ -131,7 +134,7 @@ build-R2D2-stub-image:
 
 php-cs-fixer:
   stage: Test
-  image: ${BASE_FULL_IMAGE}
+  image: ${BASE_IMAGE}
   needs:
     - composer
   script:
