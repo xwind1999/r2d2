@@ -8,7 +8,7 @@ use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityCreateRequest
 use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityUpdateRequest;
 use App\Contract\Response\Internal\RoomAvailability\RoomAvailabilityGetResponse;
 use App\Contract\Response\Internal\RoomAvailability\RoomAvailabilityUpdateResponse;
-use App\Controller\Api\RoomAvailabilityController;
+use App\Controller\Internal\RoomAvailabilityController;
 use App\Entity\RoomAvailability;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\RoomAvailabilityNotFoundException;
@@ -18,7 +18,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @coversDefaultClass \App\Controller\Api\RoomAvailabilityController
+ * @coversDefaultClass \App\Controller\Internal\RoomAvailabilityController
  */
 class RoomAvailabilityControllerTest extends TestCase
 {

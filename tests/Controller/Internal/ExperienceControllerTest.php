@@ -8,7 +8,7 @@ use App\Contract\Request\Internal\Experience\ExperienceCreateRequest;
 use App\Contract\Request\Internal\Experience\ExperienceUpdateRequest;
 use App\Contract\Response\Internal\Experience\ExperienceGetResponse;
 use App\Contract\Response\Internal\Experience\ExperienceUpdateResponse;
-use App\Controller\Api\ExperienceController;
+use App\Controller\Internal\ExperienceController;
 use App\Entity\Experience;
 use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
@@ -21,7 +21,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @coversDefaultClass \App\Controller\Api\ExperienceController
+ * @coversDefaultClass \App\Controller\Internal\ExperienceController
  */
 class ExperienceControllerTest extends TestCase
 {
