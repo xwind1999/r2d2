@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Api;
+namespace App\Controller\Internal;
 
 use App\Contract\Request\Internal\Box\BoxCreateRequest;
 use App\Contract\Request\Internal\Box\BoxUpdateRequest;

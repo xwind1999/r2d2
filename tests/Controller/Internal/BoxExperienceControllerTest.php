@@ -6,7 +6,7 @@ namespace App\Tests\Controller\Internal;
 
 use App\Contract\Request\Internal\BoxExperience\BoxExperienceCreateRequest;
 use App\Contract\Request\Internal\BoxExperience\BoxExperienceDeleteRequest;
-use App\Controller\Api\BoxExperienceController;
+use App\Controller\Internal\BoxExperienceController;
 use App\Entity\BoxExperience;
 use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
@@ -16,7 +16,7 @@ use App\Manager\BoxExperienceManager;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \App\Controller\Api\BoxExperienceController
+ * @coversDefaultClass \App\Controller\Internal\BoxExperienceController
  */
 class BoxExperienceControllerTest extends TestCase
 {

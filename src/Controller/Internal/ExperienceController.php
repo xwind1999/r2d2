@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Api;
+namespace App\Controller\Internal;
 
 use App\Contract\Request\Internal\Experience\ExperienceCreateRequest;
 use App\Contract\Request\Internal\Experience\ExperienceUpdateRequest;

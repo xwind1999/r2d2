@@ -8,7 +8,7 @@ use App\Contract\Request\Internal\BookingDate\BookingDateCreateRequest;
 use App\Contract\Request\Internal\BookingDate\BookingDateUpdateRequest;
 use App\Contract\Response\Internal\BookingDate\BookingDateGetResponse;
 use App\Contract\Response\Internal\BookingDate\BookingDateUpdateResponse;
-use App\Controller\Api\BookingDateController;
+use App\Controller\Internal\BookingDateController;
 use App\Entity\BookingDate;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\BookingDateNotFoundException;
@@ -18,7 +18,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @coversDefaultClass \App\Controller\Api\BookingDateController
+ * @coversDefaultClass \App\Controller\Internal\BookingDateController
  */
 class BookingDateControllerTest extends TestCase
 {
@@ -50,7 +50,6 @@ class BookingDateControllerTest extends TestCase
         $bookingDate->uuid = $uuidInterface->reveal();
         $bookingDate->bookingGoldenId = '1234';
         $bookingDate->componentGoldenId = '5678';
-        $bookingDate->rateBandGoldenId = '7895';
         $bookingDate->date = $currentDate;
         $bookingDate->price = 10;
         $bookingDate->isUpsell = false;
@@ -66,7 +65,6 @@ class BookingDateControllerTest extends TestCase
         $this->assertEquals($uuid, $return->uuid);
         $this->assertEquals($bookingDate->bookingGoldenId, $return->bookingGoldenId);
         $this->assertEquals($bookingDate->componentGoldenId, $return->componentGoldenId);
-        $this->assertEquals($bookingDate->rateBandGoldenId, $return->rateBandGoldenId);
         $this->assertEquals($bookingDate->date, $return->date);
         $this->assertEquals($bookingDate->price, $return->price);
         $this->assertEquals($bookingDate->isUpsell, $return->isUpsell);
@@ -156,7 +154,6 @@ class BookingDateControllerTest extends TestCase
         $bookingDate->uuid = $uuidInterface->reveal();
         $bookingDate->bookingGoldenId = '1234';
         $bookingDate->componentGoldenId = '1234';
-        $bookingDate->rateBandGoldenId = '1234';
         $bookingDate->date = new \DateTime('2020-01-01');
         $bookingDate->price = 9990;
         $bookingDate->isUpsell = true;

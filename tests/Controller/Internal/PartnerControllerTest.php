@@ -8,7 +8,7 @@ use App\Contract\Request\Internal\Partner\PartnerCreateRequest;
 use App\Contract\Request\Internal\Partner\PartnerUpdateRequest;
 use App\Contract\Response\Internal\Partner\PartnerGetResponse;
 use App\Contract\Response\Internal\Partner\PartnerUpdateResponse;
-use App\Controller\Api\PartnerController;
+use App\Controller\Internal\PartnerController;
 use App\Entity\Partner;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\PartnerNotFoundException;
@@ -18,7 +18,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * @coversDefaultClass \App\Controller\Api\PartnerController
+ * @coversDefaultClass \App\Controller\Internal\PartnerController
  */
 class PartnerControllerTest extends TestCase
 {

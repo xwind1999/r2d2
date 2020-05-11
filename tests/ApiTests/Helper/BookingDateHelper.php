@@ -50,12 +50,6 @@ class BookingDateHelper
         $payload['component_golden_id'] = $component->golden_id;
     }
 
-    public function addValidRateBand(array &$payload)
-    {
-        $rateBand = json_decode(ApiTestCase::$rateBandHelper->create()->getContent());
-        $payload['rate_band_golden_id'] = $rateBand->golden_id;
-    }
-
     /**
      * @return JsonResponse|object
      */
@@ -64,7 +58,6 @@ class BookingDateHelper
         if (empty($payload)) {
             $payload = $this->getDefault();
             $this->addValidComponent($payload);
-            $this->addValidRateBand($payload);
             $this->addValidBooking($payload);
         }
         $this->client->request('POST', $this->baseUrl.self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));

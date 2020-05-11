@@ -7,11 +7,9 @@ namespace App\Tests\Manager;
 use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityCreateRequest;
 use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityUpdateRequest;
 use App\Entity\Component;
-use App\Entity\RateBand;
 use App\Entity\RoomAvailability;
 use App\Manager\RoomAvailabilityManager;
 use App\Repository\ComponentRepository;
-use App\Repository\RateBandRepository;
 use App\Repository\RoomAvailabilityRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -33,16 +31,10 @@ class RoomAvailabilityManagerTest extends TestCase
      */
     protected $componentRepository;
 
-    /**
-     * @var ObjectProphecy|RateBandRepository
-     */
-    protected $rateBandRepository;
-
     public function setUp(): void
     {
         $this->repository = $this->prophesize(RoomAvailabilityRepository::class);
         $this->componentRepository = $this->prophesize(ComponentRepository::class);
-        $this->rateBandRepository = $this->prophesize(RateBandRepository::class);
     }
 
     /**
@@ -52,17 +44,13 @@ class RoomAvailabilityManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->rateBandRepository->reveal());
+        $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal());
         $component = new Component();
         $component->goldenId = '1234';
-        $rateBand = new RateBand();
-        $rateBand->goldenId = '5678';
         $this->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
-        $this->rateBandRepository->findOneByGoldenId(Argument::any())->willReturn($rateBand);
         $roomAvailabilityUpdateRequest = new RoomAvailabilityUpdateRequest();
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $roomAvailabilityUpdateRequest->componentGoldenId = '1234';
-        $roomAvailabilityUpdateRequest->rateBandGoldenId = '5678';
         $roomAvailabilityUpdateRequest->stock = 2;
         $roomAvailabilityUpdateRequest->date = new \DateTime('2020-01-01');
         $roomAvailabilityUpdateRequest->type = 'instant';
@@ -73,7 +61,6 @@ class RoomAvailabilityManagerTest extends TestCase
         $roomAvailability = new RoomAvailability();
         $roomAvailability->uuid = $uuidInterface->reveal();
         $roomAvailability->componentGoldenId = '4321';
-        $roomAvailability->rateBandGoldenId = '8765';
         $roomAvailability->stock = 3;
         $roomAvailability->date = new \DateTime('2020-01-02');
         $roomAvailability->type = 'instant';
@@ -85,7 +72,6 @@ class RoomAvailabilityManagerTest extends TestCase
 
         $this->assertSame($roomAvailability, $updatedRoomAvailability);
         $this->assertEquals('1234', $roomAvailability->componentGoldenId);
-        $this->assertEquals('5678', $roomAvailability->rateBandGoldenId);
         $this->assertEquals('2', $roomAvailability->stock);
         $this->assertEquals('2020-01-01', $roomAvailability->date->format('Y-m-d'));
         $this->assertEquals('instant', $roomAvailability->type);
@@ -98,7 +84,7 @@ class RoomAvailabilityManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->rateBandRepository->reveal());
+        $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal());
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -118,16 +104,12 @@ class RoomAvailabilityManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->rateBandRepository->reveal());
+        $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal());
         $component = new Component();
         $component->goldenId = '1234';
-        $rateBand = new RateBand();
-        $rateBand->goldenId = '7895';
         $this->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
-        $this->rateBandRepository->findOneByGoldenId(Argument::any())->willReturn($rateBand);
         $roomAvailabilityCreateRequest = new RoomAvailabilityCreateRequest();
         $roomAvailabilityCreateRequest->componentGoldenId = '1234';
-        $roomAvailabilityCreateRequest->rateBandGoldenId = '5678';
         $roomAvailabilityCreateRequest->stock = 2;
         $roomAvailabilityCreateRequest->date = new \DateTime('2020-01-01');
         $roomAvailabilityCreateRequest->type = 'instant';
@@ -136,7 +118,6 @@ class RoomAvailabilityManagerTest extends TestCase
 
         $roomAvailability = $manager->create($roomAvailabilityCreateRequest);
         $this->assertEquals($roomAvailabilityCreateRequest->componentGoldenId, $roomAvailability->componentGoldenId);
-        $this->assertEquals($roomAvailabilityCreateRequest->rateBandGoldenId, $roomAvailability->rateBandGoldenId);
         $this->assertEquals($roomAvailabilityCreateRequest->stock, $roomAvailability->stock);
         $this->assertEquals($roomAvailabilityCreateRequest->date, $roomAvailability->date);
         $this->assertEquals($roomAvailabilityCreateRequest->type, $roomAvailability->type);
