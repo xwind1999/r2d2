@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Command\Import;
 
-use App\Command\Import\RelationshipImportCommand;
-use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
+use App\Command\Import\PartnerImportCommand;
+use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Helper\CSVParser;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -20,9 +20,9 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @coversDefaultClass \App\Command\Import\RelationshipImportCommand
+ * @coversDefaultClass \App\Command\Import\PartnerImportCommand
  */
-class RelationshipImportCommandTest extends KernelTestCase
+class PartnerImportCommandTest extends KernelTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy
@@ -45,9 +45,9 @@ class RelationshipImportCommandTest extends KernelTestCase
     private $helper;
 
     /**
-     * @var ObjectProphecy|ProductRelationshipRequest
+     * @var ObjectProphecy|PartnerRequest
      */
-    private $productRelationshipRequest;
+    private $partnerRequest;
 
     protected function setUp(): void
     {
@@ -55,21 +55,32 @@ class RelationshipImportCommandTest extends KernelTestCase
         $this->messageBus = $this->prophesize(MessageBusInterface::class);
         $this->validator = $this->prophesize(ValidatorInterface::class);
         $this->helper = $this->prophesize(CSVParser::class);
-        $this->productRelationshipRequest = $this->prophesize(ProductRelationshipRequest::class);
+        $this->partnerRequest = $this->prophesize(PartnerRequest::class);
     }
 
-    public function productRelationshipRequestProvider(): iterable
+    public function partnerRequestProvider(): iterable
     {
         $iterator = new \ArrayIterator([
             0 => [
-                'parentProduct' => 'BB0000335658',
-                'childProduct' => 'HG0000335654',
-                'sortOrder' => 1,
-                'isEnabled' => true,
-                'relationshipType' => 'Box-Experience',
-                'printType' => 'Digital',
-                'childCount' => 4,
-                'childQuantity' => 0,
+                'Account_URN__c' => '00016503',
+                'Type' => 'partner',
+                'CurrencyIsoCode' => 'EUR',
+                'CeaseDate__c' => null,
+                'Channel_Manager_Active__c' => false,
+            ],
+            1 => [
+                'Account_URN__c' => '00016504',
+                'Type' => 'partner',
+                'CurrencyIsoCode' => 'EUREXTRA',
+                'CeaseDate__c' => null,
+                'Channel_Manager_Active__c' => false,
+            ],
+            2 => [
+                'Account_URN__c' => '00016505',
+                'Type' => 'partnerandveryveryveryverylong',
+                'CurrencyIsoCode' => 'EUR',
+                'CeaseDate__c' => null,
+                'Channel_Manager_Active__c' => false,
             ],
         ]);
 
@@ -82,17 +93,17 @@ class RelationshipImportCommandTest extends KernelTestCase
      * @covers ::execute
      * @covers ::process
      *
-     * @dataProvider productRelationshipRequestProvider
+     * @dataProvider partnerRequestProvider
      */
-    public function testExecuteSuccessfully(\ArrayIterator $arrayProductRelationshipRequest): void
+    public function testExecuteSuccessfully(\ArrayIterator $requestArray): void
     {
-        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($arrayProductRelationshipRequest);
+        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($requestArray);
         $this->validator->validate(Argument::any())->willReturn(new ConstraintViolationList([]));
-        $this->messageBus->dispatch(Argument::any())->willReturn(new Envelope($this->productRelationshipRequest->reveal()));
+        $this->messageBus->dispatch(Argument::any())->willReturn(new Envelope($this->partnerRequest->reveal()));
 
         $application = new Application(static::createKernel());
 
-        $command = new RelationshipImportCommand(
+        $command = new PartnerImportCommand(
             $this->logger->reveal(),
             $this->messageBus->reveal(),
             $this->helper->reveal(),
@@ -102,13 +113,13 @@ class RelationshipImportCommandTest extends KernelTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'command' => $command->getName(),
-            'file' => 'Relationships_tests.csv',
+            'file' => 'Partners_tests.csv',
         ]);
 
         $this->assertEquals(0, $commandTester->getStatusCode());
-        $this->assertEquals('r2d2:relationship:import', $command::getDefaultName());
+        $this->assertEquals('r2d2:partner:import', $command::getDefaultName());
         $this->assertStringContainsString('[OK] Command executed', $commandTester->getDisplay());
-        $this->assertStringContainsString('Total records: 1', $commandTester->getDisplay());
+        $this->assertStringContainsString('Total records: 3', $commandTester->getDisplay());
         $this->assertStringContainsString('Starting at:', $commandTester->getDisplay());
         $this->assertStringContainsString('Finishing at :', $commandTester->getDisplay());
     }
@@ -120,17 +131,17 @@ class RelationshipImportCommandTest extends KernelTestCase
      * @covers ::process
      * @covers ::logError
      *
-     * @dataProvider productRelationshipRequestProvider
+     * @dataProvider partnerRequestProvider
      */
-    public function testExecuteWithInvalidData(\ArrayIterator $arrayProductRelationshipRequest): void
+    public function testExecuteWithInvalidData(\ArrayIterator $requestArray): void
     {
-        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($arrayProductRelationshipRequest);
+        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($requestArray);
         $errors = new ConstraintViolationList([]);
         $errors->add(new ConstraintViolation(Argument::any(), null, [], Argument::any(), null, null));
         $this->validator->validate(Argument::any())->willReturn($errors);
 
         $application = new Application(static::createKernel());
-        $command = new RelationshipImportCommand(
+        $command = new PartnerImportCommand(
             $this->logger->reveal(),
             $this->messageBus->reveal(),
             $this->helper->reveal(),
@@ -138,7 +149,7 @@ class RelationshipImportCommandTest extends KernelTestCase
         );
         $application->add($command);
         $commandTester = new CommandTester($command);
-        $commandTester->execute(['command' => $command->getName(), 'file' => 'Relationships_tests.csv']);
+        $commandTester->execute(['command' => $command->getName(), 'file' => 'Partners_tests.csv']);
 
         $this->assertEquals(0, $commandTester->getStatusCode());
     }
@@ -150,16 +161,16 @@ class RelationshipImportCommandTest extends KernelTestCase
      * @covers ::process
      * @covers ::logError
      *
-     * @dataProvider productRelationshipRequestProvider
+     * @dataProvider partnerRequestProvider
      */
-    public function testExecuteCatchesException(\ArrayIterator $arrayProductRelationshipRequest): void
+    public function testExecuteCatchesException(\ArrayIterator $requestArray): void
     {
-        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($arrayProductRelationshipRequest);
+        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($requestArray);
         $errors = new ConstraintViolationList([]);
         $errors->add(new ConstraintViolation(Argument::any(), null, [], Argument::any(), null, null));
 
         $application = new Application(static::createKernel());
-        $command = new RelationshipImportCommand(
+        $command = new PartnerImportCommand(
             $this->logger->reveal(),
             $this->messageBus->reveal(),
             $this->helper->reveal(),
@@ -167,10 +178,10 @@ class RelationshipImportCommandTest extends KernelTestCase
         );
         $application->add($command);
         $commandTester = new CommandTester($command);
-        $commandTester->execute(['command' => $command->getName(), 'file' => 'Relationships_tests.csv']);
+        $commandTester->execute(['command' => $command->getName(), 'file' => 'Partners_tests.csv']);
 
         $this->assertEquals(1, $commandTester->getStatusCode());
-        $this->assertStringContainsString('Total records: 1', $commandTester->getDisplay());
+        $this->assertStringContainsString('Total records: 3', $commandTester->getDisplay());
         $this->assertStringContainsString('Starting at:', $commandTester->getDisplay());
         $this->assertStringContainsString('[ERROR] Command exited', $commandTester->getDisplay());
     }
