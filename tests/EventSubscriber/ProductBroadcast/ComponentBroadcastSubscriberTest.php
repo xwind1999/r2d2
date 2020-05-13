@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\EventSubscriber;
+namespace App\Tests\EventSubscriber\ProductBroadcast;
 
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
@@ -10,7 +10,7 @@ use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\ComponentBroadcastEvent;
-use App\EventSubscriber\ComponentBroadcastSubscriber;
+use App\EventSubscriber\ProductBroadcast\ComponentBroadcastSubscriber;
 use App\Exception\Repository\PartnerNotFoundException;
 use App\Manager\ComponentManager;
 use PHPUnit\Framework\TestCase;
@@ -18,7 +18,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 
 /**
- * @coversDefaultClass \App\EventSubscriber\ComponentBroadcastSubscriber
+ * @coversDefaultClass \App\EventSubscriber\ProductBroadcast\ComponentBroadcastSubscriber
  */
 class ComponentBroadcastSubscriberTest extends TestCase
 {
@@ -75,7 +75,7 @@ class ComponentBroadcastSubscriberTest extends TestCase
      *
      * @dataProvider sampleException
      */
-    public function testHandleMessageCatchesException(\Exception $exception, string $logLevel): void
+    public function testHandleMessageCatchesException(\Exception $exception): void
     {
         $partner = new Partner();
         $partner->id = '4321';

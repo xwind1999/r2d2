@@ -10,6 +10,10 @@ framework:
                         'broadcast-listeners-partner': ~
                     exchange:
                         type: direct
+                retry_strategy:
+                    max_retries: 10
+                    delay: 120000
+                    multiplier: 2
 
             broadcast-listeners-product:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -18,6 +22,10 @@ framework:
                         'broadcast-listeners-product': ~
                     exchange:
                         type: direct
+                retry_strategy:
+                    max_retries: 10
+                    delay: 120000
+                    multiplier: 2
 
             broadcast-listeners-product-relationship:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -26,6 +34,10 @@ framework:
                         'broadcast-listeners-product-relationship': ~
                     exchange:
                         type: direct
+                retry_strategy:
+                    max_retries: 10
+                    delay: 120000
+                    multiplier: 2
 
             failed-broadcast-listeners:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -34,7 +46,6 @@ framework:
                         'failed-broadcast-listeners': ~
                     exchange:
                         type: direct
-        # sync: 'sync://'
 
         routing:
         # Route your messages to the transports
