@@ -7,7 +7,6 @@ variables:
   image: docker-registry.production.smartbox.com/chef/chef-knife
   dependencies:
     - build-app-container
-  allow_failure: true
   script:
     - >
       export COMMAND="
