@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests;
 
-use Symfony\Component\BrowserKit\Response;
-
 class BookingApiTest extends ApiTestCase
 {
     public static string $boxId;
@@ -50,12 +48,12 @@ class BookingApiTest extends ApiTestCase
         $firstBookingId = bin2hex(random_bytes(8));
 
         $payload = $this->defaultPayload(['bookingId' => $firstBookingId]);
-        $this->testCreate($payload, function (BookingApiTest $test, Response $response) {
+        $this->testCreate($payload, function (BookingApiTest $test, $response) {
             $responseContent = json_decode($response->getContent());
             $test->assertEquals(201, $response->getStatusCode());
         });
 
-        $this->testCreate($payload, function (BookingApiTest $test, Response $response) {
+        $this->testCreate($payload, function (BookingApiTest $test, $response) {
             $responseContent = json_decode($response->getContent());
             $test->assertEquals(409, $response->getStatusCode());
         });
@@ -68,7 +66,7 @@ class BookingApiTest extends ApiTestCase
     {
         yield 'happy path' => [
             $this->defaultPayload(),
-            function (BookingApiTest $test, Response $response) {
+            function (BookingApiTest $test, $response) {
                 $responseContent = json_decode($response->getContent());
                 $this->assertEquals(201, $response->getStatusCode());
             },
@@ -95,7 +93,7 @@ class BookingApiTest extends ApiTestCase
                     ],
                 ],
             ]),
-            function (BookingApiTest $test, Response $response) {
+            function (BookingApiTest $test, $response) {
                 $responseContent = json_decode($response->getContent());
                 $test->assertEquals(201, $response->getStatusCode());
             },
@@ -126,7 +124,7 @@ class BookingApiTest extends ApiTestCase
                     ],
                 ],
             ]),
-            function (BookingApiTest $test, Response $response) {
+            function (BookingApiTest $test, $response) {
                 $responseContent = json_decode($response->getContent());
                 $test->assertEquals(201, $response->getStatusCode());
             },
@@ -168,7 +166,7 @@ class BookingApiTest extends ApiTestCase
                     ],
                 ],
             ]),
-            function (BookingApiTest $test, Response $response) {
+            function (BookingApiTest $test, $response) {
                 $responseContent = json_decode($response->getContent());
                 $test->assertEquals(201, $response->getStatusCode());
             },
@@ -189,7 +187,7 @@ class BookingApiTest extends ApiTestCase
                     ],
                 ],
             ]),
-            function (BookingApiTest $test, Response $response) {
+            function (BookingApiTest $test, $response) {
                 $responseContent = json_decode($response->getContent());
                 $test->assertEquals(500, $response->getStatusCode());
             },
