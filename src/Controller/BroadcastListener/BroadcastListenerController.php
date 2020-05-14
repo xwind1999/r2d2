@@ -8,6 +8,7 @@ use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -28,6 +29,7 @@ class BroadcastListenerController
      *     response=202,
      *     description="Product handled")
      * )
+     * @Security(name="basic")
      */
     public function productListener(ProductRequest $productRequest, MessageBusInterface $messageBus): Response
     {
@@ -49,6 +51,7 @@ class BroadcastListenerController
      *     response=202,
      *     description="Partner handled")
      * )
+     * @Security(name="basic")
      */
     public function partnerListener(PartnerRequest $partnerRequest, MessageBusInterface $messageBus): Response
     {
@@ -70,6 +73,7 @@ class BroadcastListenerController
      *     response=202,
      *     description="Relationship handled")
      * )
+     * @Security(name="basic")
      */
     public function relationshipListener(ProductRelationshipRequest $relationshipRequest, MessageBusInterface $messageBus): Response
     {

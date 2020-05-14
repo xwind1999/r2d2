@@ -13,6 +13,7 @@ use App\Exception\Manager\BoxExperience\RelationshipAlreadyExistsException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\BoxExperienceManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -41,6 +42,7 @@ class BoxExperienceController
      *     response=404,
      *     description="Resource not found"
      * )
+     * @Security(name="basic")
      */
     public function create(BoxExperienceCreateRequest $boxExperienceCreateRequest, BoxExperienceManager $boxExperienceManager): BoxExperienceCreateResponse
     {
@@ -72,6 +74,7 @@ class BoxExperienceController
      *     response=404,
      *     description="Resource not found"
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      */

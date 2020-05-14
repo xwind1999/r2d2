@@ -55,10 +55,15 @@ class ApiTestCase extends WebTestCase
     {
         if (isset($_SERVER['API_TEST_BASE_URL'])) {
             static::$baseUrl = $_SERVER['API_TEST_BASE_URL'];
-            static::$client = new HttpBrowser(HttpClient::create());
+            static::$client = new HttpBrowser(HttpClient::create([
+                'auth_basic' => ['admin', $_SERVER['USER_ADMIN_PASSWORD']],
+            ]));
             static::$kernel = static::bootKernel([]);
         } else {
-            static::$client = static::createClient();
+            static::$client = static::createClient([], [
+                'PHP_AUTH_USER' => 'admin',
+                'PHP_AUTH_PW' => $_SERVER['USER_ADMIN_PASSWORD'],
+            ]);
         }
 
         static::$serializer = static::$kernel->getContainer()->get('jms_serializer');

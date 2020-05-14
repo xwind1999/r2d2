@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Manager\BookingManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -42,6 +43,8 @@ class BookingController
      *     response=400,
      *     description="Bad request"
      * )
+     *
+     * @Security(name="basic")
      */
     public function create(BookingCreateRequest $bookingCreateRequest, BookingManager $bookingManager): Response
     {
