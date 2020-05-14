@@ -14,6 +14,7 @@ use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\RoomPriceManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
@@ -35,7 +36,8 @@ class RoomPriceController
      *     response=201,
      *     description="Booking Date created",
      *     @Model(type=RoomPriceCreateResponse::class)
-     * )l
+     * )
+     * @Security(name="basic")
      */
     public function create(RoomPriceCreateRequest $roomPriceCreateRequest, RoomPriceManager $roomPriceManager): RoomPriceCreateResponse
     {
@@ -59,6 +61,7 @@ class RoomPriceController
      *     description="Booking Date successfully retrieved",
      *     @Model(type=RoomPriceGetResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
@@ -88,6 +91,7 @@ class RoomPriceController
      *     response=200,
      *     description="Booking Date deleted"
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
@@ -123,6 +127,7 @@ class RoomPriceController
      *     description="RoomPrice updated",
      *     @Model(type=RoomPriceUpdateResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException

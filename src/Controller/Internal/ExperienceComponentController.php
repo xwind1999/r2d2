@@ -16,6 +16,7 @@ use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\ExperienceComponentNotFoundException;
 use App\Manager\ExperienceComponentManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -44,6 +45,7 @@ class ExperienceComponentController
      *     response=404,
      *     description="Resource not found"
      * )
+     * @Security(name="basic")
      */
     public function create(
         ExperienceComponentCreateRequest $experienceComponentCreateRequest,
@@ -77,6 +79,7 @@ class ExperienceComponentController
      *     response=404,
      *     description="Resource not found"
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      */
@@ -107,6 +110,7 @@ class ExperienceComponentController
      *     description="Relationship upated",
      *     @Model(type=ExperienceComponentUpdateResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      */

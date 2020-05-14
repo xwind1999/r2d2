@@ -4,6 +4,9 @@ nelmio_api_doc:
             title: R2D2
             description: A resourceful astromech droid, R2-D2 served Padmé Amidala, Anakin Skywalker and Luke Skywalker in turn, showing great bravery in rescuing his masters and their friends from many perils.
             version: 1.0.0
+        securityDefinitions:
+            basic:
+                type: basic
     areas: # to filter documented areas
         path_patterns:
             - ^(?!/(_error|_wdt|_profiler|_monitor)) # Accepts routes under /api except /api/doc

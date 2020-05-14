@@ -16,6 +16,7 @@ use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\BoxManager;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
@@ -38,6 +39,7 @@ class BoxController
      *     description="Box created",
      *     @Model(type=BoxCreateResponse::class)
      * )
+     * @Security(name="basic")
      */
     public function create(BoxCreateRequest $boxCreateRequest, BoxManager $boxManager): BoxCreateResponse
     {
@@ -65,6 +67,7 @@ class BoxController
      *     description="Box successfully retrieved",
      *     @Model(type=BoxGetResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
@@ -94,6 +97,7 @@ class BoxController
      *     response=200,
      *     description="Box deleted"
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
@@ -129,6 +133,7 @@ class BoxController
      *     description="Box successfully updated",
      *     @Model(type=BoxUpdateResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException

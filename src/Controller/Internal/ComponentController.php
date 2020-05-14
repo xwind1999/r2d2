@@ -14,6 +14,7 @@ use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\ComponentManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
@@ -36,6 +37,7 @@ class ComponentController
      *     description="Component created",
      *     @Model(type=ComponentCreateResponse::class)
      * )
+     * @Security(name="basic")
      */
     public function create(ComponentCreateRequest $componentCreateRequest, ComponentManager $componentManager): ComponentCreateResponse
     {
@@ -59,6 +61,7 @@ class ComponentController
      *     description="Component successfully retrieved",
      *     @Model(type=ComponentGetResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
@@ -88,6 +91,7 @@ class ComponentController
      *     response=200,
      *     description="Component deleted"
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
@@ -123,6 +127,7 @@ class ComponentController
      *     description="Component updated",
      *     @Model(type=ComponentUpdateResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException

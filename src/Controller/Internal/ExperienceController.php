@@ -16,6 +16,7 @@ use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\ExperienceManager;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
@@ -38,6 +39,7 @@ class ExperienceController
      *     description="Experience created",
      *     @Model(type=ExperienceCreateResponse::class)
      * )
+     * @Security(name="basic")
      */
     public function create(
         ExperienceCreateRequest $experienceCreateRequest,
@@ -67,6 +69,7 @@ class ExperienceController
      *     description="Experience successfully retrieved",
      *     @Model(type=ExperienceGetResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
@@ -96,6 +99,7 @@ class ExperienceController
      *     response=200,
      *     description="Experience deleted"
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
@@ -131,6 +135,7 @@ class ExperienceController
      *     description="Experience updated",
      *     @Model(type=ExperienceUpdateResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
