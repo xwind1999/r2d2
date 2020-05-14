@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Helper\TimestampableEntityTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\CustomIdGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -14,8 +13,6 @@ use Ramsey\Uuid\UuidInterface;
  */
 class BookingDate
 {
-    use TimestampableEntityTrait;
-
     /**
      * @ORM\Id
      * @ORM\Column(type="uuid_binary_ordered_time", unique=true)
@@ -56,11 +53,6 @@ class BookingDate
      * @ORM\Column(type="integer", options={"unsigned"=true})
      */
     public int $price;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    public bool $isUpsell;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true})

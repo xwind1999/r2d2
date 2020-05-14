@@ -37,7 +37,7 @@ class ComponentManager
         $component->name = $componentCreateRequest->name;
         $component->description = $componentCreateRequest->description;
         $component->inventory = $componentCreateRequest->inventory;
-        $component->duration = $componentCreateRequest->voucherExpirationDuration;
+        $component->duration = $componentCreateRequest->duration;
         $component->isSellable = $componentCreateRequest->isSellable;
         $component->isReservable = $componentCreateRequest->isReservable;
         $component->status = $componentCreateRequest->status;

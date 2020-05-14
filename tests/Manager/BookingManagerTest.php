@@ -4,21 +4,37 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
-use App\Contract\Request\Internal\Booking\BookingCreateRequest;
-use App\Contract\Request\Internal\Booking\BookingUpdateRequest;
+use App\Contract\Request\Booking\BookingCreate\Room;
+use App\Contract\Request\Booking\BookingCreate\RoomDate;
+use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Entity\Booking;
+use App\Entity\BookingDate;
+use App\Entity\Box;
+use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\Guest;
 use App\Entity\Partner;
+use App\Exception\Booking\BadPriceException;
+use App\Exception\Booking\DateOutOfRangeException;
+use App\Exception\Booking\DuplicatedDatesForSameRoomException;
+use App\Exception\Booking\InvalidExtraNightException;
+use App\Exception\Booking\NoIncludedRoomFoundException;
+use App\Exception\Booking\RoomsDontHaveSameDurationException;
+use App\Exception\Booking\UnallocatedDateException;
+use App\Exception\Http\ResourceConflictException;
+use App\Exception\Repository\BookingNotFoundException;
+use App\Helper\MoneyHelper;
 use App\Manager\BookingManager;
 use App\Repository\BookingRepository;
+use App\Repository\BoxRepository;
+use App\Repository\ComponentRepository;
 use App\Repository\ExperienceRepository;
-use App\Repository\GuestRepository;
-use App\Repository\PartnerRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
+use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Ramsey\Uuid\UuidInterface;
 
 /**
  * @coversDefaultClass \App\Manager\BookingManager
@@ -26,226 +42,580 @@ use Ramsey\Uuid\UuidInterface;
 class BookingManagerTest extends TestCase
 {
     /**
-     * @var BookingRepository|ObjectProphecy
+     * @var EntityManagerInterface|ObjectProphecy
      */
-    protected $repository;
+    public $entityManager;
 
     /**
-     * @var ObjectProphecy|PartnerRepository
+     * @var BookingRepository|ObjectProphecy
      */
-    protected $partnerRepository;
+    public $repository;
 
     /**
      * @var ExperienceRepository|ObjectProphecy
      */
-    protected $experienceRepository;
+    public $experienceRepository;
 
     /**
-     * @var GuestRepository|ObjectProphecy
+     * @var ComponentRepository|ObjectProphecy
      */
-    private $guestRepository;
+    public $componentRepository;
+
+    /**
+     * @var MoneyHelper|ObjectProphecy
+     */
+    public $moneyHelper;
+
+    /**
+     * @var BoxRepository|ObjectProphecy
+     */
+    public $boxRepository;
+
+    public BookingManager $bookingManager;
 
     public function setUp(): void
     {
+        $this->entityManager = $this->prophesize(EntityManagerInterface::class);
         $this->repository = $this->prophesize(BookingRepository::class);
-        $this->partnerRepository = $this->prophesize(PartnerRepository::class);
         $this->experienceRepository = $this->prophesize(ExperienceRepository::class);
-        $this->guestRepository = $this->prophesize(GuestRepository::class);
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::get
-     * @covers ::update
-     */
-    public function testUpdate()
-    {
-        $manager = new BookingManager(
+        $this->componentRepository = $this->prophesize(ComponentRepository::class);
+        $this->moneyHelper = $this->prophesize(MoneyHelper::class);
+        $this->boxRepository = $this->prophesize(BoxRepository::class);
+        $this->bookingManager = new BookingManager(
+            $this->entityManager->reveal(),
             $this->repository->reveal(),
-            $this->partnerRepository->reveal(),
             $this->experienceRepository->reveal(),
-            $this->guestRepository->reveal()
+            $this->componentRepository->reveal(),
+            $this->moneyHelper->reveal(),
+            $this->boxRepository->reveal()
         );
-
-        $partner = new Partner();
-        $partner->goldenId = '5432';
-        $this->partnerRepository->findOneByGoldenId('5432')->willReturn($partner);
-
-        $experience = new Experience();
-        $experience->goldenId = '9012';
-        $this->experienceRepository->findOneByGoldenId('9012')->willReturn($experience);
-
-        $bookingUpdateRequest = new BookingUpdateRequest();
-        $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
-        $currentDate = new \DateTime();
-
-        $guest = new Guest();
-        $guest->externalId = '5435454';
-
-        $bookingUpdateRequest->goldenId = '9876';
-        $bookingUpdateRequest->partnerGoldenId = '5432';
-        $bookingUpdateRequest->experienceGoldenId = '9012';
-        $bookingUpdateRequest->type = 'booking';
-        $bookingUpdateRequest->voucher = '123456789';
-        $bookingUpdateRequest->brand = 'sbx';
-        $bookingUpdateRequest->country = 'fr';
-        $bookingUpdateRequest->requestType = 'instant';
-        $bookingUpdateRequest->channel = 'web';
-        $bookingUpdateRequest->cancellationChannel = null;
-        $bookingUpdateRequest->status = 'complete';
-        $bookingUpdateRequest->totalPrice = 150;
-        $bookingUpdateRequest->startDate = new \DateTime('2020-05-05');
-        $bookingUpdateRequest->endDate = new \DateTime('2020-05-06');
-        $bookingUpdateRequest->guest = [$guest];
-        $bookingUpdateRequest->customerComment = 'i want a double bed';
-        $bookingUpdateRequest->partnerComment = 'i dont have double bed';
-        $bookingUpdateRequest->placedAt = $currentDate;
-        $bookingUpdateRequest->cancelledAt = $currentDate;
-
-        $uuidInterface = $this->prophesize(UuidInterface::class);
-        $uuidInterface->toString()->willReturn($uuid);
-
-        $booking = new Booking();
-        $booking->uuid = $uuidInterface->reveal();
-        $booking->goldenId = '1234';
-        $booking->partnerGoldenId = '5678';
-        $booking->experienceGoldenId = '9012';
-        $booking->type = 'booking';
-        $booking->voucher = '123456789';
-        $booking->brand = 'sbx';
-        $booking->country = 'fr';
-        $booking->requestType = 'instant';
-        $booking->channel = 'web';
-        $booking->cancellationChannel = null;
-        $booking->status = 'complete';
-        $booking->totalPrice = 150;
-        $booking->startDate = new \DateTime('2020-05-05');
-        $booking->endDate = new \DateTime('2020-05-06');
-        $booking->customerComment = null;
-        $booking->partnerComment = null;
-        $booking->placedAt = $currentDate;
-        $booking->cancelledAt = null;
-        $this->repository->findOne($uuid)->willReturn($booking);
-
-        $this->repository->save(Argument::type(Booking::class))->shouldBeCalled();
-
-        $manager->update($uuid, $bookingUpdateRequest);
-        $this->assertEquals('9876', $booking->goldenId);
-        $this->assertEquals('5432', $booking->partnerGoldenId);
-        $this->assertEquals('9012', $booking->experienceGoldenId);
-        $this->assertEquals('booking', $booking->type);
-        $this->assertEquals('123456789', $booking->voucher);
-        $this->assertEquals('sbx', $booking->brand);
-        $this->assertEquals('fr', $booking->country);
-        $this->assertEquals('instant', $booking->requestType);
-        $this->assertEquals('web', $booking->channel);
-        $this->assertEquals(null, $booking->cancellationChannel);
-        $this->assertEquals('complete', $booking->status);
-        $this->assertEquals(150, $booking->totalPrice);
-        $this->assertEquals(new \DateTime('2020-05-05'), $booking->startDate);
-        $this->assertEquals(new \DateTime('2020-05-06'), $booking->endDate);
-        $this->assertEquals('i want a double bed', $booking->customerComment);
-        $this->assertEquals('i dont have double bed', $booking->partnerComment);
-        $this->assertEquals($currentDate, $booking->placedAt);
-        $this->assertEquals($currentDate, $booking->cancelledAt);
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::get
-     * @covers ::delete
-     */
-    public function testDelete()
-    {
-        $manager = new BookingManager(
-            $this->repository->reveal(),
-            $this->partnerRepository->reveal(),
-            $this->experienceRepository->reveal(),
-            $this->guestRepository->reveal()
-        );
-        $uuid = '12345678';
-
-        $uuidInterface = $this->prophesize(UuidInterface::class);
-        $uuidInterface->toString()->willReturn($uuid);
-        $booking = new Booking();
-        $booking->uuid = $uuidInterface->reveal();
-        $this->repository->findOne($uuid)->willReturn($booking);
-
-        $this->repository->delete(Argument::type(Booking::class))->shouldBeCalled();
-
-        $manager->delete($uuid);
     }
 
     /**
      * @covers ::__construct
      * @covers ::create
+     *
+     * @dataProvider dataForCreate
      */
-    public function testCreate()
+    public function testCreate(BookingCreateRequest $bookingCreateRequest, ?int $duration, ?callable $setUp, ?string $exceptionClass, callable $asserts)
     {
-        $manager = new BookingManager(
-            $this->repository->reveal(),
-            $this->partnerRepository->reveal(),
-            $this->experienceRepository->reveal(),
-            $this->guestRepository->reveal()
-        );
-
         $partner = new Partner();
         $partner->goldenId = '5678';
-        $this->partnerRepository->findOneByGoldenId('5678')->willReturn($partner);
 
         $experience = new Experience();
-        $experience->goldenId = '9012';
-        $this->experienceRepository->findOneByGoldenId('9012')->willReturn($experience);
+        $experience->goldenId = $bookingCreateRequest->experience->id;
+        $experience->partner = $partner;
+        $this->experienceRepository->findOneByGoldenId($bookingCreateRequest->experience->id)->willReturn($experience);
 
-        $guest = new Guest();
-        $guest->firstName = 'Person One';
+        $box = new Box();
+        $box->goldenId = $bookingCreateRequest->box;
+        $box->brand = 'SBX';
+        $box->country = 'FR';
+        $this->boxRepository->findOneByGoldenId($bookingCreateRequest->box)->willReturn($box);
 
-        $currentDate = new \DateTime();
+        $component = new Component();
+        $component->goldenId = 'component-id';
+        $component->duration = $duration;
+        $this->componentRepository->findDefaultRoomByExperience($experience)->willReturn($component);
 
-        $bookingCreateRequest = new BookingCreateRequest();
+        // TODO: replace with experience price after R2D2-209
+        $money = new Money(400, new Currency($bookingCreateRequest->currency));
+        $this->moneyHelper->create(400, $bookingCreateRequest->currency)->willReturn($money);
 
-        $bookingCreateRequest->goldenId = '1234';
-        $bookingCreateRequest->partnerGoldenId = '5678';
-        $bookingCreateRequest->experienceGoldenId = '9012';
-        $bookingCreateRequest->type = 'booking';
-        $bookingCreateRequest->voucher = '123456789';
-        $bookingCreateRequest->brand = 'sbx';
-        $bookingCreateRequest->country = 'fr';
-        $bookingCreateRequest->requestType = 'instant';
-        $bookingCreateRequest->channel = 'web';
-        $bookingCreateRequest->cancellationChannel = null;
-        $bookingCreateRequest->status = 'complete';
-        $bookingCreateRequest->totalPrice = 150;
-        $bookingCreateRequest->startDate = new \DateTime('2020-05-05');
-        $bookingCreateRequest->endDate = new \DateTime('2020-05-06');
-        $bookingCreateRequest->guest = [$guest];
-        $bookingCreateRequest->customerComment = null;
-        $bookingCreateRequest->partnerComment = null;
-        $bookingCreateRequest->placedAt = $currentDate;
-        $bookingCreateRequest->cancelledAt = null;
+        if ($setUp) {
+            $setUp($this);
+        }
 
-        $this->repository->save(Argument::type(Booking::class))->shouldBeCalled();
+        if ($exceptionClass) {
+            $this->expectException($exceptionClass);
+        }
 
-        $booking = $manager->create($bookingCreateRequest);
+        $booking = $this->bookingManager->create($bookingCreateRequest);
 
-        $this->assertEquals($bookingCreateRequest->goldenId, $booking->goldenId);
-        $this->assertEquals($bookingCreateRequest->partnerGoldenId, $booking->partnerGoldenId);
-        $this->assertEquals($bookingCreateRequest->experienceGoldenId, $booking->experienceGoldenId);
-        $this->assertEquals($bookingCreateRequest->type, $booking->type);
-        $this->assertEquals($bookingCreateRequest->voucher, $booking->voucher);
-        $this->assertEquals($bookingCreateRequest->brand, $booking->brand);
-        $this->assertEquals($bookingCreateRequest->country, $booking->country);
-        $this->assertEquals($bookingCreateRequest->requestType, $booking->requestType);
-        $this->assertEquals($bookingCreateRequest->channel, $booking->channel);
-        $this->assertEquals($bookingCreateRequest->cancellationChannel, $booking->cancellationChannel);
-        $this->assertEquals($bookingCreateRequest->status, $booking->status);
-        $this->assertEquals($bookingCreateRequest->totalPrice, $booking->totalPrice);
-        $this->assertEquals($bookingCreateRequest->startDate, $booking->startDate);
-        $this->assertEquals($bookingCreateRequest->endDate, $booking->endDate);
-        $this->assertEquals($bookingCreateRequest->guest[0]->firstName, $booking->guest->first()->firstName);
-        $this->assertEquals($bookingCreateRequest->customerComment, $booking->customerComment);
-        $this->assertEquals($bookingCreateRequest->partnerComment, $booking->partnerComment);
-        $this->assertEquals($bookingCreateRequest->placedAt, $booking->placedAt);
-        $this->assertEquals($bookingCreateRequest->cancelledAt, $booking->cancelledAt);
+        $asserts($this, $booking);
+    }
+
+    public function dataForCreate(): iterable
+    {
+        $baseBookingCreateRequest = new BookingCreateRequest();
+        $baseBookingCreateRequest->bookingId = 'SBXFRJBO200101123123';
+        $baseBookingCreateRequest->box = '2406';
+        $baseBookingCreateRequest->experience = new \App\Contract\Request\Booking\BookingCreate\Experience();
+        $baseBookingCreateRequest->experience->id = '3216334';
+        $baseBookingCreateRequest->experience->components = [
+            'Cup of tea',
+            'Una noche muy buena',
+        ];
+        $baseBookingCreateRequest->currency = 'EUR';
+        $baseBookingCreateRequest->voucher = '198257918';
+        $baseBookingCreateRequest->startDate = new \DateTime('2020-01-01');
+        $baseBookingCreateRequest->endDate = new \DateTime('2020-01-02');
+        $baseBookingCreateRequest->customerComment = 'Clean sheets please';
+        $baseBookingCreateRequest->guests = [new \App\Contract\Request\Booking\BookingCreate\Guest()];
+        $baseBookingCreateRequest->guests[0]->firstName = 'Hermano';
+        $baseBookingCreateRequest->guests[0]->lastName = 'Guido';
+        $baseBookingCreateRequest->guests[0]->email = 'maradona@worldcup.ar';
+        $baseBookingCreateRequest->guests[0]->phone = '123 123 123';
+
+        yield 'happy days' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(400, $booking->totalPrice);
+                $test->assertCount(1, $booking->dates);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'happy days, null duration (defaulting to one)' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            null,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(400, $booking->totalPrice);
+                $test->assertCount(1, $booking->dates);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'happy extra days' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 300;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledTimes(2);
+                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(700, $booking->totalPrice);
+                $test->assertCount(2, $booking->dates);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'happy extra rooms' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-01');
+                $roomDate2->price = 300;
+                $roomDate2->extraNight = false;
+                $room2 = new Room();
+                $room2->extraRoom = true;
+                $room2->dates = [$roomDate2];
+                $bookingCreateRequest->rooms = [$room, $room2];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledTimes(2);
+                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(700, $booking->totalPrice);
+                $test->assertCount(2, $booking->dates);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'happy extra days and extra rooms' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 300;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $roomDate3 = new RoomDate();
+                $roomDate3->day = new \DateTime('2020-01-01');
+                $roomDate3->price = 300;
+                $roomDate3->extraNight = false;
+                $roomDate4 = new RoomDate();
+                $roomDate4->day = new \DateTime('2020-01-02');
+                $roomDate4->price = 300;
+                $roomDate4->extraNight = true;
+                $room2 = new Room();
+                $room2->extraRoom = true;
+                $room2->dates = [$roomDate3, $roomDate4];
+                $bookingCreateRequest->rooms = [$room, $room2, $room2];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledTimes(6);
+                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(1900, $booking->totalPrice);
+                $test->assertCount(6, $booking->dates);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'duplicated booking' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willReturn(new Booking());
+            },
+            ResourceConflictException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(400, $booking->totalPrice);
+                $test->assertCount(1, $booking->dates);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'date not in range' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-03');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            DateOutOfRangeException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
+            },
+        ];
+
+        yield 'duplicated dates for same room ' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-01');
+                $roomDate2->price = 0;
+                $roomDate2->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            DuplicatedDatesForSameRoomException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            },
+        ];
+
+        yield 'no included room ' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+
+                $bookingCreateRequest->rooms = [$room, $room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            NoIncludedRoomFoundException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            },
+        ];
+
+        yield 'dates not covering full room duration ' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            2,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            UnallocatedDateException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            },
+        ];
+
+        yield 'unallocated date' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            2,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            UnallocatedDateException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            },
+        ];
+
+        yield 'rooms with different duration' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 0;
+                $roomDate2->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $roomDate3 = new RoomDate();
+                $roomDate3->day = new \DateTime('2020-01-02');
+                $roomDate3->price = 3000;
+                $roomDate3->extraNight = false;
+                $room2 = new Room();
+                $room2->extraRoom = true;
+                $room2->dates = [$roomDate3];
+
+                $bookingCreateRequest->rooms = [$room, $room2];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            2,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            RoomsDontHaveSameDurationException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            },
+        ];
+
+        yield 'rooms with different duration 2' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-01');
+                $roomDate2->price = 4000;
+                $roomDate2->extraNight = false;
+                $roomDate3 = new RoomDate();
+                $roomDate3->day = new \DateTime('2020-01-02');
+                $roomDate3->price = 3000;
+                $roomDate3->extraNight = true;
+                $room2 = new Room();
+                $room2->extraRoom = true;
+                $room2->dates = [$roomDate3, $roomDate2];
+
+                $bookingCreateRequest->rooms = [$room, $room2];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            2,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            RoomsDontHaveSameDurationException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            },
+        ];
+
+        yield 'extra night with price zero' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 0;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            BadPriceException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledTimes(1);
+            },
+        ];
+
+        yield 'extra night with extra_night=false' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 1000;
+                $roomDate2->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            InvalidExtraNightException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledTimes(1);
+            },
+        ];
     }
 }

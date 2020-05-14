@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Component;
+use App\Entity\Experience;
 use App\Exception\Repository\ComponentNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -48,6 +49,26 @@ class ComponentRepository extends ServiceEntityRepository
     public function findOneByGoldenId(string $goldenId): Component
     {
         $component = $this->findOneBy(['goldenId' => $goldenId]);
+
+        if (null === $component) {
+            throw new ComponentNotFoundException();
+        }
+
+        return $component;
+    }
+
+    public function findDefaultRoomByExperience(Experience $experience): Component
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb
+            ->join('c.experienceComponent', 'ec')
+            ->where('c.isReservable = 1')
+            ->andWhere('ec.experience = :experience')
+            ->andWhere('ec.isEnabled = true')
+            ->setParameter('experience', $experience->uuid->getBytes())
+        ;
+
+        $component = $qb->getQuery()->getOneOrNullResult();
 
         if (null === $component) {
             throw new ComponentNotFoundException();
