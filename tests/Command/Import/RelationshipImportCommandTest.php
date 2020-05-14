@@ -6,56 +6,38 @@ namespace App\Tests\Command\Import;
 
 use App\Command\Import\RelationshipImportCommand;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
-use App\Helper\CSVParser;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @coversDefaultClass \App\Command\Import\RelationshipImportCommand
+ * @group relationship-import-command
  */
-class RelationshipImportCommandTest extends KernelTestCase
+class RelationshipImportCommandTest extends AbstractImportCommandTest
 {
-    /**
-     * @var LoggerInterface|ObjectProphecy
-     */
-    private $logger;
-
-    /**
-     * @var MessageBusInterface|ObjectProphecy
-     */
-    private $messageBus;
-
-    /**
-     * @var ObjectProphecy|ValidatorInterface
-     */
-    private $validator;
-
-    /**
-     * @var CSVParser|ObjectProphecy
-     */
-    private $helper;
-
     /**
      * @var ObjectProphecy|ProductRelationshipRequest
      */
-    private $productRelationshipRequest;
+    protected ObjectProphecy $requestClass;
 
     protected function setUp(): void
     {
-        $this->logger = $this->prophesize(LoggerInterface::class);
-        $this->messageBus = $this->prophesize(MessageBusInterface::class);
-        $this->validator = $this->prophesize(ValidatorInterface::class);
-        $this->helper = $this->prophesize(CSVParser::class);
-        $this->productRelationshipRequest = $this->prophesize(ProductRelationshipRequest::class);
+        $this->requestClass = $this->prophesize(ProductRelationshipRequest::class);
+        parent::setUp();
+        $application = new Application(static::createKernel());
+
+        $this->command = new RelationshipImportCommand(
+            $this->logger->reveal(),
+            $this->messageBus->reveal(),
+            $this->helper->reveal(),
+            $this->validator->reveal()
+        );
+        $application->add($this->command);
+        $this->commandTester = new CommandTester($this->command);
     }
 
     public function productRelationshipRequestProvider(): iterable
@@ -86,31 +68,14 @@ class RelationshipImportCommandTest extends KernelTestCase
      */
     public function testExecuteSuccessfully(\ArrayIterator $arrayProductRelationshipRequest): void
     {
-        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($arrayProductRelationshipRequest);
-        $this->validator->validate(Argument::any())->willReturn(new ConstraintViolationList([]));
-        $this->messageBus->dispatch(Argument::any())->willReturn(new Envelope($this->productRelationshipRequest->reveal()));
+        $this->executeWithValidData($arrayProductRelationshipRequest);
 
-        $application = new Application(static::createKernel());
-
-        $command = new RelationshipImportCommand(
-            $this->logger->reveal(),
-            $this->messageBus->reveal(),
-            $this->helper->reveal(),
-            $this->validator->reveal()
-        );
-        $application->add($command);
-        $commandTester = new CommandTester($command);
-        $commandTester->execute([
-            'command' => $command->getName(),
-            'file' => 'Relationships_tests.csv',
-        ]);
-
-        $this->assertEquals(0, $commandTester->getStatusCode());
-        $this->assertEquals('r2d2:relationship:import', $command::getDefaultName());
-        $this->assertStringContainsString('[OK] Command executed', $commandTester->getDisplay());
-        $this->assertStringContainsString('Total records: 1', $commandTester->getDisplay());
-        $this->assertStringContainsString('Starting at:', $commandTester->getDisplay());
-        $this->assertStringContainsString('Finishing at :', $commandTester->getDisplay());
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+        $this->assertEquals('r2d2:relationship:import', $this->command::getDefaultName());
+        $this->assertStringContainsString('[OK] Command executed', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Total records: 1', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Starting at:', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Finishing at :', $this->commandTester->getDisplay());
     }
 
     /**
@@ -124,23 +89,9 @@ class RelationshipImportCommandTest extends KernelTestCase
      */
     public function testExecuteWithInvalidData(\ArrayIterator $arrayProductRelationshipRequest): void
     {
-        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($arrayProductRelationshipRequest);
-        $errors = new ConstraintViolationList([]);
-        $errors->add(new ConstraintViolation(Argument::any(), null, [], Argument::any(), null, null));
-        $this->validator->validate(Argument::any())->willReturn($errors);
+        $this->executeWithInvalidData($arrayProductRelationshipRequest);
 
-        $application = new Application(static::createKernel());
-        $command = new RelationshipImportCommand(
-            $this->logger->reveal(),
-            $this->messageBus->reveal(),
-            $this->helper->reveal(),
-            $this->validator->reveal()
-        );
-        $application->add($command);
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['command' => $command->getName(), 'file' => 'Relationships_tests.csv']);
-
-        $this->assertEquals(0, $commandTester->getStatusCode());
+        $this->assertEquals(1, $this->commandTester->getStatusCode());
     }
 
     /**
@@ -157,21 +108,28 @@ class RelationshipImportCommandTest extends KernelTestCase
         $this->helper->readFile(Argument::any(), Argument::any())->willReturn($arrayProductRelationshipRequest);
         $errors = new ConstraintViolationList([]);
         $errors->add(new ConstraintViolation(Argument::any(), null, [], Argument::any(), null, null));
+        $this->validator->validate(Argument::any())->willReturn($errors);
 
-        $application = new Application(static::createKernel());
-        $command = new RelationshipImportCommand(
-            $this->logger->reveal(),
-            $this->messageBus->reveal(),
-            $this->helper->reveal(),
-            $this->validator->reveal()
-        );
-        $application->add($command);
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['command' => $command->getName(), 'file' => 'Relationships_tests.csv']);
+        $this->commandTester->execute([
+            'command' => $this->command->getName(),
+            'file' => 'Relationship_Test.csv',
+        ]);
 
-        $this->assertEquals(1, $commandTester->getStatusCode());
-        $this->assertStringContainsString('Total records: 1', $commandTester->getDisplay());
-        $this->assertStringContainsString('Starting at:', $commandTester->getDisplay());
-        $this->assertStringContainsString('[ERROR] Command exited', $commandTester->getDisplay());
+        $this->assertEquals(1, $this->commandTester->getStatusCode());
+        $this->assertStringContainsString('Total records: 1', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Starting at:', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('[ERROR] Command exited', $this->commandTester->getDisplay());
+    }
+
+    /**
+     * @covers::configure
+     */
+    public function testConfigureOutput()
+    {
+        $definition = $this->command->getDefinition();
+
+        $this->assertEquals('Command to push CSV relationship to the queue', $this->command->getDescription());
+        $this->assertArrayHasKey('file', $definition->getArguments());
+        $this->assertEquals('CSV file path', $definition->getArgument('file')->getDescription());
     }
 }

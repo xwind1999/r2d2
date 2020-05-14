@@ -2,187 +2,106 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Command\Import;
+namespace App\Tests\Command;
 
 use App\Command\Import\PartnerImportCommand;
 use App\Contract\Request\BroadcastListener\PartnerRequest;
-use App\Helper\CSVParser;
-use Prophecy\Argument;
+use App\Tests\Command\Import\AbstractImportCommandTest;
 use Prophecy\Prophecy\ObjectProphecy;
-use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @coversDefaultClass \App\Command\Import\PartnerImportCommand
+ * @group partner-import-command
  */
-class PartnerImportCommandTest extends KernelTestCase
+class PartnerImportCommandTest extends AbstractImportCommandTest
 {
-    /**
-     * @var LoggerInterface|ObjectProphecy
-     */
-    private $logger;
+    protected ObjectProphecy $partnerRequest;
 
-    /**
-     * @var MessageBusInterface|ObjectProphecy
-     */
-    private $messageBus;
-
-    /**
-     * @var ObjectProphecy|ValidatorInterface
-     */
-    private $validator;
-
-    /**
-     * @var CSVParser|ObjectProphecy
-     */
-    private $helper;
-
-    /**
-     * @var ObjectProphecy|PartnerRequest
-     */
-    private $partnerRequest;
+    protected ObjectProphecy $requestClass;
 
     protected function setUp(): void
     {
-        $this->logger = $this->prophesize(LoggerInterface::class);
-        $this->messageBus = $this->prophesize(MessageBusInterface::class);
-        $this->validator = $this->prophesize(ValidatorInterface::class);
-        $this->helper = $this->prophesize(CSVParser::class);
-        $this->partnerRequest = $this->prophesize(PartnerRequest::class);
+        $this->requestClass = $this->prophesize(PartnerRequest::class);
+        parent::setUp();
+
+        $this->command = new PartnerImportCommand(
+            $this->logger->reveal(),
+            $this->messageBus->reveal(),
+            $this->helper->reveal(),
+            $this->validator->reveal());
+
+        $this->commandTester = new CommandTester($this->command);
+        $this->application->add($this->command);
     }
 
-    public function partnerRequestProvider(): iterable
+    /**
+     * @covers ::__construct
+     * @covers ::configure
+     * @covers ::execute
+     * @covers ::process
+     * @dataProvider requestProvider
+     */
+    public function testExecuteWithInvalidData(\Iterator $partnerRequests): void
     {
-        $iterator = new \ArrayIterator([
-            0 => [
-                'Account_URN__c' => '00016503',
+        $this->executeWithInvalidData($partnerRequests);
+
+        $this->assertEquals('r2d2:partner:import', $this->command::getDefaultName());
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::configure
+     * @covers ::execute
+     * @covers ::process
+     * @dataProvider requestProvider
+     */
+    public function testExecuteWithValidData(\Iterator $partnerRequests): void
+    {
+        $this->executeWithValidData($partnerRequests);
+
+        $this->assertEquals('r2d2:partner:import', $this->command::getDefaultName());
+    }
+
+    public function requestProvider(): ?\Generator
+    {
+        $records = new \ArrayIterator([
+            [
+                'Account_URN__c' => '16503',
                 'Type' => 'partner',
                 'CurrencyIsoCode' => 'EUR',
-                'CeaseDate__c' => null,
-                'Channel_Manager_Active__c' => false,
-            ],
-            1 => [
-                'Account_URN__c' => '00016504',
-                'Type' => 'partner',
-                'CurrencyIsoCode' => 'EUREXTRA',
-                'CeaseDate__c' => null,
-                'Channel_Manager_Active__c' => false,
-            ],
-            2 => [
-                'Account_URN__c' => '00016505',
-                'Type' => 'partnerandveryveryveryverylong',
-                'CurrencyIsoCode' => 'EUR',
-                'CeaseDate__c' => null,
-                'Channel_Manager_Active__c' => false,
+                'CeaseDate__c' => '2015-06-04',
+                'Channel_Manager_Active__c' => '0',
             ],
         ]);
 
-        yield [$iterator];
+        yield [$records];
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::configure
-     * @covers ::execute
-     * @covers ::process
-     *
-     * @dataProvider partnerRequestProvider
-     */
-    public function testExecuteSuccessfully(\ArrayIterator $requestArray): void
+    public function requestProviderInvalidData(): ?\Generator
     {
-        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($requestArray);
-        $this->validator->validate(Argument::any())->willReturn(new ConstraintViolationList([]));
-        $this->messageBus->dispatch(Argument::any())->willReturn(new Envelope($this->partnerRequest->reveal()));
-
-        $application = new Application(static::createKernel());
-
-        $command = new PartnerImportCommand(
-            $this->logger->reveal(),
-            $this->messageBus->reveal(),
-            $this->helper->reveal(),
-            $this->validator->reveal()
-        );
-        $application->add($command);
-        $commandTester = new CommandTester($command);
-        $commandTester->execute([
-            'command' => $command->getName(),
-            'file' => 'Partners_tests.csv',
+        $records = new \ArrayIterator([
+            [
+                'Account_URN__c' => '9999999999999999999999',
+                'Type' => 'partner',
+                'CurrencyIsoCode' => '',
+                'CeaseDate__c' => new \DateTime('now'),
+                'Channel_Manager_Active__c' => '',
+            ],
         ]);
 
-        $this->assertEquals(0, $commandTester->getStatusCode());
-        $this->assertEquals('r2d2:partner:import', $command::getDefaultName());
-        $this->assertStringContainsString('[OK] Command executed', $commandTester->getDisplay());
-        $this->assertStringContainsString('Total records: 3', $commandTester->getDisplay());
-        $this->assertStringContainsString('Starting at:', $commandTester->getDisplay());
-        $this->assertStringContainsString('Finishing at :', $commandTester->getDisplay());
+        yield [$records];
     }
 
     /**
-     * @covers ::__construct
-     * @covers ::configure
-     * @covers ::execute
-     * @covers ::process
-     * @covers ::logError
-     *
-     * @dataProvider partnerRequestProvider
+     * @covers::configure
      */
-    public function testExecuteWithInvalidData(\ArrayIterator $requestArray): void
+    public function testConfigureOutput()
     {
-        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($requestArray);
-        $errors = new ConstraintViolationList([]);
-        $errors->add(new ConstraintViolation(Argument::any(), null, [], Argument::any(), null, null));
-        $this->validator->validate(Argument::any())->willReturn($errors);
+        $definition = $this->command->getDefinition();
 
-        $application = new Application(static::createKernel());
-        $command = new PartnerImportCommand(
-            $this->logger->reveal(),
-            $this->messageBus->reveal(),
-            $this->helper->reveal(),
-            $this->validator->reveal()
-        );
-        $application->add($command);
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['command' => $command->getName(), 'file' => 'Partners_tests.csv']);
-
-        $this->assertEquals(0, $commandTester->getStatusCode());
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::configure
-     * @covers ::execute
-     * @covers ::process
-     * @covers ::logError
-     *
-     * @dataProvider partnerRequestProvider
-     */
-    public function testExecuteCatchesException(\ArrayIterator $requestArray): void
-    {
-        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($requestArray);
-        $errors = new ConstraintViolationList([]);
-        $errors->add(new ConstraintViolation(Argument::any(), null, [], Argument::any(), null, null));
-
-        $application = new Application(static::createKernel());
-        $command = new PartnerImportCommand(
-            $this->logger->reveal(),
-            $this->messageBus->reveal(),
-            $this->helper->reveal(),
-            $this->validator->reveal()
-        );
-        $application->add($command);
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['command' => $command->getName(), 'file' => 'Partners_tests.csv']);
-
-        $this->assertEquals(1, $commandTester->getStatusCode());
-        $this->assertStringContainsString('Total records: 3', $commandTester->getDisplay());
-        $this->assertStringContainsString('Starting at:', $commandTester->getDisplay());
-        $this->assertStringContainsString('[ERROR] Command exited', $commandTester->getDisplay());
+        $this->assertEquals('Command to push CSV partner to the queue', $this->command->getDescription());
+        $this->assertArrayHasKey('file', $definition->getArguments());
+        $this->assertEquals('CSV file path', $definition->getArgument('file')->getDescription());
     }
 }
