@@ -14,6 +14,7 @@
         "laminas/laminas-diagnostics": "^1.6",
         "league/csv": "^9.6",
         "liip/monitor-bundle": "^2.12",
+        "moneyphp/money": "^3.3",
         "nelmio/api-doc-bundle": "^3.6",
         "ramsey/uuid": "^3.9",
         "ramsey/uuid-doctrine": "^1.6",

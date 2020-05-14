@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests;
 
-use App\Tests\ApiTests\Helper\BookingDateHelper;
 use App\Tests\ApiTests\Helper\BookingHelper;
 use App\Tests\ApiTests\Helper\BoxExperienceHelper;
 use App\Tests\ApiTests\Helper\BoxHelper;
@@ -42,8 +41,6 @@ class ApiTestCase extends WebTestCase
 
     public static BoxHelper $boxHelper;
 
-    public static BookingDateHelper $bookingDateHelper;
-
     public static BookingHelper $bookingHelper;
 
     public static BoxExperienceHelper $boxExperienceHelper;
@@ -78,7 +75,6 @@ class ApiTestCase extends WebTestCase
         static::$roomPriceHelper = new RoomPriceHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$roomAvailabilityHelper = new RoomAvailabilityHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$boxHelper = new BoxHelper(clone static::$client, static::$serializer, static::$baseUrl);
-        static::$bookingDateHelper = new BookingDateHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$bookingHelper = new BookingHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$boxExperienceHelper = new BoxExperienceHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$experienceComponentHelper = new ExperienceComponentHelper(clone static::$client, static::$serializer, static::$baseUrl);

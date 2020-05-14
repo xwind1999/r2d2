@@ -215,6 +215,9 @@
             "config/packages/monitor.yaml"
         ]
     },
+    "moneyphp/money": {
+        "version": "v3.3.1"
+    },
     "monolog/monolog": {
         "version": "2.0.2"
     },

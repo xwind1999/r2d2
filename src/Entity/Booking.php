@@ -19,6 +19,9 @@ class Booking
 {
     use TimestampableEntityTrait;
 
+    public const BOOKING_STATUS_CREATED = 'created';
+    public const BOOKING_STATUS_COMPLETE = 'complete';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="uuid_binary_ordered_time", unique=true)
@@ -56,11 +59,6 @@ class Booking
     public string $experienceGoldenId;
 
     /**
-     * @ORM\Column(type="string", length=8)
-     */
-    public string $type;
-
-    /**
      * @ORM\Column(type="string", length=12, nullable=true)
      */
     public ?string $voucher = null;
@@ -74,21 +72,6 @@ class Booking
      * @ORM\Column(type="string", length=2, nullable=true)
      */
     public ?string $country = null;
-
-    /**
-     * @ORM\Column(type="string", length=10, nullable=true)
-     */
-    public ?string $requestType = null;
-
-    /**
-     * @ORM\Column(type="string", length=45, nullable=true)
-     */
-    public ?string $channel = null;
-
-    /**
-     * @ORM\Column(type="string", length=45, nullable=true)
-     */
-    public ?string $cancellationChannel = null;
 
     /**
      * @ORM\Column(type="string", length=30)
@@ -116,16 +99,6 @@ class Booking
     public ?string $customerComment = null;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    public ?string $partnerComment = null;
-
-    /**
-     * @ORM\Column(type="date")
-     */
-    public \DateTime $placedAt;
-
-    /**
      * @ORM\Column(type="date", nullable=true)
      */
     public ?\DateTime $cancelledAt = null;
@@ -137,8 +110,16 @@ class Booking
      */
     public Collection $guest;
 
+    /**
+     * @var Collection<int, BookingDate>
+     *
+     * @ORM\OneToMany(targetEntity="BookingDate", mappedBy="booking", cascade={"persist", "remove"})
+     */
+    public Collection $dates;
+
     public function __construct()
     {
         $this->guest = new ArrayCollection();
+        $this->dates = new ArrayCollection();
     }
 }
