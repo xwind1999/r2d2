@@ -91,12 +91,8 @@ class BroadcastListenerControllerTest extends TestCase
         $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->parentProduct = 'BB0000335658';
         $relationshipRequest->childProduct = 'HG0000335654';
-        $relationshipRequest->sortOrder = 1;
         $relationshipRequest->isEnabled = true;
         $relationshipRequest->relationshipType = 'Box-Experience';
-        $relationshipRequest->printType = 'Digital';
-        $relationshipRequest->childCount = 4;
-        $relationshipRequest->childQuantity = 0;
 
         $this->messageBus->expects($this->once())
             ->method('dispatch')

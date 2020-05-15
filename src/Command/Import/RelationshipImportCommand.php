@@ -13,12 +13,8 @@ class RelationshipImportCommand extends AbstractImportCommand
     protected const IMPORT_FIELDS = [
         'parentProduct',
         'childProduct',
-        'sortOrder',
         'isEnabled',
         'relationshipType',
-        'printType',
-        'childCount',
-        'childQuantity',
     ];
 
     protected function process(\Iterator $records): void
@@ -28,12 +24,8 @@ class RelationshipImportCommand extends AbstractImportCommand
 
             $productRelationshipRequest->parentProduct = $record['parentProduct'];
             $productRelationshipRequest->childProduct = $record['childProduct'];
-            $productRelationshipRequest->sortOrder = (int) $record['sortOrder'];
             $productRelationshipRequest->isEnabled = (bool) $record['isEnabled'];
             $productRelationshipRequest->relationshipType = $record['relationshipType'];
-            $productRelationshipRequest->printType = $record['printType'];
-            $productRelationshipRequest->childCount = (int) $record['childCount'];
-            $productRelationshipRequest->childQuantity = (int) $record['childQuantity'];
 
             $errors = $this->validator->validate($productRelationshipRequest);
             if ($errors->count() > 0) {
