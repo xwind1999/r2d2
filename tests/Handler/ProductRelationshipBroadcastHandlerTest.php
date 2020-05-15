@@ -53,10 +53,8 @@ class ProductRelationshipBroadcastHandlerTest extends TestCase
         $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->parentProduct = $parentProduct;
         $relationshipRequest->childProduct = $childProduct;
-        $relationshipRequest->sortOrder = 1;
         $relationshipRequest->isEnabled = true;
         $relationshipRequest->relationshipType = 'Experience-Component';
-        $relationshipRequest->printType = 'Digital';
 
         $productRelationshipBroadcastHandler = new ProductRelationshipBroadcastHandler(
             $this->logger,
@@ -81,10 +79,8 @@ class ProductRelationshipBroadcastHandlerTest extends TestCase
         $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->parentProduct = $parentProduct;
         $relationshipRequest->childProduct = $childProduct;
-        $relationshipRequest->sortOrder = 1;
         $relationshipRequest->isEnabled = true;
         $relationshipRequest->relationshipType = 'Component-Experience';
-        $relationshipRequest->printType = 'Digital';
 
         $productRelationshipBroadcastHandler = new ProductRelationshipBroadcastHandler(
             $this->logger,

@@ -31,16 +31,6 @@ class ProductRelationshipRequest implements RequestBodyInterface, ValidatableReq
     public string $childProduct;
 
     /**
-     * @Assert\Type(type="integer")
-     * @Assert\PositiveOrZero
-     * @Assert\NotBlank
-     *
-     * @JMS\Type("strict_integer")
-     * @JMS\SerializedName("sortOrder")
-     */
-    public int $sortOrder;
-
-    /**
      * @Assert\Type(type="boolean")
      * @Assert\NotNull
      *
@@ -58,41 +48,13 @@ class ProductRelationshipRequest implements RequestBodyInterface, ValidatableReq
      */
     public string $relationshipType;
 
-    /**
-     * @Assert\Type(type="string")
-     *
-     * @JMS\Type("string")
-     * @JMS\SerializedName("printType")
-     */
-    public string $printType = '';
-
-    /**
-     * @Assert\Type(type="integer")
-     *
-     * @JMS\Type("strict_integer")
-     * @JMS\SerializedName("childCount")
-     */
-    public int $childCount = 0;
-
-    /**
-     * @Assert\Type(type="integer")
-     *
-     * @JMS\Type("strict_integer")
-     * @JMS\SerializedName("childQuantity")
-     */
-    public int $childQuantity = 0;
-
     public function getContext(): array
     {
         return [
             'parent_product' => $this->parentProduct,
             'child_product' => $this->childProduct,
-            'sort_order' => $this->sortOrder,
             'is_enabled' => $this->isEnabled,
             'relationship_type' => $this->relationshipType,
-            'print_type' => $this->printType,
-            'child_count' => $this->childCount,
-            'child_quantity' => $this->childQuantity,
         ];
     }
 }
