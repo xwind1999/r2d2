@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Contract\Request\BroadcastListener\PriceInformation\Price;
+use App\Contract\Request\BroadcastListener\PriceInformation\Product;
+use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Experience\ExperienceCreateRequest;
 use App\Contract\Request\Internal\Experience\ExperienceUpdateRequest;
@@ -183,5 +186,31 @@ class ExperienceManagerTest extends TestCase
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
 
         $this->assertEmpty($manager->replace($productRequest));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::insertPriceInfo
+     */
+    public function testinsertPriceInfo()
+    {
+        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $productDTO = new Product();
+        $productDTO->id = '1264';
+        $priceDTO = new Price();
+        $priceDTO->amount = 12;
+        $priceInformationRequest = new PriceInformationRequest();
+        $priceInformationRequest->product = $productDTO;
+        $priceInformationRequest->averageValue = $priceDTO;
+        $priceInformationRequest->averageCommission = 5556;
+        $priceInformationRequest->averageCommissionType = 'percentage';
+
+        $this->repository
+            ->findOneByGoldenId($priceInformationRequest->product->id)
+            ->shouldBeCalledOnce()
+            ->willReturn(($this->prophesize(Experience::class))->reveal())
+        ;
+        $this->repository->save(Argument::type(Experience::class))->shouldBeCalledOnce();
+        $this->assertEmpty($manager->insertPriceInfo($priceInformationRequest));
     }
 }

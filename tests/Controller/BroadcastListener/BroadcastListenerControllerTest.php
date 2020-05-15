@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Controller\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\PartnerRequest;
+use App\Contract\Request\BroadcastListener\PriceInformation\Price;
+use App\Contract\Request\BroadcastListener\PriceInformation\Product;
+use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
@@ -100,6 +103,31 @@ class BroadcastListenerControllerTest extends TestCase
 
         $controller = new BroadcastListenerController();
         $response = $controller->relationshipListener($relationshipRequest, $this->messageBus);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(202, $response->getStatusCode());
+    }
+
+    /**
+     * @covers ::priceInformationListener
+     */
+    public function testHandlePriceInformationSuccessfully()
+    {
+        $productDTO = new Product();
+        $productDTO->id = '1264';
+        $priceDTO = new Price();
+        $priceDTO->amount = 12;
+        $priceInformationRequest = new PriceInformationRequest();
+        $priceInformationRequest->product = $productDTO;
+        $priceInformationRequest->averageValue = $priceDTO;
+        $priceInformationRequest->averageCommission = 5556;
+        $priceInformationRequest->averageCommissionType = 'percentage';
+
+        $this->messageBus->expects($this->once())
+            ->method('dispatch')
+            ->willReturn($this->envelope);
+
+        $controller = new BroadcastListenerController();
+        $response = $controller->priceInformationListener($priceInformationRequest, $this->messageBus);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }
