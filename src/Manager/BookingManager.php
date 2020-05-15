@@ -78,6 +78,7 @@ class BookingManager
         $booking->endDate = $bookingCreateRequest->endDate;
         $booking->status = Booking::BOOKING_STATUS_CREATED;
         $booking->customerComment = $bookingCreateRequest->customerComment;
+        $booking->components = $bookingCreateRequest->experience->components;
         $booking->cancelledAt = null;
         /** @var ArrayCollection<int, BookingDate> */
         $bookingDatesCollection = new ArrayCollection();
