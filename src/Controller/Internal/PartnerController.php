@@ -14,6 +14,7 @@ use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\PartnerManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
@@ -36,6 +37,7 @@ class PartnerController
      *     description="Partner created",
      *     @Model(type=PartnerCreateResponse::class)
      * )
+     * @Security(name="basic")
      */
     public function create(PartnerCreateRequest $partnerCreateRequest, PartnerManager $partnerManager): PartnerCreateResponse
     {
@@ -59,6 +61,7 @@ class PartnerController
      *     description="Partner successfully retrieved",
      *     @Model(type=PartnerGetResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
@@ -88,6 +91,7 @@ class PartnerController
      *     response=200,
      *     description="Partner deleted"
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
@@ -123,6 +127,7 @@ class PartnerController
      *     description="Partner updated",
      *     @Model(type=PartnerUpdateResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException

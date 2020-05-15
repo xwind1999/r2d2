@@ -14,6 +14,7 @@ use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\RoomAvailabilityManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Swagger\Annotations as SWG;
@@ -36,6 +37,7 @@ class RoomAvailabilityController
      *     description="Room Availability created",
      *     @Model(type=RoomAvailabilityCreateResponse::class)
      * )
+     * @Security(name="basic")
      */
     public function create(RoomAvailabilityCreateRequest $roomAvailabilityCreateRequest, RoomAvailabilityManager $roomAvailabilityManager): RoomAvailabilityCreateResponse
     {
@@ -59,6 +61,7 @@ class RoomAvailabilityController
      *     description="Room Availability successfully retrieved",
      *     @Model(type=RoomAvailabilityGetResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws UnprocessableEntityException
      * @throws ResourceNotFoundException
@@ -88,6 +91,7 @@ class RoomAvailabilityController
      *     response=200,
      *     description="Room Availability deleted"
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
@@ -123,6 +127,7 @@ class RoomAvailabilityController
      *     description="Room Availability updated",
      *     @Model(type=RoomAvailabilityUpdateResponse::class)
      * )
+     * @Security(name="basic")
      *
      * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException

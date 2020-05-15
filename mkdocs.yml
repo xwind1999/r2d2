@@ -27,6 +27,7 @@ nav:
   - CI/CD: readme/ci-cd_README.md
   - Test automation guidelines: readme/testAutomation_README.md
   - Initial tools and libraries: readme/toolsAndLibraries_README.md
+  - Environments: environments.md
   - Exceptions and Error Codes: exceptions.md
   # DO NOT MODIFY ANYTHING BELOW THIS LINE
   - Architecture Decision Records:

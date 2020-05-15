@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests;
 
-use App\Tests\ApiTests\Helper\BookingDateHelper;
 use App\Tests\ApiTests\Helper\BookingHelper;
 use App\Tests\ApiTests\Helper\BoxExperienceHelper;
 use App\Tests\ApiTests\Helper\BoxHelper;
@@ -42,8 +41,6 @@ class ApiTestCase extends WebTestCase
 
     public static BoxHelper $boxHelper;
 
-    public static BookingDateHelper $bookingDateHelper;
-
     public static BookingHelper $bookingHelper;
 
     public static BoxExperienceHelper $boxExperienceHelper;
@@ -58,10 +55,15 @@ class ApiTestCase extends WebTestCase
     {
         if (isset($_SERVER['API_TEST_BASE_URL'])) {
             static::$baseUrl = $_SERVER['API_TEST_BASE_URL'];
-            static::$client = new HttpBrowser(HttpClient::create());
+            static::$client = new HttpBrowser(HttpClient::create([
+                'auth_basic' => ['admin', $_SERVER['USER_ADMIN_PASSWORD']],
+            ]));
             static::$kernel = static::bootKernel([]);
         } else {
-            static::$client = static::createClient();
+            static::$client = static::createClient([], [
+                'PHP_AUTH_USER' => 'admin',
+                'PHP_AUTH_PW' => $_SERVER['USER_ADMIN_PASSWORD'],
+            ]);
         }
 
         static::$serializer = static::$kernel->getContainer()->get('jms_serializer');
@@ -78,7 +80,6 @@ class ApiTestCase extends WebTestCase
         static::$roomPriceHelper = new RoomPriceHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$roomAvailabilityHelper = new RoomAvailabilityHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$boxHelper = new BoxHelper(clone static::$client, static::$serializer, static::$baseUrl);
-        static::$bookingDateHelper = new BookingDateHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$bookingHelper = new BookingHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$boxExperienceHelper = new BoxExperienceHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$experienceComponentHelper = new ExperienceComponentHelper(clone static::$client, static::$serializer, static::$baseUrl);

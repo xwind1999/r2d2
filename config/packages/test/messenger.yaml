@@ -7,16 +7,28 @@ framework:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: broadcast-listeners-partner
+                retry_strategy:
+                    max_retries: 10
+                    delay: 60000
+                    multiplier: 2
 
             broadcast-listeners-product:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: broadcast-listeners-product
+                retry_strategy:
+                    max_retries: 10
+                    delay: 60000
+                    multiplier: 2
 
             broadcast-listeners-product-relationship:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: broadcast-listeners-product-relationship
+                retry_strategy:
+                    max_retries: 10
+                    delay: 60000
+                    multiplier: 2
 
             failed-broadcast-listeners:
                 dsn: 'doctrine://default'
