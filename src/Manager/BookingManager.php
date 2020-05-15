@@ -19,6 +19,7 @@ use App\Exception\Http\ResourceConflictException;
 use App\Exception\Repository\BookingNotFoundException;
 use App\Helper\MoneyHelper;
 use App\Repository\BookingRepository;
+use App\Repository\BoxExperienceRepository;
 use App\Repository\BoxRepository;
 use App\Repository\ComponentRepository;
 use App\Repository\ExperienceRepository;
@@ -30,6 +31,7 @@ class BookingManager
     private EntityManagerInterface $em;
     private BookingRepository $repository;
     private ExperienceRepository $experienceRepository;
+    private BoxExperienceRepository $boxExperienceRepository;
     private ComponentRepository $componentRepository;
     private MoneyHelper $moneyHelper;
     private BoxRepository $boxRepository;
@@ -38,6 +40,7 @@ class BookingManager
         EntityManagerInterface $em,
         BookingRepository $repository,
         ExperienceRepository $experienceRepository,
+        BoxExperienceRepository $boxExperienceRepository,
         ComponentRepository $componentRepository,
         MoneyHelper $moneyHelper,
         BoxRepository $boxRepository
@@ -45,6 +48,7 @@ class BookingManager
         $this->em = $em;
         $this->repository = $repository;
         $this->experienceRepository = $experienceRepository;
+        $this->boxExperienceRepository = $boxExperienceRepository;
         $this->componentRepository = $componentRepository;
         $this->moneyHelper = $moneyHelper;
         $this->boxRepository = $boxRepository;
@@ -61,6 +65,7 @@ class BookingManager
 
         $experience = $this->experienceRepository->findOneByGoldenId($bookingCreateRequest->experience->id);
         $box = $this->boxRepository->findOneByGoldenId($bookingCreateRequest->box);
+        $this->boxExperienceRepository->findOneEnabledByBoxExperience($box, $experience);
         $component = $this->componentRepository->findDefaultRoomByExperience($experience);
 
         $partner = $experience->partner;

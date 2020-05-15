@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\Box;
 use App\Entity\BoxExperience;
 use App\Entity\Experience;
+use App\Exception\Repository\BoxExperienceRelationshipNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -38,5 +39,16 @@ class BoxExperienceRepository extends ServiceEntityRepository
     public function findOneByBoxExperience(Box $box, Experience $experience): ?BoxExperience
     {
         return $this->findOneBy(['box' => $box, 'experience' => $experience]);
+    }
+
+    public function findOneEnabledByBoxExperience(Box $box, Experience $experience): BoxExperience
+    {
+        $boxExperience = $this->findOneBy(['box' => $box, 'experience' => $experience, 'isEnabled' => true]);
+
+        if (null === $boxExperience) {
+            throw new BoxExperienceRelationshipNotFoundException();
+        }
+
+        return $boxExperience;
     }
 }
