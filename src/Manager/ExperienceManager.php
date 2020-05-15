@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Experience\ExperienceCreateRequest;
 use App\Contract\Request\Internal\Experience\ExperienceUpdateRequest;
@@ -102,6 +103,21 @@ class ExperienceManager
         $experience->description = $productRequest->description;
         $experience->peopleNumber = $productRequest->productPeopleNumber;
         $experience->duration = $productRequest->voucherExpirationDuration;
+
+        $this->repository->save($experience);
+    }
+
+    /**
+     * @throws ExperienceNotFoundException
+     */
+    public function insertPriceInfo(PriceInformationRequest $priceInformationRequest): void
+    {
+        $experience = $this->repository->findOneByGoldenId($priceInformationRequest->product->id);
+
+        $experience->price = $priceInformationRequest->averageValue ? $priceInformationRequest->averageValue->amount : null;
+        $experience->commissionType = $priceInformationRequest->averageCommissionType;
+        $experience->commission = $priceInformationRequest->averageCommission;
+        $experience->priceUpdatedAt = new \DateTime();
 
         $this->repository->save($experience);
     }
