@@ -71,12 +71,32 @@ class Experience
     /**
      * @ORM\Column(type="integer", length=2, nullable=true, options={"fixed": true})
      */
-    public ?int $peopleNumber = null;
+    public ?int $peopleNumber;
 
     /**
      * @ORM\Column(type="integer", nullable=true, options={"unsigned"=true})
      */
-    public ?int $duration = null;
+    public ?int $duration;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    public ?int $price;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    public ?string $commissionType;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    public ?int $commission;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public ?\DateTime $priceUpdatedAt = null;
 
     public function __construct()
     {

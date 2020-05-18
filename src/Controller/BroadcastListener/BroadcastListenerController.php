@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\PartnerRequest;
+use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -75,9 +76,34 @@ class BroadcastListenerController
      * )
      * @Security(name="basic")
      */
-    public function relationshipListener(ProductRelationshipRequest $relationshipRequest, MessageBusInterface $messageBus): Response
-    {
+    public function relationshipListener(
+        ProductRelationshipRequest $relationshipRequest,
+        MessageBusInterface $messageBus
+    ): Response {
         $messageBus->dispatch($relationshipRequest);
+
+        return new Response(null, 202);
+    }
+
+    /**
+     * @Route("/broadcast-listener/price-information", methods={"POST"}, format="json")
+     *
+     * @SWG\Tag(name="broadcast-listener")
+     * @SWG\Parameter(
+     *         name="body",
+     *         in="body",
+     *         @Model(type=PriceInformationRequest::class)
+     * )
+     * @SWG\Response(
+     *     response=202,
+     *     description="Price information handled")
+     * )
+     */
+    public function priceInformationListener(
+        PriceInformationRequest $priceInformationRequest,
+        MessageBusInterface $messageBus
+    ): Response {
+        $messageBus->dispatch($priceInformationRequest);
 
         return new Response(null, 202);
     }

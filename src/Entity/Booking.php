@@ -117,9 +117,15 @@ class Booking
      */
     public Collection $dates;
 
+    /**
+     * @ORM\Column(type="json")
+     */
+    public array $components;
+
     public function __construct()
     {
         $this->guest = new ArrayCollection();
         $this->dates = new ArrayCollection();
+        $this->components = [];
     }
 }

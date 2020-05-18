@@ -77,6 +77,10 @@ services:
         tags:
             - { name: jms_serializer.subscribing_handler }
 
+    App\Helper\Serializer\FloatToIntegerHandler:
+        tags:
+            - { name: jms_serializer.subscribing_handler }
+
     App\Http\HttpClientFactory: ~
 
     App\QuickData\QuickData:

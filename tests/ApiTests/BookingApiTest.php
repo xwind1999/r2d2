@@ -189,7 +189,7 @@ class BookingApiTest extends ApiTestCase
             ]),
             function (BookingApiTest $test, $response) {
                 $responseContent = json_decode($response->getContent());
-                $test->assertEquals(500, $response->getStatusCode());
+                $test->assertEquals(422, $response->getStatusCode());
             },
         ];
     }

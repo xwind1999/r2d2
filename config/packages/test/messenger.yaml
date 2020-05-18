@@ -30,6 +30,15 @@ framework:
                     delay: 60000
                     multiplier: 2
 
+            broadcast-listeners-price-information:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: broadcast-listeners-price-information
+                retry_strategy:
+                    max_retries: 10
+                    delay: 60000
+                    multiplier: 2
+
             failed-broadcast-listeners:
                 dsn: 'doctrine://default'
                 options:
@@ -41,3 +50,4 @@ framework:
             'App\Contract\Request\BroadcastListener\PartnerRequest': broadcast-listeners-partner
             'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
+            'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information

@@ -39,6 +39,18 @@ framework:
                     delay: 120000
                     multiplier: 2
 
+            broadcast-listeners-price-information:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        'broadcast-listeners-price-information': ~
+                    exchange:
+                        type: direct
+                retry_strategy:
+                    max_retries: 10
+                    delay: 120000
+                    multiplier: 2
+
             failed-broadcast-listeners:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
@@ -52,3 +64,4 @@ framework:
             'App\Contract\Request\BroadcastListener\PartnerRequest': broadcast-listeners-partner
             'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
+            'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information

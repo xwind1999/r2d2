@@ -10,6 +10,7 @@ use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
 use App\Entity\Box;
+use App\Entity\BoxExperience;
 use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\Guest;
@@ -26,6 +27,7 @@ use App\Exception\Repository\BookingNotFoundException;
 use App\Helper\MoneyHelper;
 use App\Manager\BookingManager;
 use App\Repository\BookingRepository;
+use App\Repository\BoxExperienceRepository;
 use App\Repository\BoxRepository;
 use App\Repository\ComponentRepository;
 use App\Repository\ExperienceRepository;
@@ -57,6 +59,11 @@ class BookingManagerTest extends TestCase
     public $experienceRepository;
 
     /**
+     * @var BoxExperienceRepository|ObjectProphecy
+     */
+    public $boxExperienceRepository;
+
+    /**
      * @var ComponentRepository|ObjectProphecy
      */
     public $componentRepository;
@@ -78,6 +85,7 @@ class BookingManagerTest extends TestCase
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
         $this->repository = $this->prophesize(BookingRepository::class);
         $this->experienceRepository = $this->prophesize(ExperienceRepository::class);
+        $this->boxExperienceRepository = $this->prophesize(BoxExperienceRepository::class);
         $this->componentRepository = $this->prophesize(ComponentRepository::class);
         $this->moneyHelper = $this->prophesize(MoneyHelper::class);
         $this->boxRepository = $this->prophesize(BoxRepository::class);
@@ -85,6 +93,7 @@ class BookingManagerTest extends TestCase
             $this->entityManager->reveal(),
             $this->repository->reveal(),
             $this->experienceRepository->reveal(),
+            $this->boxExperienceRepository->reveal(),
             $this->componentRepository->reveal(),
             $this->moneyHelper->reveal(),
             $this->boxRepository->reveal()
@@ -112,6 +121,9 @@ class BookingManagerTest extends TestCase
         $box->brand = 'SBX';
         $box->country = 'FR';
         $this->boxRepository->findOneByGoldenId($bookingCreateRequest->box)->willReturn($box);
+
+        $boxExperience = new BoxExperience();
+        $this->boxExperienceRepository->findOneEnabledByBoxExperience($box, $experience)->willReturn($boxExperience);
 
         $component = new Component();
         $component->goldenId = 'component-id';

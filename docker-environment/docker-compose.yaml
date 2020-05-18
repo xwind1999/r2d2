@@ -38,7 +38,7 @@ services:
     build:
       context: php
     environment:
-      COMMAND: '/app/bin/console messenger:consume broadcast-listeners-partner broadcast-listeners-product broadcast-listeners-product-relationship'
+      COMMAND: '/app/bin/console messenger:consume broadcast-listeners-partner broadcast-listeners-product broadcast-listeners-product-relationship broadcast-listeners-price-information'
     command: ['/start-command.sh']
     networks:
       - r2-d2-network
