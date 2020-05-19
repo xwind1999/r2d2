@@ -2,23 +2,25 @@ graph LR
 
 subgraph CMs
 BB8 -->|A&P|CMHub
-YieldPlanet -->|A&P|CMHub
+CM1 -->|A&P|CMHub
+CM2 -->|A&P|CMHub
 CM[...] -->|A&P|CMHub
 CMHub -->|Bookings| BB8
-CMHub -->|Bookings|YieldPlanet
-CMHub -->|Bookings|CM
+CMHub -->|Bookings| CM1
+CMHub -->|Bookings| CM2
+CMHub -->|Bookings| CM
 end
 
-subgraph "A&P Engine"
+subgraph A&P Engine
 R2D2
 end
 
-subgraph "Unity3"
+subgraph Web
 JB[JarvisBooking] -->|Bookings| R2D2
 R2D2 -->|A&P| JB
 end
 
-subgraph "Data Owners"
+subgraph Data Owners
 PRM -->|Partners| EAI
 PIM -->|Products| EAI
 R2D2 -->|Bookings| CMHub
@@ -26,14 +28,16 @@ EAI -->|A&P| R2D2
 EAI -->|Products| R2D2
 EAI -->|Partners| R2D2
 EAI -->|Partners| CMHub
+EAI -->|Partners| BB8
 CMHub -->|A&P| EAI
+R2D2 -->|Rooms| CMHub
 end
 
 style PIM fill:white,stroke:purple,stroke-width:2px
 style PRM fill:white,stroke:green,stroke-width:2px
 style BB8 fill:white,stroke:red,stroke-width:2px
-style YieldPlanet fill:white,stroke:red,stroke-width:2px
-style CM fill:white,stroke:red,stroke-width:2px
+style CM1 fill:white,stroke:red,stroke-width:2px
+style CM2 fill:white,stroke:red,stroke-width:2px
 style JB fill:white,stroke:blue,stroke-width:2px
 style EAI fill:lightgray,stroke:black,stroke-width:2px
 style R2D2 fill:lightgray,stroke:black,stroke-width:2px
@@ -42,16 +46,20 @@ style CMHub fill:lightgray,stroke:black,stroke-width:2px
 linkStyle 0 stroke:red,stroke-width:2px;
 linkStyle 1 stroke:red,stroke-width:2px;
 linkStyle 2 stroke:red,stroke-width:2px;
-linkStyle 3 stroke:blue,stroke-width:2px;
-linkStyle 4 stroke:blue,stroke-width:2px;
-linkStyle 5 stroke:blue,stroke-width:2px;
-linkStyle 6 stroke:blue,stroke-width:2px;
-linkStyle 7 stroke:red,stroke-width:2px;
-linkStyle 8 stroke:green,stroke-width:2px;
-linkStyle 9 stroke:purple,stroke-width:2px;
-linkStyle 10 stroke:blue,stroke-width:2px;
-linkStyle 11 stroke:red,stroke-width:2px;
-linkStyle 12 stroke:purple,stroke-width:2px;
-linkStyle 13 stroke:green,stroke-width:2px;
-linkStyle 14 stroke:green,stroke-width:2px;
-linkStyle 15 stroke:red,stroke-width:2px;
+linkStyle 3 stroke:red,stroke-width:2px;
+linkStyle 4 stroke:blue,stroke-width:2px,stroke-dasharray:5,5;
+linkStyle 5 stroke:blue,stroke-width:2px,stroke-dasharray:5,5;
+linkStyle 6 stroke:blue,stroke-width:2px,stroke-dasharray:5,5;
+linkStyle 7 stroke:blue,stroke-width:2px,stroke-dasharray:5,5;
+linkStyle 8 stroke:blue,stroke-width:2px;
+linkStyle 9 stroke:red,stroke-width:2px;
+linkStyle 10 stroke:green,stroke-width:2px;
+linkStyle 11 stroke:purple,stroke-width:2px;
+linkStyle 12 stroke:blue,stroke-width:2px;
+linkStyle 13 stroke:red,stroke-width:2px;
+linkStyle 14 stroke:purple,stroke-width:2px,stroke-dasharray:5,5;
+linkStyle 15 stroke:green,stroke-width:2px,stroke-dasharray:5,5;
+linkStyle 16 stroke:green,stroke-width:2px,stroke-dasharray:5,5;
+linkStyle 17 stroke:green,stroke-width:2px,stroke-dasharray:5,5;
+linkStyle 18 stroke:red,stroke-width:2px;
+linkStyle 19 stroke:brown,stroke-width:2px;
