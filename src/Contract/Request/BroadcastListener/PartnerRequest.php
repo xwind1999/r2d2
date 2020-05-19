@@ -52,7 +52,7 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
     /**
      * @Assert\Type(type="DateTime")
      *
-     * @JMS\Type("DateTime<'Y-m-d'>")
+     * @JMS\Type("DateTime<'Y-m-d\TH:i:s.uT'>")
      * @JMS\SerializedName("partnerCeaseDate")
      */
     public ?\DateTime $partnerCeaseDate = null;
@@ -64,7 +64,7 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
             'status' => $this->status,
             'currency_code' => $this->currencyCode,
             'is_channel_manager_enabled' => $this->isChannelManagerEnabled,
-            'partner_cease_date' => $this->partnerCeaseDate,
+            'partner_cease_date' => $this->partnerCeaseDate ? $this->partnerCeaseDate->format('Y-m-d H:i:s') : null,
         ];
     }
 }
