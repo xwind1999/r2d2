@@ -13,6 +13,7 @@ class BroadcastListenerHelper
     private const API_PRODUCT_BASE_URL = '/broadcast-listener/product';
     private const API_PARTNER_BASE_URL = '/broadcast-listener/partner';
     private const API_RELATIONSHIP_BASE_URL = '/broadcast-listener/product-relationship';
+    private const API_PRICE_INFORMATION_BASE_URL = '/broadcast-listener/price-information';
 
     protected AbstractBrowser $client;
     protected Serializer $serializer;
@@ -65,7 +66,7 @@ class BroadcastListenerHelper
             'status' => 'new partner',
             'currencyCode' => 'USD',
             'isChannelManagerEnabled' => true,
-            'partnerCeaseDate' => '2020-03-18',
+            'partnerCeaseDate' => '2015-10-12T23:03:09.000000+0000',
         ];
 
         return $overrides + $payload;
@@ -82,6 +83,22 @@ class BroadcastListenerHelper
             'printType' => 'Digital',
             'childCount' => 4,
             'childQuantity' => 0,
+        ];
+
+        return $overrides + $payload;
+    }
+
+    public function getDefaultPriceInformation(array $overrides = []): array
+    {
+        $payload = [
+            'product' => [
+                'id' => bin2hex(random_bytes(12)),
+            ],
+            'averageValue' => [
+                'amount' => 100.00,
+            ],
+            'averageCommissionType' => 'amount',
+            'averageCommission' => 7.50,
         ];
 
         return $overrides + $payload;
@@ -108,7 +125,13 @@ class BroadcastListenerHelper
         if (empty($payload)) {
             $payload = $this->getDefaultPartner();
         }
-        $this->client->request('POST', $this->baseUrl.self::API_PARTNER_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request('POST',
+            $this->baseUrl.self::API_PARTNER_BASE_URL,
+            [],
+            [],
+            [],
+            $this->serializer->serialize($payload, 'json')
+        );
 
         return $this->client->getResponse();
     }
@@ -121,7 +144,33 @@ class BroadcastListenerHelper
         if (empty($payload)) {
             $payload = $this->getDefaultRelationship();
         }
-        $this->client->request('POST', $this->baseUrl.self::API_RELATIONSHIP_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        $this->client->request('POST',
+            $this->baseUrl.self::API_RELATIONSHIP_BASE_URL,
+            [],
+            [],
+            [],
+            $this->serializer->serialize($payload, 'json')
+        );
+
+        return $this->client->getResponse();
+    }
+
+    /**
+     * @return JsonResponse|object
+     */
+    public function testPriceInformations(array $payload = [])
+    {
+        if (empty($payload)) {
+            $payload = $this->getDefaultPriceInformation();
+        }
+        $this->client->request(
+            'POST',
+            $this->baseUrl.self::API_PRICE_INFORMATION_BASE_URL,
+            [],
+            [],
+            [],
+            $this->serializer->serialize($payload, 'json')
+        );
 
         return $this->client->getResponse();
     }
