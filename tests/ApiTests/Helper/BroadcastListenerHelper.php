@@ -66,7 +66,7 @@ class BroadcastListenerHelper
             'status' => 'new partner',
             'currencyCode' => 'USD',
             'isChannelManagerEnabled' => true,
-            'partnerCeaseDate' => '2020-03-18',
+            'partnerCeaseDate' => '2015-10-12T23:03:09.000000+0000',
         ];
 
         return $overrides + $payload;

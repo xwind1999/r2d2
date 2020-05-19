@@ -45,7 +45,7 @@ class PartnerManagerTest extends TestCase
         $partnerUpdateRequest->status = 'alive';
         $partnerUpdateRequest->currency = 'USD';
         $partnerUpdateRequest->isChannelManagerActive = true;
-        $partnerUpdateRequest->ceaseDate = new \DateTime('2020-10-10');
+        $partnerUpdateRequest->ceaseDate = new \DateTime('2015-10-12T23:03:09.000000+0000');
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
         $uuidInterface->toString()->willReturn($uuid);
@@ -56,7 +56,7 @@ class PartnerManagerTest extends TestCase
         $partner->status = 'alive';
         $partner->currency = 'USD';
         $partner->isChannelManagerActive = true;
-        $partner->ceaseDate = new \DateTime('2020-10-10');
+        $partner->ceaseDate = new \DateTime('2015-10-12T23:03:09.000000+0000');
         $this->repository->findOne($uuid)->willReturn($partner);
 
         $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
@@ -67,7 +67,7 @@ class PartnerManagerTest extends TestCase
         $this->assertEquals('1234', $partner->goldenId);
         $this->assertEquals('alive', $partner->status);
         $this->assertEquals('USD', $partner->currency);
-        $this->assertEquals(new \DateTime('2020-10-10'), $partner->ceaseDate);
+        $this->assertEquals(new \DateTime('2015-10-12T23:03:09.000000+0000'), $partner->ceaseDate);
     }
 
     /**
@@ -103,7 +103,7 @@ class PartnerManagerTest extends TestCase
         $partnerCreateRequest->status = 'alive';
         $partnerCreateRequest->currency = 'USD';
         $partnerCreateRequest->isChannelManagerActive = true;
-        $partnerCreateRequest->ceaseDate = new \DateTime('2020-10-10');
+        $partnerCreateRequest->ceaseDate = new \DateTime('2015-10-12T23:03:09.000000+0000');
 
         $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
 
@@ -126,7 +126,7 @@ class PartnerManagerTest extends TestCase
         $partnerRequest->status = 'active';
         $partnerRequest->currencyCode = 'EUR';
         $partnerRequest->isChannelManagerEnabled = true;
-        $partnerRequest->partnerCeaseDate = new \DateTime('2020-10-10');
+        $partnerRequest->partnerCeaseDate = new \DateTime('2015-10-12T23:03:09.000000+0000');
 
         $this->repository->findOneByGoldenId($partnerRequest->id)->shouldBeCalled();
         $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
@@ -146,7 +146,7 @@ class PartnerManagerTest extends TestCase
         $partnerRequest->status = 'active';
         $partnerRequest->currencyCode = 'USD';
         $partnerRequest->isChannelManagerEnabled = true;
-        $partnerRequest->partnerCeaseDate = new \DateTime('2020-10-10');
+        $partnerRequest->partnerCeaseDate = new \DateTime('2015-10-12T23:03:09.000000+0000');
 
         $this->repository
             ->findOneByGoldenId($partnerRequest->id)
