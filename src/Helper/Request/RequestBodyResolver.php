@@ -53,6 +53,7 @@ class RequestBodyResolver implements ArgumentValueResolverInterface
 
             $data = $this->serializer->deserialize($json, $argumentType, 'json');
         } catch (\RuntimeException $exception) {
+            echo $exception->getMessage();
             throw new BadRequestException();
         } catch (\Throwable $exception) {
             throw new InternalServerErrorException();
