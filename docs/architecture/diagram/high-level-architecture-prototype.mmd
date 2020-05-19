@@ -1,5 +1,6 @@
 graph LR
-subgraph "R2D2-API"
+
+subgraph R2D2-API
 LBBE{API Load Balancer fa:fa-asterisk} --- PHP1[PHP Write Nodes fa:fa-server <br>NGINX + PHP-FPM + R2D2 Code + R2D2 .env]
 LBBE --- PHP2[PHP Read Nodes fa:fa-server <br>NGINX + PHP-FPM + R2D2 Code + R2D2 .env]
 PHP1 --- RC[Memcache fa:fa-cube]
@@ -11,7 +12,7 @@ PHP2 --- RQ
 PHP2 --- DBS
 end
 
-subgraph "CMHub API"
+subgraph CMHub API
 CMHub[CMHub fa:fa-arrows-alt] --- XCMA[External CM fa:fa-cloud]
 CMHub --- XCMB[External CM fa:fa-cloud]
 CMHub --- LBBE
