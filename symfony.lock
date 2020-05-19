@@ -486,6 +486,9 @@
     "symfony/inflector": {
         "version": "v5.0.3"
     },
+    "symfony/intl": {
+        "version": "v5.0.8"
+    },
     "symfony/maker-bundle": {
         "version": "1.0",
         "recipe": {
@@ -548,6 +551,9 @@
             "phpunit.xml.dist",
             "tests/.gitignore"
         ]
+    },
+    "symfony/polyfill-intl-icu": {
+        "version": "v1.17.0"
     },
     "symfony/polyfill-intl-idn": {
         "version": "v1.13.1"

@@ -96,6 +96,7 @@ class BroadcastListenerHelper
             ],
             'averageValue' => [
                 'amount' => 100.00,
+                'currencyCode' => 'EUR',
             ],
             'averageCommissionType' => 'amount',
             'averageCommission' => 7.50,

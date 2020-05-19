@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Box\BoxCreateRequest;
 use App\Contract\Request\Internal\Box\BoxUpdateRequest;
@@ -81,6 +82,16 @@ class BoxManager
         $box->country = $productRequest->sellableCountry ? $productRequest->sellableCountry->code : null;
         $box->status = $productRequest->status;
 
+        $this->repository->save($box);
+    }
+
+    /**
+     * @throws BoxNotFoundException
+     */
+    public function insertPriceInfo(PriceInformationRequest $priceInformationRequest): void
+    {
+        $box = $this->repository->findOneByGoldenId($priceInformationRequest->product->id);
+        $box->currency = $priceInformationRequest->averageValue ? $priceInformationRequest->averageValue->currencyCode : null;
         $this->repository->save($box);
     }
 }

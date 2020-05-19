@@ -49,6 +49,11 @@ class Box
     public ?string $status;
 
     /**
+     * @ORM\Column(type="string", length=3, nullable=true)
+     */
+    public ?string $currency;
+
+    /**
      * @var Collection<int, BoxExperience>
      *
      * @ORM\OneToMany(targetEntity="BoxExperience", mappedBy="box")
