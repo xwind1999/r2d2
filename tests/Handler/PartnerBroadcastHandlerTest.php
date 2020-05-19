@@ -28,7 +28,7 @@ class PartnerBroadcastHandlerTest extends TestCase
         $partnerRequest->status = 'alive';
         $partnerRequest->currencyCode = 'USD';
         $partnerRequest->isChannelManagerEnabled = true;
-        $partnerRequest->partnerCeaseDate = new \DateTime('2020-10-10');
+        $partnerRequest->partnerCeaseDate = new \DateTime('2015-10-12T23:03:09.000000+0000');
 
         $logger = $this->prophesize(LoggerInterface::class);
         $manager = $this->prophesize(PartnerManager::class);
@@ -50,7 +50,7 @@ class PartnerBroadcastHandlerTest extends TestCase
         $partnerRequest->status = 'alive';
         $partnerRequest->currencyCode = 'USD';
         $partnerRequest->isChannelManagerEnabled = true;
-        $partnerRequest->partnerCeaseDate = new \DateTime('2020-10-10');
+        $partnerRequest->partnerCeaseDate = new \DateTime('2015-10-12T23:03:09.000000+0000');
 
         $logger = $this->prophesize(LoggerInterface::class);
         $manager = $this->prophesize(PartnerManager::class);

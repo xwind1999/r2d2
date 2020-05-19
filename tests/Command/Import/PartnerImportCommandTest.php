@@ -70,7 +70,7 @@ class PartnerImportCommandTest extends AbstractImportCommandTest
                 'Account_URN__c' => '16503',
                 'Type' => 'partner',
                 'CurrencyIsoCode' => 'EUR',
-                'CeaseDate__c' => '2015-06-04',
+                'CeaseDate__c' => '2015-10-12T23:03:09.000000+0000',
                 'Channel_Manager_Active__c' => '0',
             ],
         ]);

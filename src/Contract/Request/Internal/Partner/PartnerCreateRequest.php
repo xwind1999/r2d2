@@ -47,7 +47,7 @@ class PartnerCreateRequest implements RequestBodyInterface, ValidatableRequest
     /**
      * @Assert\Type(type="DateTime")
      *
-     * @JMS\Type("DateTime<'Y-m-d'>")
+     * @JMS\Type("DateTime")
      */
     public ?\DateTime $ceaseDate = null;
 }
