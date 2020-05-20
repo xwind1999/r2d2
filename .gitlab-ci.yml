@@ -73,6 +73,7 @@ pages:
     - phpmetrics
     - build-docs
   needs:
+    - build-docs
     - code-tests-aggregate
     - generate-api-reference
     - generate-extra-docs
