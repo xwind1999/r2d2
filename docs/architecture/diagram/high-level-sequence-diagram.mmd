@@ -1,0 +1,60 @@
+sequenceDiagram
+
+Note left of Beneficiary: JB Box Search Flow
+  Beneficiary->>+Jarvis Booking: Get Availability;
+  Jarvis Booking->>+R2D2: ;
+  R2D2->>-Jarvis Booking: Availability Data;
+  Jarvis Booking->>-Beneficiary: ;
+
+Note left of Beneficiary: JB Calendar Flow
+  Beneficiary->>+Jarvis Booking: Get Availability;
+  Jarvis Booking->>+R2D2: ;
+  R2D2->>R2D2: Enriches Availability;
+  R2D2->>-Jarvis Booking: Enriches Availability Data;
+  Jarvis Booking->>-Beneficiary: ;
+
+Note left of Beneficiary: JB Checkout Flow
+  Beneficiary->>+Jarvis Booking: Checkout;
+  Jarvis Booking->>+R2D2: Temporary Booking;
+  R2D2->>-Jarvis Booking: ;
+  Jarvis Booking->>+Payments: Retrieve Payment (if needed);
+  Payments->>Payments: (2 steps);
+  Payments->>-Jarvis Booking: ;
+  Jarvis Booking->>+R2D2: Confirm Temporary Booking;
+  R2D2->>R2D2: Updates Availability
+  R2D2->>-Jarvis Booking: ;
+  Jarvis Booking->>+VMS: Voucher Reservation;
+  VMS->>-Jarvis Booking: ;
+  Jarvis Booking->>-Beneficiary: Confirmation;
+
+Note left of Beneficiary: R2D2 Enriches Availability
+  R2D2->>R2D2: Calculates Availability;
+
+Note left of Beneficiary: Temporary Booking Expiration Flow
+  loop After 15 minutes
+    R2D2->>R2D2: Removes Temporary Booking / Updates Availability;
+  end
+
+Note left of Beneficiary: JB Booking Confirmation
+  Jarvis Booking->>+R2D2: Confirms Booking
+  R2D2->>R2D2: Confirms Temporary Booking / Updates Availability;
+  R2D2->>-Jarvis Booking: ;
+  R2D2--x+CMHub: Send Booking Information
+  CMHub->>-R2D2: ;
+  CMHub--x+CM: Send Booking Information;
+  CM->>-CMHub: ;
+
+Note left of Beneficiary: JB Booking Cancellation
+  Jarvis Booking->>+R2D2: Cancels Booking
+  R2D2->>R2D2: Cancels Booking / Updates Availability;
+  R2D2->>-Jarvis Booking: ;
+  R2D2--x+CMHub: Send Booking Cancellation
+  CMHub->>-R2D2: ;
+  CMHub--x+CM: Send Booking Cancellation;
+  CM->>-CMHub: ;
+
+Note left of Beneficiary: A&P Information Flow
+  CM->>CMHub: A&P Update;
+  CMHub->>+R2D2: A&P Update;
+  R2D2--xR2D2: Rewrites Availability;
+  R2D2->>-CMHub: ;

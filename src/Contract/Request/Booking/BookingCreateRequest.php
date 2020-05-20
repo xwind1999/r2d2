@@ -46,8 +46,7 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
     public Experience $experience;
 
     /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="3", max="3")
+     * @Assert\Currency()
      * @Assert\NotNull
      *
      * @JMS\Type("string")

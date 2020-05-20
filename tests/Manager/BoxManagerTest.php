@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Contract\Request\BroadcastListener\PriceInformation\Price;
+use App\Contract\Request\BroadcastListener\PriceInformation\Product;
+use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
 use App\Contract\Request\BroadcastListener\ProductRequest;
@@ -161,5 +164,32 @@ class BoxManagerTest extends TestCase
         $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
 
         $this->assertEmpty($manager->replace($productRequest));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::insertPriceInfo
+     */
+    public function testinsertPriceInfo()
+    {
+        $manager = new BoxManager($this->repository->reveal());
+        $productDTO = new Product();
+        $productDTO->id = '1264';
+        $priceDTO = new Price();
+        $priceDTO->amount = 12;
+        $priceDTO->currencyCode = 'EUR';
+        $priceInformationRequest = new PriceInformationRequest();
+        $priceInformationRequest->product = $productDTO;
+        $priceInformationRequest->averageValue = $priceDTO;
+        $priceInformationRequest->averageCommission = 5556;
+        $priceInformationRequest->averageCommissionType = 'amount';
+
+        $this->repository
+            ->findOneByGoldenId($priceInformationRequest->product->id)
+            ->shouldBeCalledOnce()
+            ->willReturn(($this->prophesize(Box::class))->reveal())
+        ;
+        $this->repository->save(Argument::type(Box::class))->shouldBeCalledOnce();
+        $this->assertEmpty($manager->insertPriceInfo($priceInformationRequest));
     }
 }

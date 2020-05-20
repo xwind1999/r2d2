@@ -29,8 +29,7 @@ class PartnerCreateRequest implements RequestBodyInterface, ValidatableRequest
     public string $status;
 
     /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="3", max="3")
+     * @Assert\Currency()
      *
      * @JMS\Type("string")
      */

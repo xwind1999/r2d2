@@ -1,36 +1,36 @@
 graph LR
 
 subgraph CMs
-BB8 -->|A&P|CMHub
-CM1 -->|A&P|CMHub
-CM2 -->|A&P|CMHub
-CM[...] -->|A&P|CMHub
-CMHub -->|Bookings| BB8
-CMHub -->|Bookings| CM1
-CMHub -->|Bookings| CM2
-CMHub -->|Bookings| CM
+BB8 -->|"[Push] A&P"|CMHub
+CM1 -->|"[Pull] A&P"|CMHub
+CM2 -->|"[Pull] A&P"|CMHub
+CM[...] -->|"[Push/Pull] A&P"|CMHub
+CMHub -->|"[Push] Bookings"| BB8
+CMHub -->|"[Pull] Bookings"| CM1
+CMHub -->|"[Pull] Bookings"| CM2
+CMHub -->|"[Pull/Push] Bookings"| CM
 end
 
-subgraph A&P Engine
+subgraph A&P&B Engine
 R2D2
 end
 
 subgraph Web
-JB[JarvisBooking] -->|Bookings| R2D2
-R2D2 -->|A&P| JB
+JB[JarvisBooking] -->|"[Push] Bookings"| R2D2
+R2D2 -->|"[Get] Enhanced A&P"| JB
 end
 
 subgraph Data Owners
-PRM -->|Partners| EAI
-PIM -->|Products| EAI
-R2D2 -->|Bookings| CMHub
-EAI -->|A&P| R2D2
-EAI -->|Products| R2D2
-EAI -->|Partners| R2D2
-EAI -->|Partners| CMHub
-EAI -->|Partners| BB8
-CMHub -->|A&P| EAI
-R2D2 -->|Rooms| CMHub
+PRM -->|"[Push] Partners"| EAI
+PIM -->|"[Push] Products"| EAI
+R2D2 -->|"[Push] Bookings"| CMHub
+EAI -->|"[Push] A&P"| R2D2
+EAI -->|"[Broadcast] Products"| R2D2
+EAI -->|"[Broadcast] Partners"| R2D2
+EAI -->|"[Broadcast] Partners"| CMHub
+EAI -->|"[Broadcast] Partners"| BB8
+CMHub -->|"[Push] A&P"| EAI
+R2D2 -->|"[Push] Rooms"| CMHub
 end
 
 style PIM fill:white,stroke:purple,stroke-width:4px
@@ -46,11 +46,11 @@ style CMHub fill:lightgray,stroke:black,stroke-width:4px
 linkStyle 0 stroke:red,stroke-width:4px;
 linkStyle 1 stroke:red,stroke-width:4px,stroke-dasharray:5,5;
 linkStyle 2 stroke:red,stroke-width:4px,stroke-dasharray:5,5;
-linkStyle 3 stroke:red,stroke-width:4px,stroke-dasharray:5,5;
-linkStyle 4 stroke:blue,stroke-width:4px,stroke-dasharray:5,5;
+linkStyle 3 stroke:red,stroke-width:4px,stroke-dasharray:5,5,opacity:0.3;
+linkStyle 4 stroke:blue,stroke-width:4px;
 linkStyle 5 stroke:blue,stroke-width:4px,stroke-dasharray:5,5;
 linkStyle 6 stroke:blue,stroke-width:4px,stroke-dasharray:5,5;
-linkStyle 7 stroke:blue,stroke-width:4px,stroke-dasharray:5,5;
+linkStyle 7 stroke:blue,stroke-width:4px,stroke-dasharray:5,5,opacity:0.3;
 linkStyle 8 stroke:blue,stroke-width:4px;
 linkStyle 9 stroke:red,stroke-width:4px;
 linkStyle 10 stroke:green,stroke-width:4px;

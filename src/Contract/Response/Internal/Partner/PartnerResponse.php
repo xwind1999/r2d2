@@ -38,8 +38,7 @@ abstract class PartnerResponse extends ResponseContract
     public string $status;
 
     /**
-     * @Assert\Type(type="string")
-     * @Assert\Length(min="3", max="3")
+     * @Assert\Currency()
      * @Assert\NotBlank
      *
      * @JMS\Type("string")

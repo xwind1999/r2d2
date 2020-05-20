@@ -18,4 +18,14 @@ class Price
      * @SWG\Property(example=10.50)
      */
     public int $amount;
+
+    /**
+     * @Assert\Currency()
+     * @Assert\NotBlank()
+     *
+     * @JMS\Type("string")
+     * @SWG\Property(example="EUR")
+     * @JMS\SerializedName("currencyCode")
+     */
+    public string $currencyCode;
 }
