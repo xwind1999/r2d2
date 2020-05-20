@@ -21,12 +21,13 @@ markdown_extensions:
 
 nav:
   - Home: README.md
-  - Local setup: readme/localDevelopment_README.md
-  - Project details: readme/projectDetails_README.md
-  - Development Guidelines: readme/DevelopmentGuidelines/README.md
-  - CI/CD: readme/ci-cd_README.md
-  - Test automation guidelines: readme/testAutomation_README.md
-  - Initial tools and libraries: readme/toolsAndLibraries_README.md
+  - Local setup: readme/local-development.md
+  - Diagrams and Flows: readme/diagrams-and-flows.md
+  - Project details: readme/project-details.md
+  - Development Guidelines: readme/development-guidelines.md
+  - CI/CD: readme/ci-cd.md
+  - Test automation guidelines: readme/test-automation.md
+  - Initial tools and libraries: readme/tools-and-libraries.md
   - Environments: environments.md
   - Exceptions and Error Codes: exceptions.md
   # DO NOT MODIFY ANYTHING BELOW THIS LINE
