@@ -65,7 +65,7 @@ build-docs:
 
 pages:
   stage: Publish Reports
-  needs:
+  dependencies:
     - mermaid-generate-images
     - Api-Tests
     - code-tests-aggregate

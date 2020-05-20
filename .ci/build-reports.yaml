@@ -24,6 +24,8 @@ phpmetrics:
 
 mermaid-generate-images:
   stage: Build Reports
+  needs:
+    - composer
   image:
     name: minlag/mermaid.cli:latest
     entrypoint: [""]
