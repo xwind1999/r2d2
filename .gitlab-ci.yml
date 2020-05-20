@@ -72,6 +72,7 @@ pages:
     - mermaid-generate-images
     - phpmetrics
     - build-docs
+    - schemaspy
   needs:
     - build-docs
     - code-tests-aggregate
@@ -79,6 +80,7 @@ pages:
     - generate-extra-docs
     - mermaid-generate-images
     - phpmetrics
+    - schemaspy
   script:
     - rm -rf public/
     - mv mkdocs public/
