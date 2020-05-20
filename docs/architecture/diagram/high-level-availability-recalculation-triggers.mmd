@@ -1,0 +1,30 @@
+graph LR
+
+subgraph Check R2D2 Availability
+  R2D2Availability --> TemporaryBookingsCalculation{HasNonExpiredTemporaryBooking}
+  TemporaryBookingsCalculation --> |No| AvailabilityWithTemporaryBookingsCalculated
+  TemporaryBookingsCalculation --> |Yes| ReduceAvailabilityWithTemporaryBookings
+  ReduceAvailabilityWithTemporaryBookings --> ReturnAvailability
+  AvailabilityWithTemporaryBookingsCalculated --> ReturnAvailability
+end
+
+subgraph Temporary Booking Creation
+  TemporaryBookingRequest --> CheckR2D2Availability{CheckR2D2Availability}
+  CheckR2D2Availability --> |Yes| CreatesNewTemporaryBooking
+  CreatesNewTemporaryBooking --> AcceptTemporaryBooking
+  CheckR2D2Availability --> |No| RejectsTemporaryBooking
+end
+
+subgraph Temporary Booking Expiration
+  TemporaryBooking --> ExpiredBooking
+end
+
+subgraph Booking Life Cycle
+  TemporaryBooking --> ConfirmedBooking
+  ConfirmedBooking --> CalculateAvailability
+
+  ConfirmedBooking --> CancelledBooking
+  CancelledBooking --> CalculateAvailability
+
+  CalculateAvailability --> SetNewR2D2Availability
+end
