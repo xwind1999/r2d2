@@ -66,12 +66,18 @@ build-docs:
 pages:
   stage: Publish Reports
   dependencies:
-    - mermaid-generate-images
-    - Api-Tests
     - code-tests-aggregate
-    - phpmetrics
     - generate-api-reference
+    - generate-extra-docs
+    - mermaid-generate-images
+    - phpmetrics
+  needs:
     - build-docs
+    - code-tests-aggregate
+    - generate-api-reference
+    - generate-extra-docs
+    - mermaid-generate-images
+    - phpmetrics
   script:
     - rm -rf public/
     - mv mkdocs public/
