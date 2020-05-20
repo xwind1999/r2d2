@@ -2,12 +2,12 @@
 
 ### Sequence Diagram for Relevant Flows
 
-![](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/docs/architecture/diagram/high-level-sequence-diagram.png)
+[![high level sequence diagram](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/docs/architecture/diagram/high-level-sequence-diagram.png)](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/docs/architecture/diagram/high-level-sequence-diagram.png)
 
 ### Interaction Flow for Relevant Data
 
-![](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/docs/architecture/diagram/high-level-interactions-overview.png)
+[![high level interactions overview](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/docs/architecture/diagram/high-level-interactions-overview.png)](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/docs/architecture/diagram/high-level-interactions-overview.png)
 
-### Triggers of Recalculation of Availability 
+### Availability Recalculation Triggers 
 
-![](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/docs/architecture/diagram/high-level-availability-recalculation-triggers.png)
+[![high level availability recalculation triggers](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/docs/architecture/diagram/high-level-availability-recalculation-triggers.png)](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/docs/architecture/diagram/high-level-availability-recalculation-triggers.png)

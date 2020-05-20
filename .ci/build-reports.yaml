@@ -35,7 +35,7 @@ mermaid-generate-images:
       - report/
   script:
     - mkdir -p report/html/docs/architecture/diagram/
-    - 'for flow in docs/architecture/diagram/*.mmd; do mmdc -p mmdc-config.json -i ${flow%%.*}.mmd -o ${flow%%.*}.png; done; mv docs/architecture/diagram/*.png report/html/docs/architecture/diagram/;'
+    - 'for flow in docs/architecture/diagram/*.mmd; do mmdc -p mmdc-config.json -i ${flow%%.*}.mmd -o ${flow%%.*}.png --width 8000 --height 6000; done; mv docs/architecture/diagram/*.png report/html/docs/architecture/diagram/;'
   only:
     - master
   except:
