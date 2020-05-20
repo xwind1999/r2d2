@@ -23,14 +23,16 @@ end
 subgraph Data Owners
 PRM -->|"[Push] Partners"| EAI
 PIM -->|"[Push] Products"| EAI
-R2D2 -->|"[Push] Bookings"| CMHub
+R2D2 -->|"[Push] Bookings"| EAI
+EAI -->|"[Broadcast] Bookings"| CMHub
 EAI -->|"[Push] A&P"| R2D2
 EAI -->|"[Broadcast] Products"| R2D2
 EAI -->|"[Broadcast] Partners"| R2D2
 EAI -->|"[Broadcast] Partners"| CMHub
 EAI -->|"[Broadcast] Partners"| BB8
 CMHub -->|"[Push] A&P"| EAI
-R2D2 -->|"[Push] Rooms"| CMHub
+R2D2 -->|"[Push] Rooms"| EAI
+EAI -->|"[Broadcast] Rooms"| CMHub
 end
 
 style PIM fill:white,stroke:purple,stroke-width:4px
@@ -56,10 +58,12 @@ linkStyle 9 stroke:red,stroke-width:4px;
 linkStyle 10 stroke:green,stroke-width:4px;
 linkStyle 11 stroke:purple,stroke-width:4px;
 linkStyle 12 stroke:blue,stroke-width:4px;
-linkStyle 13 stroke:red,stroke-width:4px;
-linkStyle 14 stroke:purple,stroke-width:4px,stroke-dasharray:5,5;
-linkStyle 15 stroke:green,stroke-width:4px,stroke-dasharray:5,5;
+linkStyle 13 stroke:blue,stroke-width:4px,stroke-dasharray:5,5;
+linkStyle 14 stroke:red,stroke-width:4px;
+linkStyle 15 stroke:purple,stroke-width:4px,stroke-dasharray:5,5;
 linkStyle 16 stroke:green,stroke-width:4px,stroke-dasharray:5,5;
 linkStyle 17 stroke:green,stroke-width:4px,stroke-dasharray:5,5;
-linkStyle 18 stroke:red,stroke-width:4px;
-linkStyle 19 stroke:brown,stroke-width:4px;
+linkStyle 18 stroke:green,stroke-width:4px,stroke-dasharray:5,5;
+linkStyle 19 stroke:red,stroke-width:4px;
+linkStyle 20 stroke:brown,stroke-width:4px;
+linkStyle 21 stroke:brown,stroke-width:4px,stroke-dasharray:5,5;
