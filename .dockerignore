@@ -1,0 +1,11 @@
+*
+!.ci/
+!bin/
+!config/
+!public/
+!src/
+!src-vendor-fixes/
+!vendor/
+!composer.json
+!composer.lock
+!symfony.lock

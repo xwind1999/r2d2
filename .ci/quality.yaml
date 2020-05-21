@@ -1,6 +1,6 @@
 variables:
   PACT_BROKER: http://pactbroker.production.smartbox.com:30336/
-  BASE_IMAGE_Stub: docker-registry.production.smartbox.com/millenium-falcon/r2d2mock
+  BASE_IMAGE_STUB: docker-registry.production.smartbox.com/millenium-falcon/r2d2mock
 
 unitTests:
   stage: Test
@@ -32,7 +32,6 @@ Api-Tests:
   script:
     - until bin/console doctrine:database:create -e test --if-not-exists --no-interaction; do sleep 1; done
     - bin/console doctrine:schema:update --force
-    - java -jar /schemaspy.jar -dp /mysql/mysql-connector-java-8.0.20.jar -t mysql -o report/html/db -u root -p admin123 -host mysql -db r2d2 -s r2d2 -vizjs -degree 2 -imageformat png
     - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
   artifacts:
     expire_in: 1 day
@@ -131,8 +130,8 @@ build-R2D2-stub-image:
     changes:
        - stub/sandbox/main.js
   script:
-    - docker build -t ${BASE_IMAGE_Stub}:latest -f stub/Dockerfile .
-    - docker push ${BASE_IMAGE_Stub}:latest
+    - docker build -t ${BASE_IMAGE_STUB}:latest stub/
+    - docker push ${BASE_IMAGE_STUB}:latest
 
 php-cs-fixer:
   stage: Test

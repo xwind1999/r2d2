@@ -1,5 +1,5 @@
 FROM deardooley/getsandbox
 
-COPY stub/sandbox /sandbox
+COPY sandbox /sandbox
 
 EXPOSE 8080
