@@ -11,7 +11,6 @@ variables:
     - >
       export COMMAND="
       export APP_IMAGE=${APP_IMAGE};
-      export HOSTNAME=\`hostname -s\`;
       docker pull ${APP_IMAGE};
       cd ${ENV_WORKDIR};
       ${DOCKER_COMPOSE_CMD} rm -fs && sudo ${ENV_WORKDIR}/pull.rb -g && ${DOCKER_COMPOSE_CMD} up -d;
@@ -19,7 +18,6 @@ variables:
     - ${CI_PROJECT_DIR}/.ci/tools/notify.sh || true
 #    - ${CI_PROJECT_DIR}/.ci/tools/notify-newrelic.sh "${ENVIRONMENT_NAME}" "${CONSOLE_NEWRELIC_BUILDING}" || true
     - ${CI_PROJECT_DIR}/.ci/tools/knife-nodes.sh "${ENVIRONMENT_NAME}" "${COMMAND}" -a ipaddress
-    - ${CI_PROJECT_DIR}/.ci/tools/knife-nodes.sh "${ENVIRONMENT_NAME}" "docker exec r2d2_api_1 sudo -u www-data composer dump-env prod"
     - ${CI_PROJECT_DIR}/.ci/tools/knife-master.sh "${ENVIRONMENT_NAME}" "docker exec r2d2_api_1 sudo -u www-data bin/console d:schema:update --force -n"
     - ${CI_PROJECT_DIR}/.ci/tools/knife-master.sh "${ENVIRONMENT_NAME}" "docker exec r2d2_api_1 sudo -u www-data bin/console d:m:m -n" || true
 #    - ${CI_PROJECT_DIR}/.ci/tools/notify-newrelic.sh "${ENVIRONMENT_NAME}" "${CONSOLE_NEWRELIC_COMPLETED}" || true
