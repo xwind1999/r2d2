@@ -1,7 +1,5 @@
 .idea/
 **/.DS_Store
-/docker-environment/.composer/*
-!/docker-environment/.composer/.gitkeep
 /report
 *.pyc
 
