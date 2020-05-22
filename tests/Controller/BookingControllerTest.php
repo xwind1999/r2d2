@@ -5,13 +5,20 @@ declare(strict_types=1);
 namespace App\Tests\Controller;
 
 use App\Contract\Request\Booking\BookingCreateRequest;
+use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Controller\BookingController;
 use App\Manager\BookingManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @coversDefaultClass \App\Controller\BookingController
+ */
 class BookingControllerTest extends TestCase
 {
+    /**
+     * @covers ::create
+     */
     public function testCreate()
     {
         $controller = new BookingController();
@@ -21,5 +28,20 @@ class BookingControllerTest extends TestCase
         $response = $controller->create($bookingCreateRequest, $manager->reveal());
 
         $this->assertInstanceOf(Response::class, $response);
+    }
+
+    /**
+     * @covers ::update
+     */
+    public function testUpdate()
+    {
+        $controller = new BookingController();
+        $bookingUpdateRequest = new BookingUpdateRequest();
+        $manager = $this->prophesize(BookingManager::class);
+        $manager->update($bookingUpdateRequest)->shouldBeCalled();
+        $response = $controller->update($bookingUpdateRequest, $manager->reveal());
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(204, $response->getStatusCode());
     }
 }

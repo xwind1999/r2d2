@@ -7,6 +7,7 @@ namespace App\Tests\Manager;
 use App\Contract\Request\Booking\BookingCreate\Room;
 use App\Contract\Request\Booking\BookingCreate\RoomDate;
 use App\Contract\Request\Booking\BookingCreateRequest;
+use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
 use App\Entity\Box;
@@ -16,8 +17,10 @@ use App\Entity\Experience;
 use App\Entity\Guest;
 use App\Entity\Partner;
 use App\Exception\Booking\BadPriceException;
+use App\Exception\Booking\BookingAlreadyInFinalStatusException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
+use App\Exception\Booking\InvalidBookingNewStatus;
 use App\Exception\Booking\InvalidExtraNightException;
 use App\Exception\Booking\NoIncludedRoomFoundException;
 use App\Exception\Booking\RoomsDontHaveSameDurationException;
@@ -98,6 +101,81 @@ class BookingManagerTest extends TestCase
             $this->moneyHelper->reveal(),
             $this->boxRepository->reveal()
         );
+    }
+
+    /**
+     * @dataProvider dataForUpdate
+     */
+    public function testUpdate(BookingUpdateRequest $bookingUpdateRequest, Booking $booking, ?string $exceptionClass, ?callable $asserts)
+    {
+        $this->repository->findOneByGoldenId($bookingUpdateRequest->bookingId)->willReturn($booking);
+        if ($exceptionClass) {
+            $this->expectException($exceptionClass);
+        }
+        $this->bookingManager->update($bookingUpdateRequest);
+        if ($asserts) {
+            $asserts($this, $booking);
+        }
+    }
+
+    public function dataForUpdate(): iterable
+    {
+        $bookingUpdateRequest = new BookingUpdateRequest();
+        $bookingUpdateRequest->bookingId = '123123123';
+        $bookingUpdateRequest->status = 'complete';
+        $booking = new Booking();
+        $booking->status = 'created';
+
+        yield 'happy path' => [
+            $bookingUpdateRequest,
+            $booking,
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist($booking)->shouldHaveBeenCalled();
+                $test->entityManager->flush()->shouldHaveBeenCalled();
+            },
+        ];
+
+        yield 'happy path updating voucher' => [
+            (function ($bookingUpdateRequest) {
+                $bookingUpdateRequest->voucher = '43214312';
+
+                return $bookingUpdateRequest;
+            })(clone $bookingUpdateRequest),
+            clone $booking,
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist($booking)->shouldHaveBeenCalled();
+                $test->entityManager->flush()->shouldHaveBeenCalled();
+                $test->assertEquals('43214312', $booking->voucher);
+            },
+        ];
+
+        yield 'booking in final status' => [
+            $bookingUpdateRequest,
+            (function ($booking) {
+                $booking->status = 'cancelled';
+
+                return $booking;
+            })(clone $booking),
+            BookingAlreadyInFinalStatusException::class,
+            null,
+        ];
+
+        yield 'invalid new booking status' => [
+            (function ($bookingUpdateRequest) {
+                $bookingUpdateRequest->status = 'created';
+
+                return $bookingUpdateRequest;
+            })(clone $bookingUpdateRequest),
+            (function ($booking) {
+                $booking->status = 'created';
+
+                return $booking;
+            })(clone $booking),
+            InvalidBookingNewStatus::class,
+            null,
+        ];
     }
 
     /**
