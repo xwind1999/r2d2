@@ -18,6 +18,9 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * @coversDefaultClass \App\Helper\Request\RequestBodyResolver
+ */
 class RequestBodyResolverTest extends TestCase
 {
     /**
@@ -38,6 +41,8 @@ class RequestBodyResolverTest extends TestCase
 
     /**
      * @dataProvider providerSupports
+     * @covers ::__construct
+     * @covers ::supports
      */
     public function testSupports(bool $supports, ?object $class): void
     {
@@ -49,6 +54,10 @@ class RequestBodyResolverTest extends TestCase
         $this->assertEquals($supports, $requestBodyResolver->supports($request, $argumentMetadata));
     }
 
+    /**
+     * @covers ::__construct
+     * @covers ::resolve
+     */
     public function testResolve(): void
     {
         $request = new Request([], [], [], [], [], [], 'aa');
@@ -65,6 +74,10 @@ class RequestBodyResolverTest extends TestCase
         $this->assertEquals([$class], $requestBodyResolver->resolve($request, $argumentMetadata));
     }
 
+    /**
+     * @covers ::__construct
+     * @covers ::resolve
+     */
     public function testResolveWithInvalidType(): void
     {
         $request = new Request([], [], [], [], [], [], 'aa');
@@ -77,6 +90,10 @@ class RequestBodyResolverTest extends TestCase
         $requestBodyResolver->resolve($request, $argumentMetadata);
     }
 
+    /**
+     * @covers ::__construct
+     * @covers ::resolve
+     */
     public function testResolveWithInvalidJson(): void
     {
         $request = new Request([], [], [], [], [], [], 'aa');
@@ -92,6 +109,26 @@ class RequestBodyResolverTest extends TestCase
         $requestBodyResolver->resolve($request, $argumentMetadata);
     }
 
+    /**
+     * @covers ::__construct
+     * @covers ::resolve
+     */
+    public function testResolveWithInvalidJsonField(): void
+    {
+        $request = new Request([], [], [], [], [], [], 'aa');
+        $this->expectException(UnprocessableEntityException::class);
+        $class = new class() {
+        };
+        $argumentMetadata = new ArgumentMetadata('test', get_class($class), false, false, null);
+        $requestBodyResolver = new RequestBodyResolver($this->serializer->reveal(), $this->validator->reveal());
+        $this->serializer->deserialize('aa', get_class($class), 'json')->willThrow(new \TypeError());
+        $requestBodyResolver->resolve($request, $argumentMetadata);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::resolve
+     */
     public function testResolveValidationWillFail(): void
     {
         $request = new Request([], [], [], [], [], [], 'aa');
