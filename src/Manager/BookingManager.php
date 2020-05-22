@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Contract\Request\Booking\BookingCreateRequest;
+use App\Contract\Request\Booking\BookingUpdateRequest;
+use App\DBAL\BookingStatus;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
 use App\Entity\Guest;
 use App\Exception\Booking\BadPriceException;
+use App\Exception\Booking\BookingAlreadyInFinalStatusException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
+use App\Exception\Booking\InvalidBookingNewStatus;
 use App\Exception\Booking\InvalidExtraNightException;
 use App\Exception\Booking\NoIncludedRoomFoundException;
 use App\Exception\Booking\RoomsDontHaveSameDurationException;
@@ -81,7 +85,7 @@ class BookingManager
         $booking->country = $box->country;
         $booking->startDate = $bookingCreateRequest->startDate;
         $booking->endDate = $bookingCreateRequest->endDate;
-        $booking->status = Booking::BOOKING_STATUS_CREATED;
+        $booking->status = BookingStatus::BOOKING_STATUS_CREATED;
         $booking->customerComment = $bookingCreateRequest->customerComment;
         $booking->components = $bookingCreateRequest->experience->components;
         $booking->cancelledAt = null;
@@ -207,5 +211,31 @@ class BookingManager
         $this->em->flush();
 
         return $booking;
+    }
+
+    public function update(BookingUpdateRequest $bookingUpdateRequest): void
+    {
+        $booking = $this->repository->findOneByGoldenId($bookingUpdateRequest->bookingId);
+
+        if (in_array($booking->status, BookingStatus::BOOKING_FINAL_STATUSES)) {
+            throw new BookingAlreadyInFinalStatusException();
+        }
+
+        if ($booking->status === $bookingUpdateRequest->status) {
+            throw new InvalidBookingNewStatus();
+        }
+
+        $booking->status = $bookingUpdateRequest->status;
+
+        if (null !== $bookingUpdateRequest->voucher) {
+            $booking->voucher = $bookingUpdateRequest->voucher;
+        }
+
+        $this->em->persist($booking);
+        $this->em->flush();
+
+        //TODO: send the booking to CMHub
+        //TODO: send the booking cancellation to CMHub
+        //maybe dispatch a "BookingUpdatedEvent" with the new status?
     }
 }

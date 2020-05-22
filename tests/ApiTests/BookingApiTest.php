@@ -49,14 +49,64 @@ class BookingApiTest extends ApiTestCase
 
         $payload = $this->defaultPayload(['bookingId' => $firstBookingId]);
         $this->testCreate($payload, function (BookingApiTest $test, $response) {
-            $responseContent = json_decode($response->getContent());
             $test->assertEquals(201, $response->getStatusCode());
         });
 
         $this->testCreate($payload, function (BookingApiTest $test, $response) {
-            $responseContent = json_decode($response->getContent());
             $test->assertEquals(409, $response->getStatusCode());
         });
+    }
+
+    public function testUpdate()
+    {
+        $bookingPayload = $this->defaultPayload();
+        $this->testCreate($bookingPayload, function (BookingApiTest $test, $response) {
+            $test->assertEquals(201, $response->getStatusCode());
+        });
+        $updatePayload = [
+            'bookingId' => $bookingPayload['bookingId'],
+            'status' => 'complete',
+        ];
+        $response = self::$bookingHelper->update($updatePayload);
+        $this->assertEquals(204, $response->getStatusCode());
+    }
+
+    public function testUpdateToTheSameStatusWillFail()
+    {
+        $bookingPayload = $this->defaultPayload();
+        $this->testCreate($bookingPayload, function (BookingApiTest $test, $response) {
+            $test->assertEquals(201, $response->getStatusCode());
+        });
+        $updatePayload = [
+            'bookingId' => $bookingPayload['bookingId'],
+            'status' => 'created',
+        ];
+        $response = self::$bookingHelper->update($updatePayload);
+        $this->assertEquals(422, $response->getStatusCode());
+    }
+
+    public function testUpdateToUnknownStatusWillFail()
+    {
+        $bookingPayload = $this->defaultPayload();
+        $this->testCreate($bookingPayload, function (BookingApiTest $test, $response) {
+            $test->assertEquals(201, $response->getStatusCode());
+        });
+        $updatePayload = [
+            'bookingId' => $bookingPayload['bookingId'],
+            'status' => '253235532352',
+        ];
+        $response = self::$bookingHelper->update($updatePayload);
+        $this->assertEquals(422, $response->getStatusCode());
+    }
+
+    public function testUpdateUnknownBookingWillFail()
+    {
+        $updatePayload = [
+            'bookingId' => 'aaaaaa',
+            'status' => 'complete',
+        ];
+        $response = self::$bookingHelper->update($updatePayload);
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     /**

@@ -19,9 +19,6 @@ class Booking
 {
     use TimestampableEntityTrait;
 
-    public const BOOKING_STATUS_CREATED = 'created';
-    public const BOOKING_STATUS_COMPLETE = 'complete';
-
     /**
      * @ORM\Id
      * @ORM\Column(type="uuid_binary_ordered_time", unique=true)
@@ -74,7 +71,7 @@ class Booking
     public ?string $country = null;
 
     /**
-     * @ORM\Column(type="string", length=30)
+     * @ORM\Column(type="booking_status", length=30)
      */
     public string $status;
 
