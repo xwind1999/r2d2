@@ -71,6 +71,20 @@ class BookingApiTest extends ApiTestCase
         $this->assertEquals(204, $response->getStatusCode());
     }
 
+    public function testUpdateToCancelled()
+    {
+        $bookingPayload = $this->defaultPayload();
+        $this->testCreate($bookingPayload, function (BookingApiTest $test, $response) {
+            $test->assertEquals(201, $response->getStatusCode());
+        });
+        $updatePayload = [
+            'bookingId' => $bookingPayload['bookingId'],
+            'status' => 'cancelled',
+        ];
+        $response = self::$bookingHelper->update($updatePayload);
+        $this->assertEquals(204, $response->getStatusCode());
+    }
+
     public function testUpdateToTheSameStatusWillFail()
     {
         $bookingPayload = $this->defaultPayload();
