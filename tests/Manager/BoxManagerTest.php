@@ -123,10 +123,8 @@ class BoxManagerTest extends TestCase
     public function testReplace()
     {
         $manager = new BoxManager($this->repository->reveal());
-        $brand = new Brand();
-        $brand->code = 'SBX';
-        $country = new Country();
-        $country->code = 'FR';
+        $brand = Brand::create('SBX');
+        $country = Country::create('FR');
         $productRequest = new ProductRequest();
         $productRequest->id = '1234';
         $productRequest->sellableBrand = $brand;
@@ -146,10 +144,8 @@ class BoxManagerTest extends TestCase
     public function testReplaceCatchesBoxNotFoundException()
     {
         $manager = new BoxManager($this->repository->reveal());
-        $brand = new Brand();
-        $brand->code = 'SBX';
-        $country = new Country();
-        $country->code = 'FR';
+        $brand = Brand::create('SBX');
+        $country = Country::create('FR');
         $productRequest = new ProductRequest();
         $productRequest->id = '1234';
         $productRequest->sellableBrand = $brand;

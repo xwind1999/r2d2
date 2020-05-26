@@ -32,7 +32,7 @@ class PartnerImportCommand extends AbstractImportCommand
             $partnerRequest->status = $record['Type'];
             $partnerRequest->currencyCode = $record['CurrencyIsoCode'];
             $partnerRequest->isChannelManagerEnabled = (bool) ($record['Channel_Manager_Active__c']);
-            $partnerRequest->partnerCeaseDate = new \DateTime($record['CeaseDate__c']);
+            $partnerRequest->partnerCeaseDate = $record['CeaseDate__c'] ? new \DateTime($record['CeaseDate__c']) : null;
 
             $errors = $this->validator->validate($partnerRequest);
             if ($errors->count() > 0) {

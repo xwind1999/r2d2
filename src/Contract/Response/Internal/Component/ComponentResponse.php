@@ -53,7 +53,7 @@ abstract class ComponentResponse extends ResponseContract
      *
      * @JMS\Type("string")
      */
-    public string $description;
+    public ?string $description = null;
 
     /**
      * @Assert\Type(type="integer")

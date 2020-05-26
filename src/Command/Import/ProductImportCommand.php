@@ -19,14 +19,14 @@ class ProductImportCommand extends AbstractImportCommand
         'name',
         'description',
         'universe',
-        'is_sellable',
-        'is_reservable',
-        'partner',
         'sellable_brand',
         'sellable_country',
+        'partner',
         'status',
         'type',
         'product_people_number',
+        'is_reservable',
+        'is_sellable',
         'voucher_expiration_duration',
     ];
 
@@ -34,31 +34,20 @@ class ProductImportCommand extends AbstractImportCommand
     {
         foreach ($records as $record) {
             $productRequest = new ProductRequest();
-            $universe = new Universe();
-            $universe->id = $record['Universe'];
 
-            $partner = new Partner();
-            $partner->id = $record['Partner'];
-
-            $sellableBrand = new Brand();
-            $sellableBrand->code = $record['SellableBrand'];
-
-            $sellableCountry = new Country();
-            $sellableCountry->code = $record['SellableCountry'];
-
-            $productRequest->id = $record['Id'];
-            $productRequest->name = $record['Name'];
-            $productRequest->description = $record['Description'];
-            $productRequest->universe = $universe;
-            $productRequest->isSellable = (bool) $record['IsSellable'];
-            $productRequest->isReservable = (bool) $record['IsReservable'];
-            $productRequest->partner = $partner;
-            $productRequest->sellableBrand = $sellableBrand;
-            $productRequest->sellableCountry = $sellableCountry;
-            $productRequest->status = $record['Status'];
-            $productRequest->type = $record['Type'];
-            $productRequest->productPeopleNumber = (int) $record['ProductPeopleNumber'];
-            $productRequest->voucherExpirationDuration = (int) $record['VoucherExpirationDuration'];
+            $productRequest->id = $record['id'];
+            $productRequest->name = $record['name'];
+            $productRequest->description = strlen($record['description']) > 1 ? $record['description'] : ' ';
+            $productRequest->universe = !empty($record['universe']) ? Universe::create($record['universe']) : null;
+            $productRequest->partner = !empty($record['partner']) ? Partner::create($record['partner']) : null;
+            $productRequest->sellableBrand = !empty($record['sellableBrand']) ? Brand::create($record['sellableBrand']) : null;
+            $productRequest->sellableCountry = !empty($record['sellableCountryCode']) ? Country::create($record['sellableCountry']) : null;
+            $productRequest->isSellable = (bool) $record['is_sellable'];
+            $productRequest->isReservable = (bool) $record['is_reservable'];
+            $productRequest->status = $record['status'];
+            $productRequest->type = $record['type'];
+            $productRequest->productPeopleNumber = (int) $record['product_people_number'];
+            $productRequest->voucherExpirationDuration = (int) $record['voucher_expiration_duration'];
 
             $errors = $this->validator->validate($productRequest);
             if ($errors->count() > 0) {
