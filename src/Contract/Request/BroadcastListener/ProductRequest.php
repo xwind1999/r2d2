@@ -39,7 +39,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      *
      * @JMS\Type("string")
      */
-    public string $description;
+    public ?string $description = null;
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Universe")

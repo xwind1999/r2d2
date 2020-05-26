@@ -77,14 +77,10 @@ class ComponentBroadcastSubscriberTest extends TestCase
      */
     public function testHandleMessageCatchesException(\Exception $exception): void
     {
-        $partner = new Partner();
-        $partner->id = '4321';
-        $universe = new Universe();
-        $universe->id = 'universe';
-        $country = new Country();
-        $country->code = 'FR';
-        $brand = new Brand();
-        $brand->code = 'SBX';
+        $partner = Partner::create('4321');
+        $universe = Universe::create('universe');
+        $country = Country::create('FR');
+        $brand = Brand::create('SBX');
         $productRequest = new ProductRequest();
         $productRequest->id = '1234';
         $productRequest->partner = $partner;

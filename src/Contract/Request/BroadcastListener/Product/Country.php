@@ -17,4 +17,12 @@ class Country
      * @JMS\Type("string")
      */
     public string $code;
+
+    public static function create(string $code): Country
+    {
+        $country = new Country();
+        $country->code = $code;
+
+        return $country;
+    }
 }

@@ -41,10 +41,8 @@ class BroadcastListenerControllerTest extends TestCase
      */
     public function testHandleProductsSuccessfully()
     {
-        $universe = new Universe();
-        $universe->id = 'product universe';
-        $partner = new Partner();
-        $partner->id = '123456';
+        $universe = Universe::create('product universe');
+        $partner = Partner::create('123456');
         $productRequest = new ProductRequest();
         $productRequest->id = '123456';
         $productRequest->name = 'product name';

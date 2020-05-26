@@ -17,4 +17,12 @@ class Partner
      * @JMS\Type("string")
      */
     public string $id;
+
+    public static function create(string $id): Partner
+    {
+        $partner = new Partner();
+        $partner->id = $id;
+
+        return $partner;
+    }
 }
