@@ -50,9 +50,9 @@ class Component
     public string $name;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
-    public string $description;
+    public ?string $description = null;
 
     /**
      * @ORM\Column(type="integer", nullable=true)

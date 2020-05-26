@@ -17,4 +17,12 @@ class Brand
      * @JMS\Type("string")
      */
     public string $code;
+
+    public static function create(string $code): Brand
+    {
+        $brand = new Brand();
+        $brand->code = $code;
+
+        return $brand;
+    }
 }

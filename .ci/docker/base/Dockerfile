@@ -45,8 +45,6 @@ COPY ./runit/runit /etc/runit
 RUN mkdir /service; \
     chmod 777 /service
 
-COPY ./start.sh ./start-crond.sh ./start-command.sh  /
-
 COPY ./nginx/default.conf /etc/nginx/conf.d
 COPY ./nginx/nginx.conf /etc/nginx
 COPY ./php/php-fpm.conf /etc/php7
@@ -54,5 +52,3 @@ COPY ./php/www.conf /etc/php7/php-fpm.d
 COPY ./load-key.sh /
 
 WORKDIR /app
-
-CMD ["/start.sh"]

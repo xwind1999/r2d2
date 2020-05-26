@@ -35,7 +35,7 @@ mermaid-generate-images:
       - report/
   script:
     - mkdir -p report/html/docs/architecture/diagram/
-    - 'for flow in docs/architecture/diagram/*.mmd; do mmdc -p mmdc-config.json -i ${flow%%.*}.mmd -o ${flow%%.*}.png; done; mv docs/architecture/diagram/*.png report/html/docs/architecture/diagram/;'
+    - 'for flow in docs/architecture/diagram/*.mmd; do mmdc -p mmdc-config.json -i ${flow%%.*}.mmd -o ${flow%%.*}.png --width 8000 --height 6000; done; mv docs/architecture/diagram/*.png report/html/docs/architecture/diagram/;'
   only:
     - master
   except:
@@ -54,6 +54,28 @@ code-tests-aggregate:
     paths:
       - report/
       - openapi.json
+
+schemaspy:
+  stage: Build Reports
+  image: ${VALIDATION_IMAGE}
+  needs:
+    - composer
+  services:
+    - name: mysql:8.0
+      alias: mysql
+  variables:
+    MYSQL_DATABASE: r2d2
+    MYSQL_ROOT_PASSWORD: admin123
+    MYSQL_USER: root
+    DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_ROOT_PASSWORD}@mysql/${MYSQL_DATABASE}?serverVersion=8.0"
+  script:
+    - until bin/console doctrine:database:create -e test --if-not-exists --no-interaction; do sleep 1; done
+    - bin/console doctrine:schema:update --force
+    - java -jar /schemaspy.jar -dp /mysql/mysql-connector-java-8.0.20.jar -t mysql -o report/html/db -u root -p admin123 -host mysql -db r2d2 -s r2d2 -vizjs -degree 2 -imageformat png
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - report/html/db
 
 generate-extra-docs:
   stage: Build Reports

@@ -1,9 +1,0 @@
-#!/bin/sh
-
-(
-echo -e "\e[41m\e[5mDEPRECATED: PLEASE USE DEFUSE INSTEAD OF THIS"
-cd $(pwd)/docker-environment;
-export USER="$(id -u):$(id -g)"
-/usr/bin/env python2.7 scripts/main.py $@
-
-)

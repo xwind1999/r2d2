@@ -27,7 +27,20 @@ class BookingHelper
      */
     public function create(array $payload)
     {
-        $this->client->request('POST', $this->baseUrl.self::API_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+        return $this->request('POST', $this->baseUrl.self::API_BASE_URL, $payload);
+    }
+
+    /**
+     * @return JsonResponse|object
+     */
+    public function update(array $payload)
+    {
+        return $this->request('PATCH', $this->baseUrl.self::API_BASE_URL, $payload);
+    }
+
+    public function request(string $method, string $url, array $body)
+    {
+        $this->client->request($method, $url, [], [], [], $this->serializer->serialize($body, 'json'));
 
         return $this->client->getResponse();
     }

@@ -30,10 +30,8 @@ class ProductBroadcastHandlerTest extends TestCase
      */
     public function testHandlerMessageBoxType(): void
     {
-        $country = new Country();
-        $country->code = 'FR';
-        $brand = new Brand();
-        $brand->code = 'SBX';
+        $country = Country::create('FR');
+        $brand = Brand::create('SBX');
         $productRequest = new ProductRequest();
         $productRequest->id = '1234';
         $productRequest->sellableBrand = $brand;
@@ -65,14 +63,10 @@ class ProductBroadcastHandlerTest extends TestCase
      */
     public function testHandlerMessageThrowsNonExistentTypeResolverException(): void
     {
-        $partner = new Partner();
-        $partner->id = '4321';
-        $universe = new Universe();
-        $universe->id = 'universe';
-        $country = new Country();
-        $country->code = 'FR';
-        $brand = new Brand();
-        $brand->code = 'SBX';
+        $partner = Partner::create('4321');
+        $universe = Universe::create('universe');
+        $country = Country::create('FR');
+        $brand = Brand::create('SBX');
         $productRequest = new ProductRequest();
         $productRequest->id = '1234';
         $productRequest->name = 'box name';

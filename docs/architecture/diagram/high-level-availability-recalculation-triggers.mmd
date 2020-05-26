@@ -1,29 +1,31 @@
-graph LR
+graph TD
 
 subgraph Check R2D2 Availability
-  R2D2Availability --> TemporaryBookingsCalculation{HasNonExpiredTemporaryBooking}
+  CurrentR2D2Availability --> TemporaryBookingsCalculation{HasNonExpiredTemporaryBooking}
   TemporaryBookingsCalculation --> |No| AvailabilityWithTemporaryBookingsCalculated
   TemporaryBookingsCalculation --> |Yes| ReduceAvailabilityWithTemporaryBookings
-  ReduceAvailabilityWithTemporaryBookings --> ReturnAvailability
-  AvailabilityWithTemporaryBookingsCalculated --> ReturnAvailability
-end
+  ReduceAvailabilityWithTemporaryBookings --> AvailabilityWithTemporaryBookingsCalculated
+  AvailabilityWithTemporaryBookingsCalculated --> NewBookingsBookingsCalculation{HasNewConfirmedBooking}
 
-subgraph Temporary Booking Creation
-  TemporaryBookingRequest --> CheckR2D2Availability{CheckR2D2Availability}
-  CheckR2D2Availability --> |Yes| CreatesNewTemporaryBooking
-  CreatesNewTemporaryBooking --> AcceptTemporaryBooking
-  CheckR2D2Availability --> |No| RejectsTemporaryBooking
-end
-
-subgraph Temporary Booking Expiration
-  TemporaryBooking --> ExpiredBooking
+  NewBookingsBookingsCalculation --> |No| AvailabilityWithNewBookingsCalculated
+  NewBookingsBookingsCalculation --> |Yes| ReduceAvailabilityWithNewBookings
+  ReduceAvailabilityWithNewBookings --> AvailabilityWithNewBookingsCalculated
+  AvailabilityWithNewBookingsCalculated --> ReturnNewR2D2Availability
 end
 
 subgraph Booking Life Cycle
-  TemporaryBooking --> ConfirmedBooking
+  TemporaryBookingRequest --> CheckR2D2Availability{CheckR2D2Availability}
+  CheckR2D2Availability --> |Yes| CreatesNewTemporaryBooking
+  CreatesNewTemporaryBooking --> TemporaryBooking
+  CheckR2D2Availability --> |No| RejectsBooking
+
+  TemporaryBooking --> ExpiredBooking
+  ExpiredBooking --> |Confirm Expired Temp Booking| TemporaryBookingRequest
+
+  TemporaryBooking --> |Confirm Temp Booking| ConfirmedBooking
   ConfirmedBooking --> CalculateAvailability
 
-  ConfirmedBooking --> CancelledBooking
+  ConfirmedBooking --> |Cancel Booking| CancelledBooking
   CancelledBooking --> CalculateAvailability
 
   CalculateAvailability --> SetNewR2D2Availability

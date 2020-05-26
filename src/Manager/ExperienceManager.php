@@ -100,7 +100,7 @@ class ExperienceManager
         $experience->partner = $partner;
         $experience->partnerGoldenId = $productRequest->partner ? $productRequest->partner->id : '';
         $experience->name = $productRequest->name;
-        $experience->description = $productRequest->description;
+        $experience->description = $productRequest->description ?? ' ';
         $experience->peopleNumber = $productRequest->productPeopleNumber;
         $experience->duration = $productRequest->voucherExpirationDuration;
 
