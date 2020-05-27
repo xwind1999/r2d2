@@ -2,6 +2,6 @@ monolog:
     handlers:
         main:
             type: stream
-            path: "%kernel.logs_dir%/r2d2.log"
+            path: "%kernel.logs_dir%/%env(LOG_FILE)%"
             formatter: Monolog\Formatter\LogstashFormatter
             channels: ['app', 'messenger', 'php', 'request', 'console']
