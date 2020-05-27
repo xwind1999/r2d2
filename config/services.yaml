@@ -9,6 +9,7 @@ parameters:
         auth_basic:
             user: '%env(CMHUB_USER)%'
             password: '%env(CMHUB_PASSWORD)%'
+    feature_flags.availability_convert: '%env(AVAILABILITY_CONVERT)%'
 
 services:
     # default configuration for services in *this* file
@@ -80,6 +81,12 @@ services:
     App\Helper\Serializer\FloatToIntegerHandler:
         tags:
             - { name: jms_serializer.subscribing_handler }
+
+    App\Helper\Feature\AvailabilityConvertFlag:
+        arguments:
+            - '%feature_flags.availability_convert%'
+
+    App\Helper\Feature\FeatureInterface $availabilityConvertFlag: '@App\Helper\Feature\AvailabilityConvertFlag'
 
     App\Http\HttpClientFactory: ~
 

@@ -46,6 +46,14 @@ class PartnerManager
     /**
      * @throws EntityNotFoundException
      */
+    public function getOneByGoldenId(string $goldenId): Partner
+    {
+        return $this->repository->findOneByGoldenId($goldenId);
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     */
     public function delete(string $uuid): void
     {
         $partner = $this->get($uuid);

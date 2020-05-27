@@ -157,4 +157,20 @@ class PartnerManagerTest extends TestCase
 
         $this->assertEmpty($manager->replace($partnerRequest));
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getOneByGoldenId
+     */
+    public function testGetOneByGoldenId()
+    {
+        $partner = new Partner();
+        $partnerGoldenId = '1234';
+        $partner->goldenId = $partnerGoldenId;
+        $this->repository->findOneByGoldenId(Argument::any())->willReturn($partner);
+        $manager = new PartnerManager($this->repository->reveal());
+        $manager->getOneByGoldenId($partnerGoldenId);
+
+        $this->repository->findOneByGoldenId($partnerGoldenId)->shouldBeCalledOnce();
+    }
 }
