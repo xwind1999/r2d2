@@ -55,4 +55,18 @@ class ExperienceRepository extends ServiceEntityRepository
 
         return $experience;
     }
+
+    public function findListExperienceIdsWithInactiveChannelManagerPartner(array $experienceIds): array
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb
+            ->join('e.partner', 'ep')
+            ->select('e.goldenId')
+            ->where($qb->expr()->in('e.goldenId', $experienceIds))
+            ->andWhere('ep.isChannelManagerActive = 0')
+            ->indexBy('e', 'e.goldenId')
+        ;
+
+        return $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+    }
 }

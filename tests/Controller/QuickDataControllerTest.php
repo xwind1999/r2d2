@@ -82,11 +82,13 @@ class QuickDataControllerTest extends TestCase
     public function testAvailabilityPricePeriod()
     {
         $prestId = 5678;
+        $experienceId = 1234;
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
         $availabilityPricePeriodRequest = new AvailabilityPricePeriodRequest();
         $availabilityPricePeriodRequest->prestId = $prestId;
+        $availabilityPricePeriodRequest->experienceId = $experienceId;
         $availabilityPricePeriodRequest->dateFrom = $dateFrom;
         $availabilityPricePeriodRequest->dateTo = $dateTo;
         $legacyAvailabilityProvider = $this->prophesize(LegacyAvailabilityProvider::class);
@@ -94,7 +96,7 @@ class QuickDataControllerTest extends TestCase
         $controller = new QuickDataController();
 
         $qdResponse = $this->prophesize(QuickDataResponse::class);
-        $legacyAvailabilityProvider->getAvailabilityPriceForExperience($prestId, $dateFrom, $dateTo)->willReturn($qdResponse->reveal());
+        $legacyAvailabilityProvider->getAvailabilityPriceForExperience($experienceId, $prestId, $dateFrom, $dateTo)->willReturn($qdResponse->reveal());
         $response = $controller->availabilityPricePeriod($availabilityPricePeriodRequest, $legacyAvailabilityProvider->reveal());
 
         $this->assertInstanceOf(QuickDataResponse::class, $response);

@@ -213,4 +213,36 @@ class ExperienceManagerTest extends TestCase
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalledOnce();
         $this->assertEmpty($manager->insertPriceInfo($priceInformationRequest));
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getIdsListWithPartnerChannelManagerInactive
+     */
+    public function testGetIdsListWithPartnerChannelManagerInactive()
+    {
+        $expIds = [
+            '1234', '4321', '1111',
+        ];
+        $this->repository->findListExperienceIdsWithInactiveChannelManagerPartner(Argument::any())->willReturn($expIds);
+        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $manager->getIdsListWithPartnerChannelManagerInactive($expIds);
+
+        $this->repository->findListExperienceIdsWithInactiveChannelManagerPartner($expIds)->shouldBeCalledOnce();
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getOneByGoldenId
+     */
+    public function testGetOneByGoldenId()
+    {
+        $experience = new Experience();
+        $expId = '1234';
+        $experience->goldenId = $expId;
+        $this->repository->findOneByGoldenId(Argument::any())->willReturn($experience);
+        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $manager->getOneByGoldenId($expId);
+
+        $this->repository->findOneByGoldenId($expId)->shouldBeCalledOnce();
+    }
 }

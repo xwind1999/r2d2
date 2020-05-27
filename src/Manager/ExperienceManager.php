@@ -56,6 +56,14 @@ class ExperienceManager
     /**
      * @throws EntityNotFoundException
      */
+    public function getOneByGoldenId(string $goldenId): Experience
+    {
+        return $this->repository->findOneByGoldenId($goldenId);
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     */
     public function delete(string $uuid): void
     {
         $experience = $this->get($uuid);
@@ -120,5 +128,10 @@ class ExperienceManager
         $experience->priceUpdatedAt = new \DateTime();
 
         $this->repository->save($experience);
+    }
+
+    public function getIdsListWithPartnerChannelManagerInactive(array $experienceIds): array
+    {
+        return $this->repository->findListExperienceIdsWithInactiveChannelManagerPartner($experienceIds);
     }
 }
