@@ -106,3 +106,9 @@ services:
         resource: '../src/Logger/Processor'
         tags:
             - { name: monolog.processor }
+
+    App\Logger\Processor\EnvironmentNameProcessor:
+        arguments:
+            - '%env(ENVIRONMENT_NAME)'
+        tags:
+            - { name: monolog.processor }
