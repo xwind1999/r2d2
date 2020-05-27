@@ -109,6 +109,6 @@ services:
 
     App\Logger\Processor\EnvironmentNameProcessor:
         arguments:
-            - '%env(ENVIRONMENT_NAME)'
+            - '%env(ENVIRONMENT_NAME)%'
         tags:
             - { name: monolog.processor }
