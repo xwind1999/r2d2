@@ -10,7 +10,7 @@ framework:
                         broadcast-listeners-partner:
                             binding_keys: [broadcast-listeners-partner]
                             arguments:
-                                x-queue-type: classic
+                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-partner
@@ -26,7 +26,7 @@ framework:
                         broadcast-listeners-product:
                             binding_keys: [broadcast-listeners-product]
                             arguments:
-                                x-queue-type: classic
+                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-product
@@ -42,7 +42,7 @@ framework:
                         broadcast-listeners-product-relationship:
                             binding_keys: [broadcast-listeners-product-relationship]
                             arguments:
-                                x-queue-type: classic
+                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-product-relationship
@@ -58,7 +58,7 @@ framework:
                         broadcast-listeners-price-information:
                             binding_keys: [broadcast-listeners-price-information]
                             arguments:
-                                x-queue-type: classic
+                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-price-information
@@ -74,7 +74,7 @@ framework:
                         failed-broadcast-listeners:
                             binding_keys: [failed-broadcast-listeners]
                             arguments:
-                                x-queue-type: classic
+                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: failed-broadcast-listeners
