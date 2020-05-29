@@ -9,6 +9,7 @@ parameters:
         auth_basic:
             user: '%env(CMHUB_USER)%'
             password: '%env(CMHUB_PASSWORD)%'
+    feature_flags.availability_convert: '%env(AVAILABILITY_CONVERT)%'
 
 services:
     # default configuration for services in *this* file
@@ -81,6 +82,12 @@ services:
         tags:
             - { name: jms_serializer.subscribing_handler }
 
+    App\Helper\Feature\AvailabilityConvertFlag:
+        arguments:
+            - '%feature_flags.availability_convert%'
+
+    App\Helper\Feature\FeatureInterface $availabilityConvertFlag: '@App\Helper\Feature\AvailabilityConvertFlag'
+
     App\Http\HttpClientFactory: ~
 
     App\QuickData\QuickData:
@@ -97,5 +104,11 @@ services:
 
     App\Logger\Processor\:
         resource: '../src/Logger/Processor'
+        tags:
+            - { name: monolog.processor }
+
+    App\Logger\Processor\EnvironmentNameProcessor:
+        arguments:
+            - '%env(ENVIRONMENT_NAME)%'
         tags:
             - { name: monolog.processor }

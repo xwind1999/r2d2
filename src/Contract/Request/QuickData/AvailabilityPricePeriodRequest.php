@@ -16,6 +16,16 @@ class AvailabilityPricePeriodRequest implements RequestQueryInterface, Validatab
      * @Assert\Positive()
      * @Assert\NotBlank
      *
+     * @JMS\SerializedName("ExperienceId")
+     * @JMS\Type("integer")
+     */
+    public int $experienceId;
+
+    /**
+     * @Assert\Type(type="integer")
+     * @Assert\Positive()
+     * @Assert\NotBlank
+     *
      * @JMS\SerializedName("prestid")
      * @JMS\Type("integer")
      */

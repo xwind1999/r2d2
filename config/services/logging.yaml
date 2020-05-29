@@ -19,6 +19,7 @@ services:
     clogger.messenger.middlewarestack:
         class: Clogger\MiddlewareStack
         arguments:
+            - '@App\Helper\Logger\ContextMessageNormalizer'
             - '@App\Helper\Logger\Messenger\MessageNormalizer'
 
     logger:

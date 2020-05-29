@@ -152,6 +152,13 @@ class QuickDataController
      *     description="Ignored"
      * )
      * @SWG\Parameter(
+     *     name="ExperienceId",
+     *     in="query",
+     *     type="integer",
+     *     format="integer",
+     *     description="Experience ID (example: 88826)"
+     * )
+     * @SWG\Parameter(
      *     name="prestid",
      *     in="query",
      *     type="integer",
@@ -178,8 +185,10 @@ class QuickDataController
      */
     public function availabilityPricePeriod(AvailabilityPricePeriodRequest $availabilityPricePeriodRequest, LegacyAvailabilityProvider $legacyAvailabilityProvider): QuickDataResponse
     {
-        $quickDataResponse = $legacyAvailabilityProvider->getAvailabilityPriceForExperience($availabilityPricePeriodRequest->prestId, $availabilityPricePeriodRequest->dateFrom, $availabilityPricePeriodRequest->dateTo);
-
-        return $quickDataResponse;
+        return $legacyAvailabilityProvider->getAvailabilityPriceForExperience(
+            $availabilityPricePeriodRequest->experienceId,
+            $availabilityPricePeriodRequest->prestId,
+            $availabilityPricePeriodRequest->dateFrom,
+            $availabilityPricePeriodRequest->dateTo);
     }
 }
