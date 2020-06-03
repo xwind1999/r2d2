@@ -13,7 +13,7 @@ class BoxExperience
 {
     /**
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Box")
+     * @ORM\ManyToOne(targetEntity="Box", inversedBy="boxExperience")
      * @ORM\JoinColumn(name="box_uuid", referencedColumnName="uuid", nullable=false)
      */
     public Box $box;
@@ -25,7 +25,7 @@ class BoxExperience
 
     /**
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Experience")
+     * @ORM\ManyToOne(targetEntity="Experience", inversedBy="boxExperience")
      * @ORM\JoinColumn(name="experience_uuid", referencedColumnName="uuid", nullable=false)
      */
     public Experience $experience;

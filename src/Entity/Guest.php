@@ -24,7 +24,7 @@ class Guest
     public UuidInterface $uuid;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Booking")
+     * @ORM\ManyToOne(targetEntity="Booking", inversedBy="guest")
      * @ORM\JoinColumn(name="booking_uuid", referencedColumnName="uuid", nullable=false)
      */
     public Booking $booking;

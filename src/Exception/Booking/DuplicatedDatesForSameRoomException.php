@@ -9,5 +9,5 @@ use App\Exception\Http\UnprocessableEntityException;
 class DuplicatedDatesForSameRoomException extends UnprocessableEntityException
 {
     protected const MESSAGE = 'Duplicated dates for same room';
-    protected const CODE = 1300005;
+    protected const CODE = 1300009;
 }

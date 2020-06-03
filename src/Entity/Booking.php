@@ -112,17 +112,22 @@ class Booking
      *
      * @ORM\OneToMany(targetEntity="BookingDate", mappedBy="booking", cascade={"persist", "remove"})
      */
-    public Collection $dates;
+    public Collection $bookingDate;
 
     /**
      * @ORM\Column(type="json")
      */
     public array $components;
 
+    /**
+     * @ORM\Column(name="expired_at", type="datetime", nullable=true)
+     */
+    public \DateTime $expiresAt;
+
     public function __construct()
     {
         $this->guest = new ArrayCollection();
-        $this->dates = new ArrayCollection();
+        $this->bookingDate = new ArrayCollection();
         $this->components = [];
     }
 }

@@ -9,15 +9,14 @@ use App\Contract\Request\Booking\BookingCreate\RoomDate;
 use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
-use App\Entity\BookingDate;
 use App\Entity\Box;
 use App\Entity\BoxExperience;
 use App\Entity\Component;
 use App\Entity\Experience;
-use App\Entity\Guest;
 use App\Entity\Partner;
 use App\Exception\Booking\BadPriceException;
 use App\Exception\Booking\BookingAlreadyInFinalStatusException;
+use App\Exception\Booking\BookingHasExpiredException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
 use App\Exception\Booking\InvalidBookingNewStatus;
@@ -43,6 +42,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @coversDefaultClass \App\Manager\BookingManager
+ * @group booking
  */
 class BookingManagerTest extends TestCase
 {
@@ -99,12 +99,13 @@ class BookingManagerTest extends TestCase
             $this->boxExperienceRepository->reveal(),
             $this->componentRepository->reveal(),
             $this->moneyHelper->reveal(),
-            $this->boxRepository->reveal()
+            $this->boxRepository->reveal(),
         );
     }
 
     /**
      * @dataProvider dataForUpdate
+     * @group update-booking
      */
     public function testUpdate(BookingUpdateRequest $bookingUpdateRequest, Booking $booking, ?string $exceptionClass, ?callable $asserts)
     {
@@ -125,6 +126,8 @@ class BookingManagerTest extends TestCase
         $bookingUpdateRequest->status = 'complete';
         $booking = new Booking();
         $booking->status = 'created';
+        $booking->createdAt = new \DateTime('now');
+        $booking->expiresAt = (clone $booking->createdAt)->add(new \DateInterval('PT15M'));
 
         yield 'happy path' => [
             $bookingUpdateRequest,
@@ -176,6 +179,22 @@ class BookingManagerTest extends TestCase
             InvalidBookingNewStatus::class,
             null,
         ];
+
+        yield 'booking with date expired' => [
+            (function ($bookingUpdateRequest) {
+                $bookingUpdateRequest->status = 'created';
+
+                return $bookingUpdateRequest;
+            })(clone $bookingUpdateRequest),
+            (function ($booking) {
+                $booking->status = 'created';
+                $booking->expiresAt = clone $booking->createdAt;
+
+                return $booking;
+            })(clone $booking),
+            BookingHasExpiredException::class,
+            null,
+        ];
     }
 
     /**
@@ -183,6 +202,7 @@ class BookingManagerTest extends TestCase
      * @covers ::create
      *
      * @dataProvider dataForCreate
+     * @group create
      */
     public function testCreate(BookingCreateRequest $bookingCreateRequest, ?int $duration, ?callable $setUp, ?string $exceptionClass, callable $asserts)
     {
@@ -266,12 +286,10 @@ class BookingManagerTest extends TestCase
             },
             null,
             function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
-                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->flush()->shouldHaveBeenCalledOnce();
                 $test->assertEquals(400, $booking->totalPrice);
-                $test->assertCount(1, $booking->dates);
+                $test->assertCount(1, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
         ];
@@ -295,12 +313,10 @@ class BookingManagerTest extends TestCase
             },
             null,
             function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
-                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->flush()->shouldHaveBeenCalledOnce();
                 $test->assertEquals(400, $booking->totalPrice);
-                $test->assertCount(1, $booking->dates);
+                $test->assertCount(1, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
         ];
@@ -329,12 +345,10 @@ class BookingManagerTest extends TestCase
             },
             null,
             function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledTimes(2);
-                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->flush()->shouldHaveBeenCalledOnce();
                 $test->assertEquals(700, $booking->totalPrice);
-                $test->assertCount(2, $booking->dates);
+                $test->assertCount(2, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
         ];
@@ -366,12 +380,10 @@ class BookingManagerTest extends TestCase
             },
             null,
             function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledTimes(2);
-                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->flush()->shouldHaveBeenCalledOnce();
                 $test->assertEquals(700, $booking->totalPrice);
-                $test->assertCount(2, $booking->dates);
+                $test->assertCount(2, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
         ];
@@ -412,12 +424,10 @@ class BookingManagerTest extends TestCase
             },
             null,
             function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledTimes(6);
-                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->flush()->shouldHaveBeenCalledOnce();
                 $test->assertEquals(1900, $booking->totalPrice);
-                $test->assertCount(6, $booking->dates);
+                $test->assertCount(6, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
         ];
@@ -441,12 +451,10 @@ class BookingManagerTest extends TestCase
             },
             ResourceConflictException::class,
             function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
-                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->flush()->shouldHaveBeenCalledOnce();
                 $test->assertEquals(400, $booking->totalPrice);
-                $test->assertCount(1, $booking->dates);
+                $test->assertCount(1, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
         ];
@@ -469,9 +477,8 @@ class BookingManagerTest extends TestCase
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
             },
             DateOutOfRangeException::class,
-            function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
-                $test->entityManager->persist(Argument::type(Guest::class))->shouldHaveBeenCalledOnce();
+            function ($test) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
             },
         ];
 
@@ -498,8 +505,8 @@ class BookingManagerTest extends TestCase
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
             },
             DuplicatedDatesForSameRoomException::class,
-            function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            function ($test) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
             },
         ];
 
@@ -522,8 +529,8 @@ class BookingManagerTest extends TestCase
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
             },
             NoIncludedRoomFoundException::class,
-            function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            function ($test) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
             },
         ];
 
@@ -546,8 +553,8 @@ class BookingManagerTest extends TestCase
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
             },
             UnallocatedDateException::class,
-            function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            function ($test) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
             },
         ];
 
@@ -571,8 +578,8 @@ class BookingManagerTest extends TestCase
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
             },
             UnallocatedDateException::class,
-            function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            function ($test) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
             },
         ];
 
@@ -608,8 +615,8 @@ class BookingManagerTest extends TestCase
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
             },
             RoomsDontHaveSameDurationException::class,
-            function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            function ($test) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
             },
         ];
 
@@ -645,8 +652,8 @@ class BookingManagerTest extends TestCase
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
             },
             RoomsDontHaveSameDurationException::class,
-            function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledOnce();
+            function ($test) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
             },
         ];
 
@@ -671,11 +678,11 @@ class BookingManagerTest extends TestCase
             })(clone $baseBookingCreateRequest),
             1,
             function (BookingManagerTest $test) {
-                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->repository->findOneByGoldenId(Argument::type('string'))->willThrow(new BookingNotFoundException());
             },
             BadPriceException::class,
-            function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledTimes(1);
+            function ($test) {
+                $test->entityManager->rollback()->shouldHaveBeenCalledTimes(1);
             },
         ];
 
@@ -703,8 +710,8 @@ class BookingManagerTest extends TestCase
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
             },
             InvalidExtraNightException::class,
-            function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(BookingDate::class))->shouldHaveBeenCalledTimes(1);
+            function ($test) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledTimes(1);
             },
         ];
     }

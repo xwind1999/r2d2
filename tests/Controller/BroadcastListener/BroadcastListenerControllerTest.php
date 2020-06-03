@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @coversDefaultClass \App\Controller\BroadcastListener\BroadcastListenerController
+ * @group broadcast-listener
  */
 class BroadcastListenerControllerTest extends TestCase
 {
