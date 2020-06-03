@@ -16,7 +16,7 @@ class ExperienceComponent
 
     /**
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Component")
+     * @ORM\ManyToOne(targetEntity="Component", inversedBy="experienceComponent")
      * @ORM\JoinColumn(name="component_uuid", referencedColumnName="uuid", nullable=false)
      */
     public Component $component;
@@ -28,7 +28,7 @@ class ExperienceComponent
 
     /**
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Experience")
+     * @ORM\ManyToOne(targetEntity="Experience", inversedBy="experienceComponent")
      * @ORM\JoinColumn(name="experience_uuid", referencedColumnName="uuid", nullable=false)
      */
     public Experience $experience;

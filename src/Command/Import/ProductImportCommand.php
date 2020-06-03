@@ -37,7 +37,7 @@ class ProductImportCommand extends AbstractImportCommand
 
             $productRequest->id = $record['id'];
             $productRequest->name = $record['name'];
-            $productRequest->description = strlen($record['description']) > 1 ? $record['description'] : ' ';
+            $productRequest->description = strlen($record['description']) > 0 ? $record['description'] : ' ';
             $productRequest->universe = !empty($record['universe']) ? Universe::create($record['universe']) : null;
             $productRequest->partner = !empty($record['partner']) ? Partner::create($record['partner']) : null;
             $productRequest->sellableBrand = !empty($record['sellableBrand']) ? Brand::create($record['sellableBrand']) : null;
