@@ -9,6 +9,8 @@ generate-api-reference:
     expire_in: 1 day
     paths:
       - openapi.json
+  except:
+    - tags
 
 phpmetrics:
   stage: Build Reports
@@ -21,6 +23,8 @@ phpmetrics:
     expire_in: 1 day
     paths:
       - report/
+  except:
+    - tags
 
 mermaid-generate-images:
   stage: Build Reports
@@ -40,6 +44,7 @@ mermaid-generate-images:
     - master
   except:
     - schedules
+    - tags
 
 code-tests-aggregate:
   stage: Build Reports
@@ -54,6 +59,8 @@ code-tests-aggregate:
     paths:
       - report/
       - openapi.json
+  except:
+    - tags
 
 schemaspy:
   stage: Build Reports
@@ -76,6 +83,8 @@ schemaspy:
     expire_in: 1 day
     paths:
       - report/html/db
+  except:
+    - tags
 
 generate-extra-docs:
   stage: Build Reports
@@ -93,3 +102,5 @@ generate-extra-docs:
       - mkdocs.yml
       - docs/exceptions.md
       - docs/README.md
+  except:
+    - tags

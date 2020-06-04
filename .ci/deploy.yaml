@@ -3,8 +3,8 @@ variables:
   DOCKER_COMPOSE_CMD: docker-compose
 
 .deploy:
-  stage: Project Env Deploy
   image: docker-registry.production.smartbox.com/chef/chef-knife
+  stage: Project Env Deploy
   dependencies:
     - build-app-container
   script:
@@ -16,7 +16,7 @@ variables:
       ${DOCKER_COMPOSE_CMD} rm -fs && sudo ${ENV_WORKDIR}/pull.rb -g && ${DOCKER_COMPOSE_CMD} up -d;
       "
     - ${CI_PROJECT_DIR}/.ci/tools/notify.sh || true
-#    - ${CI_PROJECT_DIR}/.ci/tools/notify-newrelic.sh "${ENVIRONMENT_NAME}" "${CONSOLE_NEWRELIC_BUILDING}" || true
+    #    - ${CI_PROJECT_DIR}/.ci/tools/notify-newrelic.sh "${ENVIRONMENT_NAME}" "${CONSOLE_NEWRELIC_BUILDING}" || true
     - ${CI_PROJECT_DIR}/.ci/tools/knife-nodes.sh "${ENVIRONMENT_NAME}" "${COMMAND}" -a ipaddress
     - ${CI_PROJECT_DIR}/.ci/tools/knife-master.sh "${ENVIRONMENT_NAME}" "docker exec r2d2_api_1 sudo -u www-data bin/console d:schema:update --force -n"
     - ${CI_PROJECT_DIR}/.ci/tools/knife-master.sh "${ENVIRONMENT_NAME}" "docker exec r2d2_api_1 sudo -u www-data bin/console d:m:m -n" || true
@@ -31,3 +31,15 @@ variables:
     ENVIRONMENT_NAME: ie1-devint-r2d2
   only:
     - master
+  except:
+    - tags
+
+'[PREPROD] Deploy':
+  extends: .deploy
+  stage: Preprod Deploy
+  environment:
+    name: ie1-preprod-r2d2
+  variables:
+    ENVIRONMENT_NAME: ie1-preprod-r2d2
+  only:
+    - tags
