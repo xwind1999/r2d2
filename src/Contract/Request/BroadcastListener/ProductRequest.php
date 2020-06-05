@@ -153,6 +153,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\ListPrice")
+     * @JMS\SerializedName("listPrice")
      */
     public ?ListPrice $listPrice = null;
 
