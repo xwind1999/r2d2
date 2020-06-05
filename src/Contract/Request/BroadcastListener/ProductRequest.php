@@ -6,6 +6,7 @@ namespace App\Contract\Request\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
+use App\Contract\Request\BroadcastListener\Product\ListPrice;
 use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Helper\Request\RequestBodyInterface;
@@ -147,6 +148,14 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      */
     public ?int $stockAllotment = null;
 
+    /**
+     * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\ListPrice")
+     * @Assert\Valid
+     *
+     * @JMS\Type("App\Contract\Request\BroadcastListener\Product\ListPrice")
+     */
+    public ?ListPrice $listPrice = null;
+
     public function getContext(): array
     {
         return [
@@ -165,6 +174,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
             'voucher_expiration_duration' => $this->voucherExpirationDuration,
             'room_stock_type' => $this->roomStockType,
             'stock_allotment' => $this->stockAllotment,
+            'list_price' => $this->listPrice ? $this->listPrice->getContext() : null,
         ];
     }
 }
