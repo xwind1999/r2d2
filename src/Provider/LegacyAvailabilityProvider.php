@@ -43,8 +43,7 @@ class LegacyAvailabilityProvider
         try {
             $data = $this->quickData->getPackage($experienceId, $dateFrom, $dateTo);
             //but we process them the same way, so we have a QuickDataResponse ready
-
-            if ($this->availabilityConvertFlag->isEnabled()) {
+            if (isset($data['ListPrestation']['Availabilities']) && $this->availabilityConvertFlag->isEnabled()) {
                 $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
                 $partner = $experience->partner;
                 if (!$partner->isChannelManagerActive) {
@@ -69,7 +68,7 @@ class LegacyAvailabilityProvider
             $data = $this->quickData->getRange($boxId, $dateFrom, $dateTo);
             //but we process them the same way, so we have a GetRangeResponse ready
 
-            if ($this->availabilityConvertFlag->isEnabled()) {
+            if (isset($data['PackagesList']) && $this->availabilityConvertFlag->isEnabled()) {
                 $packageList = $data['PackagesList'];
                 $experienceIds = array_column($packageList, 'Package');
                 $inactiveChannelExperienceIds = $this->experienceManager->getIdsListWithPartnerChannelManagerInactive($experienceIds);
@@ -95,7 +94,7 @@ class LegacyAvailabilityProvider
             $data = $this->quickData->getPackageV2($packageCodes, $dateFrom, $dateTo);
             //but we process them the same way, so we have a GetRangeResponse ready
 
-            if ($this->availabilityConvertFlag->isEnabled()) {
+            if (isset($data['ListPackage']) && $this->availabilityConvertFlag->isEnabled()) {
                 $inactiveChannelExperienceIds = $this->experienceManager->getIdsListWithPartnerChannelManagerInactive($packageCodes);
                 foreach ($data['ListPackage'] as &$package) {
                     if (isset($inactiveChannelExperienceIds[$package['PackageCode']])) {
