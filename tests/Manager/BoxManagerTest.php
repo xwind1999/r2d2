@@ -9,6 +9,7 @@ use App\Contract\Request\BroadcastListener\PriceInformation\Product;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
+use App\Contract\Request\BroadcastListener\Product\ListPrice;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Box\BoxCreateRequest;
 use App\Contract\Request\Internal\Box\BoxUpdateRequest;
@@ -130,6 +131,8 @@ class BoxManagerTest extends TestCase
         $productRequest->sellableBrand = $brand;
         $productRequest->sellableCountry = $country;
         $productRequest->status = 'active';
+        $productRequest->listPrice = new ListPrice();
+        $productRequest->listPrice->currencyCode = 'EUR';
 
         $this->repository->findOneByGoldenId($productRequest->id);
         $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
@@ -151,6 +154,8 @@ class BoxManagerTest extends TestCase
         $productRequest->sellableBrand = $brand;
         $productRequest->sellableCountry = $country;
         $productRequest->status = 'active';
+        $productRequest->listPrice = new ListPrice();
+        $productRequest->listPrice->currencyCode = 'EUR';
 
         $this->repository
             ->findOneByGoldenId($productRequest->id)
