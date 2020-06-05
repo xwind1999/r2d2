@@ -51,6 +51,7 @@ code-tests-aggregate:
   image: ${BASE_IMAGE}
   needs:
     - unitTests
+    - Api-Tests
     - infection
   script:
     - echo true
