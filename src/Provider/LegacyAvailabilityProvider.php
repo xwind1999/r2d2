@@ -97,9 +97,8 @@ class LegacyAvailabilityProvider
             if (isset($data['ListPackage']) && $this->availabilityConvertFlag->isEnabled()) {
                 $inactiveChannelExperienceIds = $this->experienceManager->getIdsListWithPartnerChannelManagerInactive($packageCodes);
                 foreach ($data['ListPackage'] as &$package) {
-                    if (isset($inactiveChannelExperienceIds[$package['PackageCode']])) {
-                        $package['ListPrestation']['Availabilities'] =
-                            AvailabilityHelper::convertToRequestType($package['ListPrestation']['Availabilities']);
+                    if (isset($package['ListPrestation']['Availabilities']) && isset($inactiveChannelExperienceIds[$package['PackageCode']])) {
+                        $package['ListPrestation']['Availabilities'] = AvailabilityHelper::convertToRequestType($package['ListPrestation']['Availabilities']);
                     }
                 }
             }
