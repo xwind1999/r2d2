@@ -36,7 +36,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="255")
+     * @Assert\Length(max="255")
      *
      * @JMS\Type("string")
      */
