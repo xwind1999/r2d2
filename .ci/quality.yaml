@@ -129,7 +129,7 @@ locust-staging:
   script:
     - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
   only:
-    - branches
+    - master
   except:
     - tags
 
