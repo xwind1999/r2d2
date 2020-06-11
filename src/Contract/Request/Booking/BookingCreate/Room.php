@@ -15,7 +15,6 @@ class Room
      * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
-     * @JMS\SerializedName("extraRoom")
      *
      * @SWG\Property(type="boolean", example=false)
      */

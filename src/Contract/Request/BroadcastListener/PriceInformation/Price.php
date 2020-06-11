@@ -25,7 +25,6 @@ class Price
      *
      * @JMS\Type("string")
      * @SWG\Property(example="EUR")
-     * @JMS\SerializedName("currencyCode")
      */
     public string $currencyCode;
 }

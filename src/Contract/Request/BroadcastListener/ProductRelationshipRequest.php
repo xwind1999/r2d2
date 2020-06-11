@@ -17,7 +17,6 @@ class ProductRelationshipRequest implements RequestBodyInterface, ValidatableReq
      * @Assert\NotBlank
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("parentProduct")
      */
     public string $parentProduct;
 
@@ -26,7 +25,6 @@ class ProductRelationshipRequest implements RequestBodyInterface, ValidatableReq
      * @Assert\NotBlank
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("childProduct")
      */
     public string $childProduct;
 
@@ -35,7 +33,6 @@ class ProductRelationshipRequest implements RequestBodyInterface, ValidatableReq
      * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
-     * @JMS\SerializedName("isEnabled")
      */
     public bool $isEnabled;
 
@@ -44,7 +41,6 @@ class ProductRelationshipRequest implements RequestBodyInterface, ValidatableReq
      * @Assert\NotBlank
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("relationshipType")
      */
     public string $relationshipType;
 

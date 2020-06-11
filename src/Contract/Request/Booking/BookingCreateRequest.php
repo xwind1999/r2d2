@@ -19,7 +19,6 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      * @Assert\NotNull
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("bookingId")
      *
      * @SWG\Property(example="SBXFRJBO200101123123")
      */
@@ -71,7 +70,6 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      * @Assert\NotNull
      *
      * @JMS\Type("DateTime<'Y-m-d'>")
-     * @JMS\SerializedName("startDate")
      *
      * @SWG\Property(example="2020-01-01")
      */
@@ -82,7 +80,6 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      * @Assert\NotNull
      *
      * @JMS\Type("DateTime<'Y-m-d'>")
-     * @JMS\SerializedName("endDate")
      *
      * @SWG\Property(example="2020-01-02")
      */
@@ -93,7 +90,6 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      * @Assert\Length(min="1", max="255")
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("customerComment")
      *
      * @SWG\Property(example="Clean sheets please")
      */
