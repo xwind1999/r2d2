@@ -39,13 +39,12 @@ class LegacyAvailabilityProvider
         try {
             $data = $this->quickData->getPackage($experienceId, $dateFrom, $dateTo);
             //but we process them the same way, so we have a QuickDataResponse ready
-            if (isset($data['ListPrestation']['Availabilities'])) {
+
+            if (isset($data['ListPrestation'][0]['Availabilities'])) {
                 $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
                 $partner = $experience->partner;
-                if (!$partner->isChannelManagerActive) {
-                    $data['ListPrestation']['Availabilities'] =
-                        AvailabilityHelper::convertToRequestType($data['ListPrestation']['Availabilities']);
-                }
+                $data['ListPrestation'][0]['Availabilities'] =
+                    AvailabilityHelper::convertToRequestType($data['ListPrestation'][0]['Availabilities']);
             }
 
             return $this->serializer->fromArray($data, GetPackageResponse::class);
@@ -93,8 +92,8 @@ class LegacyAvailabilityProvider
             if (isset($data['ListPackage'])) {
                 $inactiveChannelExperienceIds = $this->experienceManager->getIdsListWithPartnerChannelManagerInactive($packageCodes);
                 foreach ($data['ListPackage'] as &$package) {
-                    if (isset($package['ListPrestation']['Availabilities']) && isset($inactiveChannelExperienceIds[$package['PackageCode']])) {
-                        $package['ListPrestation']['Availabilities'] = AvailabilityHelper::convertToRequestType($package['ListPrestation']['Availabilities']);
+                    if (isset($package['ListPrestation'][0]['Availabilities']) && isset($inactiveChannelExperienceIds[$package['PackageCode']])) {
+                        $package['ListPrestation'][0]['Availabilities'] = AvailabilityHelper::convertToRequestType($package['ListPrestation'][0]['Availabilities']);
                     }
                 }
             }

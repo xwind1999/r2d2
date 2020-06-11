@@ -88,15 +88,61 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $this->quickData->getPackage((int) $experience->goldenId, $dateFrom, $dateTo)->willReturn([
             'ListPrestation' => [
-                'Availabilities' => [
-                    ['1', 'r', '0'],
+                [
+                    'Availabilities' => [
+                        ['1', 'r', '0'],
+                    ],
+                    'PrestId' => 2896684,
+                    'Duration' => 1,
+                    'LiheId' => 15257,
+                    'PartnerCode' => '00100901',
+                    'ExtraNight' => true,
+                    'ExtraRoom' => true,
                 ],
-                'PrestId' => 2896684,
-                'Duration' => 1,
-                'LiheId' => 15257,
-                'PartnerCode' => '00100901',
-                'ExtraNight' => true,
-                'ExtraRoom' => true,
+            ],
+        ]);
+        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
+
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
+            $this->serializer->reveal(),
+            $this->experienceManager->reveal());
+        $response = $legacyAvailabilityProvider->getAvailabilityForExperience((int) $experience->goldenId, $dateFrom, $dateTo);
+
+        $this->assertInstanceOf(GetPackageResponse::class, $response);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getAvailabilityForExperience
+     */
+    public function testGetAvailabilityForExperienceWithConverterWrongFormat()
+    {
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+        $experience = new Experience();
+        $experience->goldenId = '1234';
+        $partner = new Partner();
+        $partner->isChannelManagerActive = false;
+        $experience->partner = $partner;
+
+        $result = $this->prophesize(GetPackageResponse::class);
+
+        $this->quickData->getPackage((int) $experience->goldenId, $dateFrom, $dateTo)->willReturn([
+            'ListPrestation' => [
+                [
+                ],
+                [
+                    'Availabilities' => [
+                        ['1', 'r', '0'],
+                    ],
+                    'PrestId' => 2896684,
+                    'Duration' => 1,
+                    'LiheId' => 15257,
+                    'PartnerCode' => '00100901',
+                    'ExtraNight' => true,
+                    'ExtraRoom' => true,
+                ],
             ],
         ]);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
@@ -266,15 +312,64 @@ class LegacyAvailabilityProviderTest extends TestCase
                 [
                     'PackageCode' => 88826,
                     'ListPrestation' => [
-                        'Availabilities' => [
-                            '0', '1', 'r',
+                        [
+                            'Availabilities' => [
+                                '0', '1', 'r',
+                            ],
+                            'PrestId' => 2896684,
+                            'Duration' => 1,
+                            'LiheId' => 15257,
+                            'PartnerCode' => '00100901',
+                            'ExtraNight' => true,
+                            'ExtraRoom' => true,
                         ],
-                        'PrestId' => 2896684,
-                        'Duration' => 1,
-                        'LiheId' => 15257,
-                        'PartnerCode' => '00100901',
-                        'ExtraNight' => true,
-                        'ExtraRoom' => true,
+                    ],
+                ],
+            ],
+        ]);
+        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $this->experienceManager->getIdsListWithPartnerChannelManagerInactive(Argument::any())->willReturn([
+            '88826' => '88826',
+            '88827' => '88827',
+        ]);
+        $response = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
+
+        $this->assertInstanceOf(GetPackageV2Response::class, $response);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getAvailabilityForMultipleExperiences
+     */
+    public function testGetAvailabilityForMultipleExperiencesWithConverterWrongFormat()
+    {
+        $experienceIds = [1234, 5678];
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
+            $this->serializer->reveal(),
+            $this->experienceManager->reveal());
+
+        $result = $this->prophesize(GetPackageV2Response::class);
+        $this->quickData->getPackageV2($experienceIds, $dateFrom, $dateTo)->willReturn([
+            'ListPackage' => [
+                [
+                    'PackageCode' => 88826,
+                    'ListPrestation' => [
+                        [
+                        ],
+                        [
+                            'Availabilities' => [
+                                '0', '1', 'r',
+                            ],
+                            'PrestId' => 2896684,
+                            'Duration' => 1,
+                            'LiheId' => 15257,
+                            'PartnerCode' => '00100901',
+                            'ExtraNight' => true,
+                            'ExtraRoom' => true,
+                        ],
                     ],
                 ],
             ],
