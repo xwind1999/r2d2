@@ -11,7 +11,6 @@ use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataErrorResponse;
 use App\Contract\Response\QuickData\QuickDataResponse;
 use App\Helper\AvailabilityHelper;
-use App\Helper\Feature\FeatureInterface;
 use App\Manager\ExperienceManager;
 use App\QuickData\QuickData;
 use JMS\Serializer\ArrayTransformerInterface;
@@ -27,14 +26,11 @@ class LegacyAvailabilityProvider
 
     protected ExperienceManager $experienceManager;
 
-    protected FeatureInterface $availabilityConvertFlag;
-
-    public function __construct(QuickData $quickData, ArrayTransformerInterface $serializer, ExperienceManager $experienceManager, FeatureInterface $availabilityConvertFlag)
+    public function __construct(QuickData $quickData, ArrayTransformerInterface $serializer, ExperienceManager $experienceManager)
     {
         $this->quickData = $quickData;
         $this->serializer = $serializer;
         $this->experienceManager = $experienceManager;
-        $this->availabilityConvertFlag = $availabilityConvertFlag;
     }
 
     public function getAvailabilityForExperience(int $experienceId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): QuickDataResponse
@@ -43,7 +39,7 @@ class LegacyAvailabilityProvider
         try {
             $data = $this->quickData->getPackage($experienceId, $dateFrom, $dateTo);
             //but we process them the same way, so we have a QuickDataResponse ready
-            if (isset($data['ListPrestation']['Availabilities']) && $this->availabilityConvertFlag->isEnabled()) {
+            if (isset($data['ListPrestation']['Availabilities'])) {
                 $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
                 $partner = $experience->partner;
                 if (!$partner->isChannelManagerActive) {
@@ -68,7 +64,7 @@ class LegacyAvailabilityProvider
             $data = $this->quickData->getRange($boxId, $dateFrom, $dateTo);
             //but we process them the same way, so we have a GetRangeResponse ready
 
-            if (isset($data['PackagesList']) && $this->availabilityConvertFlag->isEnabled()) {
+            if (isset($data['PackagesList'])) {
                 $packageList = $data['PackagesList'];
                 $experienceIds = array_column($packageList, 'Package');
                 $inactiveChannelExperienceIds = $this->experienceManager->getIdsListWithPartnerChannelManagerInactive($experienceIds);
@@ -94,7 +90,7 @@ class LegacyAvailabilityProvider
             $data = $this->quickData->getPackageV2($packageCodes, $dateFrom, $dateTo);
             //but we process them the same way, so we have a GetRangeResponse ready
 
-            if (isset($data['ListPackage']) && $this->availabilityConvertFlag->isEnabled()) {
+            if (isset($data['ListPackage'])) {
                 $inactiveChannelExperienceIds = $this->experienceManager->getIdsListWithPartnerChannelManagerInactive($packageCodes);
                 foreach ($data['ListPackage'] as &$package) {
                     if (isset($package['ListPrestation']['Availabilities']) && isset($inactiveChannelExperienceIds[$package['PackageCode']])) {
@@ -119,12 +115,7 @@ class LegacyAvailabilityProvider
             $isAvailabilityConvertNeeded = false;
 
             if (isset($data['DaysAvailabilityPrice'])) {
-                if ($this->availabilityConvertFlag->isEnabled()) {
-                    $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
-                    if (!$experience->partner->isChannelManagerActive) {
-                        $isAvailabilityConvertNeeded = true;
-                    }
-                }
+                $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
 
                 foreach ($data['DaysAvailabilityPrice'] as $key => $value) {
                     $data['DaysAvailabilityPrice'][$key]['Date'] = (new \DateTime($value['Date']))
@@ -132,7 +123,7 @@ class LegacyAvailabilityProvider
                         ->format(self::DATE_TIME_FORMAT)
                     ;
 
-                    if ($isAvailabilityConvertNeeded) {
+                    if (!$experience->partner->isChannelManagerActive) {
                         $data['DaysAvailabilityPrice'][$key]['AvailabilityStatus'] = AvailabilityHelper::convertAvailableValueToRequest($value['AvailabilityStatus']);
                     }
                 }
