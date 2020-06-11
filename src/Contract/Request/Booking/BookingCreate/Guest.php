@@ -16,7 +16,6 @@ class Guest
      * @Assert\NotNull
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("firstName")
      *
      * @SWG\Property(example="Hermano")
      */
@@ -28,7 +27,6 @@ class Guest
      * @Assert\NotNull
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("lastName")
      *
      * @SWG\Property(example="Guido")
      */

@@ -29,7 +29,6 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
      * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\PriceInformation\Price")
-     * @JMS\SerializedName("averageValue")
      */
     public ?Price $averageValue = null;
 
@@ -38,7 +37,6 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
      * @Assert\Length(min="1", max="10")
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("averageCommissionType")
      * @SWG\Property(example="amount")
      */
     public ?string $averageCommissionType = null;
@@ -47,7 +45,6 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
      * @Assert\Type(type="integer")
      *
      * @JMS\Type("float_to_integer")
-     * @JMS\SerializedName("averageCommission")
      * @SWG\Property(example=5.20)
      */
     public ?int $averageCommission = null;

@@ -55,7 +55,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
-     * @JMS\SerializedName("isSellable")
      */
     public bool $isSellable;
 
@@ -64,7 +63,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
-     * @JMS\SerializedName("isReservable")
      */
     public bool $isReservable;
 
@@ -73,7 +71,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Brand")
-     * @JMS\SerializedName("sellableBrand")
      */
     public ?Brand $sellableBrand = null;
 
@@ -90,7 +87,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Country")
-     * @JMS\SerializedName("sellableCountry")
      */
     public ?Country $sellableCountry = null;
 
@@ -117,7 +113,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\Length(min="1", max="2")
      *
      * @JMS\Type("integer")
-     * @JMS\SerializedName("productPeopleNumber")
      */
     public ?int $productPeopleNumber = null;
 
@@ -126,7 +121,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\PositiveOrZero
      *
      * @JMS\Type("strict_integer")
-     * @JMS\SerializedName("voucherExpirationDuration")
      */
     public ?int $voucherExpirationDuration = null;
 
@@ -135,7 +129,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\Length(min="1", max="10")
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("roomStockType")
      */
     public ?string $roomStockType = null;
 
@@ -144,7 +137,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\PositiveOrZero
      *
      * @JMS\Type("strict_integer")
-     * @JMS\SerializedName("stockAllotment")
      */
     public ?int $stockAllotment = null;
 

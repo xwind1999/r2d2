@@ -36,7 +36,6 @@ class RoomDate
      * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
-     * @JMS\SerializedName("extraNight")
      *
      * @SWG\Property(type="boolean", example=false)
      */

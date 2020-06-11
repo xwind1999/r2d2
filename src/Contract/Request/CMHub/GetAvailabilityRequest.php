@@ -16,7 +16,6 @@ class GetAvailabilityRequest implements RequestQueryInterface, ValidatableReques
      * @Assert\PositiveOrZero()
      * @Assert\NotBlank
      *
-     * @JMS\SerializedName("productId")
      * @JMS\Type("integer")
      */
     public int $productId;
@@ -25,7 +24,6 @@ class GetAvailabilityRequest implements RequestQueryInterface, ValidatableReques
      * @Assert\Type(type="DateTime")
      * @Assert\NotBlank
      *
-     * @JMS\SerializedName("start")
      * @JMS\Type("DateTime<'Y-m-d'>")
      */
     public \DateTimeInterface $start;
@@ -34,7 +32,6 @@ class GetAvailabilityRequest implements RequestQueryInterface, ValidatableReques
      * @Assert\Type(type="DateTime")
      * @Assert\NotBlank
      *
-     * @JMS\SerializedName("end")
      * @JMS\Type("DateTime<'Y-m-d'>")
      */
     public \DateTimeInterface $end;
