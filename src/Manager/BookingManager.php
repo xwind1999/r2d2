@@ -236,7 +236,7 @@ class BookingManager
         //maybe dispatch a "BookingUpdatedEvent" with the new status?
     }
 
-    public function validateBookingExpirationTime(Booking $booking): void
+    private function validateBookingExpirationTime(Booking $booking): void
     {
         $dateNow = new \DateTime('now');
 
