@@ -81,6 +81,7 @@ class BoxManager
         $box->brand = $productRequest->sellableBrand ? $productRequest->sellableBrand->code : null;
         $box->country = $productRequest->sellableCountry ? $productRequest->sellableCountry->code : null;
         $box->status = $productRequest->status;
+        $box->currency = $productRequest->listPrice ? $productRequest->listPrice->currencyCode : null;
 
         $this->repository->save($box);
     }

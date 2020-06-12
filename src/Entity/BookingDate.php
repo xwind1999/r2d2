@@ -23,7 +23,7 @@ class BookingDate
     public UuidInterface $uuid;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Booking")
+     * @ORM\ManyToOne(targetEntity="Booking", inversedBy="bookingDate", cascade={"persist"})
      * @ORM\JoinColumn(name="booking_uuid", referencedColumnName="uuid", nullable=false)
      */
     public Booking $booking;

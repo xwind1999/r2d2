@@ -35,7 +35,6 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\NotBlank
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("currencyCode")
      */
     public string $currencyCode;
 
@@ -44,7 +43,6 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\NotNull()
      *
      * @JMS\Type("strict_boolean")
-     * @JMS\SerializedName("isChannelManagerEnabled")
      */
     public bool $isChannelManagerEnabled;
 
@@ -52,7 +50,6 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\Type(type="DateTime")
      *
      * @JMS\Type("DateTime<'Y-m-d\TH:i:s.uT'>")
-     * @JMS\SerializedName("partnerCeaseDate")
      */
     public ?\DateTime $partnerCeaseDate = null;
 

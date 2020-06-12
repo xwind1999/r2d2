@@ -6,6 +6,7 @@ namespace App\Contract\Request\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
+use App\Contract\Request\BroadcastListener\Product\ListPrice;
 use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Helper\Request\RequestBodyInterface;
@@ -35,7 +36,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="255")
+     * @Assert\Length(max="255")
      *
      * @JMS\Type("string")
      */
@@ -54,7 +55,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
-     * @JMS\SerializedName("isSellable")
      */
     public bool $isSellable;
 
@@ -63,7 +63,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\NotNull
      *
      * @JMS\Type("strict_boolean")
-     * @JMS\SerializedName("isReservable")
      */
     public bool $isReservable;
 
@@ -72,7 +71,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Brand")
-     * @JMS\SerializedName("sellableBrand")
      */
     public ?Brand $sellableBrand = null;
 
@@ -89,7 +87,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\Valid
      *
      * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Country")
-     * @JMS\SerializedName("sellableCountry")
      */
     public ?Country $sellableCountry = null;
 
@@ -116,7 +113,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\Length(min="1", max="2")
      *
      * @JMS\Type("integer")
-     * @JMS\SerializedName("productPeopleNumber")
      */
     public ?int $productPeopleNumber = null;
 
@@ -125,7 +121,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\PositiveOrZero
      *
      * @JMS\Type("strict_integer")
-     * @JMS\SerializedName("voucherExpirationDuration")
      */
     public ?int $voucherExpirationDuration = null;
 
@@ -134,7 +129,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\Length(min="1", max="10")
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("roomStockType")
      */
     public ?string $roomStockType = null;
 
@@ -143,9 +137,17 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\PositiveOrZero
      *
      * @JMS\Type("strict_integer")
-     * @JMS\SerializedName("stockAllotment")
      */
     public ?int $stockAllotment = null;
+
+    /**
+     * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\ListPrice")
+     * @Assert\Valid
+     *
+     * @JMS\Type("App\Contract\Request\BroadcastListener\Product\ListPrice")
+     * @JMS\SerializedName("listPrice")
+     */
+    public ?ListPrice $listPrice = null;
 
     public function getContext(): array
     {
@@ -165,6 +167,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
             'voucher_expiration_duration' => $this->voucherExpirationDuration,
             'room_stock_type' => $this->roomStockType,
             'stock_allotment' => $this->stockAllotment,
+            'list_price' => $this->listPrice ? $this->listPrice->getContext() : null,
         ];
     }
 }

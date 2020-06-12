@@ -18,7 +18,6 @@ class BookingUpdateRequest implements RequestBodyInterface, ValidatableRequest
      * @Assert\NotNull
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName("bookingId")
      *
      * @SWG\Property(example="SBXFRJBO200101123123")
      */

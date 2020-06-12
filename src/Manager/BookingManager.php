@@ -12,6 +12,7 @@ use App\Entity\BookingDate;
 use App\Entity\Guest;
 use App\Exception\Booking\BadPriceException;
 use App\Exception\Booking\BookingAlreadyInFinalStatusException;
+use App\Exception\Booking\BookingHasExpiredException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
 use App\Exception\Booking\InvalidBookingNewStatus;
@@ -32,6 +33,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class BookingManager
 {
+    private const EXPIRATION_TIME = 'PT15M';
+
     private EntityManagerInterface $em;
     private BookingRepository $repository;
     private ExperienceRepository $experienceRepository;
@@ -89,6 +92,7 @@ class BookingManager
         $booking->customerComment = $bookingCreateRequest->customerComment;
         $booking->components = $bookingCreateRequest->experience->components;
         $booking->cancelledAt = null;
+        $booking->expiresAt = (new \DateTime('now'))->add(new \DateInterval(self::EXPIRATION_TIME));
         /** @var ArrayCollection<int, BookingDate> */
         $bookingDatesCollection = new ArrayCollection();
         // TODO: replace with experience price after R2D2-209
@@ -174,7 +178,7 @@ class BookingManager
             }
         }
 
-        $booking->dates = $bookingDatesCollection;
+        $booking->bookingDate = $bookingDatesCollection;
 
         //compare the dates allocated in the rooms with the date range sent in the root element
         foreach ($period as $date) {
@@ -216,14 +220,7 @@ class BookingManager
     public function update(BookingUpdateRequest $bookingUpdateRequest): void
     {
         $booking = $this->repository->findOneByGoldenId($bookingUpdateRequest->bookingId);
-
-        if (in_array($booking->status, BookingStatus::BOOKING_FINAL_STATUSES)) {
-            throw new BookingAlreadyInFinalStatusException();
-        }
-
-        if ($booking->status === $bookingUpdateRequest->status) {
-            throw new InvalidBookingNewStatus();
-        }
+        $this->validateBookingStatus($bookingUpdateRequest, $booking);
 
         $booking->status = $bookingUpdateRequest->status;
 
@@ -237,5 +234,28 @@ class BookingManager
         //TODO: send the booking to CMHub
         //TODO: send the booking cancellation to CMHub
         //maybe dispatch a "BookingUpdatedEvent" with the new status?
+    }
+
+    private function validateBookingExpirationTime(Booking $booking): void
+    {
+        $dateNow = new \DateTime('now');
+
+        // @TODO: Check the availability before send the exception
+        if ($booking->expiresAt < $dateNow) {
+            throw new BookingHasExpiredException();
+        }
+    }
+
+    private function validateBookingStatus(BookingUpdateRequest $bookingUpdateRequest, Booking $booking): void
+    {
+        $this->validateBookingExpirationTime($booking);
+
+        if (BookingStatus::BOOKING_STATUS_COMPLETE === $booking->status || BookingStatus::BOOKING_STATUS_CANCELLED === $booking->status) {
+            throw new BookingAlreadyInFinalStatusException();
+        }
+
+        if ($booking->status === $bookingUpdateRequest->status) {
+            throw new InvalidBookingNewStatus();
+        }
     }
 }

@@ -23,7 +23,7 @@ class PartnerImportCommand extends AbstractImportCommand
         parent::configure();
     }
 
-    public function process(\Iterator $records): void
+    protected function process(\Iterator $records): void
     {
         foreach ($records as $record) {
             $partnerRequest = new PartnerRequest();

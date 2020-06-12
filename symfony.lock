@@ -90,6 +90,9 @@
     "doctrine/reflection": {
         "version": "v1.1.0"
     },
+    "doctrine/sql-formatter": {
+        "version": "1.1.0"
+    },
     "exsyst/swagger": {
         "version": "v0.4.1"
     },
@@ -158,9 +161,6 @@
     },
     "infection/infection": {
         "version": "0.15.0"
-    },
-    "jdorn/sql-formatter": {
-        "version": "v1.2.17"
     },
     "jms/metadata": {
         "version": "2.1.0"
@@ -381,6 +381,9 @@
     "seld/jsonlint": {
         "version": "1.7.2"
     },
+    "symfony/amqp-messenger": {
+        "version": "v5.1.0"
+    },
     "symfony/asset": {
         "version": "v5.0.3"
     },
@@ -415,8 +418,14 @@
     "symfony/dependency-injection": {
         "version": "v5.0.2"
     },
+    "symfony/deprecation-contracts": {
+        "version": "v2.1.2"
+    },
     "symfony/doctrine-bridge": {
         "version": "v5.0.3"
+    },
+    "symfony/doctrine-messenger": {
+        "version": "v5.1.0"
     },
     "symfony/dom-crawler": {
         "version": "v5.0.2"
@@ -511,7 +520,7 @@
         ]
     },
     "symfony/mime": {
-        "version": "v5.0.2"
+        "version": "v5.1.0"
     },
     "symfony/monolog-bridge": {
         "version": "v5.0.3"
@@ -552,17 +561,26 @@
             "tests/.gitignore"
         ]
     },
+    "symfony/polyfill-intl-grapheme": {
+        "version": "v1.17.0"
+    },
     "symfony/polyfill-intl-icu": {
         "version": "v1.17.0"
     },
     "symfony/polyfill-intl-idn": {
-        "version": "v1.13.1"
+        "version": "v1.17.0"
+    },
+    "symfony/polyfill-intl-normalizer": {
+        "version": "v1.17.0"
     },
     "symfony/polyfill-mbstring": {
         "version": "v1.13.1"
     },
     "symfony/polyfill-php73": {
         "version": "v1.13.1"
+    },
+    "symfony/polyfill-php80": {
+        "version": "v1.17.0"
     },
     "symfony/process": {
         "version": "v5.0.3"
@@ -575,6 +593,9 @@
     },
     "symfony/property-info": {
         "version": "v5.0.3"
+    },
+    "symfony/redis-messenger": {
+        "version": "v5.1.0"
     },
     "symfony/routing": {
         "version": "4.2",
@@ -619,6 +640,9 @@
     },
     "symfony/stopwatch": {
         "version": "v5.0.3"
+    },
+    "symfony/string": {
+        "version": "v5.1.0"
     },
     "symfony/test-pack": {
         "version": "v1.0.6"
