@@ -43,8 +43,10 @@ class LegacyAvailabilityProvider
             if (isset($data['ListPrestation'][0]['Availabilities'])) {
                 $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
                 $partner = $experience->partner;
-                $data['ListPrestation'][0]['Availabilities'] =
-                    AvailabilityHelper::convertToRequestType($data['ListPrestation'][0]['Availabilities']);
+                if (!$partner->isChannelManagerActive) {
+                    $data['ListPrestation'][0]['Availabilities'] =
+                        AvailabilityHelper::convertToRequestType($data['ListPrestation'][0]['Availabilities']);
+                }
             }
 
             return $this->serializer->fromArray($data, GetPackageResponse::class);
