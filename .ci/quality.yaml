@@ -51,7 +51,7 @@ Project-Env-Api-Tests:
   stage: Project Env Validation
   image: ${BASE_IMAGE}
   needs:
-    - composer
+    - composertags
     - '[DEVINT] Post-deploy Health Check'
   dependencies:
     - composer
@@ -77,8 +77,6 @@ Project-Env-Api-Tests:
     expire_in: 3 days
     paths:
       - report/
-  tags:
-    - k8s
   except:
     - schedules
 
@@ -87,7 +85,7 @@ locust-preprod:
   stage: Load Tests
   allow_failure: true
   only:
-    - tags
+    - branches
   variables:
     LOCUST_ENV: "preprod"
     LOCUST_HOST: "https://r2-d2-api-preprod.sbxtest.net"
@@ -184,11 +182,6 @@ contractTests-against-Api:
   allow_failure: true
   except:
     - tags
-
-.load-Tests:
-  image: grubykarol/locust
-  script:
-    - locust -f tests/LoadTests/R2D2Locust.py  --host=http://r2-d2-api/ --no-web -c 1 -r 1 --only-summary --run-time 1m
 
 validate-api-spec-schema:
   stage: Test
