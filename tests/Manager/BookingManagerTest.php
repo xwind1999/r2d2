@@ -14,6 +14,7 @@ use App\Entity\BoxExperience;
 use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\Partner;
+use App\Event\BookingStatusEvent;
 use App\Exception\Booking\BadPriceException;
 use App\Exception\Booking\BookingAlreadyInFinalStatusException;
 use App\Exception\Booking\BookingHasExpiredException;
@@ -39,6 +40,7 @@ use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @coversDefaultClass \App\Manager\BookingManager
@@ -83,6 +85,11 @@ class BookingManagerTest extends TestCase
 
     public BookingManager $bookingManager;
 
+    /**
+     * @var EventDispatcherInterface|ObjectProphecy
+     */
+    private $eventDispatcher;
+
     public function setUp(): void
     {
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
@@ -92,6 +99,7 @@ class BookingManagerTest extends TestCase
         $this->componentRepository = $this->prophesize(ComponentRepository::class);
         $this->moneyHelper = $this->prophesize(MoneyHelper::class);
         $this->boxRepository = $this->prophesize(BoxRepository::class);
+        $this->eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
         $this->bookingManager = new BookingManager(
             $this->entityManager->reveal(),
             $this->repository->reveal(),
@@ -100,6 +108,7 @@ class BookingManagerTest extends TestCase
             $this->componentRepository->reveal(),
             $this->moneyHelper->reveal(),
             $this->boxRepository->reveal(),
+            $this->eventDispatcher->reveal()
         );
     }
 
@@ -107,12 +116,22 @@ class BookingManagerTest extends TestCase
      * @dataProvider dataForUpdate
      * @group update-booking
      */
-    public function testUpdate(BookingUpdateRequest $bookingUpdateRequest, Booking $booking, ?string $exceptionClass, ?callable $asserts)
-    {
+    public function testUpdate(
+        BookingUpdateRequest $bookingUpdateRequest,
+        Booking $booking,
+        ?string $exceptionClass,
+        ?callable $asserts,
+        ?callable $setUp
+    ) {
         $this->repository->findOneByGoldenId($bookingUpdateRequest->bookingId)->willReturn($booking);
+        if ($setUp) {
+            $setUp($this);
+        }
+
         if ($exceptionClass) {
             $this->expectException($exceptionClass);
         }
+
         $this->bookingManager->update($bookingUpdateRequest);
         if ($asserts) {
             $asserts($this, $booking);
@@ -137,6 +156,12 @@ class BookingManagerTest extends TestCase
                 $test->entityManager->persist($booking)->shouldHaveBeenCalled();
                 $test->entityManager->flush()->shouldHaveBeenCalled();
             },
+            function (BookingManagerTest $test) {
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+            },
         ];
 
         yield 'happy path updating voucher' => [
@@ -150,7 +175,17 @@ class BookingManagerTest extends TestCase
             function ($test, $booking) {
                 $test->entityManager->persist($booking)->shouldHaveBeenCalled();
                 $test->entityManager->flush()->shouldHaveBeenCalled();
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
                 $test->assertEquals('43214312', $booking->voucher);
+            },
+            function (BookingManagerTest $test) {
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
             },
         ];
 
@@ -162,6 +197,7 @@ class BookingManagerTest extends TestCase
                 return $booking;
             })(clone $booking),
             BookingAlreadyInFinalStatusException::class,
+            null,
             null,
         ];
 
@@ -177,6 +213,7 @@ class BookingManagerTest extends TestCase
                 return $booking;
             })(clone $booking),
             InvalidBookingNewStatus::class,
+            null,
             null,
         ];
 
@@ -194,6 +231,7 @@ class BookingManagerTest extends TestCase
             })(clone $booking),
             BookingHasExpiredException::class,
             null,
+            null,
         ];
     }
 
@@ -204,8 +242,13 @@ class BookingManagerTest extends TestCase
      * @dataProvider dataForCreate
      * @group create
      */
-    public function testCreate(BookingCreateRequest $bookingCreateRequest, ?int $duration, ?callable $setUp, ?string $exceptionClass, callable $asserts)
-    {
+    public function testCreate(
+        BookingCreateRequest $bookingCreateRequest,
+        ?int $duration,
+        ?callable $setUp,
+        ?string $exceptionClass,
+        callable $asserts
+    ) {
         $partner = new Partner();
         $partner->goldenId = '5678';
 
@@ -283,6 +326,10 @@ class BookingManagerTest extends TestCase
             1,
             function (BookingManagerTest $test) {
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
             },
             null,
             function ($test, $booking) {
@@ -310,6 +357,10 @@ class BookingManagerTest extends TestCase
             null,
             function (BookingManagerTest $test) {
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
             },
             null,
             function ($test, $booking) {
@@ -342,6 +393,10 @@ class BookingManagerTest extends TestCase
             1,
             function (BookingManagerTest $test) {
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
             },
             null,
             function ($test, $booking) {
@@ -377,6 +432,10 @@ class BookingManagerTest extends TestCase
             1,
             function (BookingManagerTest $test) {
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
             },
             null,
             function ($test, $booking) {
@@ -421,6 +480,10 @@ class BookingManagerTest extends TestCase
             1,
             function (BookingManagerTest $test) {
                 $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
             },
             null,
             function ($test, $booking) {
