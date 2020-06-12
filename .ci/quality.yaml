@@ -80,9 +80,26 @@ Project-Env-Api-Tests:
   only:
     - master
 
+'smokeTesting':
+  stage: Test
+  image: ${BASE_IMAGE}
+  script:
+    - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
+  only:
+    - branches
+  except:
+    - tags
+
+'[PREPROD] smokeTesting':
+  stage: Test
+  image: ${BASE_IMAGE}
+  script:
+    - curl -f https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
+  only:
+    - tags
+
 '[PREPROD] Pre-deploy Health Check':
   stage: Pre-deploy Health Check
-  allow_failure: true
   image: ${BASE_IMAGE}
   script:
     - curl -f https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
