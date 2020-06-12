@@ -68,6 +68,8 @@ Project-Env-Api-Tests:
   image:
     name: ${LOCUST_IMAGE}
   when: always
+  needs:
+    - composer
   script:
     - echo "Running Locust tests...."
     - locust -f ${CI_PROJECT_DIR}/tests/LoadTests/${LOCUST_FILE}  --host=${LOCUST_HOST} ${LOCUST_OPTS} --only-summary
@@ -85,10 +87,7 @@ locust-preprod:
   stage: Load Tests
   allow_failure: true
   only:
-    refs:
-      - tags
-    variables:
-      - $CI == 'true'
+    - tags
   variables:
     LOCUST_ENV: "preprod"
     LOCUST_HOST: "https://r2-d2-api-preprod.sbxtest.net"
@@ -102,10 +101,7 @@ locust-staging:
   stage: Load Tests
   allow_failure: true
   only:
-    refs:
-      - branches
-    variables:
-      - $CI == 'true'
+    - branches
   variables:
     LOCUST_ENV: "staging"
     LOCUST_HOST: "http://r2-d2-api-devint.sbxtest.net"
