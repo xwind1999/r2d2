@@ -51,7 +51,7 @@ Project-Env-Api-Tests:
   stage: Project Env Validation
   image: ${BASE_IMAGE}
   needs:
-    - composertags
+    - composer
     - '[DEVINT] Post-deploy Health Check'
   dependencies:
     - composer
@@ -65,10 +65,9 @@ Project-Env-Api-Tests:
     - tags
 
 .locust-template: &locust
-  image:
-    name: ${LOCUST_IMAGE}
+  image: ${LOCUST_IMAGE}
   when: always
-  needs:
+  dependencies:
     - composer
   script:
     - echo "Running Locust tests...."
@@ -85,14 +84,12 @@ locust-preprod:
   stage: Load Tests
   allow_failure: true
   only:
-    - branches
+    - tags
   variables:
     LOCUST_ENV: "preprod"
     LOCUST_HOST: "https://r2-d2-api-preprod.sbxtest.net"
     LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 15s"
     LOCUST_FILE: "end2EndTests.py"
-  except:
-    - schedules
 
 locust-staging:
   <<: *locust
@@ -105,8 +102,6 @@ locust-staging:
     LOCUST_HOST: "http://r2-d2-api-devint.sbxtest.net"
     LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 15s"
     LOCUST_FILE: "end2EndTests.py"
-  except:
-    - schedules
 
 '[DEVINT] Pre-deploy Health Check':
   stage: Pre-deploy Health Check
