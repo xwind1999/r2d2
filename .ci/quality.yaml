@@ -69,8 +69,6 @@ Project-Env-Api-Tests:
   inherit:
     default: false
   when: always
-  dependencies:
-    - composer
   script:
     - echo "Running Locust tests...."
     - echo ${CI_PROJECT_DIR}
