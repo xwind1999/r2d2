@@ -24,7 +24,7 @@ class RoomPriceApiTest extends ApiTestCase
         $response = self::$roomPriceHelper->get($uuid);
         $responseContent = json_decode($response->getContent());
         $this->assertObjectHasAttribute('uuid', $responseContent);
-        $this->assertObjectHasAttribute('created_at', $responseContent);
+        $this->assertObjectHasAttribute('createdAt', $responseContent);
         $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;

@@ -39,11 +39,10 @@ abstract class AbstractExperienceComponentResponse extends ResponseContract
 
     /**
      * @Assert\Type(type="DateTime")
-     * @Assert\NotBlank
      *
      * @JMS\Type("DateTime")
      */
-    public \DateTime $externalUpdatedAt;
+    public ?\DateTime $externalUpdatedAt = null;
 
     public function __construct(ExperienceComponent $experienceComponent)
     {

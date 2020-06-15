@@ -49,6 +49,8 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
      */
     public ?int $averageCommission = null;
 
+    public ?\DateTime $updatedAt = null;
+
     public function getContext(): array
     {
         return [
@@ -56,6 +58,7 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
             'average_value' => $this->averageValue ? $this->averageValue->amount : '',
             'average_commission_type' => $this->averageCommissionType,
             'average_commission' => $this->averageCommission,
+            'updated_at' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
         ];
     }
 }

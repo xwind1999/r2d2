@@ -52,12 +52,4 @@ class ExperienceCreateRequest implements RequestBodyInterface, ValidatableReques
      * @JMS\Type("integer")
      */
     public ?int $productPeopleNumber;
-
-    /**
-     * @Assert\Type(type="integer")
-     * @Assert\PositiveOrZero
-     *
-     * @JMS\Type("strict_integer")
-     */
-    public ?int $voucherExpirationDuration = null;
 }

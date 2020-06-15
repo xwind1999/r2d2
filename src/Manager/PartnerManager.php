@@ -8,6 +8,7 @@ use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\Internal\Partner\PartnerCreateRequest;
 use App\Contract\Request\Internal\Partner\PartnerUpdateRequest;
 use App\Entity\Partner;
+use App\Exception\Manager\Partner\OutdatedPartnerException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\PartnerNotFoundException;
 use App\Repository\PartnerRepository;
@@ -86,11 +87,16 @@ class PartnerManager
             $partner = new Partner();
         }
 
+        if (!empty($partner->externalUpdatedAt) && $partner->externalUpdatedAt > $partnerRequest->updatedAt) {
+            throw new OutdatedPartnerException();
+        }
+
         $partner->goldenId = $partnerRequest->id;
         $partner->status = $partnerRequest->status;
         $partner->currency = $partnerRequest->currencyCode;
         $partner->isChannelManagerActive = $partnerRequest->isChannelManagerEnabled;
         $partner->ceaseDate = $partnerRequest->partnerCeaseDate;
+        $partner->externalUpdatedAt = $partnerRequest->updatedAt;
 
         $this->repository->save($partner);
     }

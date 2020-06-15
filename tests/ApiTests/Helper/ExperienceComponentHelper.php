@@ -26,8 +26,8 @@ class ExperienceComponentHelper
     public function getDefault(array $overrides = []): array
     {
         $payload = [
-            'is_enabled' => true,
-            'external_updated_at' => '2020-01-01T00:00:00+0',
+            'isEnabled' => true,
+            'externalUpdatedAt' => '2020-01-01T00:00:00+0',
         ];
 
         return $overrides + $payload;
@@ -53,8 +53,8 @@ class ExperienceComponentHelper
     public function delete(string $componentGoldenId, string $experienceGoldenId): object
     {
         $payload = [
-            'experience_golden_id' => $experienceGoldenId,
-            'component_golden_id' => $componentGoldenId,
+            'experienceGoldenId' => $experienceGoldenId,
+            'componentGoldenId' => $componentGoldenId,
         ];
 
         $this->client->request('DELETE',
@@ -69,13 +69,13 @@ class ExperienceComponentHelper
     {
         $experience = json_decode(ApiTestCase::$experienceHelper->create()->getContent());
 
-        $payload['experience_golden_id'] = $experience->golden_id;
+        $payload['experienceGoldenId'] = $experience->goldenId;
     }
 
     private function addValidComponent(array &$payload): void
     {
         $component = json_decode(ApiTestCase::$componentHelper->create()->getContent());
 
-        $payload['component_golden_id'] = $component->golden_id;
+        $payload['componentGoldenId'] = $component->goldenId;
     }
 }

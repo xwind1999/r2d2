@@ -79,7 +79,6 @@ class RoomAvailabilityManagerTest extends TestCase
 
     /**
      * @covers ::__construct
-     * @covers ::get
      * @covers ::delete
      */
     public function testDelete()
@@ -96,6 +95,25 @@ class RoomAvailabilityManagerTest extends TestCase
         $this->repository->delete(Argument::type(RoomAvailability::class))->shouldBeCalled();
 
         $manager->delete($uuid);
+    }
+
+    /**
+     * @covers ::get
+     */
+    public function testGet()
+    {
+        $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal());
+        $uuid = '12345678';
+
+        $uuidInterface = $this->prophesize(UuidInterface::class);
+        $uuidInterface->toString()->willReturn($uuid);
+        $roomAvailability = new RoomAvailability();
+        $roomAvailability->uuid = $uuidInterface->reveal();
+        $this->repository->findOne($uuid)->willReturn($roomAvailability);
+
+        $actual = $manager->get($uuid);
+
+        $this->assertSame($roomAvailability, $actual);
     }
 
     /**

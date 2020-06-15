@@ -53,6 +53,8 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
      */
     public ?\DateTime $partnerCeaseDate = null;
 
+    public ?\DateTime $updatedAt = null;
+
     public function getContext(): array
     {
         return [
@@ -61,6 +63,7 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
             'currency_code' => $this->currencyCode,
             'is_channel_manager_enabled' => $this->isChannelManagerEnabled,
             'partner_cease_date' => $this->partnerCeaseDate ? $this->partnerCeaseDate->format('Y-m-d H:i:s') : null,
+            'updated_at' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
         ];
     }
 }

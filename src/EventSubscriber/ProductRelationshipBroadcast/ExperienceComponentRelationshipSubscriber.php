@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\EventSubscriber\ProductRelationshipBroadcast;
 
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
+use App\Exception\ContextualException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceComponentManager;
@@ -45,6 +46,10 @@ class ExperienceComponentRelationshipSubscriber implements EventSubscriberInterf
                 'No existing Component for this relationship',
                 $event->getProductRelationshipRequest()->getContext()
             );
+
+            throw $exception;
+        } catch (ContextualException $exception) {
+            $this->logger->warning($exception, $event->getProductRelationshipRequest()->getContext());
 
             throw $exception;
         } catch (\Exception $exception) {

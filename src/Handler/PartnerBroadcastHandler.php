@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Handler;
 
 use App\Contract\Request\BroadcastListener\PartnerRequest;
+use App\Exception\ContextualException;
 use App\Manager\PartnerManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -24,6 +25,10 @@ class PartnerBroadcastHandler implements MessageHandlerInterface
     {
         try {
             $this->partnerManager->replace($partnerRequest);
+        } catch (ContextualException $exception) {
+            $this->logger->warning($exception, $partnerRequest->getContext());
+
+            throw $exception;
         } catch (\Exception $exception) {
             $this->logger->warning($exception->getMessage(), $partnerRequest->getContext());
 

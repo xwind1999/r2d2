@@ -67,11 +67,24 @@ class PartnerImportCommandTest extends AbstractImportCommandTest
     {
         $records = new \ArrayIterator([
             [
-                'Account_URN__c' => '16503',
-                'Type' => 'partner',
-                'CurrencyIsoCode' => 'EUR',
-                'CeaseDate__c' => '2015-10-12T23:03:09.000000+0000',
-                'Channel_Manager_Active__c' => '0',
+                'id' => '16503',
+                'type' => 'partner',
+                'currencyCode' => 'EUR',
+                'partnerCeaseDate' => '2015-10-12T23:03:09.000000+0000',
+                'isChannelManagerEnabled' => '0',
+                'updatedAt' => '2020-01-01 00:00:00',
+            ],
+        ]);
+
+        yield [$records];
+
+        $records = new \ArrayIterator([
+            [
+                'id' => '16503',
+                'type' => 'partner',
+                'currencyCode' => 'EUR',
+                'partnerCeaseDate' => '2015-10-12T23:03:09.000000+0000',
+                'isChannelManagerEnabled' => '0',
             ],
         ]);
 
@@ -82,11 +95,11 @@ class PartnerImportCommandTest extends AbstractImportCommandTest
     {
         $records = new \ArrayIterator([
             [
-                'Account_URN__c' => '9999999999999999999999',
-                'Type' => 'partner',
-                'CurrencyIsoCode' => '',
-                'CeaseDate__c' => new \DateTime('now'),
-                'Channel_Manager_Active__c' => '',
+                'id' => '9999999999999999999999',
+                'type' => 'partner',
+                'partnerCeaseDate' => new \DateTime('now'),
+                'isChannelManagerEnabled' => '',
+                'updatedAt' => '2020-01-01 00:00:00',
             ],
         ]);
 

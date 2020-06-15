@@ -64,14 +64,6 @@ class ComponentCreateRequest implements RequestBodyInterface, ValidatableRequest
     public ?int $duration = null;
 
     /**
-     * @Assert\Type(type="integer")
-     * @Assert\PositiveOrZero
-     *
-     * @JMS\Type("strict_integer")
-     */
-    public ?int $voucherExpirationDuration = null;
-
-    /**
      * @Assert\Type(type="boolean")
      * @Assert\NotNull()
      *

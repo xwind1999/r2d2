@@ -10,6 +10,7 @@ use App\Contract\Request\Internal\Component\ComponentCreateRequest;
 use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
 use App\Entity\Component;
 use App\Entity\Partner;
+use App\Exception\Manager\Component\OutdatedComponentException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Manager\ComponentManager;
 use App\Repository\ComponentRepository;
@@ -59,8 +60,8 @@ class ComponentManagerTest extends TestCase
         $componentUpdateRequest->name = 'room with a big big bed';
         $componentUpdateRequest->description = 'the bed is so big it could fit two families';
         $componentUpdateRequest->inventory = 2;
-        $componentUpdateRequest->voucherExpirationDuration = 1;
         $componentUpdateRequest->isSellable = true;
+        $componentUpdateRequest->duration = 3;
         $componentUpdateRequest->isReservable = true;
         $componentUpdateRequest->status = 'not_ok';
 
@@ -74,7 +75,7 @@ class ComponentManagerTest extends TestCase
         $component->name = 'room with small bed';
         $component->description = 'the bed is very small';
         $component->inventory = 1;
-        $component->duration = 0;
+        $component->duration = 2;
         $component->isSellable = false;
         $component->isReservable = false;
         $component->status = 'ok';
@@ -86,7 +87,7 @@ class ComponentManagerTest extends TestCase
 
         $this->assertSame($component, $updatedRoom);
         $this->assertEquals(2, $component->inventory);
-        $this->assertEquals(1, $component->duration);
+        $this->assertEquals(3, $component->duration);
         $this->assertEquals(true, $component->isReservable);
         $this->assertEquals(true, $component->isSellable);
         $this->assertEquals('4321', $component->partnerGoldenId);
@@ -132,7 +133,6 @@ class ComponentManagerTest extends TestCase
         $componentCreateRequest->name = 'room with small bed';
         $componentCreateRequest->description = 'the bed is very small';
         $componentCreateRequest->inventory = 1;
-        $componentCreateRequest->voucherExpirationDuration = 0;
         $componentCreateRequest->isSellable = false;
         $componentCreateRequest->isReservable = false;
         $componentCreateRequest->status = 'ok';
@@ -145,7 +145,6 @@ class ComponentManagerTest extends TestCase
         $this->assertEquals($componentCreateRequest->name, $component->name);
         $this->assertEquals($componentCreateRequest->description, $component->description);
         $this->assertEquals($componentCreateRequest->inventory, $component->inventory);
-        $this->assertEquals($componentCreateRequest->voucherExpirationDuration, $component->duration);
         $this->assertEquals($componentCreateRequest->isSellable, $component->isSellable);
         $this->assertEquals($componentCreateRequest->isReservable, $component->isReservable);
         $this->assertEquals($componentCreateRequest->status, $component->status);
@@ -167,7 +166,6 @@ class ComponentManagerTest extends TestCase
         $productRequest->description = 'a fancy dinner with feet massage';
         $productRequest->isSellable = true;
         $productRequest->isReservable = true;
-        $productRequest->voucherExpirationDuration = 3;
         $productRequest->status = 'test Status';
         $productRequest->roomStockType = 'on_request';
 
@@ -177,6 +175,31 @@ class ComponentManagerTest extends TestCase
         $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
 
         $this->assertEmpty($manager->replace($productRequest));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceWithOutdatedRecord()
+    {
+        $manager = new ComponentManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $partner = new PartnerDTO();
+        $partner->id = '5678';
+        $productRequest = new ProductRequest();
+        $productRequest->id = '5678';
+        $productRequest->partner = $partner;
+        $productRequest->updatedAt = new \DateTime('2020-01-01 00:00:00');
+
+        $component = new Component();
+        $component->externalUpdatedAt = new \DateTime('2020-01-01 01:00:00');
+
+        $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
+        $this->repository->findOneByGoldenId($productRequest->id)->willReturn($component);
+
+        $this->expectException(OutdatedComponentException::class);
+
+        $manager->replace($productRequest);
     }
 
     /**
@@ -195,7 +218,6 @@ class ComponentManagerTest extends TestCase
         $productRequest->description = 'a fancy dinner with feet massage';
         $productRequest->isSellable = true;
         $productRequest->isReservable = true;
-        $productRequest->voucherExpirationDuration = 3;
         $productRequest->status = 'test Status';
         $productRequest->roomStockType = 'allotment';
 

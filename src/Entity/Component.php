@@ -80,6 +80,11 @@ class Component
     public string $status;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public ?\DateTime $externalUpdatedAt = null;
+
+    /**
      * @var Collection<int, ExperienceComponent>
      *
      * @ORM\OneToMany(targetEntity="ExperienceComponent", mappedBy="component", fetch="EXTRA_LAZY")

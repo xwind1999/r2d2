@@ -9,6 +9,7 @@ namespace App\Tests\Command {
     use Prophecy\Prophecy\ObjectProphecy;
     use Symfony\Bundle\FrameworkBundle\Console\Application;
     use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+    use Symfony\Component\Console\Input\InputOption;
     use Symfony\Component\Console\Tester\CommandTester;
 
     class ApiDumpCommandTest extends KernelTestCase
@@ -80,7 +81,17 @@ namespace App\Tests\Command {
 
             $commandTester->execute([]);
 
-            $this->assertNotEquals(0, $commandTester->getStatusCode());
+            $this->assertEquals(1, $commandTester->getStatusCode());
+        }
+
+        public function testCorrectDescription(): void
+        {
+            $this->assertEquals('Dumps API documentation in Swagger JSON format', $this->command->getDescription());
+        }
+
+        public function testHasValidOptions(): void
+        {
+            $this->assertInstanceOf(InputOption::class, $this->command->getDefinition()->getOption('no-pretty'));
         }
     }
 }

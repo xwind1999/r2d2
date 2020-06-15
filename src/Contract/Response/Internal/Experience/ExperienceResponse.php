@@ -64,13 +64,6 @@ abstract class ExperienceResponse extends ResponseContract
      */
     public ?int $productPeopleNumber;
 
-    /**
-     * @Assert\Type(type="integer")
-     *
-     * @JMS\Type("strict_integer")
-     */
-    public ?int $voucherExpirationDuration;
-
     public function __construct(Experience $experience)
     {
         $this->uuid = $experience->uuid->toString();
@@ -79,7 +72,6 @@ abstract class ExperienceResponse extends ResponseContract
         $this->name = $experience->name;
         $this->description = $experience->description;
         $this->productPeopleNumber = $experience->peopleNumber;
-        $this->voucherExpirationDuration = $experience->duration;
         $this->createdAt = $experience->createdAt;
         $this->updatedAt = $experience->updatedAt;
     }

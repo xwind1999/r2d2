@@ -12,20 +12,20 @@ class BookingApiTest extends ApiTestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        $boxId = json_decode(ApiTestCase::$boxHelper->create()->getContent())->golden_id;
-        $partnerId = json_decode(ApiTestCase::$partnerHelper->create()->getContent())->golden_id;
-        $experienceId = json_decode(ApiTestCase::$experienceHelper->create()->getContent())->golden_id;
+        $boxId = json_decode(ApiTestCase::$boxHelper->create()->getContent())->goldenId;
+        $partnerId = json_decode(ApiTestCase::$partnerHelper->create()->getContent())->goldenId;
+        $experienceId = json_decode(ApiTestCase::$experienceHelper->create()->getContent())->goldenId;
         $boxExperience = ApiTestCase::$boxExperienceHelper->create(ApiTestCase::$boxExperienceHelper->getDefault([
-            'box_golden_id' => $boxId,
-            'experience_golden_id' => $experienceId,
+            'boxGoldenId' => $boxId,
+            'experienceGoldenId' => $experienceId,
         ]));
         $component = json_decode(ApiTestCase::$componentHelper->create(ApiTestCase::$componentHelper->getDefault([
-            'partner_golden_id' => $partnerId,
+            'partnerGoldenId' => $partnerId,
             'duration' => 1,
-        ]))->getContent())->golden_id;
+        ]))->getContent())->goldenId;
         $experienceComponent = ApiTestCase::$experienceComponentHelper->create(ApiTestCase::$experienceComponentHelper->getDefault([
-            'component_golden_id' => $component,
-            'experience_golden_id' => $experienceId,
+            'componentGoldenId' => $component,
+            'experienceGoldenId' => $experienceId,
         ]));
         static::$boxId = $boxId;
         static::$experienceId = $experienceId;

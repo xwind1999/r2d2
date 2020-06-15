@@ -26,12 +26,11 @@ class ExperienceHelper
     public function getDefault(array $overrides = []): array
     {
         $payload = [
-            'golden_id' => bin2hex(random_bytes(12)),
+            'goldenId' => bin2hex(random_bytes(12)),
             'name' => '1234',
             'description' => '1234',
-            'product_people_number' => '2',
-            'voucher_expiration_duration' => 3,
-            'partner_golden_id' => '1234',
+            'productPeopleNumber' => '2',
+            'partnerGoldenId' => '1234',
         ];
 
         return $overrides + $payload;
@@ -40,7 +39,7 @@ class ExperienceHelper
     public function addValidPartner(array &$payload)
     {
         $partner = json_decode(ApiTestCase::$partnerHelper->create()->getContent());
-        $payload['partner_golden_id'] = $partner->golden_id;
+        $payload['partnerGoldenId'] = $partner->goldenId;
     }
 
     /**

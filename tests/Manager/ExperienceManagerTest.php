@@ -12,6 +12,8 @@ use App\Contract\Request\Internal\Experience\ExperienceCreateRequest;
 use App\Contract\Request\Internal\Experience\ExperienceUpdateRequest;
 use App\Entity\Experience;
 use App\Entity\Partner;
+use App\Exception\Manager\Experience\OutdatedExperienceException;
+use App\Exception\Manager\Experience\OutdatedExperiencePriceException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceManager;
 use App\Repository\ExperienceRepository;
@@ -60,7 +62,6 @@ class ExperienceManagerTest extends TestCase
         $experienceUpdateRequest->name = 'dinner with massage';
         $experienceUpdateRequest->description = 'a fancy dinner with feet massage';
         $experienceUpdateRequest->productPeopleNumber = 1;
-        $experienceUpdateRequest->voucherExpirationDuration = 2;
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
         $uuidInterface->toString()->willReturn($uuid);
@@ -123,7 +124,6 @@ class ExperienceManagerTest extends TestCase
         $experienceCreateRequest->name = 'dinner with massage';
         $experienceCreateRequest->description = 'a fancy dinner with feet massage';
         $experienceCreateRequest->productPeopleNumber = 2;
-        $experienceCreateRequest->voucherExpirationDuration = 3;
 
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
 
@@ -150,7 +150,6 @@ class ExperienceManagerTest extends TestCase
         $productRequest->name = 'dinner with massage';
         $productRequest->description = 'a fancy dinner with feet massage';
         $productRequest->productPeopleNumber = 2;
-        $productRequest->voucherExpirationDuration = 3;
 
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
         $this->repository->findOneByGoldenId($productRequest->id);
@@ -158,6 +157,30 @@ class ExperienceManagerTest extends TestCase
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
 
         $this->assertEmpty($manager->replace($productRequest));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceWithOutdatedRecord()
+    {
+        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $partner = new \App\Contract\Request\BroadcastListener\Product\Partner();
+        $partner->id = '5678';
+        $productRequest = new ProductRequest();
+        $productRequest->id = '5678';
+        $productRequest->partner = $partner;
+        $productRequest->updatedAt = new \DateTime('2020-01-01 00:00:00');
+
+        $experience = new Experience();
+        $experience->externalUpdatedAt = new \DateTime('2020-01-01 01:00:00');
+
+        $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
+        $this->repository->findOneByGoldenId($productRequest->id)->willReturn($experience);
+
+        $this->expectException(OutdatedExperienceException::class);
+        $manager->replace($productRequest);
     }
 
     /**
@@ -175,7 +198,6 @@ class ExperienceManagerTest extends TestCase
         $productRequest->name = 'dinner with massage';
         $productRequest->description = 'a fancy dinner with feet massage';
         $productRequest->productPeopleNumber = 2;
-        $productRequest->voucherExpirationDuration = 3;
 
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
         $this->repository
@@ -212,6 +234,31 @@ class ExperienceManagerTest extends TestCase
         ;
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalledOnce();
         $this->assertEmpty($manager->insertPriceInfo($priceInformationRequest));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::insertPriceInfo
+     */
+    public function testInsertOutdatedPriceInfo()
+    {
+        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
+        $productDTO = new Product();
+        $productDTO->id = '1264';
+        $priceInformationRequest = new PriceInformationRequest();
+        $priceInformationRequest->product = $productDTO;
+        $priceInformationRequest->updatedAt = new \DateTime('2020-01-01 00:00:00');
+
+        $experience = $this->prophesize(Experience::class);
+        $experience->priceUpdatedAt = new \DateTime('2020-01-01 01:00:00');
+
+        $this->repository
+            ->findOneByGoldenId($priceInformationRequest->product->id)
+            ->shouldBeCalledOnce()
+            ->willReturn($experience->reveal())
+        ;
+        $this->expectException(OutdatedExperiencePriceException::class);
+        $manager->insertPriceInfo($priceInformationRequest);
     }
 
     /**

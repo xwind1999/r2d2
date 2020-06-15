@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\EventSubscriber\ProductBroadcast;
 
 use App\Event\Product\BoxBroadcastEvent;
+use App\Exception\ContextualException;
 use App\Manager\BoxManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,6 +32,10 @@ class BoxBroadcastSubscriber implements EventSubscriberInterface
     {
         try {
             $this->boxManager->replace($event->getProductRequest());
+        } catch (ContextualException $exception) {
+            $this->logger->warning($exception, $event->getContext());
+
+            throw $exception;
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage(), $event->getProductRequest()->getContext());
 

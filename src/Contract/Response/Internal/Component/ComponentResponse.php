@@ -63,13 +63,6 @@ abstract class ComponentResponse extends ResponseContract
     public ?int $inventory;
 
     /**
-     * @Assert\Type(type="integer")
-     *
-     * @JMS\Type("strict_integer")
-     */
-    public ?int $voucherExpirationDuration;
-
-    /**
      * @Assert\Type(type="boolean")
      * @Assert\NotNull()
      *
@@ -116,7 +109,6 @@ abstract class ComponentResponse extends ResponseContract
         $this->name = $component->name;
         $this->description = $component->description;
         $this->inventory = $component->inventory;
-        $this->voucherExpirationDuration = $component->duration;
         $this->isSellable = $component->isSellable;
         $this->isReservable = $component->isReservable;
         $this->status = $component->status;

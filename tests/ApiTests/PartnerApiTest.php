@@ -8,7 +8,7 @@ class PartnerApiTest extends ApiTestCase
 {
     public function testCreateWithInvalidGoldenId()
     {
-        $partnerCreateRequest = self::$partnerHelper->getDefault(['golden_id' => '']);
+        $partnerCreateRequest = self::$partnerHelper->getDefault(['goldenId' => '']);
         $response = self::$partnerHelper->create($partnerCreateRequest);
         $this->assertEquals(422, $response->getStatusCode());
     }
@@ -31,7 +31,7 @@ class PartnerApiTest extends ApiTestCase
         $response = self::$partnerHelper->get($uuid);
         $responseContent = json_decode($response->getContent());
         $this->assertObjectHasAttribute('uuid', $responseContent);
-        $this->assertObjectHasAttribute('created_at', $responseContent);
+        $this->assertObjectHasAttribute('createdAt', $responseContent);
         $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;
@@ -45,7 +45,7 @@ class PartnerApiTest extends ApiTestCase
         $partner = json_decode(self::$partnerHelper->get($uuid)->getContent(), true);
         $payload = [
             'status' => 'inactive',
-            'cease_date' => (new \DateTime())->format('Y-m-d'),
+            'ceaseDate' => (new \DateTime())->format('Y-m-d'),
         ] + $partner;
         $response = self::$partnerHelper->update($uuid, $payload);
         $responseContent = json_decode($response->getContent());

@@ -15,6 +15,7 @@ class RelationshipImportCommand extends AbstractImportCommand
         'childProduct',
         'isEnabled',
         'relationshipType',
+        'updatedAt',
     ];
 
     protected function process(\Iterator $records): void
@@ -26,6 +27,9 @@ class RelationshipImportCommand extends AbstractImportCommand
             $productRelationshipRequest->childProduct = $record['childProduct'];
             $productRelationshipRequest->isEnabled = (bool) $record['isEnabled'];
             $productRelationshipRequest->relationshipType = $record['relationshipType'];
+            if (!empty($record['updatedAt'])) {
+                $productRelationshipRequest->updatedAt = new \DateTime($record['updatedAt']);
+            }
 
             $errors = $this->validator->validate($productRelationshipRequest);
             if ($errors->count() > 0) {

@@ -8,7 +8,7 @@ class RoomAvailabilityApiTest extends ApiTestCase
 {
     public function testCreateWithInvalidRoomGoldenId()
     {
-        $response = self::$roomAvailabilityHelper->create(['component_golden_id' => '']);
+        $response = self::$roomAvailabilityHelper->create(['componentGoldenId' => '']);
         $this->assertEquals(422, $response->getStatusCode());
     }
 
@@ -30,7 +30,7 @@ class RoomAvailabilityApiTest extends ApiTestCase
         $response = self::$roomAvailabilityHelper->get($uuid);
         $responseContent = json_decode($response->getContent());
         $this->assertObjectHasAttribute('uuid', $responseContent);
-        $this->assertObjectHasAttribute('created_at', $responseContent);
+        $this->assertObjectHasAttribute('createdAt', $responseContent);
         $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;
