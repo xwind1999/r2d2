@@ -1,6 +1,7 @@
 variables:
   PACT_BROKER: http://pactbroker.production.smartbox.com:30336/
   BASE_IMAGE_STUB: docker-registry.production.smartbox.com/millenium-falcon/r2d2mock
+  LOCUST_IMAGE: locustio/locust:1.0.2
 
 unitTests:
   stage: Test
@@ -62,6 +63,48 @@ Project-Env-Api-Tests:
     - master
   except:
     - tags
+
+.locust-template: &locust
+  image: ${LOCUST_IMAGE}
+  inherit:
+    default: false
+  when: always
+  script:
+    - echo "Running Locust tests...."
+    - echo ${CI_PROJECT_DIR}
+    - locust -f ${CI_PROJECT_DIR}/tests/LoadTests/${LOCUST_FILE}  --host=${LOCUST_HOST} ${LOCUST_OPTS} --only-summary
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - report/
+  tags:
+    - k8s
+  except:
+    - schedules
+
+locust-preprod:
+  <<: *locust
+  stage: Load Tests
+  allow_failure: true
+  only:
+    - tags
+  variables:
+    LOCUST_ENV: "preprod"
+    LOCUST_HOST: "https://r2-d2-api-preprod.sbxtest.net"
+    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
+    LOCUST_FILE: "end2EndTests.py"
+
+locust-staging:
+  <<: *locust
+  stage: Load Tests
+  allow_failure: true
+  only:
+    - master
+  variables:
+    LOCUST_ENV: "staging"
+    LOCUST_HOST: "http://r2-d2-api-devint.sbxtest.net"
+    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
+    LOCUST_FILE: "end2EndTests.py"
 
 '[DEVINT] Pre-deploy Health Check':
   stage: Pre-deploy Health Check
@@ -154,11 +197,6 @@ contractTests-against-Api:
   allow_failure: true
   except:
     - tags
-
-.load-Tests:
-  image: grubykarol/locust
-  script:
-    - locust -f tests/LoadTests/R2D2Locust.py  --host=http://r2-d2-api/ --no-web -c 1 -r 1 --only-summary --run-time 1m
 
 validate-api-spec-schema:
   stage: Test

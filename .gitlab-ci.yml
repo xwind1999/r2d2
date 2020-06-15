@@ -10,6 +10,7 @@ stages:
   - Preprod Deploy
   - Post-deploy Health Check
   - Project Env Validation
+  - Load Tests
   - Build Reports
   - Generate Documentation
   - Publish Reports
