@@ -43,3 +43,15 @@ variables:
     ENVIRONMENT_NAME: ie1-preprod-r2d2
   only:
     - tags
+
+'[PROD] Deploy':
+  extends: .deploy
+  stage: Production Deploy
+  environment:
+    name: ie1-prod-r2d2
+  variables:
+    ENVIRONMENT_NAME: ie1-prod-r2d2
+  when: manual
+  only:
+    - tags
+

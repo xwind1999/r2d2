@@ -5,10 +5,15 @@ stages:
   - Test
   - Static analysis
   - App Container Build
-  - Pre-deploy Health Check
+  - DevInt Pre Health Check
+  - PreProd Pre Health Check
   - Project Env Deploy
   - Preprod Deploy
-  - Post-deploy Health Check
+  - DevInt Post Health Check
+  - PreProd Post Health Check
+  - Production Pre Health Check
+  - Production Deploy
+  - Production Post Health Check
   - Project Env Validation
   - Load Tests
   - Build Reports
