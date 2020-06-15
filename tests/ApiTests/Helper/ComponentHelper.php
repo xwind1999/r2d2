@@ -34,7 +34,7 @@ class ComponentHelper
             'duration' => 1,
             'isSellable' => true,
             'isReservable' => true,
-            'status' => 'enabled',
+            'status' => 'live',
         ];
 
         return $overrides + $payload;

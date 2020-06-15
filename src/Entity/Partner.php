@@ -49,7 +49,7 @@ class Partner
     /**
      * @ORM\Column(type="date", nullable=true)
      */
-    public ?\DateTime $ceaseDate;
+    public ?\DateTime $ceaseDate = null;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)

@@ -36,22 +36,22 @@ class Box
     /**
      * @ORM\Column(type="string", length=3, nullable=true)
      */
-    public ?string $brand;
+    public ?string $brand = null;
 
     /**
      * @ORM\Column(type="string", length=2, nullable=true)
      */
-    public ?string $country;
+    public ?string $country = null;
 
     /**
-     * @ORM\Column(type="string", length=30, nullable=true)
+     * @ORM\Column(type="product_status", length=30)
      */
-    public ?string $status;
+    public string $status;
 
     /**
      * @ORM\Column(type="string", length=3, nullable=true)
      */
-    public ?string $currency;
+    public ?string $currency = null;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
