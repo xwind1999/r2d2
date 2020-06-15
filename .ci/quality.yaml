@@ -93,7 +93,7 @@ locust-preprod:
   variables:
     LOCUST_ENV: "preprod"
     LOCUST_HOST: "https://r2-d2-api-preprod.sbxtest.net"
-    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 15s"
+    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
     LOCUST_FILE: "end2EndTests.py"
 
 locust-staging:
@@ -101,11 +101,11 @@ locust-staging:
   stage: Load Tests
   allow_failure: true
   only:
-    - branches
+    - master
   variables:
     LOCUST_ENV: "staging"
     LOCUST_HOST: "http://r2-d2-api-devint.sbxtest.net"
-    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 15s"
+    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
     LOCUST_FILE: "end2EndTests.py"
 
 '[DEVINT] Pre-deploy Health Check':
