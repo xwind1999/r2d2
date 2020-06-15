@@ -79,8 +79,7 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
-            "@auto-scripts",
-            "R2D2\\Hooks\\InstallHooks::checkHooks"
+            "@auto-scripts"
         ],
         "post-update-cmd": [
             "@auto-scripts"

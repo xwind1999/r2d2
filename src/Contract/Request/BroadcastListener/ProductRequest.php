@@ -166,8 +166,14 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
         $productRequest->status = $product['status'];
         $productRequest->type = $product['type'];
         $productRequest->description = $product['description'] ?? null;
-        $productRequest->roomStockType = $product['roomStockType'] ?? null;
-        $productRequest->productDurationUnit = $product['productDurationUnit'] ?? null;
+
+        if (!empty($product['roomStockType'])) {
+            $productRequest->roomStockType = $product['roomStockType'];
+        }
+
+        if (!empty($product['productDurationUnit'])) {
+            $productRequest->productDurationUnit = $product['productDurationUnit'];
+        }
 
         if (!empty($product['productPeopleNumber'])) {
             $productRequest->productPeopleNumber = (int) $product['productPeopleNumber'];
