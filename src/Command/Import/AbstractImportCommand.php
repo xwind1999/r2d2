@@ -89,12 +89,14 @@ abstract class AbstractImportCommand extends Command
     {
         $msgError = '';
         foreach ($errors as $violation) {
-            $msgError = sprintf('Failed during validation :[%s] %s', $violation->getPropertyPath(), $violation->getMessage());
-            $this->io->error($msgError);
-            $this->logger->error(
-                sprintf('Failed during validation :[%s] %s', $violation->getPropertyPath(), $violation->getMessage()),
-                $violation->getParameters()
+            $msgError = sprintf(
+                'Failed during validation: ("%s","%s"): %s',
+                $violation->getPropertyPath(),
+                $violation->getInvalidValue(),
+                $violation->getMessage()
             );
+            $this->io->error($msgError);
+            $this->logger->error($msgError, $violation->getParameters());
         }
         throw new \InvalidArgumentException($msgError);
     }
