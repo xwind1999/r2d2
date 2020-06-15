@@ -66,6 +66,8 @@ Project-Env-Api-Tests:
 
 .locust-template: &locust
   image: ${LOCUST_IMAGE}
+  inherit:
+    default: false
   when: always
   dependencies:
     - composer
