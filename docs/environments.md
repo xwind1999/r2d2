@@ -40,7 +40,7 @@
 | R2D2 | https://r2-d2-api-preprod.sbxtest.net/ | booking | booking | `/booking` |
 | R2D2 | https://r2-d2-api-preprod.sbxtest.net/ | | | `/quickdata`, `/cmhub`, `/`, `/ping` |
 | RabbitMQ | http://ie1-pp-r2d2-rabbitmq-01.z.sbxtest.net:15672/ | rabbit-admin | 3iwgXykuxdO | |
-| MySQL | ie1-pp-r2d2-db-01.z.sbxtest.net:3306 | ??? | ???? | |
+| MySQL | ie1-pp-r2d2-db-01.z.sbxtest.net:3306 | u_r2d2 | gT6%Ne^m6DO8QGwi3j62 | |
 
 
 ## PRODUCTION
