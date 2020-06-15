@@ -49,7 +49,7 @@ abstract class AbstractImportCommand extends Command
     protected function configure(): void
     {
         $service = self::getDefaultName() ?? ':service:';
-        preg_match('/:([a-z]+):/', $service, $services);
+        preg_match('/:([a-z\-]+):/', $service, $services);
         $this
             ->setDescription(sprintf('Command to push CSV %s to the queue', $services[1]))
             ->addArgument('file', InputArgument::REQUIRED, 'CSV file path')
@@ -63,7 +63,7 @@ abstract class AbstractImportCommand extends Command
         /** @var string $filePath */
         $filePath = $input->getArgument('file');
 
-        $records = $this->csvParser->readFile($filePath, $this::IMPORT_FIELDS);
+        $records = $this->csvParser->readFile($filePath, static::IMPORT_FIELDS);
 
         $this->io->note(sprintf('Total records: %s', iterator_count($records)));
         $this->io->note(sprintf('Starting at: %s', (new \DateTime())->format('Y-m-d H:i:s')));

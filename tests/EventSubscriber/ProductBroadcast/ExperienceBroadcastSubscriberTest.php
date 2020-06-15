@@ -11,6 +11,7 @@ use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\ExperienceBroadcastEvent;
 use App\EventSubscriber\ProductBroadcast\ExperienceBroadcastSubscriber;
+use App\Exception\Manager\Experience\OutdatedExperienceException;
 use App\Manager\ExperienceManager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -98,5 +99,26 @@ class ExperienceBroadcastSubscriberTest extends TestCase
 
         $this->expectException(\Exception::class);
         $this->assertEmpty($experienceSubscriber->handleMessage($this->experienceEvent->reveal()));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::handleMessage
+     */
+    public function testHandleMessageCatchesOutdatedException(): void
+    {
+        $productRequest = new ProductRequest();
+
+        $this->experienceEvent->getProductRequest()->shouldBeCalled()->willReturn($productRequest);
+        $this->experienceEvent->getContext()->willReturn(['aaa' => 'bbb']);
+
+        $exception = new OutdatedExperienceException();
+        $this->experienceManager->replace($productRequest)->shouldBeCalled()->willThrow($exception);
+        $experienceSubscriber = new ExperienceBroadcastSubscriber($this->logger->reveal(), $this->experienceManager->reveal());
+
+        $this->logger->warning($exception, ['aaa' => 'bbb'])->shouldBeCalled();
+
+        $this->expectException(OutdatedExperienceException::class);
+        $experienceSubscriber->handleMessage($this->experienceEvent->reveal());
     }
 }

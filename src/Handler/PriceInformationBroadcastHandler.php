@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Handler;
 
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
+use App\Exception\ContextualException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\BoxManager;
 use App\Manager\ExperienceManager;
@@ -30,6 +31,10 @@ class PriceInformationBroadcastHandler implements MessageHandlerInterface
             $this->experienceManager->insertPriceInfo($priceInformationRequest);
         } catch (ExperienceNotFoundException $exception) {
             $this->boxManager->insertPriceInfo($priceInformationRequest);
+        } catch (ContextualException $exception) {
+            $this->logger->warning($exception, $priceInformationRequest->getContext());
+
+            throw $exception;
         } catch (\Exception $exception) {
             $this->logger->warning($exception->getMessage(), $priceInformationRequest->getContext());
 

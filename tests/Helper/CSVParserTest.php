@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Command\Import\Helper;
 
+use App\Exception\Helper\InvalidCSVHeadersException;
 use App\Helper\CSVParser;
-use League\Csv\Reader;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -13,28 +13,27 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  */
 class CSVParserTest extends KernelTestCase
 {
-    private Reader $csv;
+    private $tmpFile;
 
     private array $expected = [
-        ['parentProduct', 'childProduct', 'sortOrder', 'isEnabled', 'relationshipType', 'childCount', 'childQuantity'],
-        ['189970', '482341', '1', '1', 'Experience-Component', '0', '0'],
-        ['108338', '321805', '1', '1', 'Experience-Component', '0', '0'],
-        ['73026', '237127', '1', '1', 'Experience-Component', '0', '0'],
+        ['parentProduct', 'childProduct', 'isEnabled', 'relationshipType'],
+        ['189970', '482341', '1', 'Experience-Component'],
+        ['108338', '321805', '1', 'Experience-Component'],
+        ['73026', '237127', '1', 'Experience-Component'],
     ];
 
     public function setUp(): void
     {
-        $tmp = new \SplTempFileObject();
+        $this->tmpFile = tmpfile();
         foreach ($this->expected as $row) {
-            $tmp->fputcsv($row);
+            fputcsv($this->tmpFile, $row);
         }
-
-        $this->csv = Reader::createFromFileObject($tmp);
+        rewind($this->tmpFile);
     }
 
     public function tearDown(): void
     {
-        unset($this->csv);
+        fclose($this->tmpFile);
     }
 
     /**
@@ -47,16 +46,30 @@ class CSVParserTest extends KernelTestCase
         $fields = [
             'parentProduct',
             'childProduct',
-            'sortOrder',
             'isEnabled',
             'relationshipType',
-            'printType',
-            'childCount',
-            'childQuantity',
         ];
-
-        $response = $csvParser->readFile($this->csv->getPathname(), $fields);
+        $response = $csvParser->readFile(stream_get_meta_data($this->tmpFile)['uri'], $fields);
 
         $this->assertInstanceOf(\Iterator::class, $response);
+    }
+
+    /**
+     * @covers ::readFile
+     */
+    public function testReadFileWithInvalidHeaders(): void
+    {
+        $csvParser = new CSVParser();
+
+        $fields = [
+            'parentProduct',
+            'childProduct',
+            'isEnabled',
+            'relationshipType',
+            'invalidHeader',
+        ];
+
+        $this->expectException(InvalidCSVHeadersException::class);
+        $response = $csvParser->readFile(stream_get_meta_data($this->tmpFile)['uri'], $fields);
     }
 }

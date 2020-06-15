@@ -11,6 +11,7 @@ use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\ComponentBroadcastEvent;
 use App\EventSubscriber\ProductBroadcast\ComponentBroadcastSubscriber;
+use App\Exception\Manager\Component\OutdatedComponentException;
 use App\Exception\Repository\PartnerNotFoundException;
 use App\Manager\ComponentManager;
 use PHPUnit\Framework\TestCase;
@@ -93,7 +94,6 @@ class ComponentBroadcastSubscriberTest extends TestCase
         $productRequest->sellableBrand = $brand;
         $productRequest->status = 'active';
         $productRequest->type = 'mev';
-        $productRequest->voucherExpirationDuration = 3;
 
         $this->event->getProductRequest()->shouldBeCalled()->willReturn($productRequest);
 
@@ -102,6 +102,27 @@ class ComponentBroadcastSubscriberTest extends TestCase
 
         $this->expectException(get_class($exception));
         $this->assertEmpty($subscriber->handleMessage($this->event->reveal()));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::handleMessage
+     */
+    public function testHandleMessageCatchesOutdatedException(): void
+    {
+        $productRequest = new ProductRequest();
+
+        $this->event->getProductRequest()->shouldBeCalled()->willReturn($productRequest);
+        $this->event->getContext()->willReturn(['aaa' => 'bbb']);
+
+        $exception = new OutdatedComponentException();
+        $this->manager->replace($productRequest)->shouldBeCalled()->willThrow($exception);
+        $subscriber = new ComponentBroadcastSubscriber($this->logger->reveal(), $this->manager->reveal());
+
+        $this->logger->warning($exception, ['aaa' => 'bbb'])->shouldBeCalled();
+
+        $this->expectException(OutdatedComponentException::class);
+        $subscriber->handleMessage($this->event->reveal());
     }
 
     public function sampleException(): array

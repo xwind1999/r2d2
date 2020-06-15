@@ -26,7 +26,7 @@ class RoomAvailabilityHelper
     public function getDefault(array $overrides = []): array
     {
         $payload = [
-            'component_golden_id' => '1234',
+            'componentGoldenId' => '1234',
             'stock' => 2,
             'date' => '2020-01-01',
             'type' => 'instant',
@@ -38,7 +38,7 @@ class RoomAvailabilityHelper
     public function addValidComponent(array &$payload)
     {
         $component = json_decode(ApiTestCase::$componentHelper->create()->getContent());
-        $payload['component_golden_id'] = $component->golden_id;
+        $payload['componentGoldenId'] = $component->goldenId;
     }
 
     /**

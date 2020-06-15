@@ -14,6 +14,8 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Controller\BroadcastListener\BroadcastListenerController;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -39,6 +41,7 @@ class BroadcastListenerControllerTest extends TestCase
 
     /**
      * @covers ::productListener
+     * @covers ::getBroadcastDateTimeFromRequest
      */
     public function testHandleProductsSuccessfully()
     {
@@ -57,8 +60,11 @@ class BroadcastListenerControllerTest extends TestCase
             ->method('dispatch')
             ->willReturn($this->envelope);
 
+        $request = new Request();
+        $request->headers = new HeaderBag();
+
         $controller = new BroadcastListenerController();
-        $response = $controller->productListener($productRequest, $this->messageBus);
+        $response = $controller->productListener($request, $productRequest, $this->messageBus);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }
@@ -79,8 +85,11 @@ class BroadcastListenerControllerTest extends TestCase
             ->method('dispatch')
             ->willReturn($this->envelope);
 
+        $request = new Request();
+        $request->headers = new HeaderBag();
+
         $controller = new BroadcastListenerController();
-        $response = $controller->partnerListener($partnerRequest, $this->messageBus);
+        $response = $controller->partnerListener($request, $partnerRequest, $this->messageBus);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }
@@ -100,8 +109,11 @@ class BroadcastListenerControllerTest extends TestCase
             ->method('dispatch')
             ->willReturn($this->envelope);
 
+        $request = new Request();
+        $request->headers = new HeaderBag();
+
         $controller = new BroadcastListenerController();
-        $response = $controller->relationshipListener($relationshipRequest, $this->messageBus);
+        $response = $controller->relationshipListener($request, $relationshipRequest, $this->messageBus);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }
@@ -125,8 +137,11 @@ class BroadcastListenerControllerTest extends TestCase
             ->method('dispatch')
             ->willReturn($this->envelope);
 
+        $request = new Request();
+        $request->headers = new HeaderBag();
+
         $controller = new BroadcastListenerController();
-        $response = $controller->priceInformationListener($priceInformationRequest, $this->messageBus);
+        $response = $controller->priceInformationListener($request, $priceInformationRequest, $this->messageBus);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helper;
 
+use App\Exception\Helper\InvalidCSVHeadersException;
 use League\Csv\Reader;
 
 class CSVParser
@@ -14,6 +15,10 @@ class CSVParser
     {
         $reader = Reader::createFromPath($filePath);
         $reader->setHeaderOffset(self::HEADER_OFFSET);
+
+        if ($reader->getHeader() !== $fields) {
+            throw new InvalidCSVHeadersException();
+        }
 
         return $reader->getRecords($fields);
     }

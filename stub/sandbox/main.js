@@ -172,13 +172,6 @@ Sandbox.define('/broadcast-listener/product-relationship','POST',function (req, 
         })
     }
 
-    if (req.body.sortOrder === undefined) {
-        return res.json(422, {
-            status: "Error: Unprocessable Entity",
-            details: "sortOrder : This field cant be null"
-        })
-    }
-
     if (req.body.relationshipType === "box-experience")
         state.box_experience.push(req.body)
     else

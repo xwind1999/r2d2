@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\EventSubscriber\ProductBroadcast;
 
 use App\Event\Product\ExperienceBroadcastEvent;
+use App\Exception\ContextualException;
 use App\Manager\ExperienceManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,6 +32,10 @@ class ExperienceBroadcastSubscriber implements EventSubscriberInterface
     {
         try {
             $this->experienceManager->replace($event->getProductRequest());
+        } catch (ContextualException $exception) {
+            $this->logger->warning($exception, $event->getContext());
+
+            throw $exception;
         } catch (\Exception $exception) {
             $this->logger->warning($exception->getMessage(), $event->getProductRequest()->getContext());
 

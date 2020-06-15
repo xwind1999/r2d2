@@ -14,6 +14,7 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Box\BoxCreateRequest;
 use App\Contract\Request\Internal\Box\BoxUpdateRequest;
 use App\Entity\Box;
+use App\Exception\Manager\Box\OutdatedBoxException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Manager\BoxManager;
 use App\Repository\BoxRepository;
@@ -138,6 +139,26 @@ class BoxManagerTest extends TestCase
         $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
 
         $this->assertEmpty($manager->replace($productRequest));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceWithOutdatedRecord()
+    {
+        $manager = new BoxManager($this->repository->reveal());
+        $productRequest = new ProductRequest();
+        $productRequest->id = '1234';
+        $productRequest->updatedAt = new \DateTime('2020-01-01 00:00:00');
+
+        $box = new Box();
+        $box->externalUpdatedAt = new \DateTime('2020-01-01 01:00:00');
+
+        $this->repository->findOneByGoldenId($productRequest->id)->willReturn($box);
+
+        $this->expectException(OutdatedBoxException::class);
+        $manager->replace($productRequest);
     }
 
     /**

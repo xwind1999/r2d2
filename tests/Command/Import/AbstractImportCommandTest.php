@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Command\Import;
 
 use App\Helper\CSVParser;
-use League\Csv\Reader;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -93,21 +92,7 @@ abstract class AbstractImportCommandTest extends KernelTestCase
         $this->assertStringContainsString('Command executed', $this->commandTester->getDisplay());
     }
 
-    public function requestProvider(): ?\Generator
-    {
-        $reader = Reader::createFromPath($this->filename, 'r');
-        $reader->setHeaderOffset(0);
-        $records = new \ArrayIterator($reader->jsonSerialize());
+    abstract public function requestProvider(): ?\Generator;
 
-        yield [$records];
-    }
-
-    public function requestProviderInvalidData(): ?\Generator
-    {
-        $reader = Reader::createFromPath($this->invalidFilename, 'r');
-        $reader->setHeaderOffset(0);
-        $records = new \ArrayIterator($reader->jsonSerialize());
-
-        yield [$records];
-    }
+    abstract public function requestProviderInvalidData(): ?\Generator;
 }

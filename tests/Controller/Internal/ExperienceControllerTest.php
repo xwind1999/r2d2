@@ -70,7 +70,6 @@ class ExperienceControllerTest extends TestCase
         $this->assertEquals($experience->name, $return->name);
         $this->assertEquals($experience->description, $return->description);
         $this->assertEquals($experience->peopleNumber, $return->productPeopleNumber);
-        $this->assertEquals($experience->duration, $return->voucherExpirationDuration);
         $this->assertEquals($experience->createdAt, $return->createdAt);
         $this->assertEquals($experience->updatedAt, $return->updatedAt);
     }

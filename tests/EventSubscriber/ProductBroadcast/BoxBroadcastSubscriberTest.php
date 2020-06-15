@@ -11,6 +11,7 @@ use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\BoxBroadcastEvent;
 use App\EventSubscriber\ProductBroadcast\BoxBroadcastSubscriber;
+use App\Exception\Manager\Box\OutdatedBoxException;
 use App\Manager\BoxManager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -98,5 +99,26 @@ class BoxBroadcastSubscriberTest extends TestCase
 
         $this->expectException(\Exception::class);
         $this->assertEmpty($boxSubscriber->handleMessage($this->boxEvent->reveal()));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::handleMessage
+     */
+    public function testHandleMessageCatchesOutdatedException(): void
+    {
+        $productRequest = new ProductRequest();
+
+        $this->boxEvent->getProductRequest()->shouldBeCalled()->willReturn($productRequest);
+        $this->boxEvent->getContext()->willReturn(['aaa' => 'bbb']);
+
+        $exception = new OutdatedBoxException();
+        $this->boxManager->replace($productRequest)->shouldBeCalled()->willThrow($exception);
+        $boxSubscriber = new BoxBroadcastSubscriber($this->logger->reveal(), $this->boxManager->reveal());
+
+        $this->logger->warning($exception, ['aaa' => 'bbb'])->shouldBeCalled();
+
+        $this->expectException(OutdatedBoxException::class);
+        $boxSubscriber->handleMessage($this->boxEvent->reveal());
     }
 }

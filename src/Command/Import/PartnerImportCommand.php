@@ -11,11 +11,12 @@ class PartnerImportCommand extends AbstractImportCommand
     protected static $defaultName = 'r2d2:partner:import';
 
     protected const IMPORT_FIELDS = [
-        'Account_URN__c',
-        'Type',
-        'CurrencyIsoCode',
-        'CeaseDate__c',
-        'Channel_Manager_Active__c',
+        'id',
+        'type',
+        'currencyCode',
+        'partnerCeaseDate',
+        'isChannelManagerEnabled',
+        'updatedAt',
     ];
 
     protected function configure(): void
@@ -28,11 +29,18 @@ class PartnerImportCommand extends AbstractImportCommand
         foreach ($records as $record) {
             $partnerRequest = new PartnerRequest();
 
-            $partnerRequest->id = $record['Account_URN__c'];
-            $partnerRequest->status = $record['Type'];
-            $partnerRequest->currencyCode = $record['CurrencyIsoCode'];
-            $partnerRequest->isChannelManagerEnabled = (bool) ($record['Channel_Manager_Active__c']);
-            $partnerRequest->partnerCeaseDate = $record['CeaseDate__c'] ? new \DateTime($record['CeaseDate__c']) : null;
+            $partnerRequest->id = $record['id'];
+            $partnerRequest->status = $record['type'];
+            $partnerRequest->currencyCode = $record['currencyCode'];
+            $partnerRequest->isChannelManagerEnabled = (bool) ($record['isChannelManagerEnabled']);
+
+            if (!empty($record['partnerCeaseDate'])) {
+                $partnerRequest->partnerCeaseDate = new \DateTime($record['partnerCeaseDate']);
+            }
+
+            if (!empty($record['updatedAt'])) {
+                $partnerRequest->updatedAt = new \DateTime($record['updatedAt']);
+            }
 
             $errors = $this->validator->validate($partnerRequest);
             if ($errors->count() > 0) {

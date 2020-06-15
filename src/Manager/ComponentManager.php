@@ -8,6 +8,7 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Component\ComponentCreateRequest;
 use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
 use App\Entity\Component;
+use App\Exception\Manager\Component\OutdatedComponentException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\PartnerNotFoundException;
@@ -77,8 +78,8 @@ class ComponentManager
         $component->partnerGoldenId = $componentUpdateRequest->partnerGoldenId;
         $component->name = $componentUpdateRequest->name;
         $component->description = $componentUpdateRequest->description;
+        $component->duration = $componentUpdateRequest->duration;
         $component->inventory = $componentUpdateRequest->inventory;
-        $component->duration = $componentUpdateRequest->voucherExpirationDuration;
         $component->isSellable = $componentUpdateRequest->isSellable;
         $component->isReservable = $componentUpdateRequest->isReservable;
         $component->status = $componentUpdateRequest->status;
@@ -90,6 +91,7 @@ class ComponentManager
 
     /**
      * @throws PartnerNotFoundException
+     * @throws OutdatedComponentException
      */
     public function replace(ProductRequest $productRequest): void
     {
@@ -101,17 +103,21 @@ class ComponentManager
             $component = new Component();
         }
 
+        if (!empty($component->externalUpdatedAt) && $component->externalUpdatedAt > $productRequest->updatedAt) {
+            throw new OutdatedComponentException();
+        }
+
         $component->goldenId = $productRequest->id;
         $component->partner = $partner;
         $component->partnerGoldenId = $productRequest->partner ? $productRequest->partner->id : '';
         $component->name = $productRequest->name;
         $component->description = $productRequest->description;
-        $component->duration = $productRequest->voucherExpirationDuration;
         $component->isReservable = $productRequest->isReservable;
         $component->isSellable = $productRequest->isSellable;
         $component->status = $productRequest->status;
         $component->roomStockType = $productRequest->roomStockType;
         $component->inventory = $productRequest->stockAllotment;
+        $component->externalUpdatedAt = $productRequest->updatedAt;
 
         $this->repository->save($component);
     }

@@ -9,8 +9,8 @@ class BoxExperienceApiTest extends ApiTestCase
     public function testCreateWithNonExistentBoxAndExperience(): void
     {
         $payload = self::$boxExperienceHelper->getDefault([
-            'box_golden_id' => 'non-existent-experience',
-            'experience_golden_id' => 'does-not-exist',
+            'boxGoldenId' => 'non-existent-experience',
+            'experienceGoldenId' => 'does-not-exist',
         ]);
         $response = self::$boxExperienceHelper->create($payload);
         $this->assertEquals(404, $response->getStatusCode());
@@ -31,8 +31,8 @@ class BoxExperienceApiTest extends ApiTestCase
     public function testCreateAgainWillFail(\stdClass $boxExperience)
     {
         $payload = self::$boxExperienceHelper->getDefault([
-            'box_golden_id' => $boxExperience->box_golden_id,
-            'experience_golden_id' => $boxExperience->experience_golden_id,
+            'boxGoldenId' => $boxExperience->boxGoldenId,
+            'experienceGoldenId' => $boxExperience->experienceGoldenId,
         ]);
         $response = self::$boxExperienceHelper->create($payload);
 
@@ -46,7 +46,7 @@ class BoxExperienceApiTest extends ApiTestCase
      */
     public function testDelete(\stdClass $boxExperience): \stdClass
     {
-        $response = self::$boxExperienceHelper->delete($boxExperience->box_golden_id, $boxExperience->experience_golden_id);
+        $response = self::$boxExperienceHelper->delete($boxExperience->boxGoldenId, $boxExperience->experienceGoldenId);
         $this->assertEquals(204, $response->getStatusCode());
 
         return $boxExperience;
@@ -57,7 +57,7 @@ class BoxExperienceApiTest extends ApiTestCase
      */
     public function testDeleteAgain(\stdClass $boxExperience): void
     {
-        $response = self::$boxExperienceHelper->delete($boxExperience->box_golden_id, $boxExperience->experience_golden_id);
+        $response = self::$boxExperienceHelper->delete($boxExperience->boxGoldenId, $boxExperience->experienceGoldenId);
         $this->assertEquals(204, $response->getStatusCode());
     }
 

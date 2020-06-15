@@ -9,8 +9,8 @@ class ExperienceComponentApiTest extends ApiTestCase
     public function testCreateWithNonExistentBoxAndExperience(): void
     {
         $payload = self::$experienceComponentHelper->getDefault([
-            'component_golden_id' => 'non-existent-experience',
-            'experience_golden_id' => 'does-not-exist',
+            'componentGoldenId' => 'non-existent-experience',
+            'experienceGoldenId' => 'does-not-exist',
         ]);
         $response = self::$experienceComponentHelper->create($payload);
         $this->assertEquals(404, $response->getStatusCode());
@@ -31,8 +31,8 @@ class ExperienceComponentApiTest extends ApiTestCase
     public function testCreateAgainWillFail(\stdClass $componentExperience)
     {
         $payload = self::$experienceComponentHelper->getDefault([
-            'component_golden_id' => $componentExperience->component_golden_id,
-            'experience_golden_id' => $componentExperience->experience_golden_id,
+            'componentGoldenId' => $componentExperience->componentGoldenId,
+            'experienceGoldenId' => $componentExperience->experienceGoldenId,
         ]);
         $response = self::$experienceComponentHelper->create($payload);
 
@@ -46,7 +46,7 @@ class ExperienceComponentApiTest extends ApiTestCase
      */
     public function testDelete(\stdClass $componentExperience): \stdClass
     {
-        $response = self::$experienceComponentHelper->delete($componentExperience->component_golden_id, $componentExperience->experience_golden_id);
+        $response = self::$experienceComponentHelper->delete($componentExperience->componentGoldenId, $componentExperience->experienceGoldenId);
         $this->assertEquals(204, $response->getStatusCode());
 
         return $componentExperience;
@@ -57,7 +57,7 @@ class ExperienceComponentApiTest extends ApiTestCase
      */
     public function testDeleteAgain(\stdClass $componentExperience): void
     {
-        $response = self::$experienceComponentHelper->delete($componentExperience->component_golden_id, $componentExperience->experience_golden_id);
+        $response = self::$experienceComponentHelper->delete($componentExperience->componentGoldenId, $componentExperience->experienceGoldenId);
         $this->assertEquals(204, $response->getStatusCode());
     }
 

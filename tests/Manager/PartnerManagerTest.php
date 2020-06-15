@@ -8,6 +8,7 @@ use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\Internal\Partner\PartnerCreateRequest;
 use App\Contract\Request\Internal\Partner\PartnerUpdateRequest;
 use App\Entity\Partner;
+use App\Exception\Manager\Partner\OutdatedPartnerException;
 use App\Exception\Repository\PartnerNotFoundException;
 use App\Manager\PartnerManager;
 use App\Repository\PartnerRepository;
@@ -132,6 +133,24 @@ class PartnerManagerTest extends TestCase
         $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
 
         $this->assertEmpty($manager->replace($partnerRequest));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceWithOutdatedRecord()
+    {
+        $manager = new PartnerManager($this->repository->reveal());
+        $partnerRequest = new PartnerRequest();
+        $partnerRequest->id = '1234';
+        $partnerRequest->updatedAt = new \DateTime('2020-01-01 00:00:00');
+
+        $partner = new Partner();
+        $partner->externalUpdatedAt = new \DateTime('2020-01-01 01:00:00');
+        $this->repository->findOneByGoldenId($partnerRequest->id)->willReturn($partner);
+        $this->expectException(OutdatedPartnerException::class);
+        $manager->replace($partnerRequest);
     }
 
     /**

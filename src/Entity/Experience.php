@@ -74,9 +74,9 @@ class Experience
     public ?int $peopleNumber;
 
     /**
-     * @ORM\Column(type="integer", nullable=true, options={"unsigned"=true})
+     * @ORM\Column(type="datetime", nullable=true)
      */
-    public ?int $duration;
+    public ?\DateTime $externalUpdatedAt = null;
 
     /**
      * @ORM\Column(type="integer", nullable=true)

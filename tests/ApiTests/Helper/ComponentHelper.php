@@ -26,16 +26,15 @@ class ComponentHelper
     public function getDefault(array $overrides = []): array
     {
         $payload = [
-            'golden_id' => bin2hex(random_bytes(12)),
-            'partner_golden_id' => '5678',
+            'goldenId' => bin2hex(random_bytes(12)),
+            'partnerGoldenId' => '5678',
             'name' => 'this is a simple room',
             'description' => 'but this room includes a jacuzzi',
             'inventory' => 10,
             'duration' => 1,
-            'is_sellable' => true,
-            'is_reservable' => true,
+            'isSellable' => true,
+            'isReservable' => true,
             'status' => 'enabled',
-            'voucher_expiration_duration' => 3,
         ];
 
         return $overrides + $payload;
@@ -44,7 +43,7 @@ class ComponentHelper
     public function addValidPartner(array &$payload)
     {
         $partner = json_decode(ApiTestCase::$partnerHelper->create()->getContent());
-        $payload['partner_golden_id'] = $partner->golden_id;
+        $payload['partnerGoldenId'] = $partner->goldenId;
     }
 
     /**

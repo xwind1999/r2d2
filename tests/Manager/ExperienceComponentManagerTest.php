@@ -11,6 +11,7 @@ use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentUpdateR
 use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
+use App\Exception\Manager\ExperienceComponent\OutdatedExperienceComponentRelationshipException;
 use App\Exception\Manager\ExperienceComponent\RelationshipAlreadyExistsException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ExperienceComponentNotFoundException;
@@ -336,12 +337,13 @@ class ExperienceComponentManagerTest extends TestCase
         $relationshipRequest->childProduct = '1234';
         $relationshipRequest->parentProduct = '7895';
         $relationshipRequest->isEnabled = false;
+        $relationshipRequest->updatedAt = new \DateTime('2020-01-01 01:00:00');
 
         $experienceComponent = new ExperienceComponent();
         $experienceComponent->componentGoldenId = '1234';
         $experienceComponent->experienceGoldenId = '7895';
         $experienceComponent->isEnabled = true;
-        $experienceComponent->externalUpdatedAt = $date;
+        $experienceComponent->externalUpdatedAt = new \DateTime('2020-01-01 00:00:00');
         $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component)->willReturn($experienceComponent);
 
         $this->experienceComponentRepository->save(Argument::type(ExperienceComponent::class))->shouldBeCalled();
@@ -349,5 +351,39 @@ class ExperienceComponentManagerTest extends TestCase
         $updatedExperienceComponent = $manager->replace($relationshipRequest);
 
         $this->assertSame(null, $updatedExperienceComponent);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceWithOutdatedRecord()
+    {
+        $manager = new ExperienceComponentManager(
+            $this->experienceComponentRepository->reveal(),
+            $this->componentRepository->reveal(),
+            $this->experienceRepository->reveal()
+        );
+
+        $component = new Component();
+        $component->goldenId = '1234';
+        $this->componentRepository->findOneByGoldenId('1234')->willReturn($component);
+
+        $experience = new Experience();
+        $experience->goldenId = '7895';
+        $this->experienceRepository->findOneByGoldenId('7895')->willReturn($experience);
+
+        $relationshipRequest = new ProductRelationshipRequest();
+        $relationshipRequest->childProduct = '1234';
+        $relationshipRequest->parentProduct = '7895';
+        $relationshipRequest->isEnabled = false;
+        $relationshipRequest->updatedAt = new \DateTime('2020-01-01 00:00:00');
+
+        $experienceComponent = new ExperienceComponent();
+        $experienceComponent->externalUpdatedAt = new \DateTime('2020-01-01 01:00:00');
+        $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component)->willReturn($experienceComponent);
+
+        $this->expectException(OutdatedExperienceComponentRelationshipException::class);
+        $manager->replace($relationshipRequest);
     }
 }

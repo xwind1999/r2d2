@@ -25,7 +25,7 @@ class BoxHelper
     public function getDefault(array $overrides = []): array
     {
         $payload = [
-            'golden_id' => bin2hex(random_bytes(12)),
+            'goldenId' => bin2hex(random_bytes(12)),
             'brand' => 'sbx',
             'country' => 'fr',
             'status' => 'created',

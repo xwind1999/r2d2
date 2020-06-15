@@ -7,6 +7,7 @@ namespace App\Tests\EventSubscriber;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\EventSubscriber\ProductRelationshipBroadcast\ExperienceComponentRelationshipSubscriber;
+use App\Exception\Manager\ExperienceComponent\OutdatedExperienceComponentRelationshipException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceComponentManager;
@@ -87,7 +88,6 @@ class ExperienceComponentRelationshipSubscriberTest extends TestCase
         $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->childProduct = '111';
         $relationshipRequest->parentProduct = '222';
-        $relationshipRequest->sortOrder = 1;
         $relationshipRequest->isEnabled = true;
         $relationshipRequest->relationshipType = 'EXPERIENCE-COMPONENT';
 
@@ -105,6 +105,7 @@ class ExperienceComponentRelationshipSubscriberTest extends TestCase
     {
         return [
             [new ComponentNotFoundException(), 'warning'],
+            [new OutdatedExperienceComponentRelationshipException(), 'warning'],
             [new ExperienceNotFoundException(), 'warning'],
             [new \Exception(), 'error'],
         ];

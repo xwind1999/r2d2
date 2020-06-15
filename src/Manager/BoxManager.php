@@ -9,6 +9,7 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Box\BoxCreateRequest;
 use App\Contract\Request\Internal\Box\BoxUpdateRequest;
 use App\Entity\Box;
+use App\Exception\Manager\Box\OutdatedBoxException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Repository\BoxRepository;
@@ -77,11 +78,16 @@ class BoxManager
             $box = new Box();
         }
 
+        if (!empty($box->externalUpdatedAt) && $box->externalUpdatedAt > $productRequest->updatedAt) {
+            throw new OutdatedBoxException();
+        }
+
         $box->goldenId = $productRequest->id;
         $box->brand = $productRequest->sellableBrand ? $productRequest->sellableBrand->code : null;
         $box->country = $productRequest->sellableCountry ? $productRequest->sellableCountry->code : null;
         $box->status = $productRequest->status;
         $box->currency = $productRequest->listPrice ? $productRequest->listPrice->currencyCode : null;
+        $box->externalUpdatedAt = $productRequest->updatedAt;
 
         $this->repository->save($box);
     }

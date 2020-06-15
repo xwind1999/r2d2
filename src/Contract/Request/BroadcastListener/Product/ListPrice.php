@@ -29,6 +29,15 @@ class ListPrice implements ContextualInterface
      */
     public string $currencyCode;
 
+    public static function createFromAmountAndCurrencyCode(string $amount, string $currencyCode): self
+    {
+        $listPrice = new ListPrice();
+        $listPrice->amount = (int) $amount * 100;
+        $listPrice->currencyCode = $currencyCode;
+
+        return $listPrice;
+    }
+
     public function getContext(): array
     {
         return [

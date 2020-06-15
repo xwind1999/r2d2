@@ -9,6 +9,7 @@ use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentCreateR
 use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentDeleteRequest;
 use App\Contract\Request\Internal\ExperienceComponent\ExperienceComponentUpdateRequest;
 use App\Entity\ExperienceComponent;
+use App\Exception\Manager\ExperienceComponent\OutdatedExperienceComponentRelationshipException;
 use App\Exception\Manager\ExperienceComponent\RelationshipAlreadyExistsException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ExperienceComponentNotFoundException;
@@ -116,6 +117,7 @@ class ExperienceComponentManager
     /**
      * @throws ExperienceNotFoundException
      * @throws ComponentNotFoundException
+     * @throws OutdatedExperienceComponentRelationshipException
      */
     public function replace(ProductRelationshipRequest $relationshipRequest): void
     {
@@ -123,13 +125,17 @@ class ExperienceComponentManager
         $experience = $this->experienceRepository->findOneByGoldenId($relationshipRequest->parentProduct);
         $experienceComponent = $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component);
 
+        if (!empty($experienceComponent->externalUpdatedAt) && $experienceComponent->externalUpdatedAt > $relationshipRequest->updatedAt) {
+            throw new OutdatedExperienceComponentRelationshipException();
+        }
+
         $experienceComponent = $experienceComponent ?? new ExperienceComponent();
         $experienceComponent->component = $component;
         $experienceComponent->componentGoldenId = $component->goldenId;
         $experienceComponent->experience = $experience;
         $experienceComponent->experienceGoldenId = $experience->goldenId;
         $experienceComponent->isEnabled = $relationshipRequest->isEnabled;
-        $experienceComponent->externalUpdatedAt = new \DateTime();
+        $experienceComponent->externalUpdatedAt = $relationshipRequest->updatedAt;
 
         $this->experienceComponentRepository->save($experienceComponent);
     }
