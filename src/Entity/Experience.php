@@ -13,7 +13,10 @@ use Ramsey\Uuid\UuidInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ExperienceRepository")
- * @ORM\Table(indexes={@ORM\Index(columns={"golden_id"})})
+ * @ORM\Table(indexes={
+ *     @ORM\Index(columns={"golden_id"}),
+ *     @ORM\Index(columns={"partner_golden_id"})
+ * })
  */
 class Experience
 {
@@ -55,6 +58,36 @@ class Experience
     public string $description;
 
     /**
+     * @ORM\Column(type="integer", length=2, nullable=true, options={"fixed": true})
+     */
+    public ?int $peopleNumber = null;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public ?\DateTime $externalUpdatedAt = null;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    public ?int $price = null;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    public ?string $commissionType = null;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    public ?int $commission = null;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public ?\DateTime $priceUpdatedAt = null;
+
+    /**
      * @var Collection<int, BoxExperience>
      *
      * @ORM\OneToMany(targetEntity="BoxExperience", mappedBy="experience", fetch="EXTRA_LAZY")
@@ -67,36 +100,6 @@ class Experience
      * @ORM\OneToMany(targetEntity="ExperienceComponent", mappedBy="experience", fetch="EXTRA_LAZY")
      */
     public Collection $experienceComponent;
-
-    /**
-     * @ORM\Column(type="integer", length=2, nullable=true, options={"fixed": true})
-     */
-    public ?int $peopleNumber;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    public ?\DateTime $externalUpdatedAt = null;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    public ?int $price;
-
-    /**
-     * @ORM\Column(type="string", length=10, nullable=true)
-     */
-    public ?string $commissionType;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    public ?int $commission;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    public ?\DateTime $priceUpdatedAt = null;
 
     public function __construct()
     {

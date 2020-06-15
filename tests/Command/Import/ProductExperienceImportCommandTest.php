@@ -36,7 +36,7 @@ class ProductExperienceImportCommandTest extends AbstractProductImportCommandTes
                 'description' => 'desc',
                 'type' => 'experience',
                 'status' => 'ready',
-                'peopleNumber' => '1',
+                'productPeopleNumber' => '1',
                 'updatedAt' => '2020-01-01 00:00:00',
             ],
         ]);
@@ -54,7 +54,7 @@ class ProductExperienceImportCommandTest extends AbstractProductImportCommandTes
                 'description' => 'desc',
                 'type' => 'experience',
                 'status' => 'ready',
-                'peopleNumber' => 'bbbbb',
+                'productPeopleNumber' => 'bbbbb',
                 'updatedAt' => 'aaaa-bb--c',
             ],
         ]);

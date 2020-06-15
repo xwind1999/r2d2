@@ -96,6 +96,11 @@ class Booking
     public ?string $customerComment = null;
 
     /**
+     * @ORM\Column(type="json")
+     */
+    public array $components;
+
+    /**
      * @ORM\Column(type="date", nullable=true)
      */
     public ?\DateTime $cancelledAt = null;
@@ -113,11 +118,6 @@ class Booking
      * @ORM\OneToMany(targetEntity="BookingDate", mappedBy="booking", cascade={"persist", "remove"})
      */
     public Collection $bookingDate;
-
-    /**
-     * @ORM\Column(type="json")
-     */
-    public array $components;
 
     /**
      * @ORM\Column(name="expired_at", type="datetime", nullable=true)

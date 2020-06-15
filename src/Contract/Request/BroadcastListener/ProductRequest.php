@@ -92,8 +92,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="30")
-     * @Assert\NotBlank
+     * @Assert\Choice(choices=\App\Constraint\ProductStatusConstraint::VALID_VALUES)
      *
      * @JMS\Type("string")
      */
@@ -118,7 +117,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="10")
+     * @Assert\Choice(choices=\App\Constraint\RoomStockTypeConstraint::VALID_VALUES)
      *
      * @JMS\Type("string")
      */
@@ -137,9 +136,16 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\PositiveOrZero
      *
      * @JMS\Type("strict_integer")
-     * @JMS\SerializedName("productDuration")
      */
     public ?int $productDuration = null;
+
+    /**
+     * @Assert\Type(type="string")
+     * @Assert\Choice(choices=\App\Constraint\ProductDurationUnitConstraint::VALID_VALUES)
+     *
+     * @JMS\Type("string")
+     */
+    public ?string $productDurationUnit = null;
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\ListPrice")
@@ -160,7 +166,20 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
         $productRequest->status = $product['status'];
         $productRequest->type = $product['type'];
         $productRequest->description = $product['description'] ?? null;
-        $productRequest->productPeopleNumber = $product['productPeopleNumber'] ?? null;
+        $productRequest->roomStockType = $product['roomStockType'] ?? null;
+        $productRequest->productDurationUnit = $product['productDurationUnit'] ?? null;
+
+        if (!empty($product['productPeopleNumber'])) {
+            $productRequest->productPeopleNumber = (int) $product['productPeopleNumber'];
+        }
+
+        if (!empty($product['stockAllotment'])) {
+            $productRequest->stockAllotment = (int) $product['stockAllotment'];
+        }
+
+        if (!empty($product['productDuration'])) {
+            $productRequest->productDuration = (int) $product['productDuration'];
+        }
 
         if (!empty($product['sellableBrand'])) {
             $productRequest->sellableBrand = Brand::create($product['sellableBrand']);
@@ -212,6 +231,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
             'type' => $this->type,
             'product_people_number' => $this->productPeopleNumber,
             'product_duration' => $this->productDuration,
+            'product_duration_unit' => $this->productDurationUnit,
             'room_stock_type' => $this->roomStockType,
             'stock_allotment' => $this->stockAllotment,
             'list_price' => $this->listPrice ? $this->listPrice->getContext() : null,

@@ -62,6 +62,7 @@ class ComponentManagerTest extends TestCase
         $componentUpdateRequest->inventory = 2;
         $componentUpdateRequest->isSellable = true;
         $componentUpdateRequest->duration = 3;
+        $componentUpdateRequest->durationUnit = 'minute';
         $componentUpdateRequest->isReservable = true;
         $componentUpdateRequest->status = 'not_ok';
 
@@ -76,6 +77,7 @@ class ComponentManagerTest extends TestCase
         $component->description = 'the bed is very small';
         $component->inventory = 1;
         $component->duration = 2;
+        $component->durationUnit = 'day';
         $component->isSellable = false;
         $component->isReservable = false;
         $component->status = 'ok';
@@ -90,6 +92,7 @@ class ComponentManagerTest extends TestCase
         $this->assertEquals(3, $component->duration);
         $this->assertEquals(true, $component->isReservable);
         $this->assertEquals(true, $component->isSellable);
+        $this->assertEquals('minute', $component->durationUnit);
         $this->assertEquals('4321', $component->partnerGoldenId);
         $this->assertEquals('room with a big big bed', $component->name);
         $this->assertEquals('the bed is so big it could fit two families', $component->description);
@@ -133,6 +136,8 @@ class ComponentManagerTest extends TestCase
         $componentCreateRequest->name = 'room with small bed';
         $componentCreateRequest->description = 'the bed is very small';
         $componentCreateRequest->inventory = 1;
+        $componentCreateRequest->duration = 2;
+        $componentCreateRequest->durationUnit = 'day';
         $componentCreateRequest->isSellable = false;
         $componentCreateRequest->isReservable = false;
         $componentCreateRequest->status = 'ok';
@@ -145,6 +150,8 @@ class ComponentManagerTest extends TestCase
         $this->assertEquals($componentCreateRequest->name, $component->name);
         $this->assertEquals($componentCreateRequest->description, $component->description);
         $this->assertEquals($componentCreateRequest->inventory, $component->inventory);
+        $this->assertEquals($componentCreateRequest->duration, $component->duration);
+        $this->assertEquals($componentCreateRequest->durationUnit, $component->durationUnit);
         $this->assertEquals($componentCreateRequest->isSellable, $component->isSellable);
         $this->assertEquals($componentCreateRequest->isReservable, $component->isReservable);
         $this->assertEquals($componentCreateRequest->status, $component->status);
@@ -164,6 +171,8 @@ class ComponentManagerTest extends TestCase
         $productRequest->partner = $partner;
         $productRequest->name = 'dinner with massage';
         $productRequest->description = 'a fancy dinner with feet massage';
+        $productRequest->productDuration = 2;
+        $productRequest->productDurationUnit = 'day';
         $productRequest->isSellable = true;
         $productRequest->isReservable = true;
         $productRequest->status = 'test Status';

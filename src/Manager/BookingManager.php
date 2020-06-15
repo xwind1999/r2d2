@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Constraint\BookingStatusConstraint;
 use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
-use App\DBAL\BookingStatus;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
 use App\Entity\Guest;
@@ -93,7 +93,7 @@ class BookingManager
         $booking->country = $box->country;
         $booking->startDate = $bookingCreateRequest->startDate;
         $booking->endDate = $bookingCreateRequest->endDate;
-        $booking->status = BookingStatus::BOOKING_STATUS_CREATED;
+        $booking->status = BookingStatusConstraint::BOOKING_STATUS_CREATED;
         $booking->customerComment = $bookingCreateRequest->customerComment;
         $booking->components = $bookingCreateRequest->experience->components;
         $booking->cancelledAt = null;
@@ -256,7 +256,7 @@ class BookingManager
     {
         $this->validateBookingExpirationTime($booking);
 
-        if (BookingStatus::BOOKING_STATUS_COMPLETE === $booking->status || BookingStatus::BOOKING_STATUS_CANCELLED === $booking->status) {
+        if (BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $booking->status || BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status) {
             throw new BookingAlreadyInFinalStatusException();
         }
 

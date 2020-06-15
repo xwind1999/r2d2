@@ -13,9 +13,9 @@ class ProductComponentImportCommand extends AbstractProductImportCommand
         'partner',
         'name',
         'description',
-        'inventory',
-        'duration',
-        'durationUnit', //TODO: start using this
+        'stockAllotment',
+        'productDuration',
+        'productDurationUnit',
         'roomStockType',
         'isSellable',
         'isReservable',

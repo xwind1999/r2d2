@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\Tests\DBAL;
 
-use App\DBAL\BookingStatus;
+use App\DBAL\ProductStatus;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \App\DBAL\BookingStatus
+ * @coversDefaultClass \App\DBAL\ProductStatus
  */
-class BookingStatusTest extends TestCase
+class ProductStatusTest extends TestCase
 {
     /**
      * @covers ::getName
      * @covers ::convertToDatabaseValue
-     * @covers \App\Constraint\BookingStatusConstraint::isValid
+     * @covers \App\Constraint\ProductStatusConstraint::isValid
      *
      * @dataProvider validValues
      */
     public function testConvertToDatabaseValue(string $value)
     {
-        $bookingStatusType = new BookingStatus();
+        $bookingStatusType = new ProductStatus();
         $platform = $this->prophesize(AbstractPlatform::class)->reveal();
 
         $this->assertEquals($value, $bookingStatusType->convertToDatabaseValue($value, $platform));
@@ -31,16 +31,16 @@ class BookingStatusTest extends TestCase
     /**
      * @covers ::getName
      * @covers ::convertToDatabaseValue
-     * @covers \App\Constraint\BookingStatusConstraint::isValid
+     * @covers \App\Constraint\ProductStatusConstraint::isValid
      */
     public function testConvertToDatabaseValueWillThrowException()
     {
         $value = 'eeeveeveve';
-        $bookingStatusType = new BookingStatus();
+        $bookingStatusType = new ProductStatus();
         $platform = $this->prophesize(AbstractPlatform::class)->reveal();
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid booking_status value');
+        $this->expectExceptionMessage('Invalid product_status value');
         $bookingStatusType->convertToDatabaseValue($value, $platform);
     }
 
@@ -49,6 +49,6 @@ class BookingStatusTest extends TestCase
      */
     public function validValues(): array
     {
-        return [['created'], ['complete'], ['cancelled']];
+        return [['prospect'], ['production'], ['live'], ['obsolete'], ['active'], ['inactive'], ['redeemable'], ['ready']];
     }
 }

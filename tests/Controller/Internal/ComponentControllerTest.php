@@ -53,6 +53,7 @@ class ComponentControllerTest extends TestCase
         $component->description = 'the bed is very small';
         $component->inventory = 1;
         $component->duration = 0;
+        $component->durationUnit = 'day';
         $component->isSellable = false;
         $component->isReservable = false;
         $component->status = 'ok';
@@ -70,6 +71,7 @@ class ComponentControllerTest extends TestCase
         $this->assertEquals($component->name, $return->name);
         $this->assertEquals($component->description, $return->description);
         $this->assertEquals($component->inventory, $return->inventory);
+        $this->assertEquals($component->durationUnit, $return->durationUnit);
         $this->assertEquals($component->isSellable, $return->isSellable);
         $this->assertEquals($component->isReservable, $return->isReservable);
         $this->assertEquals($component->status, $return->status);
@@ -162,6 +164,7 @@ class ComponentControllerTest extends TestCase
         $component->description = 'this is a test room';
         $component->inventory = 2;
         $component->duration = 2;
+        $component->durationUnit = 'day';
         $component->isSellable = true;
         $component->isReservable = true;
         $component->status = 'enabled';

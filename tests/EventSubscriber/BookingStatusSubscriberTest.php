@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\EventSubscriber;
 
-use App\DBAL\BookingStatus;
+use App\Constraint\BookingStatusConstraint;
 use App\Entity\Booking;
 use App\Event\BookingStatusEvent;
 use App\EventSubscriber\BookingStatusSubscriber;
@@ -89,15 +89,15 @@ class BookingStatusSubscriberTest extends TestCase
     {
         return [
             [
-                'booking with status created' => BookingStatus::BOOKING_STATUS_CREATED,
+                'booking with status created' => BookingStatusConstraint::BOOKING_STATUS_CREATED,
                     BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CREATED,
             ],
             [
-                'booking with status completed' => BookingStatus::BOOKING_STATUS_COMPLETE,
+                'booking with status completed' => BookingStatusConstraint::BOOKING_STATUS_COMPLETE,
                     BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_COMPLETED,
             ],
             [
-                'booking with status cancelled' => BookingStatus::BOOKING_STATUS_CANCELLED,
+                'booking with status cancelled' => BookingStatusConstraint::BOOKING_STATUS_CANCELLED,
                     BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CANCELLED,
             ],
         ];

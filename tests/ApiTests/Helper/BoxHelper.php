@@ -28,7 +28,7 @@ class BoxHelper
             'goldenId' => bin2hex(random_bytes(12)),
             'brand' => 'sbx',
             'country' => 'fr',
-            'status' => 'created',
+            'status' => 'live',
         ];
 
         return $overrides + $payload;

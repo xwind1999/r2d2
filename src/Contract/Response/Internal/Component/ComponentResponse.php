@@ -63,6 +63,21 @@ abstract class ComponentResponse extends ResponseContract
     public ?int $inventory;
 
     /**
+     * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
+     *
+     * @JMS\Type("strict_integer")
+     */
+    public ?int $duration = null;
+
+    /**
+     * @Assert\Type(type="string")
+     *
+     * @JMS\Type("string")
+     */
+    public ?string $durationUnit = null;
+
+    /**
      * @Assert\Type(type="boolean")
      * @Assert\NotNull()
      *
@@ -110,6 +125,8 @@ abstract class ComponentResponse extends ResponseContract
         $this->description = $component->description;
         $this->inventory = $component->inventory;
         $this->isSellable = $component->isSellable;
+        $this->duration = $component->duration;
+        $this->durationUnit = $component->durationUnit;
         $this->isReservable = $component->isReservable;
         $this->status = $component->status;
         $this->createdAt = $component->createdAt;
