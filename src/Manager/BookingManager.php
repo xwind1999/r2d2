@@ -10,6 +10,7 @@ use App\DBAL\BookingStatus;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
 use App\Entity\Guest;
+use App\Event\BookingStatusEvent;
 use App\Exception\Booking\BadPriceException;
 use App\Exception\Booking\BookingAlreadyInFinalStatusException;
 use App\Exception\Booking\BookingHasExpiredException;
@@ -30,6 +31,7 @@ use App\Repository\ComponentRepository;
 use App\Repository\ExperienceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class BookingManager
 {
@@ -42,6 +44,7 @@ class BookingManager
     private ComponentRepository $componentRepository;
     private MoneyHelper $moneyHelper;
     private BoxRepository $boxRepository;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -50,7 +53,8 @@ class BookingManager
         BoxExperienceRepository $boxExperienceRepository,
         ComponentRepository $componentRepository,
         MoneyHelper $moneyHelper,
-        BoxRepository $boxRepository
+        BoxRepository $boxRepository,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->em = $em;
         $this->repository = $repository;
@@ -59,6 +63,7 @@ class BookingManager
         $this->componentRepository = $componentRepository;
         $this->moneyHelper = $moneyHelper;
         $this->boxRepository = $boxRepository;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function create(BookingCreateRequest $bookingCreateRequest): Booking
@@ -213,6 +218,7 @@ class BookingManager
 
         $this->em->persist($booking);
         $this->em->flush();
+        $this->eventDispatcher->dispatch(new BookingStatusEvent($booking));
 
         return $booking;
     }
@@ -230,10 +236,10 @@ class BookingManager
 
         $this->em->persist($booking);
         $this->em->flush();
+        $this->eventDispatcher->dispatch(new BookingStatusEvent($booking));
 
         //TODO: send the booking to CMHub
         //TODO: send the booking cancellation to CMHub
-        //maybe dispatch a "BookingUpdatedEvent" with the new status?
     }
 
     private function validateBookingExpirationTime(Booking $booking): void

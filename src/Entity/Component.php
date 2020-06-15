@@ -91,6 +91,11 @@ class Component
      */
     public ?string $roomStockType = null;
 
+    /**
+     * @ORM\Column(type="boolean", options={"default": false})
+     */
+    public bool $isManageable = false;
+
     public function __construct()
     {
         $this->experienceComponent = new ArrayCollection();
