@@ -12,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ApiDumpCommand extends Command
 {
+    protected const JSON_NO_OPTION = 0;
     protected static $defaultName = 'r2d2:api:dump';
 
     private ApiDocGenerator $generatorLocator;
@@ -35,7 +36,10 @@ class ApiDumpCommand extends Command
     {
         $spec = $this->generatorLocator->generate()->toArray();
 
-        $json = json_encode($spec, $input->hasParameterOption(['--no-pretty']) ? 0 : JSON_PRETTY_PRINT);
+        $json = json_encode(
+            $spec,
+            $input->hasParameterOption(['--no-pretty']) ? static::JSON_NO_OPTION : JSON_PRETTY_PRINT
+        );
 
         if (!$json) {
             return 1;

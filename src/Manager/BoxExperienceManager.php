@@ -8,6 +8,7 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\Internal\BoxExperience\BoxExperienceCreateRequest;
 use App\Contract\Request\Internal\BoxExperience\BoxExperienceDeleteRequest;
 use App\Entity\BoxExperience;
+use App\Exception\Manager\BoxExperience\OutdatedBoxExperienceRelationshipException;
 use App\Exception\Manager\BoxExperience\RelationshipAlreadyExistsException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
@@ -78,6 +79,7 @@ class BoxExperienceManager
     /**
      * @throws ExperienceNotFoundException
      * @throws BoxNotFoundException
+     * @throws OutdatedBoxExperienceRelationshipException
      */
     public function replace(ProductRelationshipRequest $relationshipRequest): void
     {
@@ -85,13 +87,17 @@ class BoxExperienceManager
         $experience = $this->experienceRepository->findOneByGoldenId($relationshipRequest->childProduct);
         $boxExperience = $this->boxExperienceRepository->findOneByBoxExperience($box, $experience);
 
+        if (!empty($boxExperience->externalUpdatedAt) && $boxExperience->externalUpdatedAt > $relationshipRequest->updatedAt) {
+            throw new OutdatedBoxExperienceRelationshipException();
+        }
+
         $boxExperience = $boxExperience ?? new BoxExperience();
         $boxExperience->box = $box;
         $boxExperience->boxGoldenId = $box->goldenId;
         $boxExperience->experience = $experience;
         $boxExperience->isEnabled = $relationshipRequest->isEnabled;
         $boxExperience->experienceGoldenId = $experience->goldenId;
-        $boxExperience->externalUpdatedAt = new \DateTime();
+        $boxExperience->externalUpdatedAt = $relationshipRequest->updatedAt;
 
         $this->boxExperienceRepository->save($boxExperience);
     }

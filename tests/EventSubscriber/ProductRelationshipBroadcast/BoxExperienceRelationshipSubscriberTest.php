@@ -7,6 +7,7 @@ namespace App\Tests\EventSubscriber;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
 use App\EventSubscriber\ProductRelationshipBroadcast\BoxExperienceRelationshipSubscriber;
+use App\Exception\Manager\BoxExperience\OutdatedBoxExperienceRelationshipException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\BoxExperienceManager;
@@ -87,7 +88,6 @@ class BoxExperienceRelationshipSubscriberTest extends TestCase
         $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->childProduct = '111';
         $relationshipRequest->parentProduct = '222';
-        $relationshipRequest->sortOrder = 1;
         $relationshipRequest->isEnabled = true;
         $relationshipRequest->relationshipType = 'BOX-EXPERIENCE';
 
@@ -104,6 +104,7 @@ class BoxExperienceRelationshipSubscriberTest extends TestCase
     {
         return [
             [new BoxNotFoundException(), 'warning'],
+            [new OutdatedBoxExperienceRelationshipException(), 'warning'],
             [new ExperienceNotFoundException(), 'warning'],
             [new \Exception(), 'error'],
         ];

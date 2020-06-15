@@ -54,6 +54,11 @@ class Box
     public ?string $currency;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public ?\DateTime $externalUpdatedAt = null;
+
+    /**
      * @var Collection<int, BoxExperience>
      *
      * @ORM\OneToMany(targetEntity="BoxExperience", mappedBy="box")

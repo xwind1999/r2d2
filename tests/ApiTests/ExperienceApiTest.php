@@ -8,14 +8,14 @@ class ExperienceApiTest extends ApiTestCase
 {
     public function testCreateWithInvalidPartnerGoldenId()
     {
-        $experienceCreateRequest = self::$experienceHelper->getDefault(['partner_golden_id' => '']);
+        $experienceCreateRequest = self::$experienceHelper->getDefault(['partnerGoldenId' => '']);
         $response = self::$experienceHelper->create($experienceCreateRequest);
         $this->assertEquals(422, $response->getStatusCode());
     }
 
     public function testCreateWithNonExistentPartner()
     {
-        $experienceCreateRequest = self::$experienceHelper->getDefault(['partner_golden_id' => 'non-existent-partner']);
+        $experienceCreateRequest = self::$experienceHelper->getDefault(['partnerGoldenId' => 'non-existent-partner']);
         $response = self::$experienceHelper->create($experienceCreateRequest);
         $this->assertEquals(404, $response->getStatusCode());
     }
@@ -47,7 +47,7 @@ class ExperienceApiTest extends ApiTestCase
         $response = self::$experienceHelper->get($uuid);
         $responseContent = json_decode($response->getContent());
         $this->assertObjectHasAttribute('uuid', $responseContent);
-        $this->assertObjectHasAttribute('created_at', $responseContent);
+        $this->assertObjectHasAttribute('createdAt', $responseContent);
         $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;

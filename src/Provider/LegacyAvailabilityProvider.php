@@ -40,7 +40,7 @@ class LegacyAvailabilityProvider
             $data = $this->quickData->getPackage($experienceId, $dateFrom, $dateTo);
             //but we process them the same way, so we have a QuickDataResponse ready
 
-            if (isset($data['ListPrestation'][0]['Availabilities'])) {
+            if (!empty($data['ListPrestation'][0]['Availabilities'])) {
                 $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
                 $partner = $experience->partner;
                 if (!$partner->isChannelManagerActive) {
@@ -65,12 +65,12 @@ class LegacyAvailabilityProvider
             $data = $this->quickData->getRange($boxId, $dateFrom, $dateTo);
             //but we process them the same way, so we have a GetRangeResponse ready
 
-            if (isset($data['PackagesList'])) {
+            if (!empty($data['PackagesList'])) {
                 $packageList = $data['PackagesList'];
                 $experienceIds = array_column($packageList, 'Package');
                 $inactiveChannelExperienceIds = $this->experienceManager->getIdsListWithPartnerChannelManagerInactive($experienceIds);
                 foreach ($packageList as &$package) {
-                    if (isset($inactiveChannelExperienceIds[$package['Package']])) {
+                    if (!empty($inactiveChannelExperienceIds[$package['Package']])) {
                         $package['Request'] = (int) $package['Request'] + (int) $package['Stock'];
                         $package['Stock'] = 0;
                     }
@@ -91,10 +91,10 @@ class LegacyAvailabilityProvider
             $data = $this->quickData->getPackageV2($packageCodes, $dateFrom, $dateTo);
             //but we process them the same way, so we have a GetRangeResponse ready
 
-            if (isset($data['ListPackage'])) {
+            if (!empty($data['ListPackage'])) {
                 $inactiveChannelExperienceIds = $this->experienceManager->getIdsListWithPartnerChannelManagerInactive($packageCodes);
                 foreach ($data['ListPackage'] as &$package) {
-                    if (isset($package['ListPrestation'][0]['Availabilities']) && isset($inactiveChannelExperienceIds[$package['PackageCode']])) {
+                    if (!empty($package['ListPrestation'][0]['Availabilities']) && !empty($inactiveChannelExperienceIds[$package['PackageCode']])) {
                         $package['ListPrestation'][0]['Availabilities'] = AvailabilityHelper::convertToRequestType($package['ListPrestation'][0]['Availabilities']);
                     }
                 }
@@ -115,7 +115,7 @@ class LegacyAvailabilityProvider
 
             $isAvailabilityConvertNeeded = false;
 
-            if (isset($data['DaysAvailabilityPrice'])) {
+            if (!empty($data['DaysAvailabilityPrice'])) {
                 $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
 
                 foreach ($data['DaysAvailabilityPrice'] as $key => $value) {

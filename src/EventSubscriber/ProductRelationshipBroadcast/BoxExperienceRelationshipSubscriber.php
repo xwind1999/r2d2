@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\EventSubscriber\ProductRelationshipBroadcast;
 
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
+use App\Exception\ContextualException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\BoxExperienceManager;
@@ -45,6 +46,10 @@ class BoxExperienceRelationshipSubscriber implements EventSubscriberInterface
                 'No existing Experience for this relationship',
                 $event->getProductRelationshipRequest()->getContext()
             );
+
+            throw $exception;
+        } catch (ContextualException $exception) {
+            $this->logger->warning($exception, $event->getProductRelationshipRequest()->getContext());
 
             throw $exception;
         } catch (\Exception $exception) {

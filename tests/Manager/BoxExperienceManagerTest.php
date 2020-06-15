@@ -10,6 +10,7 @@ use App\Contract\Request\Internal\BoxExperience\BoxExperienceDeleteRequest;
 use App\Entity\Box;
 use App\Entity\BoxExperience;
 use App\Entity\Experience;
+use App\Exception\Manager\BoxExperience\OutdatedBoxExperienceRelationshipException;
 use App\Exception\Manager\BoxExperience\RelationshipAlreadyExistsException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
@@ -226,12 +227,13 @@ class BoxExperienceManagerTest extends TestCase
         $relationshipRequest->parentProduct = '1234';
         $relationshipRequest->childProduct = '7895';
         $relationshipRequest->isEnabled = false;
+        $relationshipRequest->updatedAt = new \DateTime('2020-01-01 01:00:00');
 
         $boxExperience = new BoxExperience();
         $boxExperience->boxGoldenId = '1234';
         $boxExperience->experienceGoldenId = '7895';
         $boxExperience->isEnabled = true;
-        $boxExperience->externalUpdatedAt = $date;
+        $boxExperience->externalUpdatedAt = new \DateTime('2020-01-01 00:00:00');
         $this->repository->findOneByBoxExperience($box, $experience)->willReturn($boxExperience);
 
         $this->repository->save(Argument::type(BoxExperience::class))->shouldBeCalled();
@@ -239,5 +241,40 @@ class BoxExperienceManagerTest extends TestCase
         $updatedBoxExperience = $manager->replace($relationshipRequest);
 
         $this->assertSame(null, $updatedBoxExperience);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceWithOutdatedRecord()
+    {
+        $manager = new BoxExperienceManager(
+            $this->repository->reveal(),
+            $this->boxRepository->reveal(),
+            $this->experienceRepository->reveal()
+        );
+
+        $box = new Box();
+        $box->goldenId = '1234';
+        $this->boxRepository->findOneByGoldenId('1234')->willReturn($box);
+
+        $experience = new Experience();
+        $experience->goldenId = '7895';
+        $this->experienceRepository->findOneByGoldenId('7895')->willReturn($experience);
+
+        $date = new \DateTime();
+        $relationshipRequest = new ProductRelationshipRequest();
+        $relationshipRequest->parentProduct = '1234';
+        $relationshipRequest->childProduct = '7895';
+        $relationshipRequest->isEnabled = false;
+        $relationshipRequest->updatedAt = new \DateTime('2020-01-01 00:00:00');
+
+        $boxExperience = new BoxExperience();
+        $boxExperience->externalUpdatedAt = new \DateTime('2020-01-01 01:00:00');
+        $this->repository->findOneByBoxExperience($box, $experience)->willReturn($boxExperience);
+
+        $this->expectException(OutdatedBoxExperienceRelationshipException::class);
+        $manager->replace($relationshipRequest);
     }
 }

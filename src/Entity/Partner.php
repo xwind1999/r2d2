@@ -50,4 +50,9 @@ class Partner
      * @ORM\Column(type="date", nullable=true)
      */
     public ?\DateTime $ceaseDate;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public ?\DateTime $externalUpdatedAt = null;
 }

@@ -44,6 +44,8 @@ class ProductRelationshipRequest implements RequestBodyInterface, ValidatableReq
      */
     public string $relationshipType;
 
+    public ?\DateTime $updatedAt = null;
+
     public function getContext(): array
     {
         return [
@@ -51,6 +53,7 @@ class ProductRelationshipRequest implements RequestBodyInterface, ValidatableReq
             'child_product' => $this->childProduct,
             'is_enabled' => $this->isEnabled,
             'relationship_type' => $this->relationshipType,
+            'updated_at' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
         ];
     }
 }

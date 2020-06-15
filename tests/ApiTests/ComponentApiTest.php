@@ -8,14 +8,14 @@ class ComponentApiTest extends ApiTestCase
 {
     public function testCreateWithInvalidPartnerGoldenId()
     {
-        $componentCreateRequest = self::$componentHelper->getDefault(['partner_golden_id' => '']);
+        $componentCreateRequest = self::$componentHelper->getDefault(['partnerGoldenId' => '']);
         $response = self::$componentHelper->create($componentCreateRequest);
         $this->assertEquals(422, $response->getStatusCode());
     }
 
     public function testCreateWithNonExistentPartner()
     {
-        $componentCreateRequest = self::$componentHelper->getDefault(['partner_golden_id' => 'non-existent-partner']);
+        $componentCreateRequest = self::$componentHelper->getDefault(['partnerGoldenId' => 'non-existent-partner']);
         $response = self::$componentHelper->create($componentCreateRequest);
         $this->assertEquals(404, $response->getStatusCode());
     }
@@ -38,7 +38,7 @@ class ComponentApiTest extends ApiTestCase
         $response = self::$componentHelper->get($uuid);
         $responseContent = json_decode($response->getContent());
         $this->assertObjectHasAttribute('uuid', $responseContent);
-        $this->assertObjectHasAttribute('created_at', $responseContent);
+        $this->assertObjectHasAttribute('createdAt', $responseContent);
         $this->assertEquals(200, $response->getStatusCode());
 
         return $uuid;

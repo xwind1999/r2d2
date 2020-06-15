@@ -14,7 +14,7 @@ class ContextMessageNormalizer implements MiddlewareInterface
      */
     public function process($level, $message, array $context): array
     {
-        if (isset($context['message']) && !is_string($context['message'])) {
+        if (!empty($context['message']) && !is_string($context['message'])) {
             $context['message_parsed'] = $context['message'];
             unset($context['message']);
         }

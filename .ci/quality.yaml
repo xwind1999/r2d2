@@ -20,7 +20,6 @@ unitTests:
 
 Api-Tests:
   stage: Test
-  allow_failure: true
   image: ${VALIDATION_IMAGE}
   needs:
     - composer

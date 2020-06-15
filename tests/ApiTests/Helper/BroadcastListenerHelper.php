@@ -50,7 +50,6 @@ class BroadcastListenerHelper
             'status' => 'active',
             'type' => 'mev',
             'productPeopleNumber' => '2',
-            'voucherExpirationDuration' => 3,
             'roomStockType' => 'on_request',
             'stockAllotment' => 5,
         ];
@@ -77,12 +76,8 @@ class BroadcastListenerHelper
         $payload = [
             'parentProduct' => 'BB0000335658',
             'childProduct' => 'HG0000335654',
-            'sortOrder' => 1,
             'isEnabled' => true,
             'relationshipType' => 'Box-Experience',
-            'printType' => 'Digital',
-            'childCount' => 4,
-            'childQuantity' => 0,
         ];
 
         return $overrides + $payload;

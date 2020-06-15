@@ -26,8 +26,8 @@ class BoxExperienceHelper
     public function getDefault(array $overrides = []): array
     {
         $payload = [
-            'is_enabled' => true,
-            'external_updated_at' => '2020-01-01T00:00:00+0',
+            'isEnabled' => true,
+            'externalUpdatedAt' => '2020-01-01T00:00:00+0',
         ];
 
         return $overrides + $payload;
@@ -36,13 +36,13 @@ class BoxExperienceHelper
     public function addValidExperience(array &$payload)
     {
         $experience = json_decode(ApiTestCase::$experienceHelper->create()->getContent());
-        $payload['experience_golden_id'] = $experience->golden_id;
+        $payload['experienceGoldenId'] = $experience->goldenId;
     }
 
     public function addValidBox(array &$payload)
     {
         $box = json_decode(ApiTestCase::$boxHelper->create()->getContent());
-        $payload['box_golden_id'] = $box->golden_id;
+        $payload['boxGoldenId'] = $box->goldenId;
     }
 
     /**
@@ -70,8 +70,8 @@ class BoxExperienceHelper
     public function delete(string $boxGoldenId, string $experienceGoldenId)
     {
         $payload = [
-            'experience_golden_id' => $experienceGoldenId,
-            'box_golden_id' => $boxGoldenId,
+            'experienceGoldenId' => $experienceGoldenId,
+            'boxGoldenId' => $boxGoldenId,
         ];
 
         $this->client->request(

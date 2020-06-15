@@ -44,7 +44,7 @@ class ExperienceComponent
     public bool $isEnabled;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
-    public \DateTime $externalUpdatedAt;
+    public ?\DateTime $externalUpdatedAt = null;
 }

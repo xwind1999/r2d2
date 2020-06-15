@@ -41,11 +41,10 @@ class BoxExperienceCreateResponse extends ResponseContract
 
     /**
      * @Assert\Type(type="DateTime")
-     * @Assert\NotBlank
      *
      * @JMS\Type("DateTime")
      */
-    public \DateTime $externalUpdatedAt;
+    public ?\DateTime $externalUpdatedAt = null;
 
     public function __construct(BoxExperience $boxExperience)
     {

@@ -11,12 +11,15 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class BroadcastListenerController
 {
+    private const EAI_TIMESTAMP_HEADER = 'x-eai-timestamp';
+
     /**
      * @Route("/broadcast-listener/product", methods={"POST"}, format="json")
      *
@@ -32,8 +35,10 @@ class BroadcastListenerController
      * )
      * @Security(name="basic")
      */
-    public function productListener(ProductRequest $productRequest, MessageBusInterface $messageBus): Response
+    public function productListener(Request $request, ProductRequest $productRequest, MessageBusInterface $messageBus): Response
     {
+        $productRequest->updatedAt = $this->getBroadcastDateTimeFromRequest($request);
+
         $messageBus->dispatch($productRequest);
 
         return new Response(null, 202);
@@ -54,8 +59,10 @@ class BroadcastListenerController
      * )
      * @Security(name="basic")
      */
-    public function partnerListener(PartnerRequest $partnerRequest, MessageBusInterface $messageBus): Response
+    public function partnerListener(Request $request, PartnerRequest $partnerRequest, MessageBusInterface $messageBus): Response
     {
+        $partnerRequest->updatedAt = $this->getBroadcastDateTimeFromRequest($request);
+
         $messageBus->dispatch($partnerRequest);
 
         return new Response(null, 202);
@@ -77,9 +84,12 @@ class BroadcastListenerController
      * @Security(name="basic")
      */
     public function relationshipListener(
+        Request $request,
         ProductRelationshipRequest $relationshipRequest,
         MessageBusInterface $messageBus
     ): Response {
+        $relationshipRequest->updatedAt = $this->getBroadcastDateTimeFromRequest($request);
+
         $messageBus->dispatch($relationshipRequest);
 
         return new Response(null, 202);
@@ -100,11 +110,22 @@ class BroadcastListenerController
      * )
      */
     public function priceInformationListener(
+        Request $request,
         PriceInformationRequest $priceInformationRequest,
         MessageBusInterface $messageBus
     ): Response {
+        $priceInformationRequest->updatedAt = $this->getBroadcastDateTimeFromRequest($request);
+
         $messageBus->dispatch($priceInformationRequest);
 
         return new Response(null, 202);
+    }
+
+    private function getBroadcastDateTimeFromRequest(Request $request): ?\DateTime
+    {
+        $timestamp = (int) $request->headers->get(self::EAI_TIMESTAMP_HEADER, '0') / 1000;
+        $dateTime = \DateTime::createFromFormat('U.u', (string) $timestamp);
+
+        return $dateTime ?: null;
     }
 }

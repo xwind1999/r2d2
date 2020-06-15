@@ -28,7 +28,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="255")
+     * @Assert\Length(max="255")
      *
      * @JMS\Type("string")
      */
@@ -56,7 +56,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      *
      * @JMS\Type("strict_boolean")
      */
-    public bool $isSellable;
+    public bool $isSellable = false;
 
     /**
      * @Assert\Type(type="boolean")
@@ -64,7 +64,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      *
      * @JMS\Type("strict_boolean")
      */
-    public bool $isReservable;
+    public bool $isReservable = false;
 
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Brand")
@@ -117,14 +117,6 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
     public ?int $productPeopleNumber = null;
 
     /**
-     * @Assert\Type(type="integer")
-     * @Assert\PositiveOrZero
-     *
-     * @JMS\Type("strict_integer")
-     */
-    public ?int $voucherExpirationDuration = null;
-
-    /**
      * @Assert\Type(type="string")
      * @Assert\Length(min="1", max="10")
      *
@@ -141,6 +133,15 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
     public ?int $stockAllotment = null;
 
     /**
+     * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
+     *
+     * @JMS\Type("strict_integer")
+     * @JMS\SerializedName("productDuration")
+     */
+    public ?int $productDuration = null;
+
+    /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\ListPrice")
      * @Assert\Valid
      *
@@ -148,6 +149,52 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @JMS\SerializedName("listPrice")
      */
     public ?ListPrice $listPrice = null;
+
+    public ?\DateTime $updatedAt = null;
+
+    public static function fromArray(array $product): self
+    {
+        $productRequest = new self();
+        $productRequest->id = $product['id'];
+        $productRequest->name = $product['name'] ?? '';
+        $productRequest->status = $product['status'];
+        $productRequest->type = $product['type'];
+        $productRequest->description = $product['description'] ?? null;
+        $productRequest->productPeopleNumber = $product['productPeopleNumber'] ?? null;
+
+        if (!empty($product['sellableBrand'])) {
+            $productRequest->sellableBrand = Brand::create($product['sellableBrand']);
+        }
+
+        if (!empty($product['sellableCountry'])) {
+            $productRequest->sellableCountry = Country::create($product['sellableCountry']);
+        }
+
+        if (!empty($product['updatedAt'])) {
+            $productRequest->updatedAt = new \DateTime($product['updatedAt']);
+        }
+
+        if (!empty($product['partner'])) {
+            $productRequest->partner = Partner::create($product['partner']);
+        }
+
+        if (!empty($product['isSellable'])) {
+            $productRequest->isSellable = (bool) $product['isSellable'];
+        }
+
+        if (!empty($product['isReservable'])) {
+            $productRequest->isReservable = (bool) $product['isReservable'];
+        }
+
+        if (!empty($product['listPrice.amount']) && !empty($product['listPrice.currencyCode'])) {
+            $productRequest->listPrice = ListPrice::createFromAmountAndCurrencyCode(
+                $product['listPrice.amount'],
+                $product['listPrice.currencyCode']
+            );
+        }
+
+        return $productRequest;
+    }
 
     public function getContext(): array
     {
@@ -164,10 +211,11 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
             'status' => $this->status,
             'type' => $this->type,
             'product_people_number' => $this->productPeopleNumber,
-            'voucher_expiration_duration' => $this->voucherExpirationDuration,
+            'product_duration' => $this->productDuration,
             'room_stock_type' => $this->roomStockType,
             'stock_allotment' => $this->stockAllotment,
             'list_price' => $this->listPrice ? $this->listPrice->getContext() : null,
+            'updated_at' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
         ];
     }
 }

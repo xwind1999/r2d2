@@ -83,6 +83,13 @@ namespace App\Tests\Command {
 
             $commandTester->execute([]);
             $this->assertEquals($expectedOutput, $commandTester->getDisplay());
+
+            $this->assertEquals(0, $commandTester->getStatusCode());
+        }
+
+        public function testCorrectDescription(): void
+        {
+            $this->assertEquals('Dumps exception information', $this->command->getDescription());
         }
     }
 }

@@ -70,7 +70,6 @@ class ComponentControllerTest extends TestCase
         $this->assertEquals($component->name, $return->name);
         $this->assertEquals($component->description, $return->description);
         $this->assertEquals($component->inventory, $return->inventory);
-        $this->assertEquals($component->duration, $return->voucherExpirationDuration);
         $this->assertEquals($component->isSellable, $return->isSellable);
         $this->assertEquals($component->isReservable, $return->isReservable);
         $this->assertEquals($component->status, $return->status);

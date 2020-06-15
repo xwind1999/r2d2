@@ -40,18 +40,40 @@ class RelationshipImportCommandTest extends AbstractImportCommandTest
         $this->commandTester = new CommandTester($this->command);
     }
 
-    public function productRelationshipRequestProvider(): iterable
+    public function requestProvider(): \Generator
     {
         $iterator = new \ArrayIterator([
-            0 => [
+            [
                 'parentProduct' => 'BB0000335658',
                 'childProduct' => 'HG0000335654',
-                'sortOrder' => 1,
                 'isEnabled' => true,
                 'relationshipType' => 'Box-Experience',
-                'printType' => 'Digital',
-                'childCount' => 4,
-                'childQuantity' => 0,
+                'updatedAt' => '2020-01-01 00:00:00',
+            ],
+        ]);
+
+        yield [$iterator];
+
+        $iterator = new \ArrayIterator([
+            [
+                'parentProduct' => 'BB0000335658',
+                'childProduct' => 'HG0000335654',
+                'isEnabled' => true,
+                'relationshipType' => 'Box-Experience',
+            ],
+        ]);
+
+        yield [$iterator];
+    }
+
+    public function requestProviderInvalidData(): \Generator
+    {
+        $iterator = new \ArrayIterator([
+            [
+                'parentProduct' => 'BB0000335658',
+                'childProduct' => 'HG0000335654',
+                'isEnabled' => 'abc',
+                'relationshipType' => 'Box-Experience',
             ],
         ]);
 
@@ -64,7 +86,7 @@ class RelationshipImportCommandTest extends AbstractImportCommandTest
      * @covers ::execute
      * @covers ::process
      *
-     * @dataProvider productRelationshipRequestProvider
+     * @dataProvider requestProvider
      */
     public function testExecuteSuccessfully(\ArrayIterator $arrayProductRelationshipRequest): void
     {
@@ -85,7 +107,7 @@ class RelationshipImportCommandTest extends AbstractImportCommandTest
      * @covers ::process
      * @covers ::logError
      *
-     * @dataProvider productRelationshipRequestProvider
+     * @dataProvider requestProviderInvalidData
      */
     public function testExecuteWithInvalidData(\ArrayIterator $arrayProductRelationshipRequest): void
     {
@@ -101,7 +123,7 @@ class RelationshipImportCommandTest extends AbstractImportCommandTest
      * @covers ::process
      * @covers ::logError
      *
-     * @dataProvider productRelationshipRequestProvider
+     * @dataProvider requestProvider
      */
     public function testExecuteCatchesException(\ArrayIterator $arrayProductRelationshipRequest): void
     {

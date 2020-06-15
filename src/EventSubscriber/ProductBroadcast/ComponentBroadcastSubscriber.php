@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\EventSubscriber\ProductBroadcast;
 
 use App\Event\Product\ComponentBroadcastEvent;
+use App\Exception\ContextualException;
 use App\Exception\Repository\PartnerNotFoundException;
 use App\Manager\ComponentManager;
 use Psr\Log\LoggerInterface;
@@ -37,6 +38,10 @@ class ComponentBroadcastSubscriber implements EventSubscriberInterface
                 'No existing Partner for this component',
                 $event->getProductRequest()->getContext()
             );
+
+            throw $exception;
+        } catch (ContextualException $exception) {
+            $this->logger->warning($exception, $event->getContext());
 
             throw $exception;
         } catch (\Exception $exception) {

@@ -39,9 +39,8 @@ class ExperienceComponentCreateRequest implements RequestBodyInterface, Validata
 
     /**
      * @Assert\Type(type="DateTime")
-     * @Assert\NotBlank
      *
      * @JMS\Type("DateTime")
      */
-    public \DateTime $externalUpdatedAt;
+    public ?\DateTime $externalUpdatedAt = null;
 }
