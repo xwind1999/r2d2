@@ -74,12 +74,13 @@ Project-Env-Api-Tests:
   script:
     - echo "Running Locust tests...."
     - echo ${CI_PROJECT_DIR}
-    - echo ${CI_PROJECT_DIR}/tests/LoadTests/${LOCUST_FILE}
     - locust -f ${CI_PROJECT_DIR}/tests/LoadTests/${LOCUST_FILE}  --host=${LOCUST_HOST} ${LOCUST_OPTS} --only-summary
   artifacts:
     expire_in: 3 days
     paths:
       - report/
+  tags:
+    - k8s
   except:
     - schedules
 
