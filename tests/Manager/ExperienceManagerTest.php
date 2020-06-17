@@ -224,7 +224,7 @@ class ExperienceManagerTest extends TestCase
         $priceInformationRequest = new PriceInformationRequest();
         $priceInformationRequest->product = $productDTO;
         $priceInformationRequest->averageValue = $priceDTO;
-        $priceInformationRequest->averageCommission = 5556;
+        $priceInformationRequest->averageCommission = '5.556';
         $priceInformationRequest->averageCommissionType = 'percentage';
 
         $this->repository
