@@ -4,7 +4,6 @@ variables:
 
 .deploy:
   image: docker-registry.production.smartbox.com/chef/chef-knife
-  stage: Project Env Deploy
   dependencies:
     - build-app-container
   script:
@@ -22,9 +21,9 @@ variables:
     - ${CI_PROJECT_DIR}/.ci/tools/knife-master.sh "${ENVIRONMENT_NAME}" "docker exec r2d2_api_1 sudo -u www-data bin/console d:m:m -n" || true
 #    - ${CI_PROJECT_DIR}/.ci/tools/notify-newrelic.sh "${ENVIRONMENT_NAME}" "${CONSOLE_NEWRELIC_COMPLETED}" || true
 
-'[DEVINT] Deploy':
+'deploy-DEV-INT':
   extends: .deploy
-  stage: Project Env Deploy
+  stage: DevInt Deploy
   environment:
     name: ie1-devint-r2d2
   variables:
@@ -34,17 +33,18 @@ variables:
   except:
     - tags
 
-'[PREPROD] Deploy':
+'deploy-PREPROD':
   extends: .deploy
   stage: Preprod Deploy
   environment:
     name: ie1-preprod-r2d2
   variables:
     ENVIRONMENT_NAME: ie1-preprod-r2d2
+  when: manual
   only:
     - tags
 
-'[PROD] Deploy':
+'deploy-PROD':
   extends: .deploy
   stage: Production Deploy
   environment:
