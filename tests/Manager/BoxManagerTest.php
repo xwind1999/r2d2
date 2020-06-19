@@ -203,7 +203,7 @@ class BoxManagerTest extends TestCase
         $priceInformationRequest = new PriceInformationRequest();
         $priceInformationRequest->product = $productDTO;
         $priceInformationRequest->averageValue = $priceDTO;
-        $priceInformationRequest->averageCommission = 5556;
+        $priceInformationRequest->averageCommission = '55.56';
         $priceInformationRequest->averageCommissionType = 'amount';
 
         $this->repository

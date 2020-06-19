@@ -15,7 +15,7 @@ class ProductExperienceImportCommand extends AbstractProductImportCommand
         'description',
         'type',
         'status',
-        'peopleNumber',
+        'productPeopleNumber',
         'updatedAt',
     ];
 }

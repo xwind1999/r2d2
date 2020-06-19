@@ -64,6 +64,14 @@ class ComponentCreateRequest implements RequestBodyInterface, ValidatableRequest
     public ?int $duration = null;
 
     /**
+     * @Assert\Type(type="string")
+     * @Assert\Choice(choices=\App\Constraint\ProductDurationUnitConstraint::VALID_VALUES)
+     *
+     * @JMS\Type("string")
+     */
+    public ?string $durationUnit = null;
+
+    /**
      * @Assert\Type(type="boolean")
      * @Assert\NotNull()
      *
@@ -81,8 +89,7 @@ class ComponentCreateRequest implements RequestBodyInterface, ValidatableRequest
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="8")
-     * @Assert\NotBlank
+     * @Assert\Choice(choices=\App\Constraint\ProductStatusConstraint::VALID_VALUES)
      *
      * @JMS\Type("string")
      */

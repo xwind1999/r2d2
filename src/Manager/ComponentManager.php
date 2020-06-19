@@ -39,6 +39,7 @@ class ComponentManager
         $component->description = $componentCreateRequest->description;
         $component->inventory = $componentCreateRequest->inventory;
         $component->duration = $componentCreateRequest->duration;
+        $component->durationUnit = $componentCreateRequest->durationUnit;
         $component->isSellable = $componentCreateRequest->isSellable;
         $component->isReservable = $componentCreateRequest->isReservable;
         $component->status = $componentCreateRequest->status;
@@ -79,6 +80,7 @@ class ComponentManager
         $component->name = $componentUpdateRequest->name;
         $component->description = $componentUpdateRequest->description;
         $component->duration = $componentUpdateRequest->duration;
+        $component->durationUnit = $componentUpdateRequest->durationUnit;
         $component->inventory = $componentUpdateRequest->inventory;
         $component->isSellable = $componentUpdateRequest->isSellable;
         $component->isReservable = $componentUpdateRequest->isReservable;

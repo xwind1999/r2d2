@@ -34,7 +34,7 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="10")
+     * @Assert\Choice(choices=\App\Constraint\PriceCommissionTypeConstraint::VALID_VALUES)
      *
      * @JMS\Type("string")
      * @SWG\Property(example="amount")
@@ -42,12 +42,12 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
     public ?string $averageCommissionType = null;
 
     /**
-     * @Assert\Type(type="integer")
+     * @Assert\Type(type="string")
      *
-     * @JMS\Type("float_to_integer")
-     * @SWG\Property(example=5.20)
+     * @JMS\Type("string")
+     * @SWG\Property(example="5.20")
      */
-    public ?int $averageCommission = null;
+    public ?string $averageCommission = null;
 
     public ?\DateTime $updatedAt = null;
 

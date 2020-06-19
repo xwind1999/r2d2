@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\DBAL;
 
-use App\Constraint\BookingStatusConstraint;
+use App\Constraint\ProductDurationUnitConstraint;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\StringType;
 
-class BookingStatus extends StringType
+class ProductDurationUnit extends StringType
 {
     public function getName(): string
     {
-        return 'booking_status';
+        return 'product_duration_unit';
     }
 
     /**
@@ -22,7 +22,7 @@ class BookingStatus extends StringType
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        if (null !== $value && !BookingStatusConstraint::isValid($value)) {
+        if (null !== $value && !ProductDurationUnitConstraint::isValid($value)) {
             throw new \InvalidArgumentException(sprintf('Invalid %s value', $this->getName()));
         }
 

@@ -1,5 +1,5 @@
 phpstan:
-  stage: Static analysis
+  stage: Static Analysis
   image: ${BASE_IMAGE}
   needs:
     - composer
@@ -9,7 +9,7 @@ phpstan:
     - tags
 
 psalm:
-  stage: Static analysis
+  stage: Static Analysis
   image: ${BASE_IMAGE}
   needs:
     - composer
@@ -19,14 +19,14 @@ psalm:
     - tags
 
 infection:
-  stage: Static analysis
+  stage: Static Analysis
   image: ${BASE_IMAGE}
   dependencies:
     - composer
-    - unitTests
+    - unit-tests
   needs:
     - composer
-    - unitTests
+    - unit-tests
   script:
     - phpdbg -qrr vendor/bin/infection --min-covered-msi=80 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage --test-framework-options="--testsuite=UnitTests "
   artifacts:

@@ -1,21 +1,20 @@
 stages:
-  - Build base image
-  - Build validation image
+  - Build Base Image
+  - Build Validation Image
+  - Dependencies
+  - Cleanup and Preparation
   - Build
   - Test
-  - Static analysis
-  - App Container Build
-  - DevInt Pre Health Check
-  - PreProd Pre Health Check
-  - Project Env Deploy
+  - Static Analysis
+  - Deploy Setup
+  - Preprod Check
+  - DevInt Deploy
   - Preprod Deploy
-  - DevInt Post Health Check
-  - PreProd Post Health Check
-  - Production Pre Health Check
+  - Deploy Validation
+  - Preprod Validation
+  - Production Check
   - Production Deploy
-  - Production Post Health Check
-  - Project Env Validation
-  - Load Tests
+  - Production Validation
   - Build Reports
   - Generate Documentation
   - Publish Reports
@@ -38,7 +37,7 @@ include:
   - local: '/.ci/build-reports.yaml'
 
 composer:
-  stage: Build
+  stage: Dependencies
   cache:
     key:
       files:
@@ -55,6 +54,8 @@ composer:
     paths:
       - vendor/
       - public/bundles
+  except:
+    - tags
 
 build-docs:
   stage: Generate Documentation

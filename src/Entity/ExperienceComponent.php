@@ -9,22 +9,18 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ExperienceComponentRepository")
+ * @ORM\Table(
+ *     indexes={
+ *         @ORM\Index(columns={"component_golden_id"})
+ *     },
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(columns={"experience_golden_id","component_golden_id"})
+ *     }
+ * )
  */
 class ExperienceComponent
 {
     use TimestampableEntityTrait;
-
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Component", inversedBy="experienceComponent")
-     * @ORM\JoinColumn(name="component_uuid", referencedColumnName="uuid", nullable=false)
-     */
-    public Component $component;
-
-    /**
-     * @ORM\Column(type="string", length=45, nullable=true)
-     */
-    public string $componentGoldenId;
 
     /**
      * @ORM\Id
@@ -37,6 +33,18 @@ class ExperienceComponent
      * @ORM\Column(type="string", length=45, nullable=true)
      */
     public string $experienceGoldenId;
+
+    /**
+     * @ORM\Id
+     * @ORM\ManyToOne(targetEntity="Component", inversedBy="experienceComponent")
+     * @ORM\JoinColumn(name="component_uuid", referencedColumnName="uuid", nullable=false)
+     */
+    public Component $component;
+
+    /**
+     * @ORM\Column(type="string", length=45, nullable=true)
+     */
+    public string $componentGoldenId;
 
     /**
      * @ORM\Column(type="boolean")

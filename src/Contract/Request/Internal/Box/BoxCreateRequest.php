@@ -38,9 +38,9 @@ class BoxCreateRequest implements RequestBodyInterface, ValidatableRequest
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="10")
+     * @Assert\Choice(choices=\App\Constraint\ProductStatusConstraint::VALID_VALUES)
      *
      * @JMS\Type("string")
      */
-    public ?string $status;
+    public string $status;
 }

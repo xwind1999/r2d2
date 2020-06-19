@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\DBAL\BookingStatus;
+use App\Constraint\BookingStatusConstraint;
 use App\Entity\Booking;
 use App\Event\BookingStatusEvent;
 use Psr\Log\LoggerInterface;
@@ -32,11 +32,11 @@ class BookingStatusSubscriber implements EventSubscriberInterface
 
         if (!empty($booking->expiresAt) && $booking->expiresAt < new \DateTime('now')) {
             $this->prepareMessage(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_EXPIRED, $booking);
-        } elseif (BookingStatus::BOOKING_STATUS_CREATED === $booking->status) {
+        } elseif (BookingStatusConstraint::BOOKING_STATUS_CREATED === $booking->status) {
             $this->prepareMessage(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CREATED, $booking);
-        } elseif (BookingStatus::BOOKING_STATUS_COMPLETE === $booking->status) {
+        } elseif (BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $booking->status) {
             $this->prepareMessage(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_COMPLETED, $booking);
-        } elseif (BookingStatus::BOOKING_STATUS_CANCELLED === $booking->status) {
+        } elseif (BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status) {
             $this->prepareMessage(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CANCELLED, $booking);
         }
     }

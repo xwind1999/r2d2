@@ -50,8 +50,8 @@ code-tests-aggregate:
   stage: Build Reports
   image: ${BASE_IMAGE}
   needs:
-    - unitTests
-    - Api-Tests
+    - unit-tests
+    - api-tests
     - infection
   script:
     - echo true

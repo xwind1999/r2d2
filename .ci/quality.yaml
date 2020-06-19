@@ -3,7 +3,7 @@ variables:
   BASE_IMAGE_STUB: docker-registry.production.smartbox.com/millenium-falcon/r2d2mock
   LOCUST_IMAGE: locustio/locust:1.0.2
 
-unitTests:
+unit-tests:
   stage: Test
   image: ${BASE_IMAGE}
   needs:
@@ -18,7 +18,7 @@ unitTests:
   except:
     - tags
 
-Api-Tests:
+api-tests:
   stage: Test
   image: ${VALIDATION_IMAGE}
   needs:
@@ -46,13 +46,10 @@ Api-Tests:
   except:
     - tags
 
-Project-Env-Api-Tests:
-  stage: Project Env Validation
+api-tests-DEV-INT:
+  stage: Deploy Validation
   image: ${BASE_IMAGE}
   needs:
-    - composer
-    - '[DEVINT] Post-deploy Health Check'
-  dependencies:
     - composer
   variables:
     API_TEST_BASE_URL: "http://ie1-devint-r2d2-api-01.z.sbxtest.net"
@@ -81,10 +78,12 @@ Project-Env-Api-Tests:
   except:
     - schedules
 
-locust-preprod:
+locust-PREPROD:
   <<: *locust
-  stage: Load Tests
+  stage: Preprod Validation
   allow_failure: true
+  needs: ['deploy-PREPROD']
+  when: on_success
   only:
     - tags
   variables:
@@ -93,9 +92,9 @@ locust-preprod:
     LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
     LOCUST_FILE: "end2EndTests.py"
 
-locust-staging:
+locust-DEV-INT:
   <<: *locust
-  stage: Load Tests
+  stage: Deploy Validation
   allow_failure: true
   only:
     - master
@@ -105,73 +104,62 @@ locust-staging:
     LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
     LOCUST_FILE: "end2EndTests.py"
 
-'[DEVINT] Pre-deploy Health Check':
-  stage: DevInt Pre Health Check
+.health-smoke-test:
   allow_failure: true
   image: ${BASE_IMAGE}
   script:
-    - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
+    - curl -f ${CHECK_ENVIRONMENT}
+  only:
+    - tags
+
+'pre-health-smoke-test-DEV-INT':
+  extends: .health-smoke-test
+  stage: Deploy Setup
+  variables:
+    CHECK_ENVIRONMENT: http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
   only:
     - master
 
-'[DEVINT] Post-deploy Health Check':
-  stage: DevInt Post Health Check
-  image: ${BASE_IMAGE}
-  script:
-    - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
+'post-health-smoke-test-DEV-INT':
+  extends: .health-smoke-test
+  stage: Deploy Validation
+  allow_failure: false
+  variables:
+    CHECK_ENVIRONMENT: http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
   only:
     - master
 
-'smokeTesting':
-  stage: Test
-  image: ${BASE_IMAGE}
-  script:
-    - curl -f http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
-  only:
-    - master
-  except:
-    - tags
+'pre-health-smoke-test-PREPROD':
+  extends: .health-smoke-test
+  stage: Preprod Check
+  variables:
+    CHECK_ENVIRONMENT: https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
 
-'[PREPROD] smokeTesting':
-  stage: Test
-  image: ${BASE_IMAGE}
-  script:
-    - curl -f https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
-  only:
-    - tags
+'post-health-smoke-test-PREPROD':
+  extends: .health-smoke-test
+  stage: Preprod Validation
+  allow_failure: false
+  needs: ['deploy-PREPROD']
+  when: on_success
+  variables:
+    CHECK_ENVIRONMENT: https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
 
-'[PREPROD] Pre-deploy Health Check':
-  stage: PreProd Pre Health Check
-  image: ${BASE_IMAGE}
-  script:
-    - curl -f https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
-  only:
-    - tags
+'pre-health-smoke-test-PROD':
+  extends: .health-smoke-test
+  stage: Production Check
+  needs: ['post-health-smoke-test-PREPROD', 'locust-PREPROD']
+  when: on_success
+  variables:
+    CHECK_ENVIRONMENT: https://r2-d2-api.production.smartbox.com/_monitor/health/run
 
-'[PREPROD] Post-deploy Health Check':
-  stage: PreProd Post Health Check
-  image: ${BASE_IMAGE}
-  script:
-    - curl -f https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
-  only:
-    - tags
-
-'[PROD] Pre-deploy Health Check':
-  stage: Production Pre Health Check
-  allow_failure: true
-  image: ${BASE_IMAGE}
-  script:
-    - curl -f https://r2-d2-api.production.smartbox.com/_monitor/health/run
-  only:
-    - tags
-
-'[PROD] Post-deploy Health Check':
-  stage: Production Post Health Check
-  image: ${BASE_IMAGE}
-  script:
-    - curl -f https://r2-d2-api.production.smartbox.com/_monitor/health/run
-  only:
-    - tags
+'post-health-smoke-test-PROD':
+  extends: .health-smoke-test
+  stage: Production Validation
+  allow_failure: false
+  needs: ['deploy-PROD']
+  when: on_success
+  variables:
+    CHECK_ENVIRONMENT: https://r2-d2-api.production.smartbox.com/_monitor/health/run
 
 .running-r2d2:
   variables:
@@ -187,7 +175,7 @@ locust-staging:
   tags:
     - docker
 
-contractTests-against-Stub:
+contract-tests-against-stub:
   stage: Test
   image: docker-registry.production.smartbox.com/pact-verifier-curl:latest
   services:
@@ -202,7 +190,7 @@ contractTests-against-Stub:
   except:
     - tags
 
-contractTests-against-Api:
+contract-tests-against-api:
   stage: Test
   extends: .running-r2d2
   image: docker-registry.production.smartbox.com/pact-verifier-curl:latest

@@ -4,13 +4,24 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Helper\TimestampableEntityTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BoxExperienceRepository")
+ * @ORM\Table(
+ *     indexes={
+ *         @ORM\Index(columns={"experience_golden_id"})
+ *     },
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(columns={"box_golden_id","experience_golden_id"})
+ *     }
+ * )
  */
 class BoxExperience
 {
+    use TimestampableEntityTrait;
+
     /**
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="Box", inversedBy="boxExperience")
@@ -19,7 +30,7 @@ class BoxExperience
     public Box $box;
 
     /**
-     * @ORM\Column(type="string", length=45, nullable=true)
+     * @ORM\Column(type="string", length=45)
      */
     public string $boxGoldenId;
 
@@ -31,7 +42,7 @@ class BoxExperience
     public Experience $experience;
 
     /**
-     * @ORM\Column(type="string", length=45, nullable=true)
+     * @ORM\Column(type="string", length=45)
      */
     public string $experienceGoldenId;
 

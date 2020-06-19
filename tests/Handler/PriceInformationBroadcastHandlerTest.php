@@ -122,7 +122,7 @@ class PriceInformationBroadcastHandlerTest extends TestCase
         $priceInformationRequest = new PriceInformationRequest();
         $priceInformationRequest->product = $productDTO;
         $priceInformationRequest->averageValue = $priceDTO;
-        $priceInformationRequest->averageCommission = 5556;
+        $priceInformationRequest->averageCommission = '123.45';
         $priceInformationRequest->averageCommissionType = 'percentage';
         $priceInformationRequest->updatedAt = new \DateTime('2020-01-01 01:00:00');
 

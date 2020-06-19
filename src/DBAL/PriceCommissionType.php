@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\DBAL;
 
-use App\Constraint\BookingStatusConstraint;
+use App\Constraint\PriceCommissionTypeConstraint;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\StringType;
 
-class BookingStatus extends StringType
+class PriceCommissionType extends StringType
 {
     public function getName(): string
     {
-        return 'booking_status';
+        return 'price_commission_type';
     }
 
     /**
@@ -22,7 +22,7 @@ class BookingStatus extends StringType
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        if (null !== $value && !BookingStatusConstraint::isValid($value)) {
+        if (null !== $value && !PriceCommissionTypeConstraint::isValid($value)) {
             throw new \InvalidArgumentException(sprintf('Invalid %s value', $this->getName()));
         }
 
