@@ -52,4 +52,12 @@ class ExperienceCreateRequest implements RequestBodyInterface, ValidatableReques
      * @JMS\Type("integer")
      */
     public ?int $productPeopleNumber;
+
+    /**
+     * @Assert\Type(type="string")
+     * @Assert\Choice(choices=\App\Constraint\ProductStatusConstraint::VALID_VALUES)
+     *
+     * @JMS\Type("string")
+     */
+    public string $status;
 }

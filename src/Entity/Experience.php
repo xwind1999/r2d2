@@ -63,6 +63,11 @@ class Experience
     public ?int $peopleNumber = null;
 
     /**
+     * @ORM\Column(type="product_status", length=8)
+     */
+    public string $status;
+
+    /**
      * @ORM\Column(type="datetime", nullable=true)
      */
     public ?\DateTime $externalUpdatedAt = null;

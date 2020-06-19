@@ -40,6 +40,7 @@ class ExperienceManager
         $experience->name = $experienceCreateRequest->name;
         $experience->description = $experienceCreateRequest->description;
         $experience->peopleNumber = $experienceCreateRequest->productPeopleNumber;
+        $experience->status = $experienceCreateRequest->status;
 
         $this->repository->save($experience);
 
@@ -85,6 +86,7 @@ class ExperienceManager
         $experience->name = $experienceUpdateRequest->name;
         $experience->description = $experienceUpdateRequest->description;
         $experience->peopleNumber = $experienceUpdateRequest->productPeopleNumber;
+        $experience->status = $experienceUpdateRequest->status;
 
         $this->repository->save($experience);
 
@@ -114,6 +116,7 @@ class ExperienceManager
         $experience->name = $productRequest->name;
         $experience->description = $productRequest->description ?? '';
         $experience->peopleNumber = $productRequest->productPeopleNumber;
+        $experience->status = $productRequest->status;
         $experience->externalUpdatedAt = $productRequest->updatedAt;
 
         $this->repository->save($experience);

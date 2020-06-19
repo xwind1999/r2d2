@@ -64,6 +64,15 @@ abstract class ExperienceResponse extends ResponseContract
      */
     public ?int $productPeopleNumber;
 
+    /**
+     * @Assert\Type(type="string")
+     * @Assert\Length(min="1", max="8")
+     * @Assert\NotBlank
+     *
+     * @JMS\Type("string")
+     */
+    public string $status;
+
     public function __construct(Experience $experience)
     {
         $this->uuid = $experience->uuid->toString();
@@ -72,6 +81,7 @@ abstract class ExperienceResponse extends ResponseContract
         $this->name = $experience->name;
         $this->description = $experience->description;
         $this->productPeopleNumber = $experience->peopleNumber;
+        $this->status = $experience->status;
         $this->createdAt = $experience->createdAt;
         $this->updatedAt = $experience->updatedAt;
     }

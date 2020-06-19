@@ -55,7 +55,7 @@ class ExperienceControllerTest extends TestCase
         $experience->name = 'dinner with massage';
         $experience->description = 'a fancy dinner with feet massage';
         $experience->peopleNumber = 1;
-        $experience->duration = 3;
+        $experience->status = 'inactive';
         $experience->createdAt = new \DateTime();
         $experience->updatedAt = new \DateTime();
 
@@ -69,6 +69,7 @@ class ExperienceControllerTest extends TestCase
         $this->assertEquals($experience->partnerGoldenId, $return->partnerGoldenId);
         $this->assertEquals($experience->name, $return->name);
         $this->assertEquals($experience->description, $return->description);
+        $this->assertEquals($experience->status, $return->status);
         $this->assertEquals($experience->peopleNumber, $return->productPeopleNumber);
         $this->assertEquals($experience->createdAt, $return->createdAt);
         $this->assertEquals($experience->updatedAt, $return->updatedAt);
@@ -174,7 +175,7 @@ class ExperienceControllerTest extends TestCase
         $experience->name = '1234';
         $experience->description = '1234';
         $experience->peopleNumber = 2;
-        $experience->duration = 3;
+        $experience->status = 'inactive';
         $experience->createdAt = new \DateTime();
         $experience->updatedAt = new \DateTime();
 
