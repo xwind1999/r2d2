@@ -49,7 +49,7 @@ api-tests:
 api-tests-DEV-INT:
   stage: Deploy Validation
   image: ${BASE_IMAGE}
-  needs:
+  dependencies:
     - composer
   variables:
     API_TEST_BASE_URL: "http://ie1-devint-r2d2-api-01.z.sbxtest.net"
