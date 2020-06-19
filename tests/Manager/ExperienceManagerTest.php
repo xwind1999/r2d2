@@ -62,6 +62,7 @@ class ExperienceManagerTest extends TestCase
         $experienceUpdateRequest->name = 'dinner with massage';
         $experienceUpdateRequest->description = 'a fancy dinner with feet massage';
         $experienceUpdateRequest->productPeopleNumber = 1;
+        $experienceUpdateRequest->status = 'active';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
         $uuidInterface->toString()->willReturn($uuid);
@@ -73,7 +74,7 @@ class ExperienceManagerTest extends TestCase
         $experience->name = '7895';
         $experience->description = '12365488';
         $experience->peopleNumber = 2;
-        $experience->duration = 3;
+        $experience->status = 'inactive';
         $this->repository->findOne($uuid)->willReturn($experience);
 
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
@@ -85,6 +86,7 @@ class ExperienceManagerTest extends TestCase
         $this->assertEquals('dinner with massage', $experience->name);
         $this->assertEquals('a fancy dinner with feet massage', $experience->description);
         $this->assertEquals('1234', $experience->goldenId);
+        $this->assertEquals('active', $experience->status);
     }
 
     /**
@@ -122,6 +124,7 @@ class ExperienceManagerTest extends TestCase
         $experienceCreateRequest->goldenId = '5678';
         $experienceCreateRequest->partnerGoldenId = '5678';
         $experienceCreateRequest->name = 'dinner with massage';
+        $experienceCreateRequest->status = 'active';
         $experienceCreateRequest->description = 'a fancy dinner with feet massage';
         $experienceCreateRequest->productPeopleNumber = 2;
 
@@ -132,6 +135,7 @@ class ExperienceManagerTest extends TestCase
         $this->assertEquals($experienceCreateRequest->partnerGoldenId, $experience->partnerGoldenId);
         $this->assertEquals($experienceCreateRequest->name, $experience->name);
         $this->assertEquals($experienceCreateRequest->description, $experience->description);
+        $this->assertEquals($experienceCreateRequest->status, $experience->status);
         $this->assertEquals($experienceCreateRequest->productPeopleNumber, $experience->peopleNumber);
     }
 
@@ -150,6 +154,7 @@ class ExperienceManagerTest extends TestCase
         $productRequest->name = 'dinner with massage';
         $productRequest->description = 'a fancy dinner with feet massage';
         $productRequest->productPeopleNumber = 2;
+        $productRequest->status = 'active';
 
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
         $this->repository->findOneByGoldenId($productRequest->id);
@@ -198,6 +203,7 @@ class ExperienceManagerTest extends TestCase
         $productRequest->name = 'dinner with massage';
         $productRequest->description = 'a fancy dinner with feet massage';
         $productRequest->productPeopleNumber = 2;
+        $productRequest->status = 'active';
 
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
         $this->repository

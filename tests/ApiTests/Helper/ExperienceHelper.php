@@ -31,6 +31,7 @@ class ExperienceHelper
             'description' => '1234',
             'productPeopleNumber' => '2',
             'partnerGoldenId' => '1234',
+            'status' => 'active',
         ];
 
         return $overrides + $payload;
