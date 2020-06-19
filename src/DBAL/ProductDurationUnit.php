@@ -6,9 +6,8 @@ namespace App\DBAL;
 
 use App\Constraint\ProductDurationUnitConstraint;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\StringType;
 
-class ProductDurationUnit extends StringType
+class ProductDurationUnit extends AbstractCommentedStringType
 {
     public function getName(): string
     {

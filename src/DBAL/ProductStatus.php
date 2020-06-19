@@ -6,9 +6,8 @@ namespace App\DBAL;
 
 use App\Constraint\ProductStatusConstraint;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\StringType;
 
-class ProductStatus extends StringType
+class ProductStatus extends AbstractCommentedStringType
 {
     public function getName(): string
     {

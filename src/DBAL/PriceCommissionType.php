@@ -6,9 +6,8 @@ namespace App\DBAL;
 
 use App\Constraint\PriceCommissionTypeConstraint;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\StringType;
 
-class PriceCommissionType extends StringType
+class PriceCommissionType extends AbstractCommentedStringType
 {
     public function getName(): string
     {
