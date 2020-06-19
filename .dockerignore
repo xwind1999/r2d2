@@ -2,6 +2,7 @@
 !.ci/
 !bin/
 !config/
+!migrations/
 !public/
 !src/
 !src-vendor-fixes/
