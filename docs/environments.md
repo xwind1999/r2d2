@@ -15,7 +15,7 @@
 | R2D2 | https://r2-d2-api-devint.sbxtest.net/ | eai | eai | `/broadcast-listener`  |
 | R2D2 | https://r2-d2-api-devint.sbxtest.net/ | booking | booking | `/booking` |
 | R2D2 | https://r2-d2-api-devint.sbxtest.net/ | | | `/quickdata`, `/cmhub`, `/`, `/ping` |
-| RabbitMQ | http://10.8.116.13:15672/ | r2d2 | r2d2 | |
+| RabbitMQ | http://10.8.116.13:15672/ | rabbit-admin | xgdfykuxdO | |
 | MySQL | ie1-devint-r2d2-db-01.z.sbxtest.net:3306 | u_r2d2 | JxUfkzcBigPE^Z*4 | |
 
 ## Preprod
