@@ -6,9 +6,8 @@ namespace App\DBAL;
 
 use App\Constraint\RoomStockTypeConstraint;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\StringType;
 
-class RoomStockType extends StringType
+class RoomStockType extends AbstractCommentedStringType
 {
     public function getName(): string
     {

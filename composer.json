@@ -18,7 +18,7 @@
         "nelmio/api-doc-bundle": "^3.6",
         "ramsey/uuid": "^3.9",
         "ramsey/uuid-doctrine": "^1.6",
-        "smartbox/api-rest-client": "dev-master",
+        "smartbox/api-rest-client": "^9.0",
         "smartbox/canonical-data-model": "^8.47",
         "symfony/asset": "v5.1.*",
         "symfony/console": "5.1.*",

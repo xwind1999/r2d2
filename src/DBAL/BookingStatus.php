@@ -6,9 +6,8 @@ namespace App\DBAL;
 
 use App\Constraint\BookingStatusConstraint;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\StringType;
 
-class BookingStatus extends StringType
+class BookingStatus extends AbstractCommentedStringType
 {
     public function getName(): string
     {
