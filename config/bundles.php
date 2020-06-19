@@ -15,4 +15,5 @@ return [
     Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true],
     Liip\MonitorBundle\LiipMonitorBundle::class => ['all' => true],
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
+    Smartbox\CDM\SmartboxCDMBundle::class => ['all' => true],
 ];
