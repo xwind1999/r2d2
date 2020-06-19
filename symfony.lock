@@ -120,6 +120,15 @@
     "globtec/phpadr": {
         "version": "dev-master"
     },
+    "guzzlehttp/guzzle": {
+        "version": "6.5.5"
+    },
+    "guzzlehttp/promises": {
+        "version": "v1.3.1"
+    },
+    "guzzlehttp/psr7": {
+        "version": "1.6.1"
+    },
     "hoa/compiler": {
         "version": "3.17.08.08"
     },
@@ -324,8 +333,14 @@
     "psr/event-dispatcher": {
         "version": "1.0.0"
     },
+    "psr/http-message": {
+        "version": "1.0.1"
+    },
     "psr/log": {
         "version": "1.1.2"
+    },
+    "ralouphie/getallheaders": {
+        "version": "3.0.3"
     },
     "ramsey/uuid": {
         "version": "3.9.2"
@@ -380,6 +395,12 @@
     },
     "seld/jsonlint": {
         "version": "1.7.2"
+    },
+    "smartbox/api-rest-client": {
+        "version": "dev-master"
+    },
+    "smartbox/canonical-data-model": {
+        "version": "v8.47.0"
     },
     "symfony/amqp-messenger": {
         "version": "v5.1.0"
