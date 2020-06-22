@@ -115,11 +115,10 @@ locust-report:
     - locust-DEV-INT
   image: ${LOCUST_REPORT_IMAGE}
   script:
-    - mkdir -p report/html/locustreport/
     - python ${CI_PROJECT_DIR}/tests/LoadTests/reportFile/graph.py
   only:
     - branches
   artifacts:
     expire_in: 3 days
     paths:
-      - report/html/locust/report.html
+      - report/html/locust/result.html
