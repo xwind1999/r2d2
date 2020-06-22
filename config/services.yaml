@@ -116,8 +116,16 @@ services:
 
     Smartbox\ApiRestClient\Clients\EaiV0Client:
         factory:   ['@Smartbox\ApiRestClient\ApiRestInternalClientBuilder', createClient]
-        arguments: ['Smartbox\ApiRestClient\Clients\EaiV0Client', '%env(APP_EAI_ENV)%', '%env(APP_EAI_USER)%', '%env(APP_EAI_PASSWORD)%']
+        arguments:
+            - 'Smartbox\ApiRestClient\Clients\EaiV0Client'
+            - '%env(APP_EAI_ENV)%'
+            - '%env(APP_EAI_USER)%'
+            - '%env(APP_EAI_PASSWORD)%'
 
     Smartbox\ApiRestClient\Clients\ChecksV0Client:
         factory:   ['@Smartbox\ApiRestClient\ApiRestInternalClientBuilder', createClient]
-        arguments: ['Smartbox\ApiRestClient\Clients\ChecksV0Client', '%env(APP_EAI_ENV)%', '%env(APP_EAI_USER)%', '%env(APP_EAI_PASSWORD)%']
+        arguments:
+            - 'Smartbox\ApiRestClient\Clients\ChecksV0Client'
+            - '%env(APP_EAI_ENV)%'
+            - '%env(APP_EAI_USER)%'
+            - '%env(APP_EAI_PASSWORD)%'
