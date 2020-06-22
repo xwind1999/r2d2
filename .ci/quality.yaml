@@ -65,7 +65,7 @@ api-tests-DEV-INT:
   inherit:
     default: false
   when: always
-  dependency: []
+  dependencies: []
   before_script:
     - sudo mkdir -p /builds/millenniumfalcon/r2-d2-api/report/html/locust/
   script:
