@@ -3,7 +3,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-df = pd.read_csv('/builds/millenniumfalcon/r2-d2-api/tests/LoadTests/csvReports/staging_end2EndTests.py_stats.csv')
+df = pd.read_csv('report/html/staging_end2EndTests.py_stats.csv')
 fig = make_subplots(rows=1, cols=1)
 
 fig.add_trace(

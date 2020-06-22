@@ -68,8 +68,7 @@ api-tests-DEV-INT:
   script:
     - echo "Running Locust tests...."
     - echo ${CI_PROJECT_DIR}
-    - mkdir -p ${CI_PROJECT_DIR}/tests/LoadTests/csvReports
-    - locust -f ${CI_PROJECT_DIR}/tests/LoadTests/${LOCUST_FILE}  --host=${LOCUST_HOST} ${LOCUST_OPTS} --csv=${CI_PROJECT_DIR}/tests/LoadTests/csvReports/${LOCUST_ENV}_${LOCUST_FILE} --only-summary
+    - locust -f ${CI_PROJECT_DIR}/tests/LoadTests/${LOCUST_FILE}  --host=${LOCUST_HOST} ${LOCUST_OPTS} --csv=report/html/${LOCUST_ENV}_${LOCUST_FILE} --only-summary
   artifacts:
     expire_in: 3 days
     paths:
