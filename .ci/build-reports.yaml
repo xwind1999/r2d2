@@ -1,3 +1,6 @@
+variables:
+  LOCUST_REPORT_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/locustreport
+
 generate-api-reference:
   stage: Build Reports
   image: ${BASE_IMAGE}
@@ -105,3 +108,18 @@ generate-extra-docs:
       - docs/README.md
   except:
     - tags
+
+locust-report:
+  stage: Build Reports
+  needs:
+    - locust-DEV-INT
+  image: ${LOCUST_REPORT_IMAGE}
+  script:
+    - mkdir -p report/html/locustreport/
+    - python ${CI_PROJECT_DIR}/tests/LoadTests/reportFile/graph.py
+  only:
+    - branches
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - report/html/locustreport/
