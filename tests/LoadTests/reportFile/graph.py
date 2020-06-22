@@ -32,5 +32,5 @@ fig.add_trace(
 )
 
 fig.update_layout(height=1000, width=1500, xaxis_title="Type of Request",yaxis_title="Response in s",title_text="Locust Performance Results")
-fig.write_html("report/html/locustreport/result.html")
+fig.write_html("report/html/locust/result.html")
 fig.show()

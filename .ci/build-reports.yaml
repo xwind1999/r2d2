@@ -122,4 +122,4 @@ locust-report:
   artifacts:
     expire_in: 3 days
     paths:
-      - report/html/locustreport/
+      - report/html/locust
