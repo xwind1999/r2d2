@@ -67,7 +67,7 @@ api-tests-DEV-INT:
   when: always
   dependencies: []
   before_script:
-    - sudo mkdir -p /builds/millenniumfalcon/r2-d2-api/report/html/locust/
+    - mkdir -p /builds/millenniumfalcon/r2-d2-api/report/html/locust/
   script:
     - echo "Running Locust tests...."
     - echo ${CI_PROJECT_DIR}
