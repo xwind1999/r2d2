@@ -9,8 +9,16 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Ramsey\Uuid\UuidInterface;
 
+/**
+ * @coversDefaultClass \App\Logger\Processor\RequestIdProcessor
+ */
 class RequestIdProcessorTest extends TestCase
 {
+    /**
+     * @covers ::__construct
+     * @covers ::__invoke
+     * @covers ::regenerate
+     */
     public function testAddInfo(): void
     {
         $uuidFactory = $this->prophesize(UuidFactoryInterface::class);
