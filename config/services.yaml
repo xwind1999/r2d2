@@ -2,6 +2,8 @@ imports:
     - { resource: services/logging.yaml }
 
 parameters:
+    newrelic.enable: '%env(bool:NR_ENABLE)%'
+    newrelic.api_key: '%env(NR_APIKEY)%'
     clients.quickdata:
         base_uri: '%env(QUICKDATA_URL)%'
     clients.cmhub:

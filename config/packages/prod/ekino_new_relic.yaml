@@ -1,0 +1,11 @@
+ekino_new_relic:
+  enabled: '%newrelic.enable%'
+  api_key: '%newrelic.api_key%'
+  exceptions: true
+  deprecations: false
+  http:
+    enabled: true
+    ignored_routes:
+    ignored_paths:
+  commands:
+    enabled: true
