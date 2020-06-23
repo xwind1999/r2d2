@@ -70,7 +70,6 @@ build-docs:
     expire_in: 1 day
   only:
     - master
-    - branches
 
 pages:
   stage: Publish Reports

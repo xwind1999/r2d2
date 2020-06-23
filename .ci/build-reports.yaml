@@ -45,7 +45,6 @@ mermaid-generate-images:
     - 'for flow in docs/architecture/diagram/*.mmd; do mmdc -p mmdc-config.json -i ${flow%%.*}.mmd -o ${flow%%.*}.png --width 8000 --height 6000; done; mv docs/architecture/diagram/*.png report/html/docs/architecture/diagram/;'
   only:
     - master
-    - branches
   except:
     - schedules
     - tags
@@ -118,7 +117,6 @@ locust-report:
   script:
     - python ${CI_PROJECT_DIR}/tests/LoadTests/reportFile/graph.py
   only:
-    - branches
     - master
   artifacts:
     expire_in: 3 days
