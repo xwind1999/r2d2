@@ -12,8 +12,7 @@
 * [Unit Tests Coverage Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/phpunit/)
 * [PHPMetrics Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/phpmetrics/)
 * [Api Tests Coverage Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/api-tests/)
-* [Locust DEVINT Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/locust/result.html)
-* [Locust PREPROD Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/locust/result.html)
+* [Locust  Report](http://millenniumfalcon.gitlab.production.smartbox.com/r2-d2-api/report/html/locust/result.html)
 
 ## Main Responsibilities (domains):
 
