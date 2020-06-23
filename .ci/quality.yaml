@@ -100,7 +100,7 @@ locust-DEV-INT:
   stage: Deploy Validation
   allow_failure: true
   only:
-    - branches
+    - master
   variables:
     LOCUST_ENV: "staging"
     LOCUST_HOST: "http://r2-d2-api-devint.sbxtest.net"
