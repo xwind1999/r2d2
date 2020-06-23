@@ -1,3 +1,4 @@
 _monitor:
-  resource: "@LiipMonitorBundle/Resources/config/routing.xml"
-  prefix: /_monitor/health
+  path: /_monitor/health/run
+  defaults:
+    _controller: Liip\MonitorBundle\Controller\HealthCheckController::runAllChecksAction
