@@ -65,10 +65,13 @@ api-tests-DEV-INT:
   inherit:
     default: false
   when: always
+  dependencies: []
+  before_script:
+    - mkdir -p /builds/millenniumfalcon/r2-d2-api/report/html/locust/
   script:
     - echo "Running Locust tests...."
     - echo ${CI_PROJECT_DIR}
-    - locust -f ${CI_PROJECT_DIR}/tests/LoadTests/${LOCUST_FILE}  --host=${LOCUST_HOST} ${LOCUST_OPTS} --only-summary
+    - locust -f ${CI_PROJECT_DIR}/tests/LoadTests/${LOCUST_FILE}  --host=${LOCUST_HOST} ${LOCUST_OPTS} --csv=report/html/locust/${LOCUST_ENV}_${LOCUST_FILE} --only-summary
   artifacts:
     expire_in: 3 days
     paths:

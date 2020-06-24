@@ -81,6 +81,7 @@ pages:
     - phpmetrics
     - build-docs
     - schemaspy
+    - locust-report
   needs:
     - build-docs
     - code-tests-aggregate
@@ -89,6 +90,7 @@ pages:
     - mermaid-generate-images
     - phpmetrics
     - schemaspy
+    - locust-report
   script:
     - rm -rf public/
     - mv mkdocs public/
