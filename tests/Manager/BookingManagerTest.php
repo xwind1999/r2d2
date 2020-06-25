@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Contract\Request\Booking\BookingCreate\Guest;
 use App\Contract\Request\Booking\BookingCreate\Room;
 use App\Contract\Request\Booking\BookingCreate\RoomDate;
 use App\Contract\Request\Booking\BookingCreateRequest;
@@ -22,6 +23,7 @@ use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
 use App\Exception\Booking\InvalidBookingNewStatus;
 use App\Exception\Booking\InvalidExtraNightException;
+use App\Exception\Booking\MisconfiguredExperiencePriceException;
 use App\Exception\Booking\NoIncludedRoomFoundException;
 use App\Exception\Booking\RoomsDontHaveSameDurationException;
 use App\Exception\Booking\UnallocatedDateException;
@@ -247,7 +249,8 @@ class BookingManagerTest extends TestCase
         ?int $duration,
         ?callable $setUp,
         ?string $exceptionClass,
-        callable $asserts
+        callable $asserts,
+        array $extraParams = []
     ) {
         $partner = new Partner();
         $partner->goldenId = '5678';
@@ -255,6 +258,7 @@ class BookingManagerTest extends TestCase
         $experience = new Experience();
         $experience->goldenId = $bookingCreateRequest->experience->id;
         $experience->partner = $partner;
+        $experience->price = $extraParams['price'] ?? 500;
         $this->experienceRepository->findOneByGoldenId($bookingCreateRequest->experience->id)->willReturn($experience);
 
         $box = new Box();
@@ -271,9 +275,8 @@ class BookingManagerTest extends TestCase
         $component->duration = $duration;
         $this->componentRepository->findDefaultRoomByExperience($experience)->willReturn($component);
 
-        // TODO: replace with experience price after R2D2-209
-        $money = new Money(400, new Currency($bookingCreateRequest->currency));
-        $this->moneyHelper->create(400, $bookingCreateRequest->currency)->willReturn($money);
+        $money = new Money($experience->price, new Currency($bookingCreateRequest->currency));
+        $this->moneyHelper->create($experience->price, $bookingCreateRequest->currency)->willReturn($money);
 
         if ($setUp) {
             $setUp($this);
@@ -304,7 +307,7 @@ class BookingManagerTest extends TestCase
         $baseBookingCreateRequest->startDate = new \DateTime('2020-01-01');
         $baseBookingCreateRequest->endDate = new \DateTime('2020-01-02');
         $baseBookingCreateRequest->customerComment = 'Clean sheets please';
-        $baseBookingCreateRequest->guests = [new \App\Contract\Request\Booking\BookingCreate\Guest()];
+        $baseBookingCreateRequest->guests = [new Guest()];
         $baseBookingCreateRequest->guests[0]->firstName = 'Hermano';
         $baseBookingCreateRequest->guests[0]->lastName = 'Guido';
         $baseBookingCreateRequest->guests[0]->email = 'maradona@worldcup.ar';
@@ -335,7 +338,7 @@ class BookingManagerTest extends TestCase
             function ($test, $booking) {
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->flush()->shouldHaveBeenCalledOnce();
-                $test->assertEquals(400, $booking->totalPrice);
+                $test->assertEquals(500, $booking->totalPrice);
                 $test->assertCount(1, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
@@ -366,7 +369,7 @@ class BookingManagerTest extends TestCase
             function ($test, $booking) {
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->flush()->shouldHaveBeenCalledOnce();
-                $test->assertEquals(400, $booking->totalPrice);
+                $test->assertEquals(500, $booking->totalPrice);
                 $test->assertCount(1, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
@@ -402,7 +405,7 @@ class BookingManagerTest extends TestCase
             function ($test, $booking) {
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->flush()->shouldHaveBeenCalledOnce();
-                $test->assertEquals(700, $booking->totalPrice);
+                $test->assertEquals(800, $booking->totalPrice);
                 $test->assertCount(2, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
@@ -441,7 +444,7 @@ class BookingManagerTest extends TestCase
             function ($test, $booking) {
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->flush()->shouldHaveBeenCalledOnce();
-                $test->assertEquals(700, $booking->totalPrice);
+                $test->assertEquals(800, $booking->totalPrice);
                 $test->assertCount(2, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
@@ -489,7 +492,7 @@ class BookingManagerTest extends TestCase
             function ($test, $booking) {
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
                 $test->entityManager->flush()->shouldHaveBeenCalledOnce();
-                $test->assertEquals(1900, $booking->totalPrice);
+                $test->assertEquals(2000, $booking->totalPrice);
                 $test->assertCount(6, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
@@ -776,6 +779,36 @@ class BookingManagerTest extends TestCase
             function ($test) {
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledTimes(1);
             },
+        ];
+
+        yield 'experience with price zero' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 0;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::type('string'))->willThrow(new BookingNotFoundException());
+            },
+            MisconfiguredExperiencePriceException::class,
+            function ($test) {
+                $test->entityManager->rollback()->shouldHaveBeenCalledTimes(1);
+            },
+            ['price' => 0],
         ];
     }
 }
