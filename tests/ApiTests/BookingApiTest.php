@@ -269,6 +269,7 @@ class BookingApiTest extends ApiTestCase
                     'Cup of tea',
                     'Una noche muy buena',
                 ],
+                'price' => 500,
             ],
             'currency' => 'EUR',
             'voucher' => '198257918',

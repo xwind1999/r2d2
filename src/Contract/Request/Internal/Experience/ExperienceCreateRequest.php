@@ -60,4 +60,12 @@ class ExperienceCreateRequest implements RequestBodyInterface, ValidatableReques
      * @JMS\Type("string")
      */
     public string $status;
+
+    /**
+     * @Assert\Type(type="integer")
+     * @Assert\PositiveOrZero
+     *
+     * @JMS\Type("strict_integer")
+     */
+    public ?int $price = null;
 }

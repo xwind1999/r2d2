@@ -41,6 +41,8 @@ class ExperienceManager
         $experience->description = $experienceCreateRequest->description;
         $experience->peopleNumber = $experienceCreateRequest->productPeopleNumber;
         $experience->status = $experienceCreateRequest->status;
+        $experience->price = $experienceCreateRequest->price;
+        $experience->priceUpdatedAt = new \DateTime('now');
 
         $this->repository->save($experience);
 
