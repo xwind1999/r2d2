@@ -351,4 +351,20 @@ class ComponentManagerTest extends TestCase
             })($component),
         ];
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getRoomsByExperienceGoldenIdsList
+     */
+    public function testGetRoomsByExperienceGoldenIdsList()
+    {
+        $compIds = [
+            '1234', '4321', '1111',
+        ];
+        $this->repository->findRoomsByExperienceGoldenIdsList(Argument::any())->willReturn($compIds);
+        $manager = new ComponentManager($this->repository->reveal(), $this->partnerRepository->reveal(), $this->manageableProductService->reveal());
+        $manager->getRoomsByExperienceGoldenIdsList($compIds);
+
+        $this->repository->findRoomsByExperienceGoldenIdsList($compIds)->shouldBeCalledOnce();
+    }
 }

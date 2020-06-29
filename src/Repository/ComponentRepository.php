@@ -83,6 +83,21 @@ class ComponentRepository extends ServiceEntityRepository
         return $component;
     }
 
+    public function findRoomsByExperienceGoldenIdsList(array $expIds): array
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb
+            ->addSelect('ec.experienceGoldenId')
+            ->join('c.experienceComponent', 'ec')
+            ->where('c.isReservable = 1')
+            ->andWhere('ec.isEnabled = true')
+            ->andWhere($qb->expr()->in('ec.experienceGoldenId', $expIds))
+            ->indexBy('c', 'c.goldenId')
+        ;
+
+        return $qb->getQuery()->getArrayResult();
+    }
+
     /**
      * @throws NonUniqueResultException
      */

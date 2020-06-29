@@ -26,11 +26,14 @@ class LegacyAvailabilityProvider
 
     protected ExperienceManager $experienceManager;
 
-    public function __construct(QuickData $quickData, ArrayTransformerInterface $serializer, ExperienceManager $experienceManager)
+    protected AvailabilityProvider $availabilityProvider;
+
+    public function __construct(QuickData $quickData, ArrayTransformerInterface $serializer, ExperienceManager $experienceManager, AvailabilityProvider $availabilityProvider)
     {
         $this->quickData = $quickData;
         $this->serializer = $serializer;
         $this->experienceManager = $experienceManager;
+        $this->availabilityProvider = $availabilityProvider;
     }
 
     public function getAvailabilityForExperience(int $experienceId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): QuickDataResponse
@@ -65,18 +68,28 @@ class LegacyAvailabilityProvider
             $data = $this->quickData->getRange($boxId, $dateFrom, $dateTo);
             //but we process them the same way, so we have a GetRangeResponse ready
 
-            if (!empty($data['PackagesList'])) {
-                $packageList = $data['PackagesList'];
-                $experienceIds = array_column($packageList, 'Package');
-                $inactiveChannelExperienceIds = $this->experienceManager->getIdsListWithPartnerChannelManagerInactive($experienceIds);
-                foreach ($packageList as &$package) {
-                    if (!empty($inactiveChannelExperienceIds[$package['Package']])) {
-                        $package['Request'] = (int) $package['Request'] + (int) $package['Stock'];
-                        $package['Stock'] = 0;
-                    }
-                }
-                $data['PackagesList'] = $packageList;
+            if (empty($data['PackagesList'])) {
+                return $this->serializer->fromArray($data, GetRangeResponse::class);
             }
+
+            $packageList = $data['PackagesList'];
+            $availabilitiesFromQD = [];
+            $experienceIds = array_column($packageList, 'Package');
+            $inactiveChannelExperienceIds = $this->experienceManager->filterIdsListWithPartnerChannelManagerCondition($experienceIds, false);
+            foreach ($packageList as $package) {
+                $experienceId = $package['Package'];
+                if (!empty($inactiveChannelExperienceIds[$experienceId])) {
+                    $availabilitiesFromQD[] = [
+                        'Package' => $experienceId,
+                        'Request' => (int) $package['Request'] + (int) $package['Stock'],
+                        'Stock' => 0,
+                    ];
+                }
+            }
+
+            $availabilitiesFromDb = $this->availabilityProvider->getRoomAvailabilities($boxId, $dateFrom, $dateTo);
+
+            $data['PackagesList'] = array_merge($availabilitiesFromQD, $availabilitiesFromDb);
         } catch (HttpExceptionInterface $exception) {
             $data = [];
         }
@@ -92,7 +105,7 @@ class LegacyAvailabilityProvider
             //but we process them the same way, so we have a GetRangeResponse ready
 
             if (!empty($data['ListPackage'])) {
-                $inactiveChannelExperienceIds = $this->experienceManager->getIdsListWithPartnerChannelManagerInactive($packageCodes);
+                $inactiveChannelExperienceIds = $this->experienceManager->filterIdsListWithPartnerChannelManagerCondition($packageCodes, false);
                 foreach ($data['ListPackage'] as &$package) {
                     if (!empty($package['ListPrestation'][0]['Availabilities']) && !empty($inactiveChannelExperienceIds[$package['PackageCode']])) {
                         $package['ListPrestation'][0]['Availabilities'] = AvailabilityHelper::convertToRequestType($package['ListPrestation'][0]['Availabilities']);
