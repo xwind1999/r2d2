@@ -4,27 +4,35 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Constraint\ProductStatusConstraint;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Component\ComponentCreateRequest;
 use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
+use App\Contract\Request\Manageable\ManageableProductRequest;
 use App\Entity\Component;
 use App\Exception\Manager\Component\OutdatedComponentException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\PartnerNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Repository\ComponentRepository;
 use App\Repository\PartnerRepository;
+use Doctrine\ORM\NonUniqueResultException;
 
 class ComponentManager
 {
-    protected ComponentRepository $repository;
+    private ComponentRepository $repository;
+    private PartnerRepository $partnerRepository;
+    private ManageableProductService $manageableProductService;
 
-    protected PartnerRepository $partnerRepository;
-
-    public function __construct(ComponentRepository $repository, PartnerRepository $partnerRepository)
-    {
+    public function __construct(
+        ComponentRepository $repository,
+        PartnerRepository $partnerRepository,
+        ManageableProductService $manageableProductService
+    ) {
         $this->repository = $repository;
         $this->partnerRepository = $partnerRepository;
+        $this->manageableProductService = $manageableProductService;
     }
 
     public function create(ComponentCreateRequest $componentCreateRequest): Component
@@ -109,6 +117,10 @@ class ComponentManager
             throw new OutdatedComponentException();
         }
 
+        $componentStatus = '';
+        if (!empty($component->status)) {
+            $componentStatus = $component->status;
+        }
         $component->goldenId = $productRequest->id;
         $component->partner = $partner;
         $component->partnerGoldenId = $productRequest->partner ? $productRequest->partner->id : '';
@@ -122,5 +134,27 @@ class ComponentManager
         $component->externalUpdatedAt = $productRequest->updatedAt;
 
         $this->repository->save($component);
+        $this->manageableProductService->dispatchForProduct($productRequest, $componentStatus);
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function findAndSetManageableComponent(ManageableProductRequest $manageableProductRequest): void
+    {
+        $component = $this->repository->findComponentWithBoxExperienceAndRelationship($manageableProductRequest);
+        $component[0]->isManageable = $this->isManageable($component);
+        $this->repository->save($component[0]);
+    }
+
+    private function isManageable(array $component): bool
+    {
+        return
+            ProductStatusConstraint::PRODUCT_STATUS_ACTIVE === $component['componentStatus']
+            && ProductStatusConstraint::PRODUCT_STATUS_ACTIVE === $component['boxStatus']
+            && true === $component['componentReservable']
+            && true === $component['boxExperienceStatus']
+            && true === $component['experienceComponentStatus']
+            && false === $component[0]->isManageable;
     }
 }

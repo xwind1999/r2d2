@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Contract\Request\Manageable\ManageableProductRequest;
+use App\Entity\Box;
+use App\Entity\BoxExperience;
 use App\Entity\Component;
 use App\Entity\Experience;
+use App\Entity\ExperienceComponent;
 use App\Exception\Repository\ComponentNotFoundException;
+use App\Exception\Repository\ManageableProductNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\NonUniqueResultException;
 
 /**
  * @method null|Component find($id, $lockMode = null, $lockVersion = null)
@@ -75,5 +81,60 @@ class ComponentRepository extends ServiceEntityRepository
         }
 
         return $component;
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function findComponentWithBoxExperienceAndRelationship(ManageableProductRequest $manageableProductRequest): array
+    {
+        $qb = $this->createQueryBuilder('component');
+        $qb
+            ->addSelect(
+                '
+                component.status as componentStatus,
+                component.isReservable as componentReservable,
+                boxExperience.isEnabled as boxExperienceStatus,
+                experienceComponent.isEnabled as experienceComponentStatus,
+                box.status as boxStatus
+            ')
+            ->join(ExperienceComponent::class, 'experienceComponent')
+            ->where('experienceComponent.componentGoldenId = component.goldenId')
+
+            ->join(Experience::class, 'experience')
+            ->andWhere('experienceComponent.experienceGoldenId = experience.goldenId')
+
+            ->join(BoxExperience::class, 'boxExperience')
+            ->andWhere('experience.goldenId = boxExperience.experienceGoldenId')
+
+            ->join(Box::class, 'box')
+            ->andWhere('boxExperience.boxGoldenId = box.goldenId')
+        ;
+
+        if ($manageableProductRequest->boxGoldenId) {
+            $qb
+                ->andWhere('box.goldenId = :boxGoldenId')
+                ->setParameter('boxGoldenId', $manageableProductRequest->boxGoldenId);
+        }
+
+        if ($manageableProductRequest->experienceGoldenId) {
+            $qb
+                ->andWhere('experience.goldenId = :experienceGoldenId')
+                ->setParameter('experienceGoldenId', $manageableProductRequest->experienceGoldenId);
+        }
+
+        if ($manageableProductRequest->componentGoldenId) {
+            $qb
+                ->andWhere('component.goldenId = :componentGoldenId')
+                ->setParameter('componentGoldenId', $manageableProductRequest->componentGoldenId);
+        }
+
+        $result = $qb->getQuery()->getOneOrNullResult();
+
+        if (null === $result) {
+            throw new ManageableProductNotFoundException();
+        }
+
+        return $result;
     }
 }

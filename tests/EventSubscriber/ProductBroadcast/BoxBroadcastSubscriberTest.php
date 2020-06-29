@@ -93,10 +93,8 @@ class BoxBroadcastSubscriberTest extends TestCase
         $productRequest->type = 'mev';
 
         $this->boxEvent->getProductRequest()->shouldBeCalled()->willReturn($productRequest);
-
         $this->boxManager->replace($productRequest)->shouldBeCalled()->willThrow(new \Exception());
         $boxSubscriber = new BoxBroadcastSubscriber($this->logger->reveal(), $this->boxManager->reveal());
-
         $this->expectException(\Exception::class);
         $this->assertEmpty($boxSubscriber->handleMessage($this->boxEvent->reveal()));
     }
