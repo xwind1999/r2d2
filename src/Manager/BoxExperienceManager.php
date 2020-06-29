@@ -12,23 +12,28 @@ use App\Exception\Manager\BoxExperience\OutdatedBoxExperienceRelationshipExcepti
 use App\Exception\Manager\BoxExperience\RelationshipAlreadyExistsException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Repository\BoxExperienceRepository;
 use App\Repository\BoxRepository;
 use App\Repository\ExperienceRepository;
 
 class BoxExperienceManager
 {
-    protected BoxRepository $boxRepository;
+    private BoxRepository $boxRepository;
+    private ExperienceRepository $experienceRepository;
+    private BoxExperienceRepository $boxExperienceRepository;
+    private ManageableProductService $manageableProductService;
 
-    protected ExperienceRepository $experienceRepository;
-
-    protected BoxExperienceRepository $boxExperienceRepository;
-
-    public function __construct(BoxExperienceRepository $boxExperienceRepository, BoxRepository $boxRepository, ExperienceRepository $experienceRepository)
-    {
+    public function __construct(
+        BoxExperienceRepository $boxExperienceRepository,
+        BoxRepository $boxRepository,
+        ExperienceRepository $experienceRepository,
+        ManageableProductService $manageableProductService
+    ) {
         $this->boxRepository = $boxRepository;
         $this->experienceRepository = $experienceRepository;
         $this->boxExperienceRepository = $boxExperienceRepository;
+        $this->manageableProductService = $manageableProductService;
     }
 
     /**
@@ -100,5 +105,6 @@ class BoxExperienceManager
         $boxExperience->externalUpdatedAt = $relationshipRequest->updatedAt;
 
         $this->boxExperienceRepository->save($boxExperience);
+        $this->manageableProductService->dispatchForProductRelationship($relationshipRequest);
     }
 }

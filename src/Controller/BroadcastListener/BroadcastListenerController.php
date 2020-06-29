@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class BroadcastListenerController
 {
+    private const EAI_TIMESTAMP_DIVISOR = 1000;
     private const EAI_TIMESTAMP_HEADER = 'x-eai-timestamp';
 
     /**
@@ -123,7 +124,7 @@ class BroadcastListenerController
 
     private function getBroadcastDateTimeFromRequest(Request $request): ?\DateTime
     {
-        $timestamp = (int) $request->headers->get(self::EAI_TIMESTAMP_HEADER, '0') / 1000;
+        $timestamp = (int) $request->headers->get(self::EAI_TIMESTAMP_HEADER, '0') / self::EAI_TIMESTAMP_DIVISOR;
         $dateTime = \DateTime::createFromFormat('U.u', (string) $timestamp);
 
         return $dateTime ?: null;

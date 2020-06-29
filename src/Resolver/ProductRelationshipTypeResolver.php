@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Resolver;
 
+use App\Constraint\RelationshipTypeConstraint;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
@@ -12,9 +13,6 @@ use App\Exception\Resolver\UnprocessableProductRelationshipTypeException;
 
 class ProductRelationshipTypeResolver
 {
-    protected const EXPERIENCE_COMPONENT_TYPE = 'EXPERIENCE-COMPONENT';
-    protected const BOX_EXPERIENCE_TYPE = 'BOX-EXPERIENCE';
-
     /**
      * @throws UnprocessableProductRelationshipTypeException
      */
@@ -22,11 +20,11 @@ class ProductRelationshipTypeResolver
     {
         $relationshipType = strtoupper($relationshipRequest->relationshipType);
 
-        if (self::EXPERIENCE_COMPONENT_TYPE === $relationshipType) {
+        if (RelationshipTypeConstraint::EXPERIENCE_COMPONENT === $relationshipType) {
             return new ExperienceComponentRelationshipBroadcastEvent($relationshipRequest);
         }
 
-        if (self::BOX_EXPERIENCE_TYPE === $relationshipType) {
+        if (RelationshipTypeConstraint::BOX_EXPERIENCE === $relationshipType) {
             return new BoxExperienceRelationshipBroadcastEvent($relationshipRequest);
         }
 

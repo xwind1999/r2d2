@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Resolver;
 
+use App\Constraint\ProductTypeConstraint;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\BoxBroadcastEvent;
 use App\Event\Product\ComponentBroadcastEvent;
@@ -13,28 +14,21 @@ use App\Exception\Resolver\UnprocessableProductTypeException;
 
 class ProductTypeResolver
 {
-    protected const BOX_TYPE = [
-        'MEV', 'DEV', 'MLV',
-    ];
-
-    protected const EXPERIENCE_TYPE = 'EXPERIENCE';
-    protected const COMPONENT_TYPE = 'COMPONENT';
-
     /**
      * @throws UnprocessableProductTypeException
      */
     public function resolve(ProductRequest $productRequest): ProductRequestEventInterface
     {
         $productType = strtoupper($productRequest->type);
-        if (in_array($productType, self::BOX_TYPE)) {
+        if (ProductTypeConstraint::isValid($productType)) {
             return new BoxBroadcastEvent($productRequest);
         }
 
-        if (self::EXPERIENCE_TYPE === $productType) {
+        if (ProductTypeConstraint::EXPERIENCE === $productType) {
             return new ExperienceBroadcastEvent($productRequest);
         }
 
-        if (self::COMPONENT_TYPE === $productType) {
+        if (ProductTypeConstraint::COMPONENT === $productType) {
             return new ComponentBroadcastEvent($productRequest);
         }
 

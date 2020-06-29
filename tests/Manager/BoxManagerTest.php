@@ -16,6 +16,7 @@ use App\Contract\Request\Internal\Box\BoxUpdateRequest;
 use App\Entity\Box;
 use App\Exception\Manager\Box\OutdatedBoxException;
 use App\Exception\Repository\BoxNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Manager\BoxManager;
 use App\Repository\BoxRepository;
 use PHPUnit\Framework\TestCase;
@@ -33,9 +34,15 @@ class BoxManagerTest extends TestCase
      */
     protected $repository;
 
+    /**
+     * @var ManageableProductService|ObjectProphecy
+     */
+    private $manageableProductService;
+
     public function setUp(): void
     {
         $this->repository = $this->prophesize(BoxRepository::class);
+        $this->manageableProductService = $this->prophesize(ManageableProductService::class);
     }
 
     /**
@@ -45,7 +52,10 @@ class BoxManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new BoxManager($this->repository->reveal());
+        $manager = new BoxManager(
+            $this->repository->reveal(),
+            $this->manageableProductService->reveal()
+        );
         $boxUpdateRequest = new BoxUpdateRequest();
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $boxUpdateRequest->goldenId = '5678';
@@ -82,7 +92,10 @@ class BoxManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new BoxManager($this->repository->reveal());
+        $manager = new BoxManager(
+            $this->repository->reveal(),
+            $this->manageableProductService->reveal()
+        );
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -102,7 +115,10 @@ class BoxManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new BoxManager($this->repository->reveal());
+        $manager = new BoxManager(
+            $this->repository->reveal(),
+            $this->manageableProductService->reveal()
+        );
         $boxCreateRequest = new BoxCreateRequest();
         $boxCreateRequest->goldenId = '5678';
         $boxCreateRequest->brand = 'sbx';
@@ -124,7 +140,10 @@ class BoxManagerTest extends TestCase
      */
     public function testReplace()
     {
-        $manager = new BoxManager($this->repository->reveal());
+        $manager = new BoxManager(
+            $this->repository->reveal(),
+            $this->manageableProductService->reveal()
+        );
         $brand = Brand::create('SBX');
         $country = Country::create('FR');
         $productRequest = new ProductRequest();
@@ -134,9 +153,12 @@ class BoxManagerTest extends TestCase
         $productRequest->status = 'active';
         $productRequest->listPrice = new ListPrice();
         $productRequest->listPrice->currencyCode = 'EUR';
+        $box = $this->prophesize(Box::class);
+        $box->status = 'inactive';
 
-        $this->repository->findOneByGoldenId($productRequest->id);
+        $this->repository->findOneByGoldenId($productRequest->id)->willReturn($box->reveal());
         $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
+        $this->manageableProductService->dispatchForProduct(Argument::any(), Argument::any())->shouldBeCalled();
 
         $this->assertEmpty($manager->replace($productRequest));
     }
@@ -147,15 +169,19 @@ class BoxManagerTest extends TestCase
      */
     public function testReplaceWithOutdatedRecord()
     {
-        $manager = new BoxManager($this->repository->reveal());
+        $manager = new BoxManager(
+            $this->repository->reveal(),
+            $this->manageableProductService->reveal()
+        );
         $productRequest = new ProductRequest();
         $productRequest->id = '1234';
         $productRequest->updatedAt = new \DateTime('2020-01-01 00:00:00');
 
-        $box = new Box();
+        $box = $this->prophesize(Box::class);
         $box->externalUpdatedAt = new \DateTime('2020-01-01 01:00:00');
+        $box->status = 'inactive';
 
-        $this->repository->findOneByGoldenId($productRequest->id)->willReturn($box);
+        $this->repository->findOneByGoldenId($productRequest->id)->willReturn($box->reveal());
 
         $this->expectException(OutdatedBoxException::class);
         $manager->replace($productRequest);
@@ -167,7 +193,10 @@ class BoxManagerTest extends TestCase
      */
     public function testReplaceCatchesBoxNotFoundException()
     {
-        $manager = new BoxManager($this->repository->reveal());
+        $manager = new BoxManager(
+            $this->repository->reveal(),
+            $this->manageableProductService->reveal()
+        );
         $brand = Brand::create('SBX');
         $country = Country::create('FR');
         $productRequest = new ProductRequest();
@@ -183,6 +212,7 @@ class BoxManagerTest extends TestCase
             ->shouldBeCalled()
             ->willThrow(new BoxNotFoundException())
         ;
+        $this->manageableProductService->dispatchForProduct(Argument::any(), Argument::any())->shouldBeCalled();
         $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
 
         $this->assertEmpty($manager->replace($productRequest));
@@ -194,7 +224,10 @@ class BoxManagerTest extends TestCase
      */
     public function testinsertPriceInfo()
     {
-        $manager = new BoxManager($this->repository->reveal());
+        $manager = new BoxManager(
+            $this->repository->reveal(),
+            $this->manageableProductService->reveal()
+        );
         $productDTO = new Product();
         $productDTO->id = '1264';
         $priceDTO = new Price();

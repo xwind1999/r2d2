@@ -34,10 +34,7 @@ class ComponentBroadcastSubscriber implements EventSubscriberInterface
         try {
             $this->manager->replace($event->getProductRequest());
         } catch (PartnerNotFoundException $exception) {
-            $this->logger->warning(
-                'No existing Partner for this component',
-                $event->getProductRequest()->getContext()
-            );
+            $this->logger->warning($exception, $event->getProductRequest()->getContext());
 
             throw $exception;
         } catch (ContextualException $exception) {

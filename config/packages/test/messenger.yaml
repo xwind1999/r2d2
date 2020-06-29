@@ -39,6 +39,13 @@ framework:
                     delay: 60000
                     multiplier: 2
 
+            calculate-manageable-flag:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: calculate-manageable-flag
+                retry_strategy:
+                    max_retries: 0
+
             failed-broadcast-listeners:
                 dsn: 'doctrine://default'
                 options:
@@ -51,3 +58,4 @@ framework:
             'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
             'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
+            'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
