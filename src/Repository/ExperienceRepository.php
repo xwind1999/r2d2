@@ -56,17 +56,35 @@ class ExperienceRepository extends ServiceEntityRepository
         return $experience;
     }
 
-    public function findListExperienceIdsWithInactiveChannelManagerPartner(array $experienceIds): array
+    public function filterListExperienceIdsWithPartnerChannelManagerCondition(array $experienceIds, bool $isChannelManagerActive): array
     {
         $qb = $this->createQueryBuilder('e');
         $qb
             ->join('e.partner', 'ep')
             ->select('e.goldenId')
             ->where($qb->expr()->in('e.goldenId', $experienceIds))
-            ->andWhere('ep.isChannelManagerActive = 0')
+            ->andWhere('ep.status = :partner')
+            ->andWhere('ep.isChannelManagerActive = :isChannelManagerActive')
+            ->setParameter('isChannelManagerActive', $isChannelManagerActive)
+            ->setParameter('partner', 'partner')
             ->indexBy('e', 'e.goldenId')
         ;
 
-        return $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+        return $qb->getQuery()->getArrayResult();
+    }
+
+    public function filterListExperienceIdsByBoxId(int $boxId): array
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb
+            ->join('e.boxExperience', 'be')
+            ->join('e.partner', 'ep')
+            ->select('e.goldenId')
+            ->where('be.boxGoldenId = :boxId')
+            ->andWhere('ep.isChannelManagerActive = 1')
+            ->setParameter('boxId', $boxId)
+            ->indexBy('e', 'e.goldenId');
+
+        return $qb->getQuery()->getArrayResult();
     }
 }

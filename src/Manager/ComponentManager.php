@@ -157,4 +157,9 @@ class ComponentManager
             && true === $component['experienceComponentStatus']
             && false === $component[0]->isManageable;
     }
+
+    public function getRoomsByExperienceGoldenIdsList(array $experienceIds): array
+    {
+        return $this->repository->findRoomsByExperienceGoldenIdsList($experienceIds);
+    }
 }

@@ -144,8 +144,13 @@ class ExperienceManager
         $this->repository->save($experience);
     }
 
-    public function getIdsListWithPartnerChannelManagerInactive(array $experienceIds): array
+    public function filterIdsListWithPartnerChannelManagerCondition(array $experienceIds, bool $isChannelManagerActive): array
     {
-        return $this->repository->findListExperienceIdsWithInactiveChannelManagerPartner($experienceIds);
+        return $this->repository->filterListExperienceIdsWithPartnerChannelManagerCondition($experienceIds, $isChannelManagerActive);
+    }
+
+    public function filterListExperienceIdsByBoxId(int $boxId): array
+    {
+        return $this->repository->filterListExperienceIdsByBoxId($boxId);
     }
 }

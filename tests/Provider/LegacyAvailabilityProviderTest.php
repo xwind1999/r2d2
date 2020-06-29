@@ -12,6 +12,7 @@ use App\Contract\Response\QuickData\QuickDataErrorResponse;
 use App\Entity\Experience;
 use App\Entity\Partner;
 use App\Manager\ExperienceManager;
+use App\Provider\AvailabilityProvider;
 use App\Provider\LegacyAvailabilityProvider;
 use App\QuickData\QuickData;
 use JMS\Serializer\ArrayTransformerInterface;
@@ -41,11 +42,17 @@ class LegacyAvailabilityProviderTest extends TestCase
      */
     protected $experienceManager;
 
+    /**
+     * @var AvailabilityProvider|ObjectProphecy
+     */
+    protected $availabilityProvider;
+
     public function setUp(): void
     {
         $this->quickData = $this->prophesize(QuickData::class);
         $this->serializer = $this->prophesize(ArrayTransformerInterface::class);
         $this->experienceManager = $this->prophesize(ExperienceManager::class);
+        $this->availabilityProvider = $this->prophesize(AvailabilityProvider::class);
     }
 
     /**
@@ -60,7 +67,9 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $result = $this->prophesize(GetPackageResponse::class);
         $this->quickData->getPackage($experienceId, $dateFrom, $dateTo)->willReturn([]);
@@ -106,7 +115,10 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
+
         $response = $legacyAvailabilityProvider->getAvailabilityForExperience((int) $experience->goldenId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageResponse::class, $response);
@@ -150,7 +162,9 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
         $response = $legacyAvailabilityProvider->getAvailabilityForExperience((int) $experience->goldenId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageResponse::class, $response);
@@ -168,7 +182,9 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $result = $this->prophesize(QuickDataErrorResponse::class);
         $responseInterface = $this->prophesize(ResponseInterface::class);
@@ -196,7 +212,9 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $result = $this->prophesize(GetRangeResponse::class);
         $this->quickData->getRange($boxId, $dateFrom, $dateTo)->willReturn([]);
@@ -218,7 +236,9 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $result = $this->prophesize(GetRangeResponse::class);
         $this->quickData->getRange($boxId, $dateFrom, $dateTo)->willReturn([
@@ -236,8 +256,20 @@ class LegacyAvailabilityProviderTest extends TestCase
             ],
         ]);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
-        $this->experienceManager->getIdsListWithPartnerChannelManagerInactive(Argument::any())->willReturn([
+        $this->experienceManager->filterIdsListWithPartnerChannelManagerCondition(Argument::any(), Argument::any())->willReturn([
             '132982' => '132982',
+        ]);
+        $this->availabilityProvider->getRoomAvailabilities(Argument::any(), Argument::any(), Argument::any())->willReturn([
+            [
+                'Package' => '132984',
+                'Stock' => 3,
+                'Request' => 0,
+            ],
+            [
+                'Package' => '132985',
+                'Stock' => 3,
+                'Request' => 0,
+            ],
         ]);
         $response = $legacyAvailabilityProvider->getAvailabilitiesForBox($boxId, $dateFrom, $dateTo);
 
@@ -256,7 +288,9 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $result = $this->prophesize(GetRangeResponse::class);
         $responseInterface = $this->prophesize(ResponseInterface::class);
@@ -282,7 +316,9 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $result = $this->prophesize(GetPackageResponse::class);
         $this->quickData->getPackageV2($experienceIds, $dateFrom, $dateTo)->willReturn([]);
@@ -304,7 +340,9 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $result = $this->prophesize(GetPackageV2Response::class);
         $this->quickData->getPackageV2($experienceIds, $dateFrom, $dateTo)->willReturn([
@@ -328,7 +366,7 @@ class LegacyAvailabilityProviderTest extends TestCase
             ],
         ]);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
-        $this->experienceManager->getIdsListWithPartnerChannelManagerInactive(Argument::any())->willReturn([
+        $this->experienceManager->filterIdsListWithPartnerChannelManagerCondition(Argument::any(), Argument::any())->willReturn([
             '88826' => '88826',
             '88827' => '88827',
         ]);
@@ -349,7 +387,9 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $result = $this->prophesize(GetPackageV2Response::class);
         $this->quickData->getPackageV2($experienceIds, $dateFrom, $dateTo)->willReturn([
@@ -375,7 +415,7 @@ class LegacyAvailabilityProviderTest extends TestCase
             ],
         ]);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
-        $this->experienceManager->getIdsListWithPartnerChannelManagerInactive(Argument::any())->willReturn([
+        $this->experienceManager->filterIdsListWithPartnerChannelManagerCondition(Argument::any(), Argument::any())->willReturn([
             '88826' => '88826',
             '88827' => '88827',
         ]);
@@ -396,7 +436,9 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $exception = $this->prophesize(HttpExceptionInterface::class);
         $result = $this->prophesize(GetPackageV2Response::class);
@@ -430,7 +472,9 @@ class LegacyAvailabilityProviderTest extends TestCase
         $formattedResponse = ['DaysAvailabilityPrice' => [['Date' => '2020-01-01T00:00:00.000000']]];
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
         $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
@@ -479,7 +523,9 @@ class LegacyAvailabilityProviderTest extends TestCase
         ];
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
         $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
@@ -503,7 +549,9 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
-            $this->experienceManager->reveal());
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
 
         $exception = $this->prophesize(HttpExceptionInterface::class);
         $result = $this->prophesize(AvailabilityPricePeriodResponse::class);

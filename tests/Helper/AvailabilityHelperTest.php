@@ -31,4 +31,54 @@ class AvailabilityHelperTest extends TestCase
         $this->assertEquals($expectedString, AvailabilityHelper::convertAvailableValueToRequest($inputString));
         $this->assertEquals($randomString, AvailabilityHelper::convertAvailableValueToRequest($randomString));
     }
+
+    public function testMapRoomAvailabilitiesToExperience()
+    {
+        $comps = [
+            '1234' => [
+                [
+                    'duration' => 0,
+                    'goldenId' => '1234',
+                ],
+                'experienceGoldenId' => '1111',
+            ],
+            '4321' => [
+                [
+                    'duration' => 0,
+                    'goldenId' => '4321',
+                ],
+                'experienceGoldenId' => '2222',
+            ],
+        ];
+
+        $roomAvailabilities = [
+            '1234' => [
+                'stock' => 10,
+                'componentGoldenId' => '1234',
+            ],
+            '4321' => [
+                'stock' => 5,
+                'componentGoldenId' => '4321',
+            ],
+            '4322' => [
+                'stock' => 6,
+                'componentGoldenId' => '4322',
+            ],
+        ];
+
+        $returnArray = [
+            [
+                'Package' => '1111',
+                'Request' => 0,
+                'Stock' => 5,
+            ],
+            [
+                'Package' => '2222',
+                'Request' => 0,
+                'Stock' => 5,
+            ],
+        ];
+
+        $this->assertEquals(AvailabilityHelper::mapRoomAvailabilitiesToExperience($comps, $roomAvailabilities, 5), $returnArray);
+    }
 }
