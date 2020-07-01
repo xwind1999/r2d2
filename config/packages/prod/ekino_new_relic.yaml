@@ -1,5 +1,6 @@
 ekino_new_relic:
   enabled: '%newrelic.enable%'
+  application_name: "%newrelic.application_name%"
   api_key: '%newrelic.api_key%'
   exceptions: true
   deprecations: false
@@ -9,3 +10,5 @@ ekino_new_relic:
     ignored_paths:
   commands:
     enabled: true
+    ignored_commands:
+      - messenger:consume

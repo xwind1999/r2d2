@@ -100,3 +100,8 @@ framework:
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
             'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
+
+        buses:
+            default:
+                middleware:
+                    - App\Helper\Newrelic\NewrelicMessengerMiddleware

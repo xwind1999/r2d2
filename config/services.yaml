@@ -2,6 +2,7 @@ imports:
     - { resource: services/logging.yaml }
 
 parameters:
+    newrelic.application_name: '%env(NR_APPNAME)%'
     newrelic.enable: '%env(bool:NR_ENABLE)%'
     newrelic.api_key: '%env(NR_APIKEY)%'
     clients.quickdata:
