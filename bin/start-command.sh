@@ -4,7 +4,7 @@
 
 ln -s /etc/sv/sym /service/sym
 
-export COMMAND='/app/bin/console messenger:consume broadcast-listeners-partner broadcast-listeners-product broadcast-listeners-product-relationship broadcast-listeners-price-information --time-limit=300'
+export COMMAND='/app/bin/console messenger:consume broadcast-listeners-partner broadcast-listeners-product broadcast-listeners-product-relationship broadcast-listeners-price-information calculate-manageable-flag --time-limit=300'
 
 /app/bin/warm-up.sh
 
