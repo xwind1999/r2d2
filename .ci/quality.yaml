@@ -49,6 +49,9 @@ api-tests:
 api-tests-DEV-INT:
   stage: Deploy Validation
   image: ${BASE_IMAGE}
+  needs:
+    - deploy-DEV-INT
+    - composer
   dependencies:
     - composer
   variables:
