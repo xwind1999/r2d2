@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
-use App\Constraint\ProductStatusConstraint;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Component\ComponentCreateRequest;
 use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
@@ -13,6 +12,7 @@ use App\Entity\Component;
 use App\Exception\Manager\Component\OutdatedComponentException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\ManageableProductNotFoundException;
 use App\Exception\Repository\PartnerNotFoundException;
 use App\Helper\Manageable\ManageableProductService;
 use App\Repository\ComponentRepository;
@@ -117,10 +117,7 @@ class ComponentManager
             throw new OutdatedComponentException();
         }
 
-        $componentStatus = '';
-        if (!empty($component->status)) {
-            $componentStatus = $component->status;
-        }
+        $currentEntity = clone $component;
         $component->goldenId = $productRequest->id;
         $component->partner = $partner;
         $component->partnerGoldenId = $productRequest->partner ? $productRequest->partner->id : '';
@@ -134,7 +131,7 @@ class ComponentManager
         $component->externalUpdatedAt = $productRequest->updatedAt;
 
         $this->repository->save($component);
-        $this->manageableProductService->dispatchForProduct($productRequest, $componentStatus);
+        $this->manageableProductService->dispatchForComponent($productRequest, $currentEntity);
     }
 
     /**
@@ -142,20 +139,16 @@ class ComponentManager
      */
     public function findAndSetManageableComponent(ManageableProductRequest $manageableProductRequest): void
     {
-        $component = $this->repository->findComponentWithBoxExperienceAndRelationship($manageableProductRequest);
-        $component[0]->isManageable = $this->isManageable($component);
-        $this->repository->save($component[0]);
-    }
+        $component = null;
+        try {
+            $component = $this->repository->findComponentWithManageableCriteria($manageableProductRequest);
+            $component->isManageable = true;
+        } catch (ManageableProductNotFoundException $exception) {
+            $component = $this->repository->findComponentWithBoxExperienceAndRelationship($manageableProductRequest);
+            $component->isManageable = false;
+        }
 
-    private function isManageable(array $component): bool
-    {
-        return
-            ProductStatusConstraint::PRODUCT_STATUS_ACTIVE === $component['componentStatus']
-            && ProductStatusConstraint::PRODUCT_STATUS_ACTIVE === $component['boxStatus']
-            && true === $component['componentReservable']
-            && true === $component['boxExperienceStatus']
-            && true === $component['experienceComponentStatus']
-            && false === $component[0]->isManageable;
+        $this->repository->save($component);
     }
 
     public function getRoomsByExperienceGoldenIdsList(array $experienceIds): array

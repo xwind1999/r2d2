@@ -13,11 +13,11 @@ use App\Entity\Component;
 use App\Entity\Partner;
 use App\Exception\Manager\Component\OutdatedComponentException;
 use App\Exception\Repository\ComponentNotFoundException;
+use App\Exception\Repository\ManageableProductNotFoundException;
 use App\Helper\Manageable\ManageableProductService;
 use App\Manager\ComponentManager;
 use App\Repository\ComponentRepository;
 use App\Repository\PartnerRepository;
-use Doctrine\ORM\NonUniqueResultException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -62,12 +62,12 @@ class ComponentManagerTest extends TestCase
      * @covers ::get
      * @covers ::update
      */
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $partner = new Partner();
         $partner->goldenId = '4321';
         $this->partnerRepository->findOneByGoldenId('4321')->willReturn($partner);
-        $componentUpdateRequest = new ComponentUpdateRequest();
+        $componentUpdateRequest = $this->prophesize(ComponentUpdateRequest::class);
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $componentUpdateRequest->uuid = $uuid;
         $componentUpdateRequest->goldenId = '1234';
@@ -84,7 +84,7 @@ class ComponentManagerTest extends TestCase
         $uuidInterface = $this->prophesize(UuidInterface::class);
         $uuidInterface->toString()->willReturn($uuid);
 
-        $component = new Component();
+        $component = $this->prophesize(Component::class);
         $component->uuid = $uuidInterface->reveal();
         $component->goldenId = '5678';
         $component->partnerGoldenId = '5678';
@@ -96,13 +96,12 @@ class ComponentManagerTest extends TestCase
         $component->isSellable = false;
         $component->isReservable = false;
         $component->status = 'ok';
-        $this->repository->findOne($uuid)->willReturn($component);
+        $this->repository->findOne($uuid)->willReturn($component->reveal());
 
         $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
 
-        $updatedRoom = $this->manager->update($uuid, $componentUpdateRequest);
+        $this->manager->update($uuid, $componentUpdateRequest->reveal());
 
-        $this->assertSame($component, $updatedRoom);
         $this->assertEquals(2, $component->inventory);
         $this->assertEquals(3, $component->duration);
         $this->assertEquals(true, $component->isReservable);
@@ -119,14 +118,14 @@ class ComponentManagerTest extends TestCase
      * @covers ::get
      * @covers ::delete
      */
-    public function testDelete()
+    public function testDelete(): void
     {
         $uuid = '12345678';
         $uuidInterface = $this->prophesize(UuidInterface::class);
         $uuidInterface->toString()->willReturn($uuid);
-        $component = new Component();
+        $component = $this->prophesize(Component::class);
         $component->uuid = $uuidInterface->reveal();
-        $this->repository->findOne($uuid)->willReturn($component);
+        $this->repository->findOne($uuid)->willReturn($component->reveal());
         $this->repository->delete(Argument::type(Component::class))->shouldBeCalled();
 
         $this->manager->delete($uuid);
@@ -136,12 +135,12 @@ class ComponentManagerTest extends TestCase
      * @covers ::__construct
      * @covers ::create
      */
-    public function testCreate()
+    public function testCreate(): void
     {
-        $partner = new Partner();
+        $partner = $this->prophesize(Partner::class);
         $partner->goldenId = '5678';
-        $this->partnerRepository->findOneByGoldenId('5678')->willReturn($partner);
-        $componentCreateRequest = new ComponentCreateRequest();
+        $this->partnerRepository->findOneByGoldenId('5678')->willReturn($partner->reveal());
+        $componentCreateRequest = $this->prophesize(ComponentCreateRequest::class);
         $componentCreateRequest->goldenId = '5678';
         $componentCreateRequest->partnerGoldenId = '5678';
         $componentCreateRequest->name = 'room with small bed';
@@ -155,7 +154,7 @@ class ComponentManagerTest extends TestCase
 
         $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
 
-        $component = $this->manager->create($componentCreateRequest);
+        $component = $this->manager->create($componentCreateRequest->reveal());
         $this->assertEquals($componentCreateRequest->goldenId, $component->goldenId);
         $this->assertEquals($componentCreateRequest->partnerGoldenId, $component->partnerGoldenId);
         $this->assertEquals($componentCreateRequest->name, $component->name);
@@ -172,13 +171,13 @@ class ComponentManagerTest extends TestCase
      * @covers ::__construct
      * @covers ::replace
      */
-    public function testReplace()
+    public function testReplace(): void
     {
-        $partner = new PartnerDTO();
+        $partner = $this->prophesize(PartnerDTO::class);
         $partner->id = '5678';
-        $productRequest = new ProductRequest();
+        $productRequest = $this->prophesize(ProductRequest::class);
         $productRequest->id = '5678';
-        $productRequest->partner = $partner;
+        $productRequest->partner = $partner->reveal();
         $productRequest->name = 'dinner with massage';
         $productRequest->description = 'a fancy dinner with feet massage';
         $productRequest->productDuration = 2;
@@ -187,35 +186,35 @@ class ComponentManagerTest extends TestCase
         $productRequest->isReservable = true;
         $productRequest->status = 'test Status';
         $productRequest->roomStockType = 'on_request';
-
         $component = $this->prophesize(Component::class);
         $component->status = 'active';
+        $component->isReservable = true;
 
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
         $this->repository->findOneByGoldenId($productRequest->id)->willReturn($component->reveal());
         $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
-        $this->manageableProductService->dispatchForProduct(Argument::any(), Argument::any())->shouldBeCalled();
-        $this->assertEmpty($this->manager->replace($productRequest));
+        $this->manageableProductService->dispatchForComponent(Argument::any(), Argument::any())->shouldBeCalled();
+        $this->manager->replace($productRequest->reveal());
     }
 
     /**
      * @covers ::__construct
      * @covers ::replace
      */
-    public function testReplaceWithOutdatedRecord()
+    public function testReplaceWithOutdatedRecord(): void
     {
-        $partner = new PartnerDTO();
+        $partner = $this->prophesize(PartnerDTO::class);
         $partner->id = '5678';
         $productRequest = new ProductRequest();
         $productRequest->id = '5678';
-        $productRequest->partner = $partner;
+        $productRequest->partner = $partner->reveal();
         $productRequest->updatedAt = new \DateTime('2020-01-01 00:00:00');
 
-        $component = new Component();
+        $component = $this->prophesize(Component::class);
         $component->externalUpdatedAt = new \DateTime('2020-01-01 01:00:00');
 
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
-        $this->repository->findOneByGoldenId($productRequest->id)->willReturn($component);
+        $this->repository->findOneByGoldenId($productRequest->id)->willReturn($component->reveal());
         $this->expectException(OutdatedComponentException::class);
 
         $this->manager->replace($productRequest);
@@ -225,13 +224,13 @@ class ComponentManagerTest extends TestCase
      * @covers ::__construct
      * @covers ::replace
      */
-    public function testReplaceCatchesExperienceNotFoundException()
+    public function testReplaceCatchesExperienceNotFoundException(): void
     {
-        $partner = new PartnerDTO();
+        $partner = $this->prophesize(PartnerDTO::class);
         $partner->id = '5678';
-        $productRequest = new ProductRequest();
+        $productRequest = $this->prophesize(ProductRequest::class);
         $productRequest->id = '5678';
-        $productRequest->partner = $partner;
+        $productRequest->partner = $partner->reveal();
         $productRequest->name = 'dinner with massage';
         $productRequest->description = 'a fancy dinner with feet massage';
         $productRequest->isSellable = true;
@@ -247,124 +246,73 @@ class ComponentManagerTest extends TestCase
         ;
         $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
 
-        $this->assertEmpty($this->manager->replace($productRequest));
+        $this->manager->replace($productRequest->reveal());
     }
 
     /**
      * @covers ::__construct
      * @covers ::findAndSetManageableComponent
-     * @covers ::isManageable
-     * @dataProvider manageableProductProvider
      */
-    public function testFindAndSetManageableComponent(array $component)
+    public function testFindAndSetManageableComponent(): void
     {
+        $component = $this->prophesize(Component::class);
+        $component->isManageable = false;
+        $component->reveal();
         $manageableProductRequest = $this->prophesize(ManageableProductRequest::class);
         $this->repository
-            ->findComponentWithBoxExperienceAndRelationship($manageableProductRequest->reveal())
-            ->shouldBeCalled()
+            ->findComponentWithManageableCriteria($manageableProductRequest->reveal())
+            ->shouldBeCalledOnce()
             ->willReturn($component)
         ;
-        $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
-        $this->assertEmpty($this->manager->findAndSetManageableComponent($manageableProductRequest->reveal()));
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::findAndSetManageableComponent
-     */
-    public function testFindAndSetManageableComponentThrowsManageableProductNotFoundException()
-    {
-        $manageableProductRequest = $this->prophesize(ManageableProductRequest::class);
         $this->repository
             ->findComponentWithBoxExperienceAndRelationship($manageableProductRequest->reveal())
-            ->shouldBeCalled()
-            ->willThrow(NonUniqueResultException::class)
-        ;
-        $this->repository->save(Argument::type(Component::class))->shouldNotBeCalled();
-        $this->expectException(NonUniqueResultException::class);
-        $this->expectExceptionMessage(NonUniqueResultException::DEFAULT_MESSAGE);
+            ->shouldNotBeCalled();
+        $this->repository->save(Argument::type(Component::class))->shouldBeCalledOnce();
+
         $this->manager->findAndSetManageableComponent($manageableProductRequest->reveal());
     }
 
-    public function manageableProductProvider(): iterable
+    /**
+     * @covers ::__construct
+     * @covers ::findAndSetManageableComponent
+     */
+    public function testFindAndSetManageableComponentCatchesManageableProductNotFoundException(): void
     {
-        $componentObject = new Component();
-        $componentObject->isManageable = false;
-        $component = [
-            0 => $componentObject,
-            'componentStatus' => 'active',
-            'componentReservable' => true,
-            'boxExperienceStatus' => true,
-            'experienceComponentStatus' => true,
-            'boxStatus' => 'active',
-        ];
+        $manageableProductRequest = $this->prophesize(ManageableProductRequest::class);
+        $component = $this->prophesize(Component::class);
+        $component->isManageable = true;
+        $component->reveal();
+        $this->repository
+            ->findComponentWithManageableCriteria($manageableProductRequest->reveal())
+            ->shouldBeCalledOnce()
+            ->willThrow(ManageableProductNotFoundException::class)
+        ;
+        $this->repository
+            ->findComponentWithBoxExperienceAndRelationship($manageableProductRequest->reveal())
+            ->shouldBeCalledOnce()
+            ->willReturn($component)
+        ;
+        $this->repository->save(Argument::type(Component::class))->shouldBeCalledOnce();
 
-        yield 'happy scenario' => [
-            $component,
-        ];
-
-        yield 'manageable is true' => [
-            (function ($newComponent) {
-                $newComponent[0]->isManageable = true;
-
-                return $newComponent;
-            })($component),
-        ];
-
-        yield 'component status is inactive' => [
-            (function ($newComponent) {
-                $newComponent['componentStatus'] = 'inactive';
-
-                return $newComponent;
-            })($component),
-        ];
-
-        yield 'component reservable is false' => [
-            (function ($newComponent) {
-                $newComponent['componentReservable'] = false;
-
-                return $newComponent;
-            })($component),
-        ];
-
-        yield 'box experience status is false' => [
-            (function ($newComponent) {
-                $newComponent['boxExperienceStatus'] = false;
-
-                return $newComponent;
-            })($component),
-        ];
-
-        yield 'experience component status is false' => [
-            (function ($newComponent) {
-                $newComponent['boxExperienceStatus'] = false;
-
-                return $newComponent;
-            })($component),
-        ];
-
-        yield 'box status status is false' => [
-            (function ($newComponent) {
-                $newComponent['boxStatus'] = 'inactive';
-
-                return $newComponent;
-            })($component),
-        ];
+        $this->manager->findAndSetManageableComponent($manageableProductRequest->reveal());
     }
 
     /**
      * @covers ::__construct
      * @covers ::getRoomsByExperienceGoldenIdsList
      */
-    public function testGetRoomsByExperienceGoldenIdsList()
+    public function testGetRoomsByExperienceGoldenIdsList(): void
     {
         $compIds = [
             '1234', '4321', '1111',
         ];
         $this->repository->findRoomsByExperienceGoldenIdsList(Argument::any())->willReturn($compIds);
-        $manager = new ComponentManager($this->repository->reveal(), $this->partnerRepository->reveal(), $this->manageableProductService->reveal());
+        $manager = new ComponentManager(
+            $this->repository->reveal(),
+            $this->partnerRepository->reveal(),
+            $this->manageableProductService->reveal()
+        );
         $manager->getRoomsByExperienceGoldenIdsList($compIds);
-
         $this->repository->findRoomsByExperienceGoldenIdsList($compIds)->shouldBeCalledOnce();
     }
 }

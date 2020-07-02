@@ -6,6 +6,8 @@ namespace App\Tests\Command\Import\Helper\Manageable;
 
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
+use App\Entity\Box;
+use App\Entity\Component;
 use App\Helper\Manageable\ManageableProductService;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -33,29 +35,51 @@ class ManageableProductServiceTest extends KernelTestCase
 
     /**
      * @covers ::__construct
+     * @covers ::dispatchForBox
      * @covers ::dispatchForProduct
      * @dataProvider statusProvider
      */
-    public function testDispatchForProduct(string $status, string $productRequestStatus): void
+    public function testDispatchForBox(string $boxStatus, string $productRequestStatus): void
     {
+        $box = $this->prophesize(Box::class);
+        $box->status = $boxStatus;
         $productRequest = $this->prophesize(ProductRequest::class);
-        $this->messageBus->dispatch(Argument::any())->shouldBeCalled()->willReturn($this->envelope);
         $productRequest->status = $productRequestStatus;
+        $this->messageBus->dispatch(Argument::any())->shouldBeCalled()->willReturn($this->envelope);
         $manageableProductService = new ManageableProductService($this->messageBus->reveal());
-        $this->assertEmpty($manageableProductService->dispatchForProduct($productRequest->reveal(), $status));
+        $manageableProductService->dispatchForBox($productRequest->reveal(), $box->reveal());
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::dispatchForComponent
+     * @covers ::dispatchForProduct
+     *
+     * @dataProvider statusProvider
+     */
+    public function testDispatchForComponent(string $boxStatus, string $productRequestStatus): void
+    {
+        $component = $this->prophesize(Component::class);
+        $component->status = $boxStatus;
+        $component->isReservable = (bool) rand(0, 1);
+        $productRequest = $this->prophesize(ProductRequest::class);
+        $productRequest->status = $productRequestStatus;
+        $this->messageBus->dispatch(Argument::any())->shouldBeCalled()->willReturn($this->envelope);
+        $manageableProductService = new ManageableProductService($this->messageBus->reveal());
+        $manageableProductService->dispatchForComponent($productRequest->reveal(), $component->reveal());
     }
 
     /**
      * @covers ::__construct
      * @covers ::dispatchForProductRelationship
+     * @covers ::dispatchForProduct
      */
     public function testDispatchForProductRelationship(): void
     {
         $productRelationshipRequest = $this->prophesize(ProductRelationshipRequest::class);
-
         $this->messageBus->dispatch(Argument::any())->shouldBeCalled()->willReturn($this->envelope);
         $manageableProductService = new ManageableProductService($this->messageBus->reveal());
-        $this->assertEmpty($manageableProductService->dispatchForProductRelationship($productRelationshipRequest->reveal()));
+        $manageableProductService->dispatchForProductRelationship($productRelationshipRequest->reveal());
     }
 
     /**
