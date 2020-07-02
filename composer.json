@@ -59,8 +59,14 @@
         "psr-4": {
             "App\\": "src/",
             "Psr\\Log\\": "src-vendor-fixes/Psr/Log",
-            "Doctrine\\ORM\\": "src-vendor-fixes/doctrine/"
-        }
+            "Doctrine\\ORM\\": "src-vendor-fixes/doctrine/",
+            "Ekino\\NewRelicBundle\\Listener\\":  "src-vendor-fixes/EkinoNewRelicBundle/"
+        },
+        "exclude-from-classmap": [
+            "vendor/psr/log/Psr/Log/LoggerInterface.php",
+            "vendor/doctrine/orm/lib/Doctrine/ORM/UnitOfWork.php",
+            "vendor/ekino/newrelic-bundle/Listener/ExceptionListener.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
