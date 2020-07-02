@@ -4,7 +4,7 @@ phpstan:
   needs:
     - composer
   script:
-    - vendor/bin/phpstan analyse $(pwd)/src --level 8
+    - php -d memory_limit=-1 vendor/bin/phpstan analyse $(pwd)/src --level 8
   except:
     - tags
 
