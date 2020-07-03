@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Constraint\ProductStatusConstraint;
 use App\Contract\Request\Manageable\ManageableProductRequest;
 use App\Entity\Box;
 use App\Entity\BoxExperience;
@@ -13,6 +14,7 @@ use App\Entity\ExperienceComponent;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ManageableProductNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
 
@@ -98,11 +100,43 @@ class ComponentRepository extends ServiceEntityRepository
         return $qb->getQuery()->getArrayResult();
     }
 
+    public function findComponentWithBoxExperienceAndRelationship(
+        ManageableProductRequest $manageableProductRequest
+    ): Component {
+        $result = $this->findComponentForManageableFlag($manageableProductRequest);
+
+        if (null === $result) {
+            throw new ComponentNotFoundException();
+        }
+
+        return $result[0];
+    }
+
+    public function findComponentWithManageableCriteria(ManageableProductRequest $manageableProductRequest): Component
+    {
+        $criteria = Criteria::create();
+        $criteria->andWhere(Criteria::expr()->eq('component.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
+        $criteria->andWhere(Criteria::expr()->eq('box.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
+        $criteria->andWhere(Criteria::expr()->eq('component.isReservable', true));
+        $criteria->andWhere(Criteria::expr()->eq('boxExperience.isEnabled', true));
+        $criteria->andWhere(Criteria::expr()->eq('experienceComponent.isEnabled', true));
+
+        $result = $this->findComponentForManageableFlag($manageableProductRequest, $criteria);
+
+        if (null === $result) {
+            throw new ManageableProductNotFoundException();
+        }
+
+        return $result[0];
+    }
+
     /**
      * @throws NonUniqueResultException
      */
-    public function findComponentWithBoxExperienceAndRelationship(ManageableProductRequest $manageableProductRequest): array
-    {
+    private function findComponentForManageableFlag(
+        ManageableProductRequest $manageableProductRequest,
+        ?Criteria $criteria = null
+    ): ?array {
         $qb = $this->createQueryBuilder('component');
         $qb
             ->addSelect(
@@ -126,6 +160,10 @@ class ComponentRepository extends ServiceEntityRepository
             ->andWhere('boxExperience.boxGoldenId = box.goldenId')
         ;
 
+        if (null !== $criteria) {
+            $qb->addCriteria($criteria);
+        }
+
         if ($manageableProductRequest->boxGoldenId) {
             $qb
                 ->andWhere('box.goldenId = :boxGoldenId')
@@ -144,12 +182,6 @@ class ComponentRepository extends ServiceEntityRepository
                 ->setParameter('componentGoldenId', $manageableProductRequest->componentGoldenId);
         }
 
-        $result = $qb->getQuery()->getOneOrNullResult();
-
-        if (null === $result) {
-            throw new ManageableProductNotFoundException();
-        }
-
-        return $result;
+        return $qb->getQuery()->getOneOrNullResult();
     }
 }

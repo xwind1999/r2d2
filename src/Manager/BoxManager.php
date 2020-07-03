@@ -85,10 +85,7 @@ class BoxManager
             throw new OutdatedBoxException();
         }
 
-        $boxStatus = '';
-        if (!empty($box->status)) {
-            $boxStatus = $box->status;
-        }
+        $currentEntity = clone $box;
         $box->goldenId = $productRequest->id;
         $box->brand = $productRequest->sellableBrand ? $productRequest->sellableBrand->code : null;
         $box->country = $productRequest->sellableCountry ? $productRequest->sellableCountry->code : null;
@@ -97,7 +94,7 @@ class BoxManager
         $box->externalUpdatedAt = $productRequest->updatedAt;
 
         $this->repository->save($box);
-        $this->manageableProductService->dispatchForProduct($productRequest, $boxStatus);
+        $this->manageableProductService->dispatchForBox($productRequest, $currentEntity);
     }
 
     /**
