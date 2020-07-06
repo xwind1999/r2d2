@@ -137,7 +137,7 @@ class ComponentManager
     /**
      * @throws NonUniqueResultException
      */
-    public function findAndSetManageableComponent(ManageableProductRequest $manageableProductRequest): void
+    public function findAndSetManageableComponent(ManageableProductRequest $manageableProductRequest): Component
     {
         $component = null;
         try {
@@ -149,6 +149,8 @@ class ComponentManager
         }
 
         $this->repository->save($component);
+
+        return $component;
     }
 
     public function getRoomsByExperienceGoldenIdsList(array $experienceIds): array

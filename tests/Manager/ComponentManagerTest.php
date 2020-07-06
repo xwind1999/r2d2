@@ -269,6 +269,7 @@ class ComponentManagerTest extends TestCase
             ->shouldNotBeCalled();
         $this->repository->save(Argument::type(Component::class))->shouldBeCalledOnce();
 
+        $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
         $this->manager->findAndSetManageableComponent($manageableProductRequest->reveal());
     }
 

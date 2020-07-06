@@ -46,6 +46,15 @@ framework:
                 retry_strategy:
                     max_retries: 0
 
+            push-room-information:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: push-room-information
+                retry_strategy:
+                    max_retries: 10
+                    delay: 60000
+                    multiplier: 2
+
             failed-broadcast-listeners:
                 dsn: 'doctrine://default'
                 options:
@@ -59,3 +68,4 @@ framework:
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
             'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
+            'App\Contract\Request\EAI\RoomRequest': push-room-information
