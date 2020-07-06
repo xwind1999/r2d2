@@ -9,6 +9,7 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Manageable\ManageableProductRequest;
 use App\Entity\Box;
 use App\Entity\Component;
+use App\Entity\Experience;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class ManageableProductService
@@ -40,6 +41,13 @@ class ManageableProductService
             (isset($previousComponent->status) && $previousComponent->status !== $productRequest->status)
             || (isset($previousComponent->isReservable) && $previousComponent->isReservable !== $productRequest->isReservable)
         ) {
+            $this->dispatchForProduct($productRequest);
+        }
+    }
+
+    public function dispatchForExperience(ProductRequest $productRequest, Experience $previousExperience): void
+    {
+        if (isset($previousExperience->status) && $previousExperience->status !== $productRequest->status) {
             $this->dispatchForProduct($productRequest);
         }
     }

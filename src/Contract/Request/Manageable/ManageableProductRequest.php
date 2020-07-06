@@ -31,6 +31,14 @@ class ManageableProductRequest
         return $manageableProductRequest;
     }
 
+    public static function fromExperience(string $experienceGoldenId): ManageableProductRequest
+    {
+        $manageableProductRequest = new self();
+        $manageableProductRequest->experienceGoldenId = $experienceGoldenId;
+
+        return $manageableProductRequest;
+    }
+
     public static function fromExperienceComponent(
         string $componentGoldenId,
         string $experienceGoldenId

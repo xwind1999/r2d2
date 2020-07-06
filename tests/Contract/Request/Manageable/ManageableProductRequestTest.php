@@ -47,6 +47,22 @@ class ManageableProductRequestTest extends TestCase
     }
 
     /**
+     * @covers ::fromExperience
+     * @covers ::getContext
+     */
+    public function testFromExperienceAndGetContext()
+    {
+        $experienceGoldenId = '84644';
+        $manageableProductRequest = ManageableProductRequest::fromExperience($experienceGoldenId);
+        $expected = [
+            'box_golden_id' => '',
+            'componentGoldenId' => '',
+            'experienceGoldenId' => $experienceGoldenId,
+        ];
+        $this->assertEquals($expected, $manageableProductRequest->getContext());
+    }
+
+    /**
      * @covers ::fromExperienceComponent
      * @covers ::getContext
      */
