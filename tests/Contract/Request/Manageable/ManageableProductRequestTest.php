@@ -21,8 +21,6 @@ class ManageableProductRequestTest extends TestCase
     public function testFromBoxAndGetContext()
     {
         $boxGoldenId = '12345';
-        $componentGoldenId = '54321';
-        $experienceGoldenId = '34512';
         $manageableProductRequest = ManageableProductRequest::fromBox($boxGoldenId);
         $expected = [
             'box_golden_id' => $boxGoldenId,
@@ -38,9 +36,7 @@ class ManageableProductRequestTest extends TestCase
      */
     public function testFromComponentAndGetContext()
     {
-        $boxGoldenId = '12345';
         $componentGoldenId = '54321';
-        $experienceGoldenId = '34512';
         $manageableProductRequest = ManageableProductRequest::fromComponent($componentGoldenId);
         $expected = [
             'box_golden_id' => '',
@@ -56,10 +52,12 @@ class ManageableProductRequestTest extends TestCase
      */
     public function testFromExperienceComponentAndGetContext()
     {
-        $boxGoldenId = '12345';
         $componentGoldenId = '54321';
         $experienceGoldenId = '34512';
-        $manageableProductRequest = ManageableProductRequest::fromExperienceComponent($componentGoldenId, $experienceGoldenId);
+        $manageableProductRequest = ManageableProductRequest::fromExperienceComponent(
+            $componentGoldenId,
+            $experienceGoldenId
+        );
         $expected = [
             'box_golden_id' => '',
             'componentGoldenId' => $componentGoldenId,
@@ -75,7 +73,6 @@ class ManageableProductRequestTest extends TestCase
     public function testFromBoxExperienceAndGetContext()
     {
         $boxGoldenId = '12345';
-        $componentGoldenId = '54321';
         $experienceGoldenId = '34512';
         $manageableProductRequest = ManageableProductRequest::fromBoxExperience($boxGoldenId, $experienceGoldenId);
         $expected = [
@@ -94,7 +91,7 @@ class ManageableProductRequestTest extends TestCase
     {
         $productRequest = $this->prophesize(ProductRequest::class);
         $manageableProductRequest = new ManageableProductRequest();
-        $this->assertEmpty($manageableProductRequest->setProductRequest($productRequest->reveal()));
+        $manageableProductRequest->setProductRequest($productRequest->reveal());
         $this->assertInstanceOf(ProductRequest::class, $manageableProductRequest->getProductRequest());
     }
 
@@ -106,7 +103,10 @@ class ManageableProductRequestTest extends TestCase
     {
         $productRelationshipRequest = $this->prophesize(ProductRelationshipRequest::class);
         $manageableProductRequest = new ManageableProductRequest();
-        $this->assertEmpty($manageableProductRequest->setProductRelationshipRequest($productRelationshipRequest->reveal()));
-        $this->assertInstanceOf(ProductRelationshipRequest::class, $manageableProductRequest->getProductRelationshipRequest());
+        $manageableProductRequest->setProductRelationshipRequest($productRelationshipRequest->reveal());
+        $this->assertInstanceOf(
+            ProductRelationshipRequest::class,
+            $manageableProductRequest->getProductRelationshipRequest()
+        );
     }
 }

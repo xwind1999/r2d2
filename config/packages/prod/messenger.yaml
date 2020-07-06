@@ -81,6 +81,22 @@ framework:
                 retry_strategy:
                     max_retries: 0
 
+            push-room-information:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        push-room-information:
+                            binding_keys: [push-room-information]
+                            arguments:
+                                x-queue-type: quorum
+                    exchange:
+                        type: direct
+                        default_publish_routing_key: push-room-information
+                retry_strategy:
+                    max_retries: 10
+                    delay: 120000
+                    multiplier: 2
+
             failed-broadcast-listeners:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
@@ -100,6 +116,7 @@ framework:
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
             'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
+            'App\Contract\Request\EAI\RoomRequest': push-room-information
 
         buses:
             default:
