@@ -117,6 +117,7 @@ class ComponentRepository extends ServiceEntityRepository
         $criteria = Criteria::create();
         $criteria->andWhere(Criteria::expr()->eq('component.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
         $criteria->andWhere(Criteria::expr()->eq('box.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
+        $criteria->andWhere(Criteria::expr()->eq('experience.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
         $criteria->andWhere(Criteria::expr()->eq('component.isReservable', true));
         $criteria->andWhere(Criteria::expr()->eq('boxExperience.isEnabled', true));
         $criteria->andWhere(Criteria::expr()->eq('experienceComponent.isEnabled', true));

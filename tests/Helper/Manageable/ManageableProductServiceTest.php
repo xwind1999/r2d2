@@ -8,6 +8,7 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Entity\Box;
 use App\Entity\Component;
+use App\Entity\Experience;
 use App\Helper\Manageable\ManageableProductService;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -52,9 +53,25 @@ class ManageableProductServiceTest extends KernelTestCase
 
     /**
      * @covers ::__construct
+     * @covers ::dispatchForExperience
+     * @covers ::dispatchForProduct
+     * @dataProvider statusProvider
+     */
+    public function testDispatchForExperience(string $experienceStatus, string $productRequestStatus): void
+    {
+        $experience = $this->prophesize(Experience::class);
+        $experience->status = $experienceStatus;
+        $productRequest = $this->prophesize(ProductRequest::class);
+        $productRequest->status = $productRequestStatus;
+        $this->messageBus->dispatch(Argument::any())->shouldBeCalled()->willReturn($this->envelope);
+        $manageableProductService = new ManageableProductService($this->messageBus->reveal());
+        $manageableProductService->dispatchForExperience($productRequest->reveal(), $experience->reveal());
+    }
+
+    /**
+     * @covers ::__construct
      * @covers ::dispatchForComponent
      * @covers ::dispatchForProduct
-     *
      * @dataProvider statusProvider
      */
     public function testDispatchForComponent(string $boxStatus, string $productRequestStatus): void
@@ -83,7 +100,9 @@ class ManageableProductServiceTest extends KernelTestCase
     }
 
     /**
-     * @see testIsDispatch
+     * @see testDispatchForBox
+     * @see testDispatchForExperience
+     * @see testDispatchForComponent
      */
     public function statusProvider(): array
     {

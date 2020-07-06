@@ -78,6 +78,24 @@ class ManageableProductResolverTest extends TestCase
 
     /**
      * @covers ::resolve
+     */
+    public function testResolveUsingExperienceSuccessfully(): void
+    {
+        $this->productRequest->type = 'experience';
+        $this->productRequest->id = '12345';
+        $this->manageableProductRequest->setProductRequest($this->productRequest->reveal());
+        $this->manageableProductRequest
+            ->getProductRequest()
+            ->shouldBeCalled()
+            ->willReturn($this->productRequest->reveal())
+        ;
+        $this->manageableProductRequest->getProductRelationshipRequest()->shouldNotBeCalled();
+        $manageableProductResolver = new ManageableProductResolver();
+        $manageableProductResolver->resolve($this->manageableProductRequest->reveal());
+    }
+
+    /**
+     * @covers ::resolve
      * @dataProvider productRelationshipProvider
      */
     public function testResolveUsingProductRelationshipSuccessfully(string $relationshipType): void

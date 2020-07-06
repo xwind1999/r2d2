@@ -15,6 +15,7 @@ use App\Entity\Partner;
 use App\Exception\Manager\Experience\OutdatedExperienceException;
 use App\Exception\Manager\Experience\OutdatedExperiencePriceException;
 use App\Exception\Repository\ExperienceNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Manager\ExperienceManager;
 use App\Repository\ExperienceRepository;
 use App\Repository\PartnerRepository;
@@ -38,10 +39,19 @@ class ExperienceManagerTest extends TestCase
      */
     protected $partnerRepository;
 
+    /**
+     * @var ManageableProductService|ObjectProphecy
+     */
+    private $manageableProductService;
+
+    private ExperienceManager $manager;
+
     public function setUp(): void
     {
         $this->repository = $this->prophesize(ExperienceRepository::class);
         $this->partnerRepository = $this->prophesize(PartnerRepository::class);
+        $this->manageableProductService = $this->prophesize(ManageableProductService::class);
+        $this->manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal(), $this->manageableProductService->reveal());
     }
 
     /**
@@ -51,7 +61,6 @@ class ExperienceManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
         $partner = new Partner();
         $partner->goldenId = '5678';
         $this->partnerRepository->findOneByGoldenId('5678')->willReturn($partner);
@@ -79,7 +88,7 @@ class ExperienceManagerTest extends TestCase
 
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
 
-        $updatedExperience = $manager->update($uuid, $experienceUpdateRequest);
+        $updatedExperience = $this->manager->update($uuid, $experienceUpdateRequest);
 
         $this->assertSame($experience, $updatedExperience);
         $this->assertEquals('5678', $experience->partnerGoldenId);
@@ -96,7 +105,6 @@ class ExperienceManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -107,7 +115,7 @@ class ExperienceManagerTest extends TestCase
 
         $this->repository->delete(Argument::type(Experience::class))->shouldBeCalled();
 
-        $manager->delete($uuid);
+        $this->manager->delete($uuid);
     }
 
     /**
@@ -116,7 +124,6 @@ class ExperienceManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
         $partner = new Partner();
         $partner->goldenId = '5678';
         $this->partnerRepository->findOneByGoldenId('5678')->willReturn($partner);
@@ -130,7 +137,7 @@ class ExperienceManagerTest extends TestCase
 
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
 
-        $experience = $manager->create($experienceCreateRequest);
+        $experience = $this->manager->create($experienceCreateRequest);
         $this->assertEquals($experienceCreateRequest->goldenId, $experience->goldenId);
         $this->assertEquals($experienceCreateRequest->partnerGoldenId, $experience->partnerGoldenId);
         $this->assertEquals($experienceCreateRequest->name, $experience->name);
@@ -145,7 +152,6 @@ class ExperienceManagerTest extends TestCase
      */
     public function testReplace()
     {
-        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
         $partner = new \App\Contract\Request\BroadcastListener\Product\Partner();
         $partner->id = '5678';
         $productRequest = new ProductRequest();
@@ -156,12 +162,12 @@ class ExperienceManagerTest extends TestCase
         $productRequest->productPeopleNumber = 2;
         $productRequest->status = 'active';
 
-        $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
-        $this->repository->findOneByGoldenId($productRequest->id);
-
+        $this->partnerRepository->findOneByGoldenId($productRequest->partner->id)->shouldBeCalled();
+        $this->repository->findOneByGoldenId($productRequest->id)->shouldBeCalled();
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
+        $this->manageableProductService->dispatchForExperience(Argument::any(), Argument::any())->shouldBeCalled();
 
-        $this->assertEmpty($manager->replace($productRequest));
+        $this->manager->replace($productRequest);
     }
 
     /**
@@ -170,7 +176,6 @@ class ExperienceManagerTest extends TestCase
      */
     public function testReplaceWithOutdatedRecord()
     {
-        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
         $partner = new \App\Contract\Request\BroadcastListener\Product\Partner();
         $partner->id = '5678';
         $productRequest = new ProductRequest();
@@ -185,7 +190,7 @@ class ExperienceManagerTest extends TestCase
         $this->repository->findOneByGoldenId($productRequest->id)->willReturn($experience);
 
         $this->expectException(OutdatedExperienceException::class);
-        $manager->replace($productRequest);
+        $this->manager->replace($productRequest);
     }
 
     /**
@@ -194,7 +199,6 @@ class ExperienceManagerTest extends TestCase
      */
     public function testReplaceCatchesExperienceNotFoundException()
     {
-        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
         $partner = new \App\Contract\Request\BroadcastListener\Product\Partner();
         $partner->id = '5678';
         $productRequest = new ProductRequest();
@@ -213,7 +217,7 @@ class ExperienceManagerTest extends TestCase
         ;
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
 
-        $this->assertEmpty($manager->replace($productRequest));
+        $this->assertEmpty($this->manager->replace($productRequest));
     }
 
     /**
@@ -222,7 +226,6 @@ class ExperienceManagerTest extends TestCase
      */
     public function testinsertPriceInfo()
     {
-        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
         $productDTO = new Product();
         $productDTO->id = '1264';
         $priceDTO = new Price();
@@ -239,7 +242,7 @@ class ExperienceManagerTest extends TestCase
             ->willReturn(($this->prophesize(Experience::class))->reveal())
         ;
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalledOnce();
-        $this->assertEmpty($manager->insertPriceInfo($priceInformationRequest));
+        $this->assertEmpty($this->manager->insertPriceInfo($priceInformationRequest));
     }
 
     /**
@@ -248,7 +251,6 @@ class ExperienceManagerTest extends TestCase
      */
     public function testInsertOutdatedPriceInfo()
     {
-        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
         $productDTO = new Product();
         $productDTO->id = '1264';
         $priceInformationRequest = new PriceInformationRequest();
@@ -264,7 +266,7 @@ class ExperienceManagerTest extends TestCase
             ->willReturn($experience->reveal())
         ;
         $this->expectException(OutdatedExperiencePriceException::class);
-        $manager->insertPriceInfo($priceInformationRequest);
+        $this->manager->insertPriceInfo($priceInformationRequest);
     }
 
     /**
@@ -277,8 +279,7 @@ class ExperienceManagerTest extends TestCase
             '1234', '4321', '1111',
         ];
         $this->repository->filterListExperienceIdsWithPartnerChannelManagerCondition(Argument::any(), Argument::any())->willReturn($expIds);
-        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
-        $manager->filterIdsListWithPartnerChannelManagerCondition($expIds, true);
+        $this->manager->filterIdsListWithPartnerChannelManagerCondition($expIds, true);
 
         $this->repository->filterListExperienceIdsWithPartnerChannelManagerCondition($expIds, true)->shouldBeCalledOnce();
     }
@@ -293,8 +294,7 @@ class ExperienceManagerTest extends TestCase
             '1234', '4321', '1111',
         ];
         $this->repository->filterListExperienceIdsByBoxId(Argument::any())->willReturn($expIds);
-        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
-        $manager->filterListExperienceIdsByBoxId(1);
+        $this->manager->filterListExperienceIdsByBoxId(1);
 
         $this->repository->filterListExperienceIdsByBoxId(1)->shouldBeCalledOnce();
     }
@@ -309,8 +309,7 @@ class ExperienceManagerTest extends TestCase
         $expId = '1234';
         $experience->goldenId = $expId;
         $this->repository->findOneByGoldenId(Argument::any())->willReturn($experience);
-        $manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal());
-        $manager->getOneByGoldenId($expId);
+        $this->manager->getOneByGoldenId($expId);
 
         $this->repository->findOneByGoldenId($expId)->shouldBeCalledOnce();
     }

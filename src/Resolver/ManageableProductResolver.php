@@ -29,6 +29,10 @@ class ManageableProductResolver
             if (ProductTypeConstraint::COMPONENT === $productType) {
                 return ManageableProductRequest::fromComponent($product->id);
             }
+
+            if (ProductTypeConstraint::EXPERIENCE === $productType) {
+                return ManageableProductRequest::fromExperience($product->id);
+            }
         }
 
         if ($product instanceof ProductRelationshipRequest) {
