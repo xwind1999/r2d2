@@ -25,7 +25,7 @@ class ManageableProductService
     {
         $manageableProductRequest = new ManageableProductRequest();
         $manageableProductRequest->setProductRelationshipRequest($productRelationshipRequest);
-        $this->messageBus->dispatch($manageableProductRequest);
+//        $this->messageBus->dispatch($manageableProductRequest);
     }
 
     public function dispatchForBox(ProductRequest $productRequest, Box $previousBox): void
