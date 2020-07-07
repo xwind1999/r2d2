@@ -9,8 +9,6 @@ framework:
                     queues:
                         broadcast-listeners-partner:
                             binding_keys: [broadcast-listeners-partner]
-                            arguments:
-                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-partner
@@ -25,8 +23,6 @@ framework:
                     queues:
                         broadcast-listeners-product:
                             binding_keys: [broadcast-listeners-product]
-                            arguments:
-                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-product
@@ -41,8 +37,6 @@ framework:
                     queues:
                         broadcast-listeners-product-relationship:
                             binding_keys: [broadcast-listeners-product-relationship]
-                            arguments:
-                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-product-relationship
@@ -57,8 +51,6 @@ framework:
                     queues:
                         broadcast-listeners-price-information:
                             binding_keys: [broadcast-listeners-price-information]
-                            arguments:
-                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-price-information
@@ -73,8 +65,6 @@ framework:
                     queues:
                         calculate-manageable-flag:
                             binding_keys: [calculate-manageable-flag]
-                            arguments:
-                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: calculate-manageable-flag
@@ -87,8 +77,6 @@ framework:
                     queues:
                         push-room-information:
                             binding_keys: [push-room-information]
-                            arguments:
-                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: push-room-information
@@ -103,8 +91,6 @@ framework:
                     queues:
                         failed-broadcast-listeners:
                             binding_keys: [failed-broadcast-listeners]
-                            arguments:
-                                x-queue-type: quorum
                     exchange:
                         type: direct
                         default_publish_routing_key: failed-broadcast-listeners
