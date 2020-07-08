@@ -130,7 +130,7 @@ class ComponentRepository extends ServiceEntityRepository
             throw new ManageableProductNotFoundException();
         }
 
-        return $result[0];
+        return $result;
     }
 
     /**
@@ -144,7 +144,7 @@ class ComponentRepository extends ServiceEntityRepository
             throw new ComponentNotFoundException();
         }
 
-        return $result[0];
+        return $result;
     }
 
     private function createQueryBuilderForCMHCriteria(Criteria $criteria): QueryBuilder
