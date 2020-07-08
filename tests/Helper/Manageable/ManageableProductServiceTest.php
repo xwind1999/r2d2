@@ -94,7 +94,7 @@ class ManageableProductServiceTest extends KernelTestCase
     public function testDispatchForProductRelationship(): void
     {
         $productRelationshipRequest = $this->prophesize(ProductRelationshipRequest::class);
-//        $this->messageBus->dispatch(Argument::any())->shouldBeCalled()->willReturn($this->envelope);
+        $this->messageBus->dispatch(Argument::any())->shouldBeCalled()->willReturn($this->envelope);
         $manageableProductService = new ManageableProductService($this->messageBus->reveal());
         $manageableProductService->dispatchForProductRelationship($productRelationshipRequest->reveal());
     }
