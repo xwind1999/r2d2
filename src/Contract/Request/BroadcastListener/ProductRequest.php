@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Contract\Request\BroadcastListener;
 
+use App\Constraint\ProductTypeConstraint;
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
 use App\Contract\Request\BroadcastListener\Product\ListPrice;
 use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
+use App\Entity\Component;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use Clogger\ContextualInterface;
@@ -218,6 +220,17 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
                 $product['listPrice.currencyCode']
             );
         }
+
+        return $productRequest;
+    }
+
+    public static function transformFromComponent(Component $component): self
+    {
+        $productRequest = new self();
+        $productRequest->id = $component->goldenId;
+        $productRequest->name = $component->name;
+        $productRequest->status = $component->status;
+        $productRequest->type = ProductTypeConstraint::COMPONENT;
 
         return $productRequest;
     }

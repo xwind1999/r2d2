@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Constraint\ProductStatusConstraint;
-use App\Contract\Request\Manageable\ManageableProductRequest;
 use App\Entity\Box;
 use App\Entity\BoxExperience;
 use App\Entity\Component;
@@ -17,6 +15,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * @method null|Component find($id, $lockMode = null, $lockVersion = null)
@@ -52,6 +51,22 @@ class ComponentRepository extends ServiceEntityRepository
         }
 
         return $component;
+    }
+
+    /**
+     * @throws ComponentNotFoundException
+     *
+     * @return array<Component>
+     */
+    public function findListByGoldenId(array $goldenIdList): array
+    {
+        $components = $this->findBy(['goldenId' => $goldenIdList]);
+
+        if (empty($components)) {
+            throw new ComponentNotFoundException();
+        }
+
+        return $components;
     }
 
     public function findOneByGoldenId(string $goldenId): Component
@@ -100,29 +115,16 @@ class ComponentRepository extends ServiceEntityRepository
         return $qb->getQuery()->getArrayResult();
     }
 
-    public function findComponentWithBoxExperienceAndRelationship(
-        ManageableProductRequest $manageableProductRequest
-    ): Component {
-        $result = $this->findComponentForManageableFlag($manageableProductRequest);
-
-        if (null === $result) {
-            throw new ComponentNotFoundException();
-        }
-
-        return $result[0];
-    }
-
-    public function findComponentWithManageableCriteria(ManageableProductRequest $manageableProductRequest): Component
+    /**
+     * @throws ManageableProductNotFoundException|NonUniqueResultException
+     */
+    public function findComponentWithManageableCriteria(Criteria $criteria): Component
     {
-        $criteria = Criteria::create();
-        $criteria->andWhere(Criteria::expr()->eq('component.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
-        $criteria->andWhere(Criteria::expr()->eq('box.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
-        $criteria->andWhere(Criteria::expr()->eq('experience.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
-        $criteria->andWhere(Criteria::expr()->eq('component.isReservable', true));
-        $criteria->andWhere(Criteria::expr()->eq('boxExperience.isEnabled', true));
-        $criteria->andWhere(Criteria::expr()->eq('experienceComponent.isEnabled', true));
-
-        $result = $this->findComponentForManageableFlag($manageableProductRequest, $criteria);
+        $result = $this
+            ->createQueryBuilderForCMHCriteria($criteria)
+            ->groupBy('component.goldenId')
+            ->getQuery()
+            ->getOneOrNullResult();
 
         if (null === $result) {
             throw new ManageableProductNotFoundException();
@@ -132,24 +134,33 @@ class ComponentRepository extends ServiceEntityRepository
     }
 
     /**
-     * @throws NonUniqueResultException
+     * @throws ComponentNotFoundException|NonUniqueResultException
      */
-    private function findComponentForManageableFlag(
-        ManageableProductRequest $manageableProductRequest,
-        ?Criteria $criteria = null
-    ): ?array {
+    public function findComponentWithBoxExperienceAndRelationship(Criteria $criteria): Component
+    {
+        $result = $this->createQueryBuilderForCMHCriteria($criteria)->getQuery()->getOneOrNullResult();
+
+        if (null === $result) {
+            throw new ComponentNotFoundException();
+        }
+
+        return $result[0];
+    }
+
+    private function createQueryBuilderForCMHCriteria(Criteria $criteria): QueryBuilder
+    {
         $qb = $this->createQueryBuilder('component');
-        $qb
-            ->addSelect(
-                '
-                component.status as componentStatus,
-                component.isReservable as componentReservable,
-                boxExperience.isEnabled as boxExperienceStatus,
-                experienceComponent.isEnabled as experienceComponentStatus,
-                box.status as boxStatus
-            ')
+        $qb = $this->getOrdinaryWhereConditionForCMHCriteria($qb);
+        $qb->addCriteria($criteria);
+
+        return $qb;
+    }
+
+    private function getOrdinaryWhereConditionForCMHCriteria(QueryBuilder $qb): QueryBuilder
+    {
+        return $qb
             ->join(ExperienceComponent::class, 'experienceComponent')
-            ->where('experienceComponent.componentGoldenId = component.goldenId')
+            ->andWhere('experienceComponent.componentGoldenId = component.goldenId')
 
             ->join(Experience::class, 'experience')
             ->andWhere('experienceComponent.experienceGoldenId = experience.goldenId')
@@ -159,30 +170,6 @@ class ComponentRepository extends ServiceEntityRepository
 
             ->join(Box::class, 'box')
             ->andWhere('boxExperience.boxGoldenId = box.goldenId')
-        ;
-
-        if (null !== $criteria) {
-            $qb->addCriteria($criteria);
-        }
-
-        if ($manageableProductRequest->boxGoldenId) {
-            $qb
-                ->andWhere('box.goldenId = :boxGoldenId')
-                ->setParameter('boxGoldenId', $manageableProductRequest->boxGoldenId);
-        }
-
-        if ($manageableProductRequest->experienceGoldenId) {
-            $qb
-                ->andWhere('experience.goldenId = :experienceGoldenId')
-                ->setParameter('experienceGoldenId', $manageableProductRequest->experienceGoldenId);
-        }
-
-        if ($manageableProductRequest->componentGoldenId) {
-            $qb
-                ->andWhere('component.goldenId = :componentGoldenId')
-                ->setParameter('componentGoldenId', $manageableProductRequest->componentGoldenId);
-        }
-
-        return $qb->getQuery()->getOneOrNullResult();
+            ;
     }
 }
