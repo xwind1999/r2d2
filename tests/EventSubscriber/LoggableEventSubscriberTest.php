@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\EventSubscriber;
 
+use App\Event\Http\BadResponseReceivedEvent;
+use App\Event\Http\ExternalServiceRequestMadeEvent;
+use App\Event\Http\WellFormedResponseReceivedEvent;
 use App\EventSubscriber\LoggableEventSubscriber;
 use App\Helper\LoggableEventInterface;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +30,14 @@ class LoggableEventSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents()
     {
-        $this->assertIsArray(LoggableEventSubscriber::getSubscribedEvents());
+        $this->assertEquals(
+            [
+                LoggableEventInterface::class => ['logEvent', 100],
+                BadResponseReceivedEvent::class => ['logEvent', 100],
+                ExternalServiceRequestMadeEvent::class => ['logEvent', 100],
+                WellFormedResponseReceivedEvent::class => ['logEvent', 100],
+            ],
+            LoggableEventSubscriber::getSubscribedEvents());
     }
 
     public function testLogEvent()

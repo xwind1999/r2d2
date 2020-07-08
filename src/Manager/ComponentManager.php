@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Constraint\ProductStatusConstraint;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Component\ComponentCreateRequest;
 use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
@@ -17,6 +18,7 @@ use App\Exception\Repository\PartnerNotFoundException;
 use App\Helper\Manageable\ManageableProductService;
 use App\Repository\ComponentRepository;
 use App\Repository\PartnerRepository;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\NonUniqueResultException;
 
 class ComponentManager
@@ -134,17 +136,28 @@ class ComponentManager
         $this->manageableProductService->dispatchForComponent($productRequest, $currentEntity);
     }
 
+    public function getRoomsByExperienceGoldenIdsList(array $experienceIds): array
+    {
+        return $this->repository->findRoomsByExperienceGoldenIdsList($experienceIds);
+    }
+
     /**
      * @throws NonUniqueResultException
      */
     public function findAndSetManageableComponent(ManageableProductRequest $manageableProductRequest): Component
     {
         $component = null;
+        $criteria = $criteria = $this->validateConditionsAndUpdateCriteria(
+            $manageableProductRequest,
+            $this->generateCriteriaForManageableComponent()
+        );
         try {
-            $component = $this->repository->findComponentWithManageableCriteria($manageableProductRequest);
+            $component = $this->repository->findComponentWithManageableCriteria($criteria);
             $component->isManageable = true;
         } catch (ManageableProductNotFoundException $exception) {
-            $component = $this->repository->findComponentWithBoxExperienceAndRelationship($manageableProductRequest);
+            $component = $this->repository->findComponentWithBoxExperienceAndRelationship(
+                $this->validateConditionsAndUpdateCriteria($manageableProductRequest, Criteria::create())
+            );
             $component->isManageable = false;
         }
 
@@ -153,8 +166,47 @@ class ComponentManager
         return $component;
     }
 
-    public function getRoomsByExperienceGoldenIdsList(array $experienceIds): array
+    private function generateCriteriaForManageableComponent(): Criteria
     {
-        return $this->repository->findRoomsByExperienceGoldenIdsList($experienceIds);
+        $criteria = Criteria::create();
+        $criteria->andWhere(Criteria::expr()->eq('component.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
+        $criteria->andWhere(
+            Criteria::expr()->in(
+                'box.status',
+                [
+                    ProductStatusConstraint::PRODUCT_STATUS_LIVE,
+                    ProductStatusConstraint::PRODUCT_STATUS_REDEEMABLE,
+                ]
+            )
+        );
+        $criteria->andWhere(Criteria::expr()->eq('experience.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
+        $criteria->andWhere(Criteria::expr()->eq('component.isReservable', true));
+        $criteria->andWhere(Criteria::expr()->eq('boxExperience.isEnabled', true));
+        $criteria->andWhere(Criteria::expr()->eq('experienceComponent.isEnabled', true));
+
+        return $criteria;
+    }
+
+    private function validateConditionsAndUpdateCriteria(
+        ManageableProductRequest $manageableProductRequest,
+        Criteria $criteria
+    ): Criteria {
+        if ($manageableProductRequest->boxGoldenId) {
+            $criteria->andWhere(Criteria::expr()->eq('box.goldenId', $manageableProductRequest->boxGoldenId));
+        }
+
+        if ($manageableProductRequest->experienceGoldenId) {
+            $criteria->andWhere(
+                Criteria::expr()->eq('experience.goldenId', $manageableProductRequest->experienceGoldenId)
+            );
+        }
+
+        if ($manageableProductRequest->componentGoldenId) {
+            $criteria->andWhere(
+                Criteria::expr()->eq('component.goldenId', $manageableProductRequest->componentGoldenId)
+            );
+        }
+
+        return $criteria;
     }
 }

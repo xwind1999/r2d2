@@ -252,50 +252,56 @@ class ComponentManagerTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::findAndSetManageableComponent
+     * @covers ::validateConditionsAndUpdateCriteria
+     * @covers ::generateCriteriaForManageableComponent
      */
     public function testFindAndSetManageableComponent(): void
     {
         $component = $this->prophesize(Component::class);
         $component->isManageable = false;
-        $component->reveal();
         $manageableProductRequest = $this->prophesize(ManageableProductRequest::class);
+        $manageableProductRequest->boxGoldenId = '12345';
+        $manageableProductRequest->componentGoldenId = '54321';
+        $manageableProductRequest->experienceGoldenId = '42135';
         $this->repository
-            ->findComponentWithManageableCriteria($manageableProductRequest->reveal())
+            ->findComponentWithManageableCriteria(Argument::any())
             ->shouldBeCalledOnce()
-            ->willReturn($component)
+            ->willReturn($component->reveal())
         ;
         $this->repository
-            ->findComponentWithBoxExperienceAndRelationship($manageableProductRequest->reveal())
+            ->findComponentWithBoxExperienceAndRelationship(Argument::any())
             ->shouldNotBeCalled();
         $this->repository->save(Argument::type(Component::class))->shouldBeCalledOnce();
 
-        $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
-        $this->manager->findAndSetManageableComponent($manageableProductRequest->reveal());
+        $component = $this->manager->findAndSetManageableComponent($manageableProductRequest->reveal());
+        $this->assertEquals(true, $component->isManageable);
     }
 
     /**
      * @covers ::__construct
      * @covers ::findAndSetManageableComponent
+     * @covers ::validateConditionsAndUpdateCriteria
+     * @covers ::generateCriteriaForManageableComponent
      */
     public function testFindAndSetManageableComponentCatchesManageableProductNotFoundException(): void
     {
         $manageableProductRequest = $this->prophesize(ManageableProductRequest::class);
         $component = $this->prophesize(Component::class);
         $component->isManageable = true;
-        $component->reveal();
         $this->repository
-            ->findComponentWithManageableCriteria($manageableProductRequest->reveal())
+            ->findComponentWithManageableCriteria(Argument::any())
             ->shouldBeCalledOnce()
             ->willThrow(ManageableProductNotFoundException::class)
         ;
         $this->repository
-            ->findComponentWithBoxExperienceAndRelationship($manageableProductRequest->reveal())
+            ->findComponentWithBoxExperienceAndRelationship(Argument::any())
             ->shouldBeCalledOnce()
-            ->willReturn($component)
+            ->willReturn($component->reveal())
         ;
         $this->repository->save(Argument::type(Component::class))->shouldBeCalledOnce();
 
-        $this->manager->findAndSetManageableComponent($manageableProductRequest->reveal());
+        $component = $this->manager->findAndSetManageableComponent($manageableProductRequest->reveal());
+        $this->assertEquals(false, $component->isManageable);
     }
 
     /**
