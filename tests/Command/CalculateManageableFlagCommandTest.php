@@ -91,6 +91,7 @@ class CalculateManageableFlagCommandTest extends KernelTestCase
         $this->commandTester->execute([
             'command' => $this->command->getName(),
             'file' => 'Import_Command.csv',
+            'batchSize' => '1',
         ]);
         $this->commandTester->getDisplay();
         $this->assertEquals(0, $this->commandTester->getStatusCode());
@@ -118,6 +119,7 @@ class CalculateManageableFlagCommandTest extends KernelTestCase
         $this->commandTester->execute([
             'command' => $this->command->getName(),
             'file' => 'Import_Command.csv',
+            'batchSize' => '1',
         ]);
         $this->commandTester->getDisplay();
         $this->assertEquals(1, $this->commandTester->getStatusCode());
@@ -142,6 +144,7 @@ class CalculateManageableFlagCommandTest extends KernelTestCase
         $this->commandTester->execute([
             'command' => $this->command->getName(),
             'file' => 'Import_Command.csv',
+            'batchSize' => '1',
         ]);
         $this->commandTester->getDisplay();
         $this->assertEquals(0, $this->commandTester->getStatusCode());

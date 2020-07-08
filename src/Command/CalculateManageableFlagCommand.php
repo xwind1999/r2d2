@@ -11,6 +11,7 @@ use App\Helper\CSVParser;
 use App\Repository\ComponentRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,6 +29,7 @@ class CalculateManageableFlagCommand extends Command
     private LoggerInterface $logger;
     private MessageBusInterface $messageBus;
     private ComponentRepository $componentRepository;
+    private int $componentsTotal = 0;
 
     public function __construct(
         CSVParser $csvParser,
@@ -48,6 +50,7 @@ class CalculateManageableFlagCommand extends Command
         $this
             ->setDescription('Command to calculate components manageable flags and push them to EAI from a CSV file')
             ->addArgument('file', InputArgument::REQUIRED, 'CSV file path')
+            ->addArgument('batchSize', InputArgument::REQUIRED, 'BATCH SIZE')
         ;
     }
 
@@ -56,33 +59,43 @@ class CalculateManageableFlagCommand extends Command
         $symfonyStyle = new SymfonyStyle($input, $output);
         /** @var string $filePath */
         $filePath = $input->getArgument('file');
-        $goldenIdArray = $this->transformFromIterator($this->csvParser->readFile($filePath, static::IMPORT_FIELDS));
+        /** @var string $batchSize */
+        $batchSize = $input->getArgument('batchSize');
+        $goldenIdList = $this->csvParser->readFile($filePath, static::IMPORT_FIELDS);
+        $goldenIdListSize = iterator_count($goldenIdList);
         $symfonyStyle->note(sprintf('Starting at: %s', (new \DateTime())->format('Y-m-d H:i:s')));
-        $symfonyStyle->note(sprintf('Total CSV IDs: %s', count($goldenIdArray)));
+        $symfonyStyle->note(sprintf('Total CSV IDs received: %s', $goldenIdListSize));
+        $progressBar = new ProgressBar($output, $goldenIdListSize);
+        $progressBar->setFormat('debug');
+        $progressBar->start();
+        $goldenIdArray = [];
+        $batchSizeInt = (int) $batchSize;
         try {
-            $components = $this->componentRepository->findListByGoldenId($goldenIdArray);
+            foreach ($goldenIdList as $key => $goldenId) {
+                $goldenIdArray[] = $goldenId['golden_id'];
+                $intKey = (int) $key;
+                if (0 === ($intKey + 1) % $batchSizeInt) {
+                    $offset = ($intKey - $batchSizeInt);
+                    $components = $this->componentRepository->findListByGoldenId(
+                        array_slice($goldenIdArray, $offset, $batchSizeInt)
+                    );
+                    $this->componentsTotal += count($components);
+                    $this->processComponents($components);
+                }
+                $progressBar->advance();
+            }
         } catch (EntityNotFoundException $exception) {
             $this->logger->error($exception);
 
             return 1;
         }
-
-        $this->processComponents($components);
-        $symfonyStyle->note(sprintf('Total Collection IDs: %s', count($components)));
+        $progressBar->finish();
+        $symfonyStyle->note('');
+        $symfonyStyle->note(sprintf('Total Collection IDs read: %s', $this->componentsTotal));
         $symfonyStyle->note(sprintf('Finishing at : %s', (new \DateTime())->format('Y-m-d H:i:s')));
         $symfonyStyle->success('Command executed');
 
         return 0;
-    }
-
-    private function transformFromIterator(\Iterator $goldenIdList): array
-    {
-        $goldenIdArray = [];
-        foreach ($goldenIdList as $goldenId) {
-            $goldenIdArray[] = $goldenId['golden_id'];
-        }
-
-        return $goldenIdArray;
     }
 
     private function processComponents(array $components): void
