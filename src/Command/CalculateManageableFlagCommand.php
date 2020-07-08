@@ -90,7 +90,7 @@ class CalculateManageableFlagCommand extends Command
             return 1;
         }
         $progressBar->finish();
-        $symfonyStyle->note('');
+        $symfonyStyle->newLine(2);
         $symfonyStyle->note(sprintf('Total Collection IDs read: %s', $this->componentsTotal));
         $symfonyStyle->note(sprintf('Finishing at : %s', (new \DateTime())->format('Y-m-d H:i:s')));
         $symfonyStyle->success('Command executed');
