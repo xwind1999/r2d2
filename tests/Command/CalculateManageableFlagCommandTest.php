@@ -85,7 +85,7 @@ class CalculateManageableFlagCommandTest extends KernelTestCase
         $this->logger->error(Argument::any())->shouldNotBeCalled();
         $this->messageBus
             ->dispatch(Argument::any())
-            ->shouldBeCalledTimes(3)
+            ->shouldBeCalledOnce()
             ->willReturn(new Envelope(new \stdClass()))
         ;
         $this->commandTester->execute([
@@ -95,6 +95,8 @@ class CalculateManageableFlagCommandTest extends KernelTestCase
         ]);
         $this->commandTester->getDisplay();
         $this->assertEquals(0, $this->commandTester->getStatusCode());
+        $this->assertStringContainsString('Total CSV IDs received: 1', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Total Collection IDs read: 1', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Command executed', $this->commandTester->getDisplay());
     }
 
@@ -135,10 +137,10 @@ class CalculateManageableFlagCommandTest extends KernelTestCase
     {
         $this->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
         $this->componentRepository->findListByGoldenId(Argument::any())->shouldBeCalledOnce()->willReturn($components);
-        $this->logger->error(Argument::any())->shouldBeCalledTimes(3);
+        $this->logger->error(Argument::any())->shouldBeCalledOnce();
         $this->messageBus
             ->dispatch(Argument::any())
-            ->shouldBeCalledTimes(3)
+            ->shouldBeCalledOnce()
             ->willThrow(\Exception::class)
         ;
         $this->commandTester->execute([
@@ -162,8 +164,6 @@ class CalculateManageableFlagCommandTest extends KernelTestCase
                 [
                     'golden_id' => [
                         '561060698188',
-                        '346158644832',
-                        '798866562991',
                     ],
                 ],
             ]
@@ -175,8 +175,6 @@ class CalculateManageableFlagCommandTest extends KernelTestCase
         $component->reveal();
         $components = [
             0 => $component,
-            1 => $component,
-            2 => $component,
         ];
 
         yield [
