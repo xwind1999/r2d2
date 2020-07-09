@@ -55,6 +55,9 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     public ?\DateTime $updatedAt = null;
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getContext(): array
     {
         return [

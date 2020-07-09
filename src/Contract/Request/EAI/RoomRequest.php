@@ -44,7 +44,9 @@ class RoomRequest extends RoomTypeProduct
             'product_name' => $this->getProduct()->getName(),
             'product_is_sellable' => $this->getProduct()->getIsSellable(),
             'partner_id' => $this->getProduct()->getPartner()->getId(),
-            'component_is_active' => $this->getIsActive(),
+            'component_is_manageable' => $this->getIsActive(),
+            'component_description' => $this->getProduct()->getDescription() ?? '',
+            'component_room_stock_type' => $this->getProduct()->getRoomStockType() ?? '',
         ];
     }
 }

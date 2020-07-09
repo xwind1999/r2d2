@@ -35,7 +35,9 @@ class RoomRequestTest extends TestCase
             'product_name' => 'abc',
             'product_is_sellable' => true,
             'partner_id' => '54321',
-            'component_is_active' => true,
+            'component_is_manageable' => true,
+            'component_description' => 'axzwe aert',
+            'component_room_stock_type' => '2',
         ];
 
         $this->assertEquals($result->getProduct()->getName(), $component->name);
