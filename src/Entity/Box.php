@@ -19,6 +19,8 @@ class Box
 {
     use TimestampableEntityTrait;
 
+    public const BOX_UNIVERSE_STAY = ['STG', 'STA', 'STW', 'MTT'];
+
     /**
      * @ORM\Id
      * @ORM\Column(type="uuid_binary_ordered_time", unique=true)
@@ -52,6 +54,11 @@ class Box
      * @ORM\Column(type="string", length=3, nullable=true)
      */
     public ?string $currency = null;
+
+    /**
+     * @ORM\Column(type="string", length=3, nullable=true)
+     */
+    public ?string $universe = null;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)

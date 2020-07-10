@@ -91,6 +91,9 @@ class BoxManager
         $box->country = $productRequest->sellableCountry ? $productRequest->sellableCountry->code : null;
         $box->status = $productRequest->status;
         $box->currency = $productRequest->listPrice ? $productRequest->listPrice->currencyCode : null;
+        if (!empty($productRequest->universe)) {
+            $box->universe = $productRequest->universe->id;
+        }
         $box->externalUpdatedAt = $productRequest->updatedAt;
 
         $this->repository->save($box);

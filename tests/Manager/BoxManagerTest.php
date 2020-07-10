@@ -10,6 +10,7 @@ use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
 use App\Contract\Request\BroadcastListener\Product\ListPrice;
+use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Box\BoxCreateRequest;
 use App\Contract\Request\Internal\Box\BoxUpdateRequest;
@@ -150,6 +151,9 @@ class BoxManagerTest extends TestCase
         $productRequest->status = 'active';
         $productRequest->listPrice = $this->prophesize(ListPrice::class);
         $productRequest->listPrice->currencyCode = 'EUR';
+        $universe = new Universe();
+        $universe->id = 'STA';
+        $productRequest->universe = $universe;
         $box = $this->prophesize(Box::class);
         $box->status = 'inactive';
 
