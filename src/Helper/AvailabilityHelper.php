@@ -26,13 +26,18 @@ class AvailabilityHelper
     {
         $returnArray = [];
 
-        foreach ($roomAvailabilities as $availability) {
-            if (!empty($components[$availability['componentGoldenId']])) {
-                $component = $components[$availability['componentGoldenId']];
+        foreach ($components as $component) {
+            if (!empty($roomAvailabilities[$component[0]['goldenId']])) {
                 $returnArray[] = [
                     'Package' => $component['experienceGoldenId'],
                     'Request' => 0,
                     'Stock' => $numberOfDays,
+                ];
+            } else {
+                $returnArray[] = [
+                    'Package' => $component['experienceGoldenId'],
+                    'Request' => $numberOfDays,
+                    'Stock' => 0,
                 ];
             }
         }
