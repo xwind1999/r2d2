@@ -49,6 +49,20 @@ class AvailabilityHelperTest extends TestCase
                 ],
                 'experienceGoldenId' => '2222',
             ],
+            '4323' => [
+                [
+                    'duration' => 0,
+                    'goldenId' => '4323',
+                ],
+                'experienceGoldenId' => '3333',
+            ],
+            '4324' => [
+                [
+                    'duration' => 0,
+                    'goldenId' => '4324',
+                ],
+                'experienceGoldenId' => '4444',
+            ],
         ];
 
         $roomAvailabilities = [
@@ -76,6 +90,16 @@ class AvailabilityHelperTest extends TestCase
                 'Package' => '2222',
                 'Request' => 0,
                 'Stock' => 5,
+            ],
+            [
+                'Package' => '3333',
+                'Request' => 5,
+                'Stock' => 0,
+            ],
+            [
+                'Package' => '4444',
+                'Request' => 5,
+                'Stock' => 0,
             ],
         ];
 
