@@ -9,11 +9,17 @@ use App\Constraint\RelationshipTypeConstraint;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Manageable\ManageableProductRequest;
+use App\Event\Manageable\ManageableBoxEvent;
+use App\Event\Manageable\ManageableBoxExperienceEvent;
+use App\Event\Manageable\ManageableComponentEvent;
+use App\Event\Manageable\ManageableExperienceComponentEvent;
+use App\Event\Manageable\ManageableExperienceEvent;
 use App\Exception\Resolver\UnprocessableManageableProductTypeException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ManageableProductResolver
 {
-    public function resolve(ManageableProductRequest $manageableProductRequest): ManageableProductRequest
+    public function resolve(ManageableProductRequest $manageableProductRequest): Event
     {
         $product = $manageableProductRequest->getProductRequest()
             ?: $manageableProductRequest->getProductRelationshipRequest()
@@ -23,15 +29,15 @@ class ManageableProductResolver
             $productType = strtoupper($product->type);
 
             if (ProductTypeConstraint::isValid($productType)) {
-                return ManageableProductRequest::fromBox($product->id);
+                return ManageableBoxEvent::fromBox($product->id);
             }
 
             if (ProductTypeConstraint::COMPONENT === $productType) {
-                return ManageableProductRequest::fromComponent($product->id);
+                return ManageableComponentEvent::fromComponent($product->id);
             }
 
             if (ProductTypeConstraint::EXPERIENCE === $productType) {
-                return ManageableProductRequest::fromExperience($product->id);
+                return ManageableExperienceEvent::fromExperience($product->id);
             }
         }
 
@@ -39,11 +45,14 @@ class ManageableProductResolver
             $relationshipType = strtoupper($product->relationshipType);
 
             if (RelationshipTypeConstraint::EXPERIENCE_COMPONENT === $relationshipType) {
-                return ManageableProductRequest::fromExperienceComponent($product->childProduct, $product->parentProduct);
+                return ManageableExperienceComponentEvent::fromExperienceComponent(
+                    $product->parentProduct,
+                    $product->childProduct
+                );
             }
 
             if (RelationshipTypeConstraint::BOX_EXPERIENCE === $relationshipType) {
-                return ManageableProductRequest::fromBoxExperience($product->parentProduct, $product->childProduct);
+                return ManageableBoxExperienceEvent::fromBoxExperience($product->parentProduct, $product->childProduct);
             }
         }
 

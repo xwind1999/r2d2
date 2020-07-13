@@ -8,7 +8,6 @@ use App\Constraint\ProductStatusConstraint;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Component\ComponentCreateRequest;
 use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
-use App\Contract\Request\Manageable\ManageableProductRequest;
 use App\Entity\Component;
 use App\Exception\Manager\Component\OutdatedComponentException;
 use App\Exception\Repository\ComponentNotFoundException;
@@ -144,29 +143,31 @@ class ComponentManager
     /**
      * @throws NonUniqueResultException
      */
-    public function findAndSetManageableComponent(ManageableProductRequest $manageableProductRequest): Component
+    public function findAndSetManageableComponent(string $componentGoldenId): Component
     {
         $component = null;
-        $criteria = $criteria = $this->validateConditionsAndUpdateCriteria(
-            $manageableProductRequest,
-            $this->generateCriteriaForManageableComponent()
-        );
         try {
-            $component = $this->repository->findComponentWithManageableCriteria($criteria);
-            $component->isManageable = true;
-        } catch (ManageableProductNotFoundException $exception) {
-            $component = $this->repository->findComponentWithBoxExperienceAndRelationship(
-                $this->validateConditionsAndUpdateCriteria($manageableProductRequest, Criteria::create())
+            $component = $this->repository->findComponentWithManageableCriteria(
+                $this->createComponentRequiredCriteria($componentGoldenId, $this->createManageableCriteria())
             );
-            $component->isManageable = false;
+            if (false === $component->isManageable) {
+                $component->isManageable = true;
+                $this->repository->save($component);
+            }
+        } catch (ManageableProductNotFoundException $exception) {
+            $component = $this->repository->findComponentWithManageableRelationships(
+                $this->createComponentRequiredCriteria($componentGoldenId, Criteria::create())
+            );
+            if (true === $component->isManageable) {
+                $component->isManageable = false;
+                $this->repository->save($component);
+            }
         }
-
-        $this->repository->save($component);
 
         return $component;
     }
 
-    private function generateCriteriaForManageableComponent(): Criteria
+    private function createManageableCriteria(): Criteria
     {
         $criteria = Criteria::create();
         $criteria->andWhere(Criteria::expr()->eq('component.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
@@ -187,26 +188,8 @@ class ComponentManager
         return $criteria;
     }
 
-    private function validateConditionsAndUpdateCriteria(
-        ManageableProductRequest $manageableProductRequest,
-        Criteria $criteria
-    ): Criteria {
-        if ($manageableProductRequest->boxGoldenId) {
-            $criteria->andWhere(Criteria::expr()->eq('box.goldenId', $manageableProductRequest->boxGoldenId));
-        }
-
-        if ($manageableProductRequest->experienceGoldenId) {
-            $criteria->andWhere(
-                Criteria::expr()->eq('experience.goldenId', $manageableProductRequest->experienceGoldenId)
-            );
-        }
-
-        if ($manageableProductRequest->componentGoldenId) {
-            $criteria->andWhere(
-                Criteria::expr()->eq('component.goldenId', $manageableProductRequest->componentGoldenId)
-            );
-        }
-
-        return $criteria;
+    private function createComponentRequiredCriteria(string $componentGoldenId, Criteria $criteria): Criteria
+    {
+        return $criteria->andWhere(Criteria::expr()->eq('component.goldenId', $componentGoldenId));
     }
 }

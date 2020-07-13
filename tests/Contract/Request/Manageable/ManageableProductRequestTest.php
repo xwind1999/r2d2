@@ -7,6 +7,11 @@ namespace App\Tests\Contract\Request\Manageable;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Manageable\ManageableProductRequest;
+use App\Event\Manageable\ManageableBoxEvent;
+use App\Event\Manageable\ManageableBoxExperienceEvent;
+use App\Event\Manageable\ManageableComponentEvent;
+use App\Event\Manageable\ManageableExperienceComponentEvent;
+use App\Event\Manageable\ManageableExperienceEvent;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,86 +20,86 @@ use PHPUnit\Framework\TestCase;
 class ManageableProductRequestTest extends TestCase
 {
     /**
-     * @covers ::fromBox
+     * @covers \App\Event\Manageable\ManageableBoxEvent::fromBox
      * @covers ::getContext
      */
     public function testFromBoxAndGetContext()
     {
         $boxGoldenId = '12345';
-        $manageableProductRequest = ManageableProductRequest::fromBox($boxGoldenId);
+        $manageableProductRequest = ManageableBoxEvent::fromBox($boxGoldenId);
         $expected = [
             'box_golden_id' => $boxGoldenId,
-            'componentGoldenId' => '',
-            'experienceGoldenId' => '',
+            'component_golden_id' => '',
+            'experience_golden_id' => '',
         ];
         $this->assertEquals($expected, $manageableProductRequest->getContext());
     }
 
     /**
-     * @covers ::fromComponent
+     * @covers \App\Event\Manageable\ManageableComponentEvent::fromComponent
      * @covers ::getContext
      */
     public function testFromComponentAndGetContext()
     {
         $componentGoldenId = '54321';
-        $manageableProductRequest = ManageableProductRequest::fromComponent($componentGoldenId);
+        $manageableProductRequest = ManageableComponentEvent::fromComponent($componentGoldenId);
         $expected = [
             'box_golden_id' => '',
-            'componentGoldenId' => $componentGoldenId,
-            'experienceGoldenId' => '',
+            'component_golden_id' => $componentGoldenId,
+            'experience_golden_id' => '',
         ];
         $this->assertEquals($expected, $manageableProductRequest->getContext());
     }
 
     /**
-     * @covers ::fromExperience
+     * @covers \App\Event\Manageable\ManageableExperienceEvent::fromExperience
      * @covers ::getContext
      */
     public function testFromExperienceAndGetContext()
     {
         $experienceGoldenId = '84644';
-        $manageableProductRequest = ManageableProductRequest::fromExperience($experienceGoldenId);
+        $manageableProductRequest = ManageableExperienceEvent::fromExperience($experienceGoldenId);
         $expected = [
             'box_golden_id' => '',
-            'componentGoldenId' => '',
-            'experienceGoldenId' => $experienceGoldenId,
+            'component_golden_id' => '',
+            'experience_golden_id' => $experienceGoldenId,
         ];
         $this->assertEquals($expected, $manageableProductRequest->getContext());
     }
 
     /**
-     * @covers ::fromExperienceComponent
+     * @covers \App\Event\Manageable\ManageableExperienceComponentEvent::fromExperienceComponent
      * @covers ::getContext
      */
     public function testFromExperienceComponentAndGetContext()
     {
         $componentGoldenId = '54321';
         $experienceGoldenId = '34512';
-        $manageableProductRequest = ManageableProductRequest::fromExperienceComponent(
-            $componentGoldenId,
-            $experienceGoldenId
+        $manageableProductRequest = ManageableExperienceComponentEvent::fromExperienceComponent(
+            $experienceGoldenId,
+            $componentGoldenId
         );
         $expected = [
             'box_golden_id' => '',
-            'componentGoldenId' => $componentGoldenId,
-            'experienceGoldenId' => $experienceGoldenId,
+            'component_golden_id' => $componentGoldenId,
+            'experience_golden_id' => $experienceGoldenId,
         ];
         $this->assertEquals($expected, $manageableProductRequest->getContext());
     }
 
     /**
-     * @covers ::fromBoxExperience
+     * @covers \App\Event\Manageable\ManageableBoxExperienceEvent::fromBoxExperience
      * @covers ::getContext
      */
     public function testFromBoxExperienceAndGetContext()
     {
         $boxGoldenId = '12345';
         $experienceGoldenId = '34512';
-        $manageableProductRequest = ManageableProductRequest::fromBoxExperience($boxGoldenId, $experienceGoldenId);
+        $manageableProductRequest = ManageableBoxExperienceEvent::fromBoxExperience($boxGoldenId, $experienceGoldenId);
         $expected = [
             'box_golden_id' => $boxGoldenId,
-            'componentGoldenId' => '',
-            'experienceGoldenId' => $experienceGoldenId,
+            'component_golden_id' => '',
+            'experience_golden_id' => $experienceGoldenId,
         ];
         $this->assertEquals($expected, $manageableProductRequest->getContext());
     }

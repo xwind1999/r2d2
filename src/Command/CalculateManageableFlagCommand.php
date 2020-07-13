@@ -103,7 +103,7 @@ class CalculateManageableFlagCommand extends Command
         foreach ($components as $key => $component) {
             $manageableProductRequest = new ManageableProductRequest();
             try {
-                $manageableProductRequest->setProductRequest(ProductRequest::transformFromComponent($component));
+                $manageableProductRequest->setProductRequest(ProductRequest::fromComponent($component));
                 $this->messageBus->dispatch($manageableProductRequest);
             } catch (\Exception $exception) {
                 $this->logger->error($exception);

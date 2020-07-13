@@ -136,7 +136,7 @@ class ComponentRepository extends ServiceEntityRepository
     /**
      * @throws ComponentNotFoundException|NonUniqueResultException
      */
-    public function findComponentWithBoxExperienceAndRelationship(Criteria $criteria): Component
+    public function findComponentWithManageableRelationships(Criteria $criteria): Component
     {
         $result = $this->createQueryBuilderForCMHCriteria($criteria)->getQuery()->getOneOrNullResult();
 
