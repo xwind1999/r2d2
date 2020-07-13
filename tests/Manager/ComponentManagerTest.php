@@ -8,7 +8,6 @@ use App\Contract\Request\BroadcastListener\Product\Partner as PartnerDTO;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Component\ComponentCreateRequest;
 use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
-use App\Contract\Request\Manageable\ManageableProductRequest;
 use App\Entity\Component;
 use App\Entity\Partner;
 use App\Exception\Manager\Component\OutdatedComponentException;
@@ -252,41 +251,38 @@ class ComponentManagerTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::findAndSetManageableComponent
-     * @covers ::validateConditionsAndUpdateCriteria
-     * @covers ::generateCriteriaForManageableComponent
+     * @covers ::createComponentRequiredCriteria
+     * @covers ::createManageableCriteria
      */
     public function testFindAndSetManageableComponent(): void
     {
         $component = $this->prophesize(Component::class);
+        $component->goldenId = '12345';
         $component->isManageable = false;
-        $manageableProductRequest = $this->prophesize(ManageableProductRequest::class);
-        $manageableProductRequest->boxGoldenId = '12345';
-        $manageableProductRequest->componentGoldenId = '54321';
-        $manageableProductRequest->experienceGoldenId = '42135';
         $this->repository
             ->findComponentWithManageableCriteria(Argument::any())
             ->shouldBeCalledOnce()
             ->willReturn($component->reveal())
         ;
         $this->repository
-            ->findComponentWithBoxExperienceAndRelationship(Argument::any())
+            ->findComponentWithManageableRelationships(Argument::any())
             ->shouldNotBeCalled();
         $this->repository->save(Argument::type(Component::class))->shouldBeCalledOnce();
 
-        $component = $this->manager->findAndSetManageableComponent($manageableProductRequest->reveal());
+        $component = $this->manager->findAndSetManageableComponent($component->goldenId);
         $this->assertEquals(true, $component->isManageable);
     }
 
     /**
      * @covers ::__construct
      * @covers ::findAndSetManageableComponent
-     * @covers ::validateConditionsAndUpdateCriteria
-     * @covers ::generateCriteriaForManageableComponent
+     * @covers ::createComponentRequiredCriteria
+     * @covers ::createManageableCriteria
      */
     public function testFindAndSetManageableComponentCatchesManageableProductNotFoundException(): void
     {
-        $manageableProductRequest = $this->prophesize(ManageableProductRequest::class);
         $component = $this->prophesize(Component::class);
+        $component->goldenId = '12345';
         $component->isManageable = true;
         $this->repository
             ->findComponentWithManageableCriteria(Argument::any())
@@ -294,13 +290,13 @@ class ComponentManagerTest extends TestCase
             ->willThrow(ManageableProductNotFoundException::class)
         ;
         $this->repository
-            ->findComponentWithBoxExperienceAndRelationship(Argument::any())
+            ->findComponentWithManageableRelationships(Argument::any())
             ->shouldBeCalledOnce()
             ->willReturn($component->reveal())
         ;
         $this->repository->save(Argument::type(Component::class))->shouldBeCalledOnce();
 
-        $component = $this->manager->findAndSetManageableComponent($manageableProductRequest->reveal());
+        $component = $this->manager->findAndSetManageableComponent($component->goldenId);
         $this->assertEquals(false, $component->isManageable);
     }
 

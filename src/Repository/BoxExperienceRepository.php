@@ -51,4 +51,16 @@ class BoxExperienceRepository extends ServiceEntityRepository
 
         return $boxExperience;
     }
+
+    public function findAllByBoxGoldenId(string $boxGoldenId): array
+    {
+        $qb = $this->createQueryBuilder('be');
+        $qb
+            ->select('be.experienceGoldenId as experienceGoldenId')
+            ->where('be.boxGoldenId = :boxGoldenId')
+            ->setParameter('boxGoldenId', $boxGoldenId)
+        ;
+
+        return $qb->getQuery()->getArrayResult();
+    }
 }

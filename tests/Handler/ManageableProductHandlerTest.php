@@ -9,14 +9,14 @@ use App\Entity\Component;
 use App\Entity\Partner;
 use App\Exception\Resolver\UnprocessableManageableProductTypeException;
 use App\Handler\ManageableProductHandler;
-use App\Manager\ComponentManager;
 use App\Resolver\ManageableProductResolver;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @coversDefaultClass \App\Handler\ManageableProductHandler
@@ -24,19 +24,14 @@ use Symfony\Component\Messenger\MessageBusInterface;
 class ManageableProductHandlerTest extends TestCase
 {
     /**
-     * @var MessageBusInterface|ObjectProphecy
+     * @var EventDispatcherInterface|ObjectProphecy
      */
-    private $messageBus;
+    private $eventDispatcher;
 
     /**
      * @var LoggerInterface|ObjectProphecy
      */
     private $logger;
-
-    /**
-     * @var ComponentManager|ObjectProphecy
-     */
-    private $componentManager;
 
     /**
      * @var ManageableProductRequest|ObjectProphecy
@@ -52,15 +47,13 @@ class ManageableProductHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->messageBus = $this->prophesize(MessageBusInterface::class);
+        $this->eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
         $this->logger = $this->prophesize(LoggerInterface::class);
-        $this->componentManager = $this->prophesize(ComponentManager::class);
         $this->manageableProductRequest = $this->prophesize(ManageableProductRequest::class);
         $this->manageableProductResolver = $this->prophesize(ManageableProductResolver::class);
         $this->manageableBroadcastHandler = new ManageableProductHandler(
             $this->logger->reveal(),
-            $this->componentManager->reveal(),
-            $this->messageBus->reveal(),
+            $this->eventDispatcher->reveal(),
             $this->manageableProductResolver->reveal()
         );
     }
@@ -84,16 +77,10 @@ class ManageableProductHandlerTest extends TestCase
         $this->manageableProductResolver
             ->resolve($this->manageableProductRequest->reveal())
             ->shouldBeCalledOnce()
-            ->willReturn($this->manageableProductRequest->reveal())
+            ->willReturn(new Event(new \stdClass()))
         ;
-        $this->componentManager
-            ->findAndSetManageableComponent($this->manageableProductRequest->reveal())
-            ->shouldBeCalledOnce()
-            ->willReturn($component->reveal())
-        ;
-        $event = new Envelope(new \stdClass());
         $this->logger->warning(Argument::any())->shouldNotBeCalled();
-        $this->messageBus->dispatch(Argument::any())->shouldBeCalledOnce()->willReturn($event);
+        $this->eventDispatcher->dispatch(Argument::any())->shouldBeCalledOnce()->willReturn(new Envelope(new \stdClass()));
 
         $this->manageableBroadcastHandler->__invoke($this->manageableProductRequest->reveal());
     }
@@ -109,12 +96,8 @@ class ManageableProductHandlerTest extends TestCase
             ->shouldBeCalledOnce()
             ->willThrow(UnprocessableManageableProductTypeException::class)
         ;
-        $this->componentManager
-            ->findAndSetManageableComponent($this->manageableProductRequest->reveal())
-            ->shouldNotBeCalled()
-        ;
         $this->manageableProductRequest->getContext()->shouldBeCalled();
-        $this->messageBus->dispatch(Argument::any())->shouldNotBeCalled();
+        $this->eventDispatcher->dispatch(Argument::any())->shouldNotBeCalled();
         $this->logger->warning(Argument::any(), Argument::any())->shouldBeCalledOnce();
 
         $this->manageableBroadcastHandler->__invoke($this->manageableProductRequest->reveal());
