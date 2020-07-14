@@ -14,6 +14,7 @@ use App\Exception\Manager\BoxExperience\OutdatedBoxExperienceRelationshipExcepti
 use App\Exception\Manager\BoxExperience\RelationshipAlreadyExistsException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Manager\BoxExperienceManager;
 use App\Repository\BoxExperienceRepository;
 use App\Repository\BoxRepository;
@@ -42,11 +43,17 @@ class BoxExperienceManagerTest extends TestCase
      */
     protected $experienceRepository;
 
+    /**
+     * @var ManageableProductService|ObjectProphecy
+     */
+    private $manageableProductService;
+
     public function setUp(): void
     {
         $this->repository = $this->prophesize(BoxExperienceRepository::class);
         $this->boxRepository = $this->prophesize(BoxRepository::class);
         $this->experienceRepository = $this->prophesize(ExperienceRepository::class);
+        $this->manageableProductService = $this->prophesize(ManageableProductService::class);
     }
 
     /**
@@ -55,7 +62,12 @@ class BoxExperienceManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new BoxExperienceManager($this->repository->reveal(), $this->boxRepository->reveal(), $this->experienceRepository->reveal());
+        $manager = new BoxExperienceManager(
+            $this->repository->reveal(),
+            $this->boxRepository->reveal(),
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
+        );
 
         $boxExperience = new BoxExperience();
         $box = new Box();
@@ -81,7 +93,12 @@ class BoxExperienceManagerTest extends TestCase
      */
     public function testDeleteWithRelationshipThatDoesntExist()
     {
-        $manager = new BoxExperienceManager($this->repository->reveal(), $this->boxRepository->reveal(), $this->experienceRepository->reveal());
+        $manager = new BoxExperienceManager(
+            $this->repository->reveal(),
+            $this->boxRepository->reveal(),
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
+        );
 
         $boxExperience = new BoxExperience();
         $box = new Box();
@@ -107,7 +124,12 @@ class BoxExperienceManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new BoxExperienceManager($this->repository->reveal(), $this->boxRepository->reveal(), $this->experienceRepository->reveal());
+        $manager = new BoxExperienceManager(
+            $this->repository->reveal(),
+            $this->boxRepository->reveal(),
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
+        );
 
         $box = new Box();
         $box->goldenId = '5678';
@@ -141,7 +163,12 @@ class BoxExperienceManagerTest extends TestCase
      */
     public function testCreateDuplicate()
     {
-        $manager = new BoxExperienceManager($this->repository->reveal(), $this->boxRepository->reveal(), $this->experienceRepository->reveal());
+        $manager = new BoxExperienceManager(
+            $this->repository->reveal(),
+            $this->boxRepository->reveal(),
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
+        );
 
         $box = new Box();
         $box->goldenId = '5678';
@@ -169,7 +196,12 @@ class BoxExperienceManagerTest extends TestCase
      */
     public function testCreateWithInvalidBoxGoldenId()
     {
-        $manager = new BoxExperienceManager($this->repository->reveal(), $this->boxRepository->reveal(), $this->experienceRepository->reveal());
+        $manager = new BoxExperienceManager(
+            $this->repository->reveal(),
+            $this->boxRepository->reveal(),
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
+        );
         $this->boxRepository->findOneByGoldenId('5678')->willThrow(BoxNotFoundException::class);
 
         $bookingCreateRequest = new BoxExperienceCreateRequest();
@@ -185,7 +217,12 @@ class BoxExperienceManagerTest extends TestCase
      */
     public function testCreateWithInvalidExperienceGoldenId()
     {
-        $manager = new BoxExperienceManager($this->repository->reveal(), $this->boxRepository->reveal(), $this->experienceRepository->reveal());
+        $manager = new BoxExperienceManager(
+            $this->repository->reveal(),
+            $this->boxRepository->reveal(),
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
+        );
 
         $box = new Box();
         $box->goldenId = '5678';
@@ -211,7 +248,8 @@ class BoxExperienceManagerTest extends TestCase
         $manager = new BoxExperienceManager(
             $this->repository->reveal(),
             $this->boxRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
 
         $box = new Box();
@@ -222,7 +260,6 @@ class BoxExperienceManagerTest extends TestCase
         $experience->goldenId = '7895';
         $this->experienceRepository->findOneByGoldenId('7895')->willReturn($experience);
 
-        $date = new \DateTime();
         $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->parentProduct = '1234';
         $relationshipRequest->childProduct = '7895';
@@ -235,7 +272,7 @@ class BoxExperienceManagerTest extends TestCase
         $boxExperience->isEnabled = true;
         $boxExperience->externalUpdatedAt = new \DateTime('2020-01-01 00:00:00');
         $this->repository->findOneByBoxExperience($box, $experience)->willReturn($boxExperience);
-
+        $this->manageableProductService->dispatchForProductRelationship(Argument::any())->shouldBeCalled();
         $this->repository->save(Argument::type(BoxExperience::class))->shouldBeCalled();
 
         $updatedBoxExperience = $manager->replace($relationshipRequest);
@@ -252,7 +289,8 @@ class BoxExperienceManagerTest extends TestCase
         $manager = new BoxExperienceManager(
             $this->repository->reveal(),
             $this->boxRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
 
         $box = new Box();

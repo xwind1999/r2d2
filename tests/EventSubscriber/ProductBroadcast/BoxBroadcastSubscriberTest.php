@@ -93,10 +93,31 @@ class BoxBroadcastSubscriberTest extends TestCase
         $productRequest->type = 'mev';
 
         $this->boxEvent->getProductRequest()->shouldBeCalled()->willReturn($productRequest);
-
         $this->boxManager->replace($productRequest)->shouldBeCalled()->willThrow(new \Exception());
         $boxSubscriber = new BoxBroadcastSubscriber($this->logger->reveal(), $this->boxManager->reveal());
-
+        $this->logger->error(
+            '',
+            [
+                'id' => '1234',
+                'name' => 'box name',
+                'description' => 'Lorem ipsum',
+                'universe' => 'universe',
+                'is_sellable' => true,
+                'is_reservable' => true,
+                'partner' => '4321',
+                'sellable_brand' => 'SBX',
+                'sellable_country' => 'FR',
+                'status' => 'active',
+                'type' => 'mev',
+                'product_people_number' => null,
+                'product_duration' => null,
+                'product_duration_unit' => null,
+                'room_stock_type' => null,
+                'stock_allotment' => null,
+                'list_price' => null,
+                'updated_at' => null,
+            ]
+        )->shouldBeCalled();
         $this->expectException(\Exception::class);
         $this->assertEmpty($boxSubscriber->handleMessage($this->boxEvent->reveal()));
     }

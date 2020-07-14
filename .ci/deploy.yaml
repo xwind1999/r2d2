@@ -1,6 +1,7 @@
 variables:
   ENV_WORKDIR: /opt/sbx/r2d2
   DOCKER_COMPOSE_CMD: docker-compose
+  CONSOLE_NEWRELIC_COMPLETED: bin/console newrelic:notify-deployment --user=${GITLAB_USER_EMAIL} --revision=${CI_PIPELINE_ID}_${CI_COMMIT_SHA}
 
 .deploy:
   image: docker-registry.production.smartbox.com/chef/chef-knife
@@ -10,15 +11,16 @@ variables:
     - >
       export COMMAND="
       export APP_IMAGE=${APP_IMAGE};
+      export HOSTNAME=\`hostname -s\`;
       docker pull ${APP_IMAGE};
       cd ${ENV_WORKDIR};
-      ${DOCKER_COMPOSE_CMD} rm -fs && sudo ${ENV_WORKDIR}/pull.rb -g && ${DOCKER_COMPOSE_CMD} up -d --scale worker=20;
+      ${DOCKER_COMPOSE_CMD} rm -fs && sudo ${ENV_WORKDIR}/pull.rb -g && ${DOCKER_COMPOSE_CMD} up -d \$(cat .scaling | sed 's/.*/--scale &/' | tr '\n' ' ');
       "
     - ${CI_PROJECT_DIR}/.ci/tools/notify.sh || true
-    #    - ${CI_PROJECT_DIR}/.ci/tools/notify-newrelic.sh "${ENVIRONMENT_NAME}" "${CONSOLE_NEWRELIC_BUILDING}" || true
     - ${CI_PROJECT_DIR}/.ci/tools/knife-nodes.sh "${ENVIRONMENT_NAME}" "${COMMAND}" -a ipaddress
-    - ${CI_PROJECT_DIR}/.ci/tools/knife-master.sh "${ENVIRONMENT_NAME}" "docker exec r2d2_api_1 sudo -u www-data bin/console d:m:m -n"
-#    - ${CI_PROJECT_DIR}/.ci/tools/notify-newrelic.sh "${ENVIRONMENT_NAME}" "${CONSOLE_NEWRELIC_COMPLETED}" || true
+    - ${CI_PROJECT_DIR}/.ci/tools/knife-master.sh "${ENVIRONMENT_NAME}" "docker exec r2d2_api_1 bin/console d:m:m -n --allow-no-migration"
+    - ${CI_PROJECT_DIR}/.ci/tools/knife-nodes.sh "${ENVIRONMENT_NAME}" "docker system prune -f -a" -a ipaddress
+    - ${CI_PROJECT_DIR}/.ci/tools/notify-newrelic.sh "${ENVIRONMENT_NAME}" "${CONSOLE_NEWRELIC_COMPLETED}" || true
 
 'deploy-DEV-INT':
   extends: .deploy
@@ -39,6 +41,7 @@ variables:
     name: ie1-preprod-r2d2
   variables:
     ENVIRONMENT_NAME: ie1-preprod-r2d2
+    NR_ENABLE: "true"
   when: manual
   only:
     - tags
@@ -50,6 +53,7 @@ variables:
     name: ie1-prod-r2d2
   variables:
     ENVIRONMENT_NAME: ie1-prod-r2d2
+    NR_ENABLE: "true"
   when: manual
   only:
     - tags

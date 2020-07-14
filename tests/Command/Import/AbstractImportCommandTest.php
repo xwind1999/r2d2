@@ -69,6 +69,7 @@ abstract class AbstractImportCommandTest extends KernelTestCase
 
         $output = $this->commandTester->getDisplay();
 
+        $this->logger->error(Argument::any())->shouldHaveBeenCalled();
         $this->assertEquals(1, $this->commandTester->getStatusCode());
         $this->assertIsString($output, 'The output must be a stream');
         $this->assertStringContainsString('Command exited', $this->commandTester->getDisplay());

@@ -9,6 +9,7 @@ use App\Exception\Manager\Partner\OutdatedPartnerException;
 use App\Handler\PartnerBroadcastHandler;
 use App\Manager\PartnerManager;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -56,6 +57,7 @@ class PartnerBroadcastHandlerTest extends TestCase
         $logger = $this->prophesize(LoggerInterface::class);
         $manager = $this->prophesize(PartnerManager::class);
         $manager->replace($partnerRequest)->shouldBeCalled()->willThrow(new \Exception());
+        $logger->warning(Argument::any(), Argument::any())->shouldBeCalledOnce();
         $partnerBroadcastHandler = new PartnerBroadcastHandler($logger->reveal(), $manager->reveal());
         $this->expectException(\Exception::class);
         $this->assertEmpty($partnerBroadcastHandler->__invoke($partnerRequest));
@@ -78,6 +80,7 @@ class PartnerBroadcastHandlerTest extends TestCase
         $logger = $this->prophesize(LoggerInterface::class);
         $manager = $this->prophesize(PartnerManager::class);
         $manager->replace($partnerRequest)->shouldBeCalled()->willThrow(new OutdatedPartnerException());
+        $logger->warning(Argument::any(), Argument::any())->shouldBeCalledOnce();
         $partnerBroadcastHandler = new PartnerBroadcastHandler($logger->reveal(), $manager->reveal());
         $this->expectException(OutdatedPartnerException::class);
         $this->assertEmpty($partnerBroadcastHandler->__invoke($partnerRequest));

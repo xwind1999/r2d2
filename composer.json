@@ -7,6 +7,7 @@
         "ext-iconv": "*",
         "ext-json": "^7.4",
         "doctrine/annotations": "^1.8",
+        "ekino/newrelic-bundle": "^2.2",
         "gedmo/doctrine-extensions": "^2.4",
         "globtec/phpadr": "dev-master",
         "jms/serializer-bundle": "^3.5",
@@ -18,8 +19,8 @@
         "nelmio/api-doc-bundle": "^3.6",
         "ramsey/uuid": "^3.9",
         "ramsey/uuid-doctrine": "^1.6",
-        "smartbox/api-rest-client": "^9.0",
-        "smartbox/canonical-data-model": "^8.47",
+        "smartbox/api-rest-client": "v10.0.0",
+        "smartbox/canonical-data-model": "v8.48",
         "symfony/asset": "v5.1.*",
         "symfony/console": "5.1.*",
         "symfony/dotenv": "5.1.*",
@@ -58,8 +59,14 @@
         "psr-4": {
             "App\\": "src/",
             "Psr\\Log\\": "src-vendor-fixes/Psr/Log",
-            "Doctrine\\ORM\\": "src-vendor-fixes/doctrine/"
-        }
+            "Doctrine\\ORM\\": "src-vendor-fixes/doctrine/",
+            "Ekino\\NewRelicBundle\\Listener\\":  "src-vendor-fixes/EkinoNewRelicBundle/"
+        },
+        "exclude-from-classmap": [
+            "vendor/psr/log/Psr/Log/LoggerInterface.php",
+            "vendor/doctrine/orm/lib/Doctrine/ORM/UnitOfWork.php",
+            "vendor/ekino/newrelic-bundle/Listener/ExceptionListener.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

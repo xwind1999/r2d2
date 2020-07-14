@@ -14,26 +14,28 @@ use App\Exception\Manager\ExperienceComponent\RelationshipAlreadyExistsException
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ExperienceComponentNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Repository\ComponentRepository;
 use App\Repository\ExperienceComponentRepository;
 use App\Repository\ExperienceRepository;
 
 class ExperienceComponentManager
 {
-    protected ComponentRepository $componentRepository;
-
-    protected ExperienceRepository $experienceRepository;
-
-    protected ExperienceComponentRepository $experienceComponentRepository;
+    private ComponentRepository $componentRepository;
+    private ExperienceRepository $experienceRepository;
+    private ExperienceComponentRepository $experienceComponentRepository;
+    private ManageableProductService $manageableProductService;
 
     public function __construct(
         ExperienceComponentRepository $experienceComponentRepository,
         ComponentRepository $componentRepository,
-        ExperienceRepository $experienceRepository
+        ExperienceRepository $experienceRepository,
+        ManageableProductService $manageableProductService
     ) {
         $this->componentRepository = $componentRepository;
         $this->experienceRepository = $experienceRepository;
         $this->experienceComponentRepository = $experienceComponentRepository;
+        $this->manageableProductService = $manageableProductService;
     }
 
     /**
@@ -138,5 +140,6 @@ class ExperienceComponentManager
         $experienceComponent->externalUpdatedAt = $relationshipRequest->updatedAt;
 
         $this->experienceComponentRepository->save($experienceComponent);
+        $this->manageableProductService->dispatchForProductRelationship($relationshipRequest);
     }
 }

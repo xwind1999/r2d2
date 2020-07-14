@@ -2,6 +2,11 @@ imports:
     - { resource: services/logging.yaml }
 
 parameters:
+    container.dumper.inline_factories: true
+    container.dumper.inline_class_loader: true
+    newrelic.application_name: '%env(NR_APPNAME)%'
+    newrelic.enable: '%env(bool:NR_ENABLE)%'
+    newrelic.api_key: '%env(NR_APIKEY)%'
     clients.quickdata:
         base_uri: '%env(QUICKDATA_URL)%'
     clients.cmhub:
@@ -116,8 +121,16 @@ services:
 
     Smartbox\ApiRestClient\Clients\EaiV0Client:
         factory:   ['@Smartbox\ApiRestClient\ApiRestInternalClientBuilder', createClient]
-        arguments: ['Smartbox\ApiRestClient\Clients\EaiV0Client', '%env(APP_EAI_ENV)%', '%env(APP_EAI_USER)%', '%env(APP_EAI_PASSWORD)%']
+        arguments:
+            - 'Smartbox\ApiRestClient\Clients\EaiV0Client'
+            - '%env(APP_EAI_ENV)%'
+            - '%env(APP_EAI_USER)%'
+            - '%env(APP_EAI_PASSWORD)%'
 
     Smartbox\ApiRestClient\Clients\ChecksV0Client:
         factory:   ['@Smartbox\ApiRestClient\ApiRestInternalClientBuilder', createClient]
-        arguments: ['Smartbox\ApiRestClient\Clients\ChecksV0Client', '%env(APP_EAI_ENV)%', '%env(APP_EAI_USER)%', '%env(APP_EAI_PASSWORD)%']
+        arguments:
+            - 'Smartbox\ApiRestClient\Clients\ChecksV0Client'
+            - '%env(APP_EAI_ENV)%'
+            - '%env(APP_EAI_USER)%'
+            - '%env(APP_EAI_PASSWORD)%'

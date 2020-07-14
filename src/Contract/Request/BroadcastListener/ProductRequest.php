@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Contract\Request\BroadcastListener;
 
+use App\Constraint\ProductTypeConstraint;
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
 use App\Contract\Request\BroadcastListener\Product\ListPrice;
 use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
+use App\Entity\BoxExperience;
+use App\Entity\Component;
+use App\Entity\ExperienceComponent;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use Clogger\ContextualInterface;
@@ -29,6 +33,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
     /**
      * @Assert\Type(type="string")
      * @Assert\Length(max="255")
+     * @Assert\NotNull
      *
      * @JMS\Type("string")
      */
@@ -217,6 +222,48 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
                 $product['listPrice.currencyCode']
             );
         }
+
+        return $productRequest;
+    }
+
+    public static function fromComponent(Component $component): self
+    {
+        $productRequest = new self();
+        $productRequest->id = $component->goldenId;
+        $productRequest->name = $component->name;
+        $productRequest->status = $component->status;
+        $productRequest->type = ProductTypeConstraint::COMPONENT;
+
+        return $productRequest;
+    }
+
+    public static function fromExperienceComponent(ExperienceComponent $experienceComponent): self
+    {
+        $productRequest = new self();
+        $productRequest->id = $experienceComponent->component->goldenId;
+        $productRequest->name = $experienceComponent->component->name;
+        $productRequest->status = $experienceComponent->experience->status;
+        $productRequest->type = ProductTypeConstraint::COMPONENT;
+
+        return $productRequest;
+    }
+
+    public static function fromBoxExperience(BoxExperience $boxExperience): self
+    {
+        $productRequest = new self();
+        $productRequest->id = $boxExperience->experience->goldenId;
+        $productRequest->name = $boxExperience->experience->name;
+        $productRequest->status = $boxExperience->experience->status;
+        $productRequest->type = ProductTypeConstraint::EXPERIENCE;
+
+        return $productRequest;
+    }
+
+    public static function fromBox(array $box): self
+    {
+        $productRequest = new self();
+        $productRequest->id = $box['experienceGoldenId'];
+        $productRequest->type = ProductTypeConstraint::EXPERIENCE;
 
         return $productRequest;
     }

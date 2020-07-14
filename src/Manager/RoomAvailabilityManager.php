@@ -76,4 +76,9 @@ class RoomAvailabilityManager
 
         return $roomAvailability;
     }
+
+    public function getRoomAvailabilitiesByComponentGoldenIds(array $componentIds, string $type, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
+    {
+        return $this->repository->findRoomAvailabilitiesByComponentGoldenIds($componentIds, $type, $dateFrom, $dateTo);
+    }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b30f91c560fe098fcaf4684d68b9eebd",
+    "content-hash": "15670da47c7c05026152f24f74f612ee",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1432,6 +1432,75 @@
                 "sql"
             ],
             "time": "2020-05-29T18:32:49+00:00"
+        },
+        {
+            "name": "ekino/newrelic-bundle",
+            "version": "2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ekino/EkinoNewRelicBundle.git",
+                "reference": "c850aacc36be84aa7e7d44f87908a2c951334970"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ekino/EkinoNewRelicBundle/zipball/c850aacc36be84aa7e7d44f87908a2c951334970",
+                "reference": "c850aacc36be84aa7e7d44f87908a2c951334970",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1",
+                "symfony/config": "^3.4|^4.0|^5.0",
+                "symfony/console": "^3.4|^4.0|^5.0",
+                "symfony/dependency-injection": "^3.4|^4.0|^5.0",
+                "symfony/event-dispatcher": "^3.4|^4.0|^5.0",
+                "symfony/http-kernel": "^3.4|^4.0|^5.0"
+            },
+            "conflict": {
+                "twig/twig": "<1.32"
+            },
+            "require-dev": {
+                "matthiasnoback/symfony-dependency-injection-test": "^3.1|^4.0",
+                "nyholm/symfony-bundle-test": "^1.6",
+                "symfony/monolog-bundle": "^3.2",
+                "symfony/phpunit-bridge": "^5.0",
+                "twig/twig": "^1.32|^2.4"
+            },
+            "suggest": {
+                "symfony/monolog-bundle": "^3.2"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ekino\\NewRelicBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Rabaix",
+                    "email": "thomas.rabaix@ekino.com",
+                    "homepage": "http://ekino.com"
+                }
+            ],
+            "description": "Integrate New Relic into Symfony2",
+            "homepage": "https://github.com/ekino/EkinoNewRelicBundle",
+            "keywords": [
+                "metric",
+                "monitoring",
+                "performance"
+            ],
+            "time": "2020-02-13T07:01:23+00:00"
         },
         {
             "name": "exsyst/swagger",
@@ -4229,17 +4298,17 @@
         },
         {
             "name": "smartbox/api-rest-client",
-            "version": "v9.0.0",
+            "version": "v10.0.0",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.production.smartbox.com:smartesb/api-rest-client.git",
-                "reference": "fc8d7452ddb0e3e4a49c620a2d6c7f049dbe5e30"
+                "reference": "d6414317add562d8a30cb9e0c9d5c940b58659d3"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3",
                 "jms/serializer": "*",
                 "php": ">=5.6",
-                "smartbox/canonical-data-model": "^v8.40.1"
+                "smartbox/canonical-data-model": "^8.48"
             },
             "require-dev": {
                 "phpunit/php-code-coverage": "^2.2.4",
@@ -4256,15 +4325,15 @@
                 "proprietary"
             ],
             "description": "ApiRestClient",
-            "time": "2020-04-29T10:04:34+00:00"
+            "time": "2020-06-30T14:58:03+00:00"
         },
         {
             "name": "smartbox/canonical-data-model",
-            "version": "v8.47.0",
+            "version": "v8.48.0",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.production.smartbox.com:smartesb/canonical-data-model.git",
-                "reference": "64cb27f06b55ab993159d98abf5458ba0352a84a"
+                "reference": "5b745c15d6f8e87e99a2afd8eba5c4e0a85da1b0"
             },
             "require": {
                 "jms/serializer": "*",
@@ -4289,7 +4358,7 @@
                 "proprietary"
             ],
             "description": "Repository containing the JSON schema files for the canonical data model used in the EAI project",
-            "time": "2020-06-18T08:21:56+00:00"
+            "time": "2020-06-22T14:52:33+00:00"
         },
         {
             "name": "symfony/amqp-messenger",

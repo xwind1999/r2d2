@@ -21,4 +21,27 @@ class AvailabilityHelper
     {
         return ('Available' == $availability) ? 'Request' : $availability;
     }
+
+    public static function mapRoomAvailabilitiesToExperience(array $components, array $roomAvailabilities, int $numberOfDays): array
+    {
+        $returnArray = [];
+
+        foreach ($components as $component) {
+            if (!empty($roomAvailabilities[$component[0]['goldenId']])) {
+                $returnArray[] = [
+                    'Package' => $component['experienceGoldenId'],
+                    'Request' => 0,
+                    'Stock' => $numberOfDays,
+                ];
+            } else {
+                $returnArray[] = [
+                    'Package' => $component['experienceGoldenId'],
+                    'Request' => $numberOfDays,
+                    'Stock' => 0,
+                ];
+            }
+        }
+
+        return $returnArray;
+    }
 }

@@ -2,7 +2,6 @@ stages:
   - Build Base Image
   - Build Validation Image
   - Dependencies
-  - Cleanup and Preparation
   - Build
   - Test
   - Static Analysis
@@ -46,6 +45,8 @@ composer:
     paths:
       - cache/composer
   script:
+    - echo ${CI_COMMIT_SHA} > public/version.txt
+    - echo ${CI_COMMIT_TAG} > public/tag.txt
     - /load-key.sh "${SSH_KNOWN_HOSTS}" "${SSH_KEY}"
     - composer config cache-dir cache/composer
     - composer install -n --no-progress
@@ -54,8 +55,6 @@ composer:
     paths:
       - vendor/
       - public/bundles
-  except:
-    - tags
 
 build-docs:
   stage: Generate Documentation

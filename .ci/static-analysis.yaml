@@ -4,7 +4,7 @@ phpstan:
   needs:
     - composer
   script:
-    - vendor/bin/phpstan analyse $(pwd)/src --level 8
+    - php -d memory_limit=-1 vendor/bin/phpstan analyse $(pwd)/src --level 8
   except:
     - tags
 
@@ -28,7 +28,7 @@ infection:
     - composer
     - unit-tests
   script:
-    - phpdbg -qrr vendor/bin/infection --min-covered-msi=80 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage --test-framework-options="--testsuite=UnitTests "
+    - phpdbg -qrr vendor/bin/infection --min-covered-msi=79 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage --test-framework-options="--testsuite=UnitTests "
   artifacts:
     expire_in: 1 day
     paths:

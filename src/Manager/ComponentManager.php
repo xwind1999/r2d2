@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Constraint\ProductStatusConstraint;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Component\ComponentCreateRequest;
 use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
@@ -11,20 +12,28 @@ use App\Entity\Component;
 use App\Exception\Manager\Component\OutdatedComponentException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\EntityNotFoundException;
+use App\Exception\Repository\ManageableProductNotFoundException;
 use App\Exception\Repository\PartnerNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Repository\ComponentRepository;
 use App\Repository\PartnerRepository;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\NonUniqueResultException;
 
 class ComponentManager
 {
-    protected ComponentRepository $repository;
+    private ComponentRepository $repository;
+    private PartnerRepository $partnerRepository;
+    private ManageableProductService $manageableProductService;
 
-    protected PartnerRepository $partnerRepository;
-
-    public function __construct(ComponentRepository $repository, PartnerRepository $partnerRepository)
-    {
+    public function __construct(
+        ComponentRepository $repository,
+        PartnerRepository $partnerRepository,
+        ManageableProductService $manageableProductService
+    ) {
         $this->repository = $repository;
         $this->partnerRepository = $partnerRepository;
+        $this->manageableProductService = $manageableProductService;
     }
 
     public function create(ComponentCreateRequest $componentCreateRequest): Component
@@ -109,6 +118,7 @@ class ComponentManager
             throw new OutdatedComponentException();
         }
 
+        $currentEntity = clone $component;
         $component->goldenId = $productRequest->id;
         $component->partner = $partner;
         $component->partnerGoldenId = $productRequest->partner ? $productRequest->partner->id : '';
@@ -122,5 +132,64 @@ class ComponentManager
         $component->externalUpdatedAt = $productRequest->updatedAt;
 
         $this->repository->save($component);
+        $this->manageableProductService->dispatchForComponent($productRequest, $currentEntity);
+    }
+
+    public function getRoomsByExperienceGoldenIdsList(array $experienceIds): array
+    {
+        return $this->repository->findRoomsByExperienceGoldenIdsList($experienceIds);
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function findAndSetManageableComponent(string $componentGoldenId): Component
+    {
+        $component = null;
+        try {
+            $component = $this->repository->findComponentWithManageableCriteria(
+                $this->createComponentRequiredCriteria($componentGoldenId, $this->createManageableCriteria())
+            );
+            if (false === $component->isManageable) {
+                $component->isManageable = true;
+                $this->repository->save($component);
+            }
+        } catch (ManageableProductNotFoundException $exception) {
+            $component = $this->repository->findComponentWithManageableRelationships(
+                $this->createComponentRequiredCriteria($componentGoldenId, Criteria::create())
+            );
+            if (true === $component->isManageable) {
+                $component->isManageable = false;
+                $this->repository->save($component);
+            }
+        }
+
+        return $component;
+    }
+
+    private function createManageableCriteria(): Criteria
+    {
+        $criteria = Criteria::create();
+        $criteria->andWhere(Criteria::expr()->eq('component.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
+        $criteria->andWhere(
+            Criteria::expr()->in(
+                'box.status',
+                [
+                    ProductStatusConstraint::PRODUCT_STATUS_LIVE,
+                    ProductStatusConstraint::PRODUCT_STATUS_REDEEMABLE,
+                ]
+            )
+        );
+        $criteria->andWhere(Criteria::expr()->eq('experience.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
+        $criteria->andWhere(Criteria::expr()->eq('component.isReservable', true));
+        $criteria->andWhere(Criteria::expr()->eq('boxExperience.isEnabled', true));
+        $criteria->andWhere(Criteria::expr()->eq('experienceComponent.isEnabled', true));
+
+        return $criteria;
+    }
+
+    private function createComponentRequiredCriteria(string $componentGoldenId, Criteria $criteria): Criteria
+    {
+        return $criteria->andWhere(Criteria::expr()->eq('component.goldenId', $componentGoldenId));
     }
 }

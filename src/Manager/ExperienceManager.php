@@ -14,19 +14,24 @@ use App\Exception\Manager\Experience\OutdatedExperiencePriceException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Exception\Repository\PartnerNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Repository\ExperienceRepository;
 use App\Repository\PartnerRepository;
 
 class ExperienceManager
 {
-    protected ExperienceRepository $repository;
+    private ExperienceRepository $repository;
+    private PartnerRepository $partnerRepository;
+    private ManageableProductService $manageableProductService;
 
-    protected PartnerRepository $partnerRepository;
-
-    public function __construct(ExperienceRepository $repository, PartnerRepository $partnerRepository)
-    {
+    public function __construct(
+        ExperienceRepository $repository,
+        PartnerRepository $partnerRepository,
+        ManageableProductService $manageableProductService
+    ) {
         $this->repository = $repository;
         $this->partnerRepository = $partnerRepository;
+        $this->manageableProductService = $manageableProductService;
     }
 
     public function create(ExperienceCreateRequest $experienceCreateRequest): Experience
@@ -41,6 +46,8 @@ class ExperienceManager
         $experience->description = $experienceCreateRequest->description;
         $experience->peopleNumber = $experienceCreateRequest->productPeopleNumber;
         $experience->status = $experienceCreateRequest->status;
+        $experience->price = $experienceCreateRequest->price;
+        $experience->priceUpdatedAt = new \DateTime('now');
 
         $this->repository->save($experience);
 
@@ -110,6 +117,7 @@ class ExperienceManager
             throw new OutdatedExperienceException();
         }
 
+        $currentEntity = clone $experience;
         $experience->goldenId = $productRequest->id;
         $experience->partner = $partner;
         $experience->partnerGoldenId = $productRequest->partner ? $productRequest->partner->id : '';
@@ -120,6 +128,7 @@ class ExperienceManager
         $experience->externalUpdatedAt = $productRequest->updatedAt;
 
         $this->repository->save($experience);
+        $this->manageableProductService->dispatchForExperience($productRequest, $currentEntity);
     }
 
     /**
@@ -142,8 +151,13 @@ class ExperienceManager
         $this->repository->save($experience);
     }
 
-    public function getIdsListWithPartnerChannelManagerInactive(array $experienceIds): array
+    public function filterIdsListWithPartnerChannelManagerCondition(array $experienceIds, bool $isChannelManagerActive): array
     {
-        return $this->repository->findListExperienceIdsWithInactiveChannelManagerPartner($experienceIds);
+        return $this->repository->filterListExperienceIdsWithPartnerChannelManagerCondition($experienceIds, $isChannelManagerActive);
+    }
+
+    public function filterListExperienceIdsByBoxId(int $boxId): array
+    {
+        return $this->repository->filterListExperienceIdsByBoxId($boxId);
     }
 }

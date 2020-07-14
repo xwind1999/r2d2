@@ -16,6 +16,7 @@ use App\Exception\Manager\ExperienceComponent\RelationshipAlreadyExistsException
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ExperienceComponentNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Manager\ExperienceComponentManager;
 use App\Repository\ComponentRepository;
 use App\Repository\ExperienceComponentRepository;
@@ -44,11 +45,17 @@ class ExperienceComponentManagerTest extends TestCase
      */
     protected $experienceRepository;
 
+    /**
+     * @var ManageableProductService|ObjectProphecy
+     */
+    private $manageableProductService;
+
     public function setUp(): void
     {
         $this->experienceComponentRepository = $this->prophesize(ExperienceComponentRepository::class);
         $this->componentRepository = $this->prophesize(ComponentRepository::class);
         $this->experienceRepository = $this->prophesize(ExperienceRepository::class);
+        $this->manageableProductService = $this->prophesize(ManageableProductService::class);
     }
 
     /**
@@ -60,7 +67,8 @@ class ExperienceComponentManagerTest extends TestCase
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
             $this->componentRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
 
         $experienceComponent = new ExperienceComponent();
@@ -93,7 +101,8 @@ class ExperienceComponentManagerTest extends TestCase
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
             $this->componentRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
 
         $experienceComponent = new ExperienceComponent();
@@ -126,7 +135,8 @@ class ExperienceComponentManagerTest extends TestCase
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
             $this->componentRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
 
         $component = new Component();
@@ -163,7 +173,8 @@ class ExperienceComponentManagerTest extends TestCase
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
             $this->componentRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
 
         $component = new Component();
@@ -208,7 +219,8 @@ class ExperienceComponentManagerTest extends TestCase
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
             $this->componentRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
         $component = new Component();
         $component->goldenId = '1234';
@@ -239,7 +251,8 @@ class ExperienceComponentManagerTest extends TestCase
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
             $this->componentRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
 
         $component = new Component();
@@ -271,7 +284,8 @@ class ExperienceComponentManagerTest extends TestCase
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
             $this->componentRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
         $this->componentRepository->findOneByGoldenId('5678')->willThrow(ComponentNotFoundException::class);
 
@@ -291,7 +305,8 @@ class ExperienceComponentManagerTest extends TestCase
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
             $this->componentRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
 
         $component = new Component();
@@ -321,7 +336,8 @@ class ExperienceComponentManagerTest extends TestCase
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
             $this->componentRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
 
         $component = new Component();
@@ -332,7 +348,6 @@ class ExperienceComponentManagerTest extends TestCase
         $experience->goldenId = '7895';
         $this->experienceRepository->findOneByGoldenId('7895')->willReturn($experience);
 
-        $date = new \DateTime();
         $relationshipRequest = new ProductRelationshipRequest();
         $relationshipRequest->childProduct = '1234';
         $relationshipRequest->parentProduct = '7895';
@@ -345,7 +360,7 @@ class ExperienceComponentManagerTest extends TestCase
         $experienceComponent->isEnabled = true;
         $experienceComponent->externalUpdatedAt = new \DateTime('2020-01-01 00:00:00');
         $this->experienceComponentRepository->findOneByExperienceComponent($experience, $component)->willReturn($experienceComponent);
-
+        $this->manageableProductService->dispatchForProductRelationship(Argument::any())->shouldBeCalled();
         $this->experienceComponentRepository->save(Argument::type(ExperienceComponent::class))->shouldBeCalled();
 
         $updatedExperienceComponent = $manager->replace($relationshipRequest);
@@ -362,7 +377,8 @@ class ExperienceComponentManagerTest extends TestCase
         $manager = new ExperienceComponentManager(
             $this->experienceComponentRepository->reveal(),
             $this->componentRepository->reveal(),
-            $this->experienceRepository->reveal()
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal()
         );
 
         $component = new Component();

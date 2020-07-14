@@ -140,4 +140,20 @@ class RoomAvailabilityManagerTest extends TestCase
         $this->assertEquals($roomAvailabilityCreateRequest->date, $roomAvailability->date);
         $this->assertEquals($roomAvailabilityCreateRequest->type, $roomAvailability->type);
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getRoomAvailabilitiesByComponentGoldenIds
+     */
+    public function testGetRoomAvailabilitiesByComponentGoldenIds()
+    {
+        $compIds = [
+            '1234', '4321', '1111',
+        ];
+        $this->repository->findRoomAvailabilitiesByComponentGoldenIds(Argument::any(), Argument::any(), Argument::any(), Argument::any())->willReturn($compIds);
+        $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal());
+        $manager->getRoomAvailabilitiesByComponentGoldenIds($compIds, 'instant', new \DateTime('2020-06-20'), new \DateTime('2020-06-30'));
+
+        $this->repository->findRoomAvailabilitiesByComponentGoldenIds($compIds, 'instant', new \DateTime('2020-06-20'), new \DateTime('2020-06-30'))->shouldBeCalledOnce();
+    }
 }

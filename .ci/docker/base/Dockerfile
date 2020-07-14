@@ -14,12 +14,12 @@ RUN sed -i '/xfs/ s/33/82/g' /etc/passwd;\
     chown 33.33 /app -R;\
     chown 33.33 /home/www-data -R;
 
-RUN apk add sudo libxml2-dev icu-dev runit $PHPIZE_DEPS openssh-client curl git bash rabbitmq-c-dev
+RUN apk add sudo libxml2-dev icu-dev runit openssh-client curl git bash rabbitmq-c-dev && apk add --virtual purgable-deps $PHPIZE_DEPS
 
-RUN docker-php-ext-install pcntl soap pdo_mysql sockets intl opcache && pecl install amqp && docker-php-ext-enable amqp
+RUN docker-php-ext-install pcntl soap pdo_mysql sockets intl opcache && pecl install amqp && docker-php-ext-enable amqp && apk del purgable-deps
 
-# COPY ./newrelic_install.sh /
-# RUN /newrelic_install.sh
+COPY ./newrelic_install.sh /
+RUN /newrelic_install.sh
 
 RUN curl -s -f -L -o /tmp/composer-setup.php https://getcomposer.org/installer \
  && php -r " \

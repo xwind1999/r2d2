@@ -12,15 +12,18 @@ use App\Entity\Box;
 use App\Exception\Manager\Box\OutdatedBoxException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\EntityNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Repository\BoxRepository;
 
 class BoxManager
 {
-    protected BoxRepository $repository;
+    private BoxRepository $repository;
+    private ManageableProductService $manageableProductService;
 
-    public function __construct(BoxRepository $repository)
+    public function __construct(BoxRepository $repository, ManageableProductService $manageableProductService)
     {
         $this->repository = $repository;
+        $this->manageableProductService = $manageableProductService;
     }
 
     public function create(BoxCreateRequest $boxCreateRequest): Box
@@ -82,14 +85,19 @@ class BoxManager
             throw new OutdatedBoxException();
         }
 
+        $currentEntity = clone $box;
         $box->goldenId = $productRequest->id;
         $box->brand = $productRequest->sellableBrand ? $productRequest->sellableBrand->code : null;
         $box->country = $productRequest->sellableCountry ? $productRequest->sellableCountry->code : null;
         $box->status = $productRequest->status;
         $box->currency = $productRequest->listPrice ? $productRequest->listPrice->currencyCode : null;
+        if (!empty($productRequest->universe)) {
+            $box->universe = $productRequest->universe->id;
+        }
         $box->externalUpdatedAt = $productRequest->updatedAt;
 
         $this->repository->save($box);
+        $this->manageableProductService->dispatchForBox($productRequest, $currentEntity);
     }
 
     /**

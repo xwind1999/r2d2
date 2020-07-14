@@ -18,6 +18,7 @@ use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
 use App\Exception\Booking\InvalidBookingNewStatus;
 use App\Exception\Booking\InvalidExtraNightException;
+use App\Exception\Booking\MisconfiguredExperiencePriceException;
 use App\Exception\Booking\NoIncludedRoomFoundException;
 use App\Exception\Booking\RoomsDontHaveSameDurationException;
 use App\Exception\Booking\UnallocatedDateException;
@@ -76,6 +77,11 @@ class BookingManager
         }
 
         $experience = $this->experienceRepository->findOneByGoldenId($bookingCreateRequest->experience->id);
+
+        if (!$experience->price) {
+            throw new MisconfiguredExperiencePriceException();
+        }
+
         $box = $this->boxRepository->findOneByGoldenId($bookingCreateRequest->box);
         $this->boxExperienceRepository->findOneEnabledByBoxExperience($box, $experience);
         $component = $this->componentRepository->findDefaultRoomByExperience($experience);
@@ -100,8 +106,7 @@ class BookingManager
         $booking->expiresAt = (new \DateTime('now'))->add(new \DateInterval(self::EXPIRATION_TIME));
         /** @var ArrayCollection<int, BookingDate> */
         $bookingDatesCollection = new ArrayCollection();
-        // TODO: replace with experience price after R2D2-209
-        $money = $this->moneyHelper->create(400, $bookingCreateRequest->currency);
+        $money = $this->moneyHelper->create($experience->price, $bookingCreateRequest->currency);
         $period = new \DatePeriod($booking->startDate, new \DateInterval('P1D'), $booking->endDate);
         $minimumDuration = $component->duration ?? 1;
         $perDay = $money->allocateTo($minimumDuration);

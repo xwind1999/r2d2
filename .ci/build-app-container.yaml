@@ -25,35 +25,11 @@ build-validation-image:
       --tag ${VALIDATION_IMAGE} .ci/docker/validation
     - docker push ${VALIDATION_IMAGE}
 
-cleanup-and-prepare-files:
-  stage: Cleanup and Preparation
-  cache:
-    key:
-      files:
-        - composer.lock
-        - symfony.lock
-    paths:
-      - cache/composer
-  script:
-    - /load-key.sh "${SSH_KNOWN_HOSTS}" "${SSH_KEY}"
-    - composer config cache-dir cache/composer
-    - composer install -n -o --no-progress --no-scripts
-    - echo ${CI_COMMIT_SHA} > public/version.txt
-    - echo ${CI_COMMIT_TAG} > public/tag.txt
-  artifacts:
-    expire_in: 1 day
-    paths:
-      - vendor/
-      - public/bundles
-      - public/version.txt
-      - public/tag.txt
-  only:
-    - master
-    - tags
-
 build-app-container:
   stage: Deploy Setup
   image: docker:dind
+  dependencies:
+    - composer
   only:
     - master
     - tags

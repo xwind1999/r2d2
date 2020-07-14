@@ -8,10 +8,14 @@ use App\CMHub\CMHub;
 use App\Contract\Response\CMHub\CMHubErrorResponse;
 use App\Contract\Response\CMHub\CMHubResponse;
 use App\Contract\Response\CMHub\GetAvailabilityResponse;
+use App\Manager\ComponentManager;
+use App\Manager\ExperienceManager;
+use App\Manager\RoomAvailabilityManager;
 use App\Provider\AvailabilityProvider;
 use JMS\Serializer\ArrayTransformerInterface;
 use JMS\Serializer\SerializerInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -36,11 +40,29 @@ class AvailabilityProviderTest extends TestCase
      */
     private $arraySerializer;
 
+    /**
+     * @var ExperienceManager|ObjectProphecy
+     */
+    protected $experienceManager;
+
+    /**
+     * @var ComponentManager|ObjectProphecy
+     */
+    protected $componentManager;
+
+    /**
+     * @var ObjectProphecy|RoomAvailabilityManager
+     */
+    protected $roomAvailabilityManager;
+
     public function setUp(): void
     {
         $this->cmHub = $this->prophesize(CMHub::class);
         $this->serializer = $this->prophesize(SerializerInterface::class);
         $this->arraySerializer = $this->prophesize(ArrayTransformerInterface::class);
+        $this->experienceManager = $this->prophesize(ExperienceManager::class);
+        $this->componentManager = $this->prophesize(ComponentManager::class);
+        $this->roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
     }
 
     /**
@@ -74,7 +96,10 @@ class AvailabilityProviderTest extends TestCase
         $availabilityProvider = new AvailabilityProvider(
             $this->cmHub->reveal(),
             $this->serializer->reveal(),
-            $this->arraySerializer->reveal()
+            $this->arraySerializer->reveal(),
+            $this->experienceManager->reveal(),
+            $this->componentManager->reveal(),
+            $this->roomAvailabilityManager->reveal()
         );
         $response = $availabilityProvider->getAvailability($productId, $dateFrom, $dateTo);
 
@@ -95,7 +120,10 @@ class AvailabilityProviderTest extends TestCase
         $availabilityProvider = new AvailabilityProvider(
             $this->cmHub->reveal(),
             $this->serializer->reveal(),
-            $this->arraySerializer->reveal()
+            $this->arraySerializer->reveal(),
+            $this->experienceManager->reveal(),
+            $this->componentManager->reveal(),
+            $this->roomAvailabilityManager->reveal()
         );
 
         $result = $this->prophesize(CMHubErrorResponse::class);
@@ -115,5 +143,71 @@ class AvailabilityProviderTest extends TestCase
             CMHubErrorResponse::class,
             $availabilityProvider->getAvailability($productId, $dateFrom, $dateTo))
         ;
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getRoomAvailabilities
+     */
+    public function testGetRoomAvailabilities()
+    {
+        $expIds = [
+            '1', '2', '3', '4',
+        ];
+
+        $components = [
+            '11' => [
+                [
+                    'goldenId' => '11',
+                ],
+                'experienceGoldenId' => '1',
+            ],
+            '22' => [
+                [
+                    'goldenId' => '22',
+                ],
+                'experienceGoldenId' => '2',
+            ],
+        ];
+
+        $availabilityProvider = new AvailabilityProvider(
+            $this->cmHub->reveal(),
+            $this->serializer->reveal(),
+            $this->arraySerializer->reveal(),
+            $this->experienceManager->reveal(),
+            $this->componentManager->reveal(),
+            $this->roomAvailabilityManager->reveal()
+        );
+        $dateFrom = new \DateTime('2020-06-20');
+        $dateTo = new \DateTime('2020-06-25');
+
+        $this->experienceManager->filterListExperienceIdsByBoxId(Argument::any())->willReturn($expIds);
+        $this->componentManager->getRoomsByExperienceGoldenIdsList(Argument::any())->willReturn($components);
+        $this->roomAvailabilityManager->getRoomAvailabilitiesByComponentGoldenIds(['11', '22'], 'instant', $dateFrom, $dateTo)
+            ->willReturn(
+                [
+                    '11' => [
+                        'componentGoldenId' => '11',
+                    ],
+                    '22' => [
+                        'componentGoldenId' => '22',
+                    ],
+                ]
+            );
+
+        $expectedArray = [
+            [
+                'Package' => '1',
+                'Request' => 0,
+                'Stock' => 6,
+            ],
+            [
+                'Package' => '2',
+                'Request' => 0,
+                'Stock' => 6,
+            ],
+        ];
+
+        $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilities(1, $dateFrom, $dateTo));
     }
 }

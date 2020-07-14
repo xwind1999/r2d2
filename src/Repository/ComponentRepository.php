@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Box;
+use App\Entity\BoxExperience;
 use App\Entity\Component;
 use App\Entity\Experience;
+use App\Entity\ExperienceComponent;
 use App\Exception\Repository\ComponentNotFoundException;
+use App\Exception\Repository\ManageableProductNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * @method null|Component find($id, $lockMode = null, $lockVersion = null)
@@ -46,6 +53,22 @@ class ComponentRepository extends ServiceEntityRepository
         return $component;
     }
 
+    /**
+     * @throws ComponentNotFoundException
+     *
+     * @return array<Component>
+     */
+    public function findListByGoldenId(array $goldenIdList): array
+    {
+        $components = $this->findBy(['goldenId' => $goldenIdList]);
+
+        if (empty($components)) {
+            throw new ComponentNotFoundException();
+        }
+
+        return $components;
+    }
+
     public function findOneByGoldenId(string $goldenId): Component
     {
         $component = $this->findOneBy(['goldenId' => $goldenId]);
@@ -75,5 +98,78 @@ class ComponentRepository extends ServiceEntityRepository
         }
 
         return $component;
+    }
+
+    public function findRoomsByExperienceGoldenIdsList(array $expIds): array
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb
+            ->addSelect('ec.experienceGoldenId')
+            ->join('c.experienceComponent', 'ec')
+            ->where('c.isReservable = 1')
+            ->andWhere('ec.isEnabled = true')
+            ->andWhere($qb->expr()->in('ec.experienceGoldenId', $expIds))
+            ->indexBy('c', 'c.goldenId')
+        ;
+
+        return $qb->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @throws ManageableProductNotFoundException|NonUniqueResultException
+     */
+    public function findComponentWithManageableCriteria(Criteria $criteria): Component
+    {
+        $result = $this
+            ->createQueryBuilderForCMHCriteria($criteria)
+            ->groupBy('component.goldenId')
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (null === $result) {
+            throw new ManageableProductNotFoundException();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @throws ComponentNotFoundException|NonUniqueResultException
+     */
+    public function findComponentWithManageableRelationships(Criteria $criteria): Component
+    {
+        $result = $this->createQueryBuilderForCMHCriteria($criteria)->getQuery()->getOneOrNullResult();
+
+        if (null === $result) {
+            throw new ComponentNotFoundException();
+        }
+
+        return $result;
+    }
+
+    private function createQueryBuilderForCMHCriteria(Criteria $criteria): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('component');
+        $qb = $this->getOrdinaryWhereConditionForCMHCriteria($qb);
+        $qb->addCriteria($criteria);
+
+        return $qb;
+    }
+
+    private function getOrdinaryWhereConditionForCMHCriteria(QueryBuilder $qb): QueryBuilder
+    {
+        return $qb
+            ->join(ExperienceComponent::class, 'experienceComponent')
+            ->andWhere('experienceComponent.componentGoldenId = component.goldenId')
+
+            ->join(Experience::class, 'experience')
+            ->andWhere('experienceComponent.experienceGoldenId = experience.goldenId')
+
+            ->join(BoxExperience::class, 'boxExperience')
+            ->andWhere('experience.goldenId = boxExperience.experienceGoldenId')
+
+            ->join(Box::class, 'box')
+            ->andWhere('boxExperience.boxGoldenId = box.goldenId')
+            ;
     }
 }
