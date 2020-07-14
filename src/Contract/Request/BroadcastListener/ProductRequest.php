@@ -10,7 +10,6 @@ use App\Contract\Request\BroadcastListener\Product\Country;
 use App\Contract\Request\BroadcastListener\Product\ListPrice;
 use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
-use App\Entity\BoxExperience;
 use App\Entity\Component;
 use App\Entity\ExperienceComponent;
 use App\Helper\Request\RequestBodyInterface;
@@ -248,12 +247,10 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
         return $productRequest;
     }
 
-    public static function fromBoxExperience(BoxExperience $boxExperience): self
+    public static function fromBoxExperience(string $experienceGoldenId): self
     {
         $productRequest = new self();
-        $productRequest->id = $boxExperience->experience->goldenId;
-        $productRequest->name = $boxExperience->experience->name;
-        $productRequest->status = $boxExperience->experience->status;
+        $productRequest->id = $experienceGoldenId;
         $productRequest->type = ProductTypeConstraint::EXPERIENCE;
 
         return $productRequest;
