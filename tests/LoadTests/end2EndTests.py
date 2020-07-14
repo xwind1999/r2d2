@@ -32,6 +32,7 @@ def broadcast_product_box(self):
    headers = {'content-type': 'application/json','Authorization':'Basic ZWFpOmVhaQ=='}
    response = self.client.post("/broadcast-listener/product",data= json.dumps({
    "id": boxProductId,
+   "name": "Load Test Box",
    "status": "inactive",
    "currencyCode": "EUR",
    "isSellable" : False,
@@ -64,6 +65,7 @@ def broadcast_product_experience(self):
    headers = {'content-type': 'application/json','Authorization':'Basic ZWFpOmVhaQ=='}
    response = self.client.post("/broadcast-listener/product",data= json.dumps({
    "id": experienceProductId,
+   "name": "Load Test Experience",
    "status": "inactive",
    "currencyCode": "EUR",
    "isSellable" : False,
