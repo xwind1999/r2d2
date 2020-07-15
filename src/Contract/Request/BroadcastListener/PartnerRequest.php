@@ -23,8 +23,7 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="16")
-     * @Assert\NotBlank
+     * @Assert\Choice(choices=\App\Constraint\PartnerStatusConstraint::VALID_VALUES)
      *
      * @JMS\Type("string")
      */

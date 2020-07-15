@@ -10,6 +10,7 @@ use App\Contract\Request\Internal\Partner\PartnerUpdateRequest;
 use App\Entity\Partner;
 use App\Exception\Manager\Partner\OutdatedPartnerException;
 use App\Exception\Repository\PartnerNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Manager\PartnerManager;
 use App\Repository\PartnerRepository;
 use PHPUnit\Framework\TestCase;
@@ -27,9 +28,15 @@ class PartnerManagerTest extends TestCase
      */
     protected $repository;
 
+    /**
+     * @var ManageableProductService|ObjectProphecy
+     */
+    private $manageableProductService;
+
     public function setUp(): void
     {
         $this->repository = $this->prophesize(PartnerRepository::class);
+        $this->manageableProductService = $this->prophesize(ManageableProductService::class);
     }
 
     /**
@@ -39,7 +46,7 @@ class PartnerManagerTest extends TestCase
      */
     public function testUpdate()
     {
-        $manager = new PartnerManager($this->repository->reveal());
+        $manager = new PartnerManager($this->repository->reveal(), $this->manageableProductService->reveal());
         $partnerUpdateRequest = new PartnerUpdateRequest();
         $uuid = 'eedc7cbe-5328-11ea-8d77-2e728ce88125';
         $partnerUpdateRequest->goldenId = '1234';
@@ -78,7 +85,7 @@ class PartnerManagerTest extends TestCase
      */
     public function testDelete()
     {
-        $manager = new PartnerManager($this->repository->reveal());
+        $manager = new PartnerManager($this->repository->reveal(), $this->manageableProductService->reveal());
         $uuid = '12345678';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
@@ -98,7 +105,7 @@ class PartnerManagerTest extends TestCase
      */
     public function testCreate()
     {
-        $manager = new PartnerManager($this->repository->reveal());
+        $manager = new PartnerManager($this->repository->reveal(), $this->manageableProductService->reveal());
         $partnerCreateRequest = new PartnerCreateRequest();
         $partnerCreateRequest->goldenId = '1234';
         $partnerCreateRequest->status = 'alive';
@@ -121,7 +128,7 @@ class PartnerManagerTest extends TestCase
      */
     public function testReplace()
     {
-        $manager = new PartnerManager($this->repository->reveal());
+        $manager = new PartnerManager($this->repository->reveal(), $this->manageableProductService->reveal());
         $partnerRequest = new PartnerRequest();
         $partnerRequest->id = '1234';
         $partnerRequest->status = 'active';
@@ -131,6 +138,7 @@ class PartnerManagerTest extends TestCase
 
         $this->repository->findOneByGoldenId($partnerRequest->id)->shouldBeCalled();
         $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
+        $this->manageableProductService->dispatchForPartner($partnerRequest, Argument::type(Partner::class))->shouldBeCalled();
 
         $this->assertEmpty($manager->replace($partnerRequest));
     }
@@ -141,7 +149,7 @@ class PartnerManagerTest extends TestCase
      */
     public function testReplaceWithOutdatedRecord()
     {
-        $manager = new PartnerManager($this->repository->reveal());
+        $manager = new PartnerManager($this->repository->reveal(), $this->manageableProductService->reveal());
         $partnerRequest = new PartnerRequest();
         $partnerRequest->id = '1234';
         $partnerRequest->updatedAt = new \DateTime('2020-01-01 00:00:00');
@@ -159,7 +167,7 @@ class PartnerManagerTest extends TestCase
      */
     public function testReplaceCatchesPartnerNotFoundException()
     {
-        $manager = new PartnerManager($this->repository->reveal());
+        $manager = new PartnerManager($this->repository->reveal(), $this->manageableProductService->reveal());
         $partnerRequest = new PartnerRequest();
         $partnerRequest->id = '1584878545';
         $partnerRequest->status = 'active';
@@ -187,7 +195,7 @@ class PartnerManagerTest extends TestCase
         $partnerGoldenId = '1234';
         $partner->goldenId = $partnerGoldenId;
         $this->repository->findOneByGoldenId(Argument::any())->willReturn($partner);
-        $manager = new PartnerManager($this->repository->reveal());
+        $manager = new PartnerManager($this->repository->reveal(), $this->manageableProductService->reveal());
         $manager->getOneByGoldenId($partnerGoldenId);
 
         $this->repository->findOneByGoldenId($partnerGoldenId)->shouldBeCalledOnce();

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Command\Import\Helper\Manageable;
 
+use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Entity\Box;
 use App\Entity\Component;
 use App\Entity\Experience;
+use App\Entity\Partner;
 use App\Helper\Manageable\ManageableProductService;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -97,6 +99,21 @@ class ManageableProductServiceTest extends KernelTestCase
         $this->messageBus->dispatch(Argument::any())->shouldBeCalled()->willReturn($this->envelope);
         $manageableProductService = new ManageableProductService($this->messageBus->reveal());
         $manageableProductService->dispatchForProductRelationship($productRelationshipRequest->reveal());
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::dispatchForPartner
+     */
+    public function testDispatchForPartner(): void
+    {
+        $partnerRequest = $this->prophesize(PartnerRequest::class);
+        $partnerRequest->status = 'ceased';
+        $previousPartner = $this->prophesize(Partner::class)->reveal();
+        $previousPartner->status = 'partner';
+        $this->messageBus->dispatch(Argument::any())->shouldBeCalled()->willReturn($this->envelope);
+        $manageableProductService = new ManageableProductService($this->messageBus->reveal());
+        $manageableProductService->dispatchForPartner($partnerRequest->reveal(), $previousPartner);
     }
 
     /**

@@ -44,7 +44,7 @@ class PartnerApiTest extends ApiTestCase
     {
         $partner = json_decode(self::$partnerHelper->get($uuid)->getContent(), true);
         $payload = [
-            'status' => 'inactive',
+            'status' => 'blacklist',
             'ceaseDate' => (new \DateTime())->format('Y-m-d'),
         ] + $partner;
         $response = self::$partnerHelper->update($uuid, $payload);

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Helper\Manageable;
 
+use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Manageable\ManageableProductRequest;
 use App\Entity\Box;
 use App\Entity\Component;
 use App\Entity\Experience;
+use App\Entity\Partner;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class ManageableProductService
@@ -49,6 +51,18 @@ class ManageableProductService
     {
         if (isset($previousExperience->status) && $previousExperience->status !== $productRequest->status) {
             $this->dispatchForProduct($productRequest);
+        }
+    }
+
+    public function dispatchForPartner(PartnerRequest $partnerRequest, Partner $previousPartner): void
+    {
+        if (
+            (isset($previousPartner->status) && $previousPartner->status !== $partnerRequest->status)
+            || (!empty($previousPartner->ceaseDate) && $previousPartner->ceaseDate < new \DateTime())
+        ) {
+            $manageableProductRequest = new ManageableProductRequest();
+            $manageableProductRequest->setPartnerRequest($partnerRequest);
+            $this->messageBus->dispatch($manageableProductRequest);
         }
     }
 

@@ -11,15 +11,20 @@ use App\Entity\Partner;
 use App\Exception\Manager\Partner\OutdatedPartnerException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Exception\Repository\PartnerNotFoundException;
+use App\Helper\Manageable\ManageableProductService;
 use App\Repository\PartnerRepository;
 
 class PartnerManager
 {
-    protected PartnerRepository $repository;
+    private PartnerRepository $repository;
+    private ManageableProductService $manageableProductService;
 
-    public function __construct(PartnerRepository $repository)
-    {
+    public function __construct(
+        PartnerRepository $repository,
+        ManageableProductService $manageableProductService
+    ) {
         $this->repository = $repository;
+        $this->manageableProductService = $manageableProductService;
     }
 
     public function create(PartnerCreateRequest $partnerCreateRequest): Partner
@@ -91,6 +96,7 @@ class PartnerManager
             throw new OutdatedPartnerException();
         }
 
+        $currentEntity = clone $partner;
         $partner->goldenId = $partnerRequest->id;
         $partner->status = $partnerRequest->status;
         $partner->currency = $partnerRequest->currencyCode;
@@ -99,5 +105,6 @@ class PartnerManager
         $partner->externalUpdatedAt = $partnerRequest->updatedAt;
 
         $this->repository->save($partner);
+        $this->manageableProductService->dispatchForPartner($partnerRequest, $currentEntity);
     }
 }

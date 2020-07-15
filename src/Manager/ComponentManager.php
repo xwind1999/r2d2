@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Constraint\PartnerStatusConstraint;
 use App\Constraint\ProductStatusConstraint;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Component\ComponentCreateRequest;
@@ -172,7 +173,10 @@ class ComponentManager
     private function createManageableCriteria(): Criteria
     {
         $criteria = Criteria::create();
-        $criteria->andWhere(Criteria::expr()->eq('component.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
+        $criteria->andWhere(Criteria::expr()->eq(
+            'component.status',
+            ProductStatusConstraint::PRODUCT_STATUS_ACTIVE
+        ));
         $criteria->andWhere(
             Criteria::expr()->in(
                 'box.status',
@@ -182,10 +186,22 @@ class ComponentManager
                 ]
             )
         );
-        $criteria->andWhere(Criteria::expr()->eq('experience.status', ProductStatusConstraint::PRODUCT_STATUS_ACTIVE));
+        $criteria->andWhere(Criteria::expr()->eq(
+            'experience.status',
+            ProductStatusConstraint::PRODUCT_STATUS_ACTIVE
+        ));
         $criteria->andWhere(Criteria::expr()->eq('component.isReservable', true));
         $criteria->andWhere(Criteria::expr()->eq('boxExperience.isEnabled', true));
         $criteria->andWhere(Criteria::expr()->eq('experienceComponent.isEnabled', true));
+        $criteria->andWhere(Criteria::expr()->eq('partner.status', PartnerStatusConstraint::PARTNER_STATUS_PARTNER));
+
+        /** @psalm-suppress TooManyArguments */
+        $c = $criteria->andWhere(
+            Criteria::expr()->orX(
+                    Criteria::expr()->isNull('partner.ceaseDate'),
+                    Criteria::expr()->gt('partner.ceaseDate', new \DateTime())
+            )
+        );
 
         return $criteria;
     }

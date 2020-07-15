@@ -35,6 +35,7 @@ class ManageableComponentSubscriber implements EventSubscriberInterface
     {
         try {
             $component = $this->manager->findAndSetManageableComponent($event->componentGoldenId);
+            //TODO: only send if changed
             $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
         } catch (\Exception $exception) {
             $this->logger->error($exception, $event->getContext());
