@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\QuickData;
 
+use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Manageable\ManageableProductRequest;
+use App\Event\Manageable\ManageablePartnerEvent;
 use App\Exception\Resolver\UnprocessableManageableProductTypeException;
 use App\Resolver\ManageableProductResolver;
 use PHPUnit\Framework\TestCase;
@@ -116,6 +118,26 @@ class ManageableProductResolverTest extends TestCase
 
     /**
      * @covers ::resolve
+     * @covers \App\Event\Manageable\ManageablePartnerEvent::fromPartner
+     */
+    public function testResolveUsingPartnerSuccessfully(): void
+    {
+        $partnerRequest = new PartnerRequest();
+        $partnerRequest->id = '123456';
+        $this->manageableProductRequest->getProductRelationshipRequest()->willReturn(null);
+        $this->manageableProductRequest->getProductRequest()->willReturn(null);
+        $this->manageableProductRequest
+            ->getPartnerRequest()
+            ->shouldBeCalled()
+            ->willReturn($partnerRequest)
+        ;
+        $manageableProductResolver = new ManageableProductResolver();
+        $resolved = $manageableProductResolver->resolve($this->manageableProductRequest->reveal());
+        $this->assertInstanceOf(ManageablePartnerEvent::class, $resolved);
+    }
+
+    /**
+     * @covers ::resolve
      */
     public function testResolveUsingBoxThrowsUnprocessableManageableProductTypeException(): void
     {
@@ -126,6 +148,7 @@ class ManageableProductResolverTest extends TestCase
             ->shouldBeCalled()
             ->willReturn($this->productRequest->reveal())
         ;
+        $this->manageableProductRequest->getPartnerRequest()->willReturn(null);
         $this->expectException(UnprocessableManageableProductTypeException::class);
         $manageableProductResolver = new ManageableProductResolver();
         $manageableProductResolver->resolve($this->manageableProductRequest->reveal());

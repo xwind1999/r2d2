@@ -26,7 +26,7 @@ class PartnerHelper
     {
         $payload = [
             'goldenId' => bin2hex(random_bytes(12)),
-            'status' => 'active',
+            'status' => 'partner',
             'isChannelManagerActive' => true,
             'currency' => 'EUR',
         ];

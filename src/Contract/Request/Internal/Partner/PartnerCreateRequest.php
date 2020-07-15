@@ -22,7 +22,7 @@ class PartnerCreateRequest implements RequestBodyInterface, ValidatableRequest
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="8")
+     * @Assert\Choice(choices=\App\Constraint\PartnerStatusConstraint::VALID_VALUES)
      *
      * @JMS\Type("string")
      */

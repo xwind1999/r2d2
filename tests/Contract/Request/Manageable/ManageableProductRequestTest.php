@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Contract\Request\Manageable;
 
+use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Manageable\ManageableProductRequest;
@@ -12,6 +13,7 @@ use App\Event\Manageable\ManageableBoxExperienceEvent;
 use App\Event\Manageable\ManageableComponentEvent;
 use App\Event\Manageable\ManageableExperienceComponentEvent;
 use App\Event\Manageable\ManageableExperienceEvent;
+use App\Event\Manageable\ManageablePartnerEvent;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,6 +33,7 @@ class ManageableProductRequestTest extends TestCase
             'box_golden_id' => $boxGoldenId,
             'component_golden_id' => '',
             'experience_golden_id' => '',
+            'partner_golden_id' => '',
         ];
         $this->assertEquals($expected, $manageableProductRequest->getContext());
     }
@@ -47,6 +50,7 @@ class ManageableProductRequestTest extends TestCase
             'box_golden_id' => '',
             'component_golden_id' => $componentGoldenId,
             'experience_golden_id' => '',
+            'partner_golden_id' => '',
         ];
         $this->assertEquals($expected, $manageableProductRequest->getContext());
     }
@@ -63,6 +67,7 @@ class ManageableProductRequestTest extends TestCase
             'box_golden_id' => '',
             'component_golden_id' => '',
             'experience_golden_id' => $experienceGoldenId,
+            'partner_golden_id' => '',
         ];
         $this->assertEquals($expected, $manageableProductRequest->getContext());
     }
@@ -83,6 +88,7 @@ class ManageableProductRequestTest extends TestCase
             'box_golden_id' => '',
             'component_golden_id' => $componentGoldenId,
             'experience_golden_id' => $experienceGoldenId,
+            'partner_golden_id' => '',
         ];
         $this->assertEquals($expected, $manageableProductRequest->getContext());
     }
@@ -100,6 +106,24 @@ class ManageableProductRequestTest extends TestCase
             'box_golden_id' => $boxGoldenId,
             'component_golden_id' => '',
             'experience_golden_id' => $experienceGoldenId,
+            'partner_golden_id' => '',
+        ];
+        $this->assertEquals($expected, $manageableProductRequest->getContext());
+    }
+
+    /**
+     * @covers \App\Event\Manageable\ManageablePartnerEvent::fromPartner
+     * @covers ::getContext
+     */
+    public function testFromPartnerAndGetContext()
+    {
+        $partnerGoldenId = '12345';
+        $manageableProductRequest = ManageablePartnerEvent::fromPartner($partnerGoldenId);
+        $expected = [
+            'box_golden_id' => '',
+            'component_golden_id' => '',
+            'experience_golden_id' => '',
+            'partner_golden_id' => $partnerGoldenId,
         ];
         $this->assertEquals($expected, $manageableProductRequest->getContext());
     }
@@ -128,6 +152,21 @@ class ManageableProductRequestTest extends TestCase
         $this->assertInstanceOf(
             ProductRelationshipRequest::class,
             $manageableProductRequest->getProductRelationshipRequest()
+        );
+    }
+
+    /**
+     * @covers ::setPartnerRequest
+     * @covers ::getPartnerRequest
+     */
+    public function testSetAndGetPartnerRequest()
+    {
+        $partnerRequest = $this->prophesize(PartnerRequest::class);
+        $manageableProductRequest = new ManageableProductRequest();
+        $manageableProductRequest->setPartnerRequest($partnerRequest->reveal());
+        $this->assertInstanceOf(
+            PartnerRequest::class,
+            $manageableProductRequest->getPartnerRequest()
         );
     }
 }

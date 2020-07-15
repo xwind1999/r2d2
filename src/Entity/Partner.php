@@ -32,7 +32,7 @@ class Partner
     public string $goldenId;
 
     /**
-     * @ORM\Column(type="string", length=16)
+     * @ORM\Column(type="partner_status", length=16)
      */
     public string $status;
 

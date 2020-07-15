@@ -9,6 +9,7 @@ use App\Entity\BoxExperience;
 use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
+use App\Entity\Partner;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ManageableProductNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -67,6 +68,14 @@ class ComponentRepository extends ServiceEntityRepository
         }
 
         return $components;
+    }
+
+    /**
+     * @return array<Component>
+     */
+    public function findListByPartner(string $partnerGoldenId): array
+    {
+        return $this->findBy(['partnerGoldenId' => $partnerGoldenId]);
     }
 
     public function findOneByGoldenId(string $goldenId): Component
@@ -160,16 +169,19 @@ class ComponentRepository extends ServiceEntityRepository
     {
         return $qb
             ->join(ExperienceComponent::class, 'experienceComponent')
-            ->andWhere('experienceComponent.componentGoldenId = component.goldenId')
+            ->andWhere('experienceComponent.componentUuid = component.uuid')
 
             ->join(Experience::class, 'experience')
-            ->andWhere('experienceComponent.experienceGoldenId = experience.goldenId')
+            ->andWhere('experienceComponent.experienceUuid = experience.uuid')
 
             ->join(BoxExperience::class, 'boxExperience')
-            ->andWhere('experience.goldenId = boxExperience.experienceGoldenId')
+            ->andWhere('experience.uuid = boxExperience.experienceUuid')
 
             ->join(Box::class, 'box')
-            ->andWhere('boxExperience.boxGoldenId = box.goldenId')
-            ;
+            ->andWhere('boxExperience.boxUuid = box.uuid')
+
+            ->join(Partner::class, 'partner')
+            ->andWhere('partner.uuid = component.partnerUuid')
+        ;
     }
 }

@@ -14,6 +14,7 @@ use App\Event\Manageable\ManageableBoxExperienceEvent;
 use App\Event\Manageable\ManageableComponentEvent;
 use App\Event\Manageable\ManageableExperienceComponentEvent;
 use App\Event\Manageable\ManageableExperienceEvent;
+use App\Event\Manageable\ManageablePartnerEvent;
 use App\Exception\Resolver\UnprocessableManageableProductTypeException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -54,6 +55,11 @@ class ManageableProductResolver
             if (RelationshipTypeConstraint::BOX_EXPERIENCE === $relationshipType) {
                 return ManageableBoxExperienceEvent::fromBoxExperience($product->parentProduct, $product->childProduct);
             }
+        }
+
+        $partnerRequest = $manageableProductRequest->getPartnerRequest();
+        if (null !== $partnerRequest) {
+            return ManageablePartnerEvent::fromPartner($partnerRequest->id);
         }
 
         throw new UnprocessableManageableProductTypeException();
