@@ -130,6 +130,8 @@ class ComponentManager
         $component->roomStockType = $productRequest->roomStockType;
         $component->inventory = $productRequest->stockAllotment;
         $component->externalUpdatedAt = $productRequest->updatedAt;
+        $component->duration = $productRequest->productDuration;
+        $component->durationUnit = $productRequest->productDurationUnit;
 
         $this->repository->save($component);
         $this->manageableProductService->dispatchForComponent($productRequest, $currentEntity);
