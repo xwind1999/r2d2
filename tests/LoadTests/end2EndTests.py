@@ -15,7 +15,7 @@ def broadcast_partner(self):
    headers = {'content-type': 'application/json','Authorization':'Basic ZWFpOmVhaQ=='}
    response = self.client.post("/broadcast-listener/partner",data= json.dumps({
    "id": partnerId,
-   "status" : "active",
+   "status" : "partner",
    "currencyCode" : "EUR",
    "isChannelManagerEnabled" : False
    }),
