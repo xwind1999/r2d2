@@ -19,7 +19,7 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 
 class AvailabilityProvider
 {
-    private const INSTANT_TYPE = 'instant';
+    private const STOCK_TYPE = 'stock';
 
     protected CMHub $cmHub;
     protected SerializerInterface $serializer;
@@ -73,7 +73,7 @@ class AvailabilityProvider
         $activeChannelComponents = $this->componentManager->getRoomsByExperienceGoldenIdsList(
             array_keys($activeChannelExperienceIds));
         $roomAvailabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesByComponentGoldenIds(
-            array_keys($activeChannelComponents), self::INSTANT_TYPE, $dateFrom, $dateTo
+            array_keys($activeChannelComponents), self::STOCK_TYPE, $dateFrom, $dateTo
         );
         $roomAvailabilities = AvailabilityHelper::mapRoomAvailabilitiesToExperience(
             $activeChannelComponents, $roomAvailabilities, $numberOfNights + 1);

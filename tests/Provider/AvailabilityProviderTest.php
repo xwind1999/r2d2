@@ -183,7 +183,7 @@ class AvailabilityProviderTest extends TestCase
 
         $this->experienceManager->filterListExperienceIdsByBoxId(Argument::any())->willReturn($expIds);
         $this->componentManager->getRoomsByExperienceGoldenIdsList(Argument::any())->willReturn($components);
-        $this->roomAvailabilityManager->getRoomAvailabilitiesByComponentGoldenIds(['11', '22'], 'instant', $dateFrom, $dateTo)
+        $this->roomAvailabilityManager->getRoomAvailabilitiesByComponentGoldenIds(['11', '22'], 'stock', $dateFrom, $dateTo)
             ->willReturn(
                 [
                     '11' => [
