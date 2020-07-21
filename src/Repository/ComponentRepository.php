@@ -169,19 +169,19 @@ class ComponentRepository extends ServiceEntityRepository
     {
         return $qb
             ->join(ExperienceComponent::class, 'experienceComponent')
-            ->andWhere('experienceComponent.componentUuid = component.uuid')
+            ->andWhere('experienceComponent.componentGoldenId = component.goldenId')
 
             ->join(Experience::class, 'experience')
-            ->andWhere('experienceComponent.experienceUuid = experience.uuid')
+            ->andWhere('experienceComponent.experienceGoldenId = experience.goldenId')
 
             ->join(BoxExperience::class, 'boxExperience')
-            ->andWhere('experience.uuid = boxExperience.experienceUuid')
+            ->andWhere('experience.goldenId = boxExperience.experienceGoldenId')
 
             ->join(Box::class, 'box')
-            ->andWhere('boxExperience.boxUuid = box.uuid')
+            ->andWhere('boxExperience.boxGoldenId = box.goldenId')
 
             ->join(Partner::class, 'partner')
-            ->andWhere('partner.uuid = component.partnerUuid')
+            ->andWhere('partner.goldenId = component.partnerGoldenId')
         ;
     }
 }
