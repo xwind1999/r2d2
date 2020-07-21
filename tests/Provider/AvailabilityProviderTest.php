@@ -159,12 +159,14 @@ class AvailabilityProviderTest extends TestCase
             '11' => [
                 [
                     'goldenId' => '11',
+                    'duration' => 2,
                 ],
                 'experienceGoldenId' => '1',
             ],
             '22' => [
                 [
                     'goldenId' => '22',
+                    'duration' => 1,
                 ],
                 'experienceGoldenId' => '2',
             ],
@@ -188,9 +190,11 @@ class AvailabilityProviderTest extends TestCase
                 [
                     '11' => [
                         'componentGoldenId' => '11',
+                        'duration' => 2,
                     ],
                     '22' => [
                         'componentGoldenId' => '22',
+                        'duration' => 1,
                     ],
                 ]
             );
@@ -199,12 +203,12 @@ class AvailabilityProviderTest extends TestCase
             [
                 'Package' => '1',
                 'Request' => 0,
-                'Stock' => 6,
+                'Stock' => 5,
             ],
             [
                 'Package' => '2',
                 'Request' => 0,
-                'Stock' => 6,
+                'Stock' => 5,
             ],
         ];
 

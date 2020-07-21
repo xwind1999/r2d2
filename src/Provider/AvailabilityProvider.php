@@ -76,7 +76,7 @@ class AvailabilityProvider
             array_keys($activeChannelComponents), self::STOCK_TYPE, $dateFrom, $dateTo
         );
         $roomAvailabilities = AvailabilityHelper::mapRoomAvailabilitiesToExperience(
-            $activeChannelComponents, $roomAvailabilities, $numberOfNights + 1);
+            $activeChannelComponents, $roomAvailabilities, $numberOfNights);
 
         return $roomAvailabilities;
     }
