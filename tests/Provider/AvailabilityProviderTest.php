@@ -203,12 +203,12 @@ class AvailabilityProviderTest extends TestCase
             [
                 'Package' => '1',
                 'Request' => 0,
-                'Stock' => 5,
+                'Stock' => 6,
             ],
             [
                 'Package' => '2',
                 'Request' => 0,
-                'Stock' => 5,
+                'Stock' => 6,
             ],
         ];
 

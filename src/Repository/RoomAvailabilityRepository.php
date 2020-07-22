@@ -47,7 +47,9 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
 
     public function findRoomAvailabilitiesByComponentGoldenIds(array $componentIds, string $type, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
     {
-        $numberOfNights = $dateTo->diff($dateFrom)->days ?: 0;
+        $dateDiff = $dateTo->diff($dateFrom)->days ?: 0;
+        // DateFrom and DateTo is the stay date, not the checkout one
+        $numberOfNights = $dateDiff + 1;
         $qb = $this->createQueryBuilder('r');
         $qb
             ->select('r.componentGoldenId')
@@ -59,7 +61,7 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
             ->having('count(r.date) = :numberOfDays')
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d'))
-            ->setParameter('numberOfDays', $numberOfNights + 1)
+            ->setParameter('numberOfDays', $numberOfNights)
             ->setParameter('type', $type)
             ->indexBy('r', 'r.componentGoldenId')
         ;

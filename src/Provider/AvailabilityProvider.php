@@ -68,7 +68,9 @@ class AvailabilityProvider
 
     public function getRoomAvailabilities(int $boxId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
     {
-        $numberOfNights = $dateTo->diff($dateFrom)->days ?: 0;
+        $dateDiff = $dateTo->diff($dateFrom)->days ?: 0;
+        // DateFrom and DateTo is the stay date, not the checkout one
+        $numberOfNights = $dateDiff + 1;
         $activeChannelExperienceIds = $this->experienceManager->filterListExperienceIdsByBoxId($boxId);
         $activeChannelComponents = $this->componentManager->getRoomsByExperienceGoldenIdsList(
             array_keys($activeChannelExperienceIds));
