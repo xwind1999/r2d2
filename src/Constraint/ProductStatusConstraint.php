@@ -14,6 +14,7 @@ class ProductStatusConstraint extends AbstractChoiceConstraint
     public const PRODUCT_STATUS_INACTIVE = 'inactive';
     public const PRODUCT_STATUS_REDEEMABLE = 'redeemable';
     public const PRODUCT_STATUS_READY = 'ready';
+    public const PRODUCT_STATUS_PLACEHOLDER = 'placeholder';
 
     public const VALID_VALUES = [
         self::PRODUCT_STATUS_PROSPECT,
@@ -24,5 +25,6 @@ class ProductStatusConstraint extends AbstractChoiceConstraint
         self::PRODUCT_STATUS_INACTIVE,
         self::PRODUCT_STATUS_REDEEMABLE,
         self::PRODUCT_STATUS_READY,
+        self::PRODUCT_STATUS_PLACEHOLDER,
     ];
 }

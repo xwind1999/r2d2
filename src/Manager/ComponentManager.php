@@ -26,15 +26,18 @@ class ComponentManager
     private ComponentRepository $repository;
     private PartnerRepository $partnerRepository;
     private ManageableProductService $manageableProductService;
+    private PartnerManager $partnerManager;
 
     public function __construct(
         ComponentRepository $repository,
         PartnerRepository $partnerRepository,
-        ManageableProductService $manageableProductService
+        ManageableProductService $manageableProductService,
+        PartnerManager $partnerManager
     ) {
         $this->repository = $repository;
         $this->partnerRepository = $partnerRepository;
         $this->manageableProductService = $manageableProductService;
+        $this->partnerManager = $partnerManager;
     }
 
     public function create(ComponentCreateRequest $componentCreateRequest): Component
@@ -107,7 +110,11 @@ class ComponentManager
      */
     public function replace(ProductRequest $productRequest): void
     {
-        $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partner ? $productRequest->partner->id : '');
+        try {
+            $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partner ? $productRequest->partner->id : '');
+        } catch (PartnerNotFoundException $exception) {
+            $partner = $this->partnerManager->createPlaceholder($productRequest->partner ? $productRequest->partner->id : '');
+        }
 
         try {
             $component = $this->repository->findOneByGoldenId($productRequest->id);

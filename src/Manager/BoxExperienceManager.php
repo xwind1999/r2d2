@@ -23,17 +23,20 @@ class BoxExperienceManager
     private ExperienceRepository $experienceRepository;
     private BoxExperienceRepository $boxExperienceRepository;
     private ManageableProductService $manageableProductService;
+    private BoxManager $boxManager;
 
     public function __construct(
         BoxExperienceRepository $boxExperienceRepository,
         BoxRepository $boxRepository,
         ExperienceRepository $experienceRepository,
-        ManageableProductService $manageableProductService
+        ManageableProductService $manageableProductService,
+        BoxManager $boxManager
     ) {
         $this->boxRepository = $boxRepository;
         $this->experienceRepository = $experienceRepository;
         $this->boxExperienceRepository = $boxExperienceRepository;
         $this->manageableProductService = $manageableProductService;
+        $this->boxManager = $boxManager;
     }
 
     /**
@@ -88,8 +91,14 @@ class BoxExperienceManager
      */
     public function replace(ProductRelationshipRequest $relationshipRequest): void
     {
-        $box = $this->boxRepository->findOneByGoldenId($relationshipRequest->parentProduct);
         $experience = $this->experienceRepository->findOneByGoldenId($relationshipRequest->childProduct);
+
+        try {
+            $box = $this->boxRepository->findOneByGoldenId($relationshipRequest->parentProduct);
+        } catch (BoxNotFoundException $exception) {
+            $box = $this->boxManager->createPlaceholder($relationshipRequest->parentProduct);
+        }
+
         $boxExperience = $this->boxExperienceRepository->findOneByBoxExperience($box, $experience);
 
         if (!empty($boxExperience->externalUpdatedAt) && $boxExperience->externalUpdatedAt > $relationshipRequest->updatedAt) {

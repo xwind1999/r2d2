@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Constraint\ProductStatusConstraint;
 use App\Contract\Request\BroadcastListener\PriceInformation\Price;
 use App\Contract\Request\BroadcastListener\PriceInformation\Product;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
@@ -130,6 +131,25 @@ class BoxManagerTest extends TestCase
         $this->assertEquals($boxCreateRequest->brand, $box->brand);
         $this->assertEquals($boxCreateRequest->country, $box->country);
         $this->assertEquals($boxCreateRequest->status, $box->status);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::createPlaceholder
+     */
+    public function testCreatePlaceholder()
+    {
+        $manager = new BoxManager(
+            $this->repository->reveal(),
+            $this->manageableProductService->reveal()
+        );
+        $box = $manager->createPlaceholder('1234');
+
+        $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
+
+        $this->assertEquals('1234', $box->goldenId);
+        $this->assertEquals(ProductStatusConstraint::PRODUCT_STATUS_PLACEHOLDER, $box->status);
+        $this->assertNull($box->externalUpdatedAt);
     }
 
     /**

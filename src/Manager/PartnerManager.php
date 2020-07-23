@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Constraint\PartnerStatusConstraint;
 use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\Internal\Partner\PartnerCreateRequest;
 use App\Contract\Request\Internal\Partner\PartnerUpdateRequest;
@@ -106,5 +107,18 @@ class PartnerManager
 
         $this->repository->save($partner);
         $this->manageableProductService->dispatchForPartner($partnerRequest, $currentEntity);
+    }
+
+    public function createPlaceholder(string $goldenId): Partner
+    {
+        $partner = new Partner();
+        $partner->goldenId = $goldenId;
+        $partner->status = PartnerStatusConstraint::PARTNER_STATUS_PLACEHOLDER;
+        $partner->currency = '';
+        $partner->isChannelManagerActive = false;
+
+        $this->repository->save($partner);
+
+        return $partner;
     }
 }

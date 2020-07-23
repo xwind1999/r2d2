@@ -15,8 +15,10 @@ use App\Entity\Partner;
 use App\Exception\Manager\Experience\OutdatedExperienceException;
 use App\Exception\Manager\Experience\OutdatedExperiencePriceException;
 use App\Exception\Repository\ExperienceNotFoundException;
+use App\Exception\Repository\PartnerNotFoundException;
 use App\Helper\Manageable\ManageableProductService;
 use App\Manager\ExperienceManager;
+use App\Manager\PartnerManager;
 use App\Repository\ExperienceRepository;
 use App\Repository\PartnerRepository;
 use PHPUnit\Framework\TestCase;
@@ -44,6 +46,11 @@ class ExperienceManagerTest extends TestCase
      */
     private $manageableProductService;
 
+    /**
+     * @var ObjectProphecy|PartnerManager
+     */
+    private $partnerManager;
+
     private ExperienceManager $manager;
 
     public function setUp(): void
@@ -51,7 +58,8 @@ class ExperienceManagerTest extends TestCase
         $this->repository = $this->prophesize(ExperienceRepository::class);
         $this->partnerRepository = $this->prophesize(PartnerRepository::class);
         $this->manageableProductService = $this->prophesize(ManageableProductService::class);
-        $this->manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal(), $this->manageableProductService->reveal());
+        $this->partnerManager = $this->prophesize(PartnerManager::class);
+        $this->manager = new ExperienceManager($this->repository->reveal(), $this->partnerRepository->reveal(), $this->manageableProductService->reveal(), $this->partnerManager->reveal());
     }
 
     /**
@@ -163,6 +171,34 @@ class ExperienceManagerTest extends TestCase
         $productRequest->status = 'active';
 
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id)->shouldBeCalled();
+        $this->repository->findOneByGoldenId($productRequest->id)->shouldBeCalled();
+        $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
+        $this->manageableProductService->dispatchForExperience(Argument::any(), Argument::any())->shouldBeCalled();
+
+        $this->manager->replace($productRequest);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceWithPlaceholderPartner()
+    {
+        $partner = new \App\Contract\Request\BroadcastListener\Product\Partner();
+        $partner->id = '5678';
+        $productRequest = new ProductRequest();
+        $productRequest->id = '5678';
+        $productRequest->partner = $partner;
+        $productRequest->name = 'dinner with massage';
+        $productRequest->description = 'a fancy dinner with feet massage';
+        $productRequest->productPeopleNumber = 2;
+        $productRequest->status = 'active';
+
+        $partnerEntity = new Partner();
+        $partnerEntity->goldenId = '5678';
+
+        $this->partnerRepository->findOneByGoldenId($productRequest->partner->id)->willThrow(new PartnerNotFoundException());
+        $this->partnerManager->createPlaceholder($productRequest->partner->id)->shouldBeCalled()->willReturn($partnerEntity);
         $this->repository->findOneByGoldenId($productRequest->id)->shouldBeCalled();
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
         $this->manageableProductService->dispatchForExperience(Argument::any(), Argument::any())->shouldBeCalled();
