@@ -12,7 +12,6 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\ComponentBroadcastEvent;
 use App\EventSubscriber\ProductBroadcast\ComponentBroadcastSubscriber;
 use App\Exception\Manager\Component\OutdatedComponentException;
-use App\Exception\Repository\PartnerNotFoundException;
 use App\Manager\ComponentManager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -128,7 +127,6 @@ class ComponentBroadcastSubscriberTest extends TestCase
     public function sampleException(): array
     {
         return [
-            [new PartnerNotFoundException(), 'warning'],
             [new \Exception(), 'error'],
         ];
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Constraint\ProductStatusConstraint;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Box\BoxCreateRequest;
@@ -108,5 +109,15 @@ class BoxManager
         $box = $this->repository->findOneByGoldenId($priceInformationRequest->product->id);
         $box->currency = $priceInformationRequest->averageValue ? $priceInformationRequest->averageValue->currencyCode : null;
         $this->repository->save($box);
+    }
+
+    public function createPlaceholder(string $goldenId): Box
+    {
+        $box = new Box();
+        $box->goldenId = $goldenId;
+        $box->status = ProductStatusConstraint::PRODUCT_STATUS_PLACEHOLDER;
+        $this->repository->save($box);
+
+        return $box;
     }
 }

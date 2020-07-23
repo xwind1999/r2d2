@@ -13,8 +13,10 @@ use App\Entity\Partner;
 use App\Exception\Manager\Component\OutdatedComponentException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ManageableProductNotFoundException;
+use App\Exception\Repository\PartnerNotFoundException;
 use App\Helper\Manageable\ManageableProductService;
 use App\Manager\ComponentManager;
+use App\Manager\PartnerManager;
 use App\Repository\ComponentRepository;
 use App\Repository\PartnerRepository;
 use PHPUnit\Framework\TestCase;
@@ -42,6 +44,11 @@ class ComponentManagerTest extends TestCase
      */
     private $manageableProductService;
 
+    /**
+     * @var ObjectProphecy|PartnerManager
+     */
+    private $partnerManager;
+
     private ComponentManager $manager;
 
     public function setUp(): void
@@ -49,10 +56,12 @@ class ComponentManagerTest extends TestCase
         $this->repository = $this->prophesize(ComponentRepository::class);
         $this->partnerRepository = $this->prophesize(PartnerRepository::class);
         $this->manageableProductService = $this->prophesize(ManageableProductService::class);
+        $this->partnerManager = $this->prophesize(PartnerManager::class);
         $this->manager = new ComponentManager(
             $this->repository->reveal(),
             $this->partnerRepository->reveal(),
-            $this->manageableProductService->reveal()
+            $this->manageableProductService->reveal(),
+            $this->partnerManager->reveal()
         );
     }
 
@@ -200,6 +209,39 @@ class ComponentManagerTest extends TestCase
      * @covers ::__construct
      * @covers ::replace
      */
+    public function testReplaceWithPlaceholderPartner(): void
+    {
+        $partner = $this->prophesize(PartnerDTO::class);
+        $partner->id = '5678';
+        $productRequest = $this->prophesize(ProductRequest::class);
+        $productRequest->id = '5678';
+        $productRequest->partner = $partner->reveal();
+        $productRequest->name = 'dinner with massage';
+        $productRequest->description = 'a fancy dinner with feet massage';
+        $productRequest->productDuration = 2;
+        $productRequest->productDurationUnit = 'day';
+        $productRequest->isSellable = true;
+        $productRequest->isReservable = true;
+        $productRequest->status = 'test Status';
+        $productRequest->roomStockType = 'on_request';
+        $component = $this->prophesize(Component::class);
+        $component->status = 'active';
+        $component->isReservable = true;
+
+        $partnerEntity = new Partner();
+        $partnerEntity->goldenId = '5678';
+        $this->partnerRepository->findOneByGoldenId($productRequest->partner->id)->willThrow(new PartnerNotFoundException());
+        $this->partnerManager->createPlaceholder($productRequest->partner->id)->shouldBeCalled()->willReturn($partnerEntity);
+        $this->repository->findOneByGoldenId($productRequest->id)->willReturn($component->reveal());
+        $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
+        $this->manageableProductService->dispatchForComponent(Argument::any(), Argument::any())->shouldBeCalled();
+        $this->manager->replace($productRequest->reveal());
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
     public function testReplaceWithOutdatedRecord(): void
     {
         $partner = $this->prophesize(PartnerDTO::class);
@@ -313,7 +355,8 @@ class ComponentManagerTest extends TestCase
         $manager = new ComponentManager(
             $this->repository->reveal(),
             $this->partnerRepository->reveal(),
-            $this->manageableProductService->reveal()
+            $this->manageableProductService->reveal(),
+            $this->partnerManager->reveal()
         );
         $manager->getRoomsByExperienceGoldenIdsList($compIds);
         $this->repository->findRoomsByExperienceGoldenIdsList($compIds)->shouldBeCalledOnce();

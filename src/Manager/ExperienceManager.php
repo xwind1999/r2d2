@@ -23,15 +23,18 @@ class ExperienceManager
     private ExperienceRepository $repository;
     private PartnerRepository $partnerRepository;
     private ManageableProductService $manageableProductService;
+    private PartnerManager $partnerManager;
 
     public function __construct(
         ExperienceRepository $repository,
         PartnerRepository $partnerRepository,
-        ManageableProductService $manageableProductService
+        ManageableProductService $manageableProductService,
+        PartnerManager $partnerManager
     ) {
         $this->repository = $repository;
         $this->partnerRepository = $partnerRepository;
         $this->manageableProductService = $manageableProductService;
+        $this->partnerManager = $partnerManager;
     }
 
     public function create(ExperienceCreateRequest $experienceCreateRequest): Experience
@@ -105,7 +108,11 @@ class ExperienceManager
      */
     public function replace(ProductRequest $productRequest): void
     {
-        $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partner ? $productRequest->partner->id : '');
+        try {
+            $partner = $this->partnerRepository->findOneByGoldenId($productRequest->partner ? $productRequest->partner->id : '');
+        } catch (PartnerNotFoundException $exception) {
+            $partner = $this->partnerManager->createPlaceholder($productRequest->partner ? $productRequest->partner->id : '');
+        }
 
         try {
             $experience = $this->repository->findOneByGoldenId($productRequest->id);

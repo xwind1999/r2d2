@@ -6,7 +6,6 @@ namespace App\EventSubscriber\ProductBroadcast;
 
 use App\Event\Product\ComponentBroadcastEvent;
 use App\Exception\ContextualException;
-use App\Exception\Repository\PartnerNotFoundException;
 use App\Manager\ComponentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -33,10 +32,6 @@ class ComponentBroadcastSubscriber implements EventSubscriberInterface
     {
         try {
             $this->manager->replace($event->getProductRequest());
-        } catch (PartnerNotFoundException $exception) {
-            $this->logger->warning($exception, $event->getProductRequest()->getContext());
-
-            throw $exception;
         } catch (ContextualException $exception) {
             $this->logger->warning($exception, $event->getContext());
 

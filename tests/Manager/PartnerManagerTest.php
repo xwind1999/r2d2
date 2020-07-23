@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Constraint\PartnerStatusConstraint;
 use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\Internal\Partner\PartnerCreateRequest;
 use App\Contract\Request\Internal\Partner\PartnerUpdateRequest;
@@ -120,6 +121,24 @@ class PartnerManagerTest extends TestCase
         $this->assertEquals($partnerCreateRequest->status, $partner->status);
         $this->assertEquals($partnerCreateRequest->currency, $partner->currency);
         $this->assertEquals($partnerCreateRequest->ceaseDate, $partner->ceaseDate);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::createPlaceholder
+     */
+    public function testCreatePlaceholder()
+    {
+        $manager = new PartnerManager($this->repository->reveal(), $this->manageableProductService->reveal());
+        $partner = $manager->createPlaceholder('1234');
+
+        $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
+
+        $this->assertEquals('1234', $partner->goldenId);
+        $this->assertEquals(PartnerStatusConstraint::PARTNER_STATUS_PLACEHOLDER, $partner->status);
+        $this->assertNull($partner->externalUpdatedAt);
+        $this->assertEquals('', $partner->currency);
+        $this->assertFalse($partner->isChannelManagerActive);
     }
 
     /**

@@ -14,6 +14,7 @@ class PartnerStatusConstraint extends AbstractChoiceConstraint
     public const PARTNER_STATUS_BLACKLIST = 'blacklist';
     public const PARTNER_STATUS_WINBACK = 'winback';
     public const PARTNER_STATUS_CEASED = 'ceased';
+    public const PARTNER_STATUS_PLACEHOLDER = 'placeholder';
 
     public const VALID_VALUES = [
         self::PARTNER_STATUS_PROSPECT,
@@ -24,5 +25,6 @@ class PartnerStatusConstraint extends AbstractChoiceConstraint
         self::PARTNER_STATUS_BLACKLIST,
         self::PARTNER_STATUS_WINBACK,
         self::PARTNER_STATUS_CEASED,
+        self::PARTNER_STATUS_PLACEHOLDER,
     ];
 }

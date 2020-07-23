@@ -16,6 +16,7 @@ use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Helper\Manageable\ManageableProductService;
 use App\Manager\BoxExperienceManager;
+use App\Manager\BoxManager;
 use App\Repository\BoxExperienceRepository;
 use App\Repository\BoxRepository;
 use App\Repository\ExperienceRepository;
@@ -48,12 +49,18 @@ class BoxExperienceManagerTest extends TestCase
      */
     private $manageableProductService;
 
+    /**
+     * @var BoxManager|ObjectProphecy
+     */
+    private $boxManager;
+
     public function setUp(): void
     {
         $this->repository = $this->prophesize(BoxExperienceRepository::class);
         $this->boxRepository = $this->prophesize(BoxRepository::class);
         $this->experienceRepository = $this->prophesize(ExperienceRepository::class);
         $this->manageableProductService = $this->prophesize(ManageableProductService::class);
+        $this->boxManager = $this->prophesize(BoxManager::class);
     }
 
     /**
@@ -66,7 +73,8 @@ class BoxExperienceManagerTest extends TestCase
             $this->repository->reveal(),
             $this->boxRepository->reveal(),
             $this->experienceRepository->reveal(),
-            $this->manageableProductService->reveal()
+            $this->manageableProductService->reveal(),
+            $this->boxManager->reveal(),
         );
 
         $boxExperience = new BoxExperience();
@@ -97,7 +105,8 @@ class BoxExperienceManagerTest extends TestCase
             $this->repository->reveal(),
             $this->boxRepository->reveal(),
             $this->experienceRepository->reveal(),
-            $this->manageableProductService->reveal()
+            $this->manageableProductService->reveal(),
+            $this->boxManager->reveal(),
         );
 
         $boxExperience = new BoxExperience();
@@ -128,7 +137,8 @@ class BoxExperienceManagerTest extends TestCase
             $this->repository->reveal(),
             $this->boxRepository->reveal(),
             $this->experienceRepository->reveal(),
-            $this->manageableProductService->reveal()
+            $this->manageableProductService->reveal(),
+            $this->boxManager->reveal(),
         );
 
         $box = new Box();
@@ -167,7 +177,8 @@ class BoxExperienceManagerTest extends TestCase
             $this->repository->reveal(),
             $this->boxRepository->reveal(),
             $this->experienceRepository->reveal(),
-            $this->manageableProductService->reveal()
+            $this->manageableProductService->reveal(),
+            $this->boxManager->reveal(),
         );
 
         $box = new Box();
@@ -200,7 +211,8 @@ class BoxExperienceManagerTest extends TestCase
             $this->repository->reveal(),
             $this->boxRepository->reveal(),
             $this->experienceRepository->reveal(),
-            $this->manageableProductService->reveal()
+            $this->manageableProductService->reveal(),
+            $this->boxManager->reveal(),
         );
         $this->boxRepository->findOneByGoldenId('5678')->willThrow(BoxNotFoundException::class);
 
@@ -221,7 +233,8 @@ class BoxExperienceManagerTest extends TestCase
             $this->repository->reveal(),
             $this->boxRepository->reveal(),
             $this->experienceRepository->reveal(),
-            $this->manageableProductService->reveal()
+            $this->manageableProductService->reveal(),
+            $this->boxManager->reveal(),
         );
 
         $box = new Box();
@@ -249,12 +262,56 @@ class BoxExperienceManagerTest extends TestCase
             $this->repository->reveal(),
             $this->boxRepository->reveal(),
             $this->experienceRepository->reveal(),
-            $this->manageableProductService->reveal()
+            $this->manageableProductService->reveal(),
+            $this->boxManager->reveal(),
         );
 
         $box = new Box();
         $box->goldenId = '1234';
         $this->boxRepository->findOneByGoldenId('1234')->willReturn($box);
+
+        $experience = new Experience();
+        $experience->goldenId = '7895';
+        $this->experienceRepository->findOneByGoldenId('7895')->willReturn($experience);
+
+        $relationshipRequest = new ProductRelationshipRequest();
+        $relationshipRequest->parentProduct = '1234';
+        $relationshipRequest->childProduct = '7895';
+        $relationshipRequest->isEnabled = false;
+        $relationshipRequest->updatedAt = new \DateTime('2020-01-01 01:00:00');
+
+        $boxExperience = new BoxExperience();
+        $boxExperience->boxGoldenId = '1234';
+        $boxExperience->experienceGoldenId = '7895';
+        $boxExperience->isEnabled = true;
+        $boxExperience->externalUpdatedAt = new \DateTime('2020-01-01 00:00:00');
+        $this->repository->findOneByBoxExperience($box, $experience)->willReturn($boxExperience);
+        $this->manageableProductService->dispatchForProductRelationship(Argument::any())->shouldBeCalled();
+        $this->repository->save(Argument::type(BoxExperience::class))->shouldBeCalled();
+
+        $updatedBoxExperience = $manager->replace($relationshipRequest);
+
+        $this->assertSame(null, $updatedBoxExperience);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::replace
+     */
+    public function testReplaceWithPlaceholderBox()
+    {
+        $manager = new BoxExperienceManager(
+            $this->repository->reveal(),
+            $this->boxRepository->reveal(),
+            $this->experienceRepository->reveal(),
+            $this->manageableProductService->reveal(),
+            $this->boxManager->reveal(),
+        );
+
+        $box = new Box();
+        $box->goldenId = '1234';
+        $this->boxRepository->findOneByGoldenId('1234')->willThrow(new BoxNotFoundException());
+        $this->boxManager->createPlaceholder('1234')->shouldBeCalled()->willReturn($box);
 
         $experience = new Experience();
         $experience->goldenId = '7895';
@@ -290,7 +347,8 @@ class BoxExperienceManagerTest extends TestCase
             $this->repository->reveal(),
             $this->boxRepository->reveal(),
             $this->experienceRepository->reveal(),
-            $this->manageableProductService->reveal()
+            $this->manageableProductService->reveal(),
+            $this->boxManager->reveal(),
         );
 
         $box = new Box();
