@@ -39,11 +39,10 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
 
     /**
      * @Assert\Type(type="boolean")
-     * @Assert\NotNull()
      *
      * @JMS\Type("strict_boolean")
      */
-    public bool $isChannelManagerEnabled;
+    public bool $isChannelManagerEnabled = false;
 
     /**
      * @Assert\Type(type="DateTime")

@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Command\Import\Helper;
+namespace App\Helper;
 
 use App\Exception\Helper\InvalidCSVHeadersException;
-use App\Helper\CSVParser;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**

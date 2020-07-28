@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Contract\Request\Product;
+namespace App\Tests\Contract\Request\BroadcastListener\Product;
 
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use PHPUnit\Framework\TestCase;

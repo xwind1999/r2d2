@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\QuickData;
+namespace App\Tests\Resolver;
 
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;

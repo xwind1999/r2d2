@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Event\Product;
+namespace App\Tests\Event;
 
 use App\Entity\Booking;
 use App\Event\BookingStatusEvent;
