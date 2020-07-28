@@ -45,8 +45,12 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         return $roomAvailability;
     }
 
-    public function findRoomAvailabilitiesByComponentGoldenIds(array $componentIds, string $type, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
-    {
+    public function findRoomAvailabilitiesByComponentGoldenIds(
+        array $componentIds,
+        string $type,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): array {
         $dateDiff = $dateTo->diff($dateFrom)->days ?: 0;
         // DateFrom and DateTo is the stay date, not the checkout one
         $numberOfNights = $dateDiff + 1;
@@ -64,6 +68,28 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
             ->setParameter('numberOfDays', $numberOfNights)
             ->setParameter('type', $type)
             ->indexBy('r', 'r.componentGoldenId')
+        ;
+
+        return $qb->getQuery()->getArrayResult();
+    }
+
+    public function findAllByComponentGoldenId(
+        string $componentGoldenId,
+        string $type,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo): array
+    {
+        $qb = $this->createQueryBuilder('r');
+        $qb
+            ->select('r.stock, r.date, r.type')
+            ->where('r.componentGoldenId = :componentGoldenId')
+            ->andWhere('r.date BETWEEN :dateFrom AND :dateTo')
+            ->andWhere('r.type = :type')
+            ->orderBy('r.date', 'ASC')
+            ->setParameter('componentGoldenId', $componentGoldenId)
+            ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
+            ->setParameter('dateTo', $dateTo->format('Y-m-d'))
+            ->setParameter('type', $type)
         ;
 
         return $qb->getQuery()->getArrayResult();

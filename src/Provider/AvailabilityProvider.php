@@ -9,6 +9,8 @@ use App\Contract\Response\CMHub\CMHubErrorResponse;
 use App\Contract\Response\CMHub\CMHubResponse;
 use App\Contract\Response\CMHub\GetAvailability\AvailabilityResponse;
 use App\Contract\Response\CMHub\GetAvailabilityResponse;
+use App\Entity\Experience;
+use App\Entity\ExperienceComponent;
 use App\Helper\AvailabilityHelper;
 use App\Manager\ComponentManager;
 use App\Manager\ExperienceManager;
@@ -44,8 +46,11 @@ class AvailabilityProvider
         $this->roomAvailabilityManager = $roomAvailabilityManager;
     }
 
-    public function getAvailability(int $productId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): CMHubResponse
-    {
+    public function getAvailability(
+        int $productId,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): CMHubResponse {
         try {
             /** @psalm-suppress ArgumentTypeCoercion */
             $response = $this->serializer->deserialize(// @phpstan-ignore-line
@@ -66,8 +71,11 @@ class AvailabilityProvider
         return $result;
     }
 
-    public function getRoomAvailabilities(int $boxId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
-    {
+    public function getRoomAvailabilitiesByBoxIdAndDates(
+        int $boxId,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): array {
         $dateDiff = $dateTo->diff($dateFrom)->days ?: 0;
         // DateFrom and DateTo is the stay date, not the checkout one
         $numberOfNights = $dateDiff + 1;
@@ -81,5 +89,27 @@ class AvailabilityProvider
             $activeChannelComponents, $roomAvailabilities, $numberOfNights);
 
         return $roomAvailabilities;
+    }
+
+    public function getRoomAvailabilitiesByExperienceAndDates(
+        Experience $experience,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): array {
+        if (empty($experience->experienceComponent->first())) {
+            return [];
+        }
+
+        /** @var ExperienceComponent $experienceComponent */
+        $experienceComponent = $experience->experienceComponent->first();
+        $roomAvailabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesListByComponentGoldenId(
+            $experienceComponent->componentGoldenId,
+            self::STOCK_TYPE,
+            $dateFrom,
+            $dateTo
+        );
+        $duration = $experienceComponent->component->duration ?: 1;
+
+        return AvailabilityHelper::calculateAvailabilitiesByDuration($duration, $roomAvailabilities);
     }
 }

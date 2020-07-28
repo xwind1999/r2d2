@@ -105,4 +105,94 @@ class AvailabilityHelperTest extends TestCase
 
         $this->assertEquals(AvailabilityHelper::mapRoomAvailabilitiesToExperience($comps, $roomAvailabilities, 5), $returnArray);
     }
+
+    public function testCalculateAvailabilitiesByDuration()
+    {
+        $roomAvailabilities = [
+            0 => [
+                'stock' => 10,
+                'date' => '2020-07-20',
+                'type' => 'instant',
+            ],
+            1 => [
+                'stock' => 10,
+                'date' => '2020-07-21',
+                'type' => 'instant',
+            ],
+            2 => [
+                'stock' => 0,
+                'date' => '2020-07-22',
+                'type' => 'instant',
+            ],
+            3 => [
+                'stock' => 10,
+                'date' => '2020-07-23',
+                'type' => 'instant',
+            ],
+            4 => [
+                'stock' => 10,
+                'date' => '2020-07-24',
+                'type' => 'instant',
+            ],
+            5 => [
+                'stock' => 10,
+                'date' => '2020-07-25',
+                'type' => 'instant',
+            ],
+            6 => [
+                'stock' => 0,
+                'date' => '2020-07-26',
+                'type' => 'instant',
+            ],
+        ];
+
+        $returnArray = ['1', '1', 'r', '1', '1', '1', 'r'];
+
+        $this->assertEquals($returnArray, AvailabilityHelper::calculateAvailabilitiesByDuration(1, $roomAvailabilities));
+    }
+
+    public function testCalculateAvailabilitiesByDurationWithAvailabilityAtLastDate()
+    {
+        $roomAvailabilities = [
+            0 => [
+                'stock' => 10,
+                'date' => '2020-07-20',
+                'type' => 'instant',
+            ],
+            1 => [
+                'stock' => 10,
+                'date' => '2020-07-21',
+                'type' => 'instant',
+            ],
+            2 => [
+                'stock' => 0,
+                'date' => '2020-07-22',
+                'type' => 'instant',
+            ],
+            3 => [
+                'stock' => 10,
+                'date' => '2020-07-23',
+                'type' => 'instant',
+            ],
+            4 => [
+                'stock' => 10,
+                'date' => '2020-07-24',
+                'type' => 'instant',
+            ],
+            5 => [
+                'stock' => 10,
+                'date' => '2020-07-25',
+                'type' => 'instant',
+            ],
+            6 => [
+                'stock' => 10,
+                'date' => '2020-07-26',
+                'type' => 'instant',
+            ],
+        ];
+
+        $returnArray = ['1', '1', 'r', '1', '1', '1', '1'];
+
+        $this->assertEquals($returnArray, AvailabilityHelper::calculateAvailabilitiesByDuration(1, $roomAvailabilities));
+    }
 }
