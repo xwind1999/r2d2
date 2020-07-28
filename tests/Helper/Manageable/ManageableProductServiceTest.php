@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Command\Import\Helper\Manageable;
+namespace App\Tests\Helper\Manageable;
 
 use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;

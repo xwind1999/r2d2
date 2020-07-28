@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\EventSubscriber;
+namespace App\Tests\EventSubscriber\Manageable;
 
 use App\Entity\Component;
 use App\Entity\Partner;

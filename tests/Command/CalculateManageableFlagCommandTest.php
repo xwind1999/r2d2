@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Command\Import;
+namespace App\Tests\Command;
 
 use App\Command\CalculateManageableFlagCommand;
 use App\Contract\Request\Manageable\ManageableProductRequest;

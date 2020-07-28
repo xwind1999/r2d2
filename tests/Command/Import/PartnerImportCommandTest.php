@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Command;
+namespace App\Tests\Command\Import;
 
 use App\Command\Import\PartnerImportCommand;
 use App\Contract\Request\BroadcastListener\PartnerRequest;
-use App\Tests\Command\Import\AbstractImportCommandTest;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Console\Tester\CommandTester;
 
