@@ -8,10 +8,14 @@ use App\CMHub\CMHub;
 use App\Contract\Response\CMHub\CMHubErrorResponse;
 use App\Contract\Response\CMHub\CMHubResponse;
 use App\Contract\Response\CMHub\GetAvailabilityResponse;
+use App\Entity\Component;
+use App\Entity\Experience;
+use App\Entity\ExperienceComponent;
 use App\Manager\ComponentManager;
 use App\Manager\ExperienceManager;
 use App\Manager\RoomAvailabilityManager;
 use App\Provider\AvailabilityProvider;
+use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\ArrayTransformerInterface;
 use JMS\Serializer\SerializerInterface;
 use PHPUnit\Framework\TestCase;
@@ -147,9 +151,9 @@ class AvailabilityProviderTest extends TestCase
 
     /**
      * @covers ::__construct
-     * @covers ::getRoomAvailabilities
+     * @covers ::getRoomAvailabilitiesByBoxIdAndDates
      */
-    public function testGetRoomAvailabilities()
+    public function testGetRoomAvailabilitiesByBoxId()
     {
         $expIds = [
             '1', '2', '3', '4',
@@ -212,6 +216,90 @@ class AvailabilityProviderTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilities(1, $dateFrom, $dateTo));
+        $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates(1, $dateFrom, $dateTo));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getRoomAvailabilitiesByExperienceAndDates
+     */
+    public function testGetRoomAvailabilitiesListByExperience()
+    {
+        $availabilityProvider = new AvailabilityProvider(
+            $this->cmHub->reveal(),
+            $this->serializer->reveal(),
+            $this->arraySerializer->reveal(),
+            $this->experienceManager->reveal(),
+            $this->componentManager->reveal(),
+            $this->roomAvailabilityManager->reveal()
+        );
+        $dateFrom = new \DateTime('2020-06-20');
+        $dateTo = new \DateTime('2020-06-25');
+
+        $component = new Component();
+        $component->duration = 1;
+        $experienceComponent = new ExperienceComponent();
+        $experienceComponent->component = $component;
+        $experienceComponent->componentGoldenId = '1234';
+        $collection = new ArrayCollection();
+        $collection->add($experienceComponent);
+        $experience = new Experience();
+        $experience->experienceComponent = $collection;
+
+        $this->roomAvailabilityManager->getRoomAvailabilitiesListByComponentGoldenId(
+            '1234', 'stock', $dateFrom, $dateTo
+        )
+            ->willReturn(
+                [
+                    0 => [
+                        'stock' => 10,
+                        'date' => '2020-07-20',
+                        'type' => 'stock',
+                    ],
+                    1 => [
+                        'stock' => 10,
+                        'date' => '2020-07-21',
+                        'type' => 'stock',
+                    ],
+                    2 => [
+                        'stock' => 0,
+                        'date' => '2020-07-22',
+                        'type' => 'stock',
+                    ],
+                    3 => [
+                        'stock' => 10,
+                        'date' => '2020-07-23',
+                        'type' => 'stock',
+                    ],
+                ]
+            );
+
+        $expectedArray = ['1', '1', 'r', '1'];
+
+        $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo));
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getRoomAvailabilitiesByExperienceAndDates
+     */
+    public function testGetRoomAvailabilitiesListByExperienceWithNoData()
+    {
+        $availabilityProvider = new AvailabilityProvider(
+            $this->cmHub->reveal(),
+            $this->serializer->reveal(),
+            $this->arraySerializer->reveal(),
+            $this->experienceManager->reveal(),
+            $this->componentManager->reveal(),
+            $this->roomAvailabilityManager->reveal()
+        );
+        $dateFrom = new \DateTime('2020-06-20');
+        $dateTo = new \DateTime('2020-06-25');
+
+        $experience = new Experience();
+
+        $expectedArray = [];
+
+        $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo));
     }
 }

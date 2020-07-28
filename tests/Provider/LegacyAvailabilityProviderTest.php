@@ -83,7 +83,7 @@ class LegacyAvailabilityProviderTest extends TestCase
      * @covers ::__construct
      * @covers ::getAvailabilityForExperience
      */
-    public function testGetAvailabilityForExperienceWithConverter()
+    public function testGetAvailabilityForExperienceForOtherPartnerType()
     {
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
@@ -91,6 +91,7 @@ class LegacyAvailabilityProviderTest extends TestCase
         $experience->goldenId = '1234';
         $partner = new Partner();
         $partner->isChannelManagerActive = false;
+        $partner->status = 'not_partner';
         $experience->partner = $partner;
 
         $result = $this->prophesize(GetPackageResponse::class);
@@ -112,6 +113,56 @@ class LegacyAvailabilityProviderTest extends TestCase
         ]);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
         $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
+        $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(['1', 'r', 's']);
+
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
+            $this->serializer->reveal(),
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
+
+        $response = $legacyAvailabilityProvider->getAvailabilityForExperience((int) $experience->goldenId, $dateFrom, $dateTo);
+
+        $this->assertInstanceOf(GetPackageResponse::class, $response);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getAvailabilityForExperience
+     */
+    public function testGetAvailabilityForExperienceWithConverter()
+    {
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+        $experience = new Experience();
+        $experience->goldenId = '1234';
+        $partner = new Partner();
+        $partner->isChannelManagerActive = true;
+        $partner->status = 'partner';
+        $experience->partner = $partner;
+
+        $result = $this->prophesize(GetPackageResponse::class);
+
+        $this->quickData->getPackage((int) $experience->goldenId, $dateFrom, $dateTo)->willReturn([
+            'ListPrestation' => [
+                [
+                    'Availabilities' => [
+                        ['1', 'r', '0'],
+                    ],
+                    'PrestId' => 2896684,
+                    'Duration' => 1,
+                    'LiheId' => 15257,
+                    'PartnerCode' => '00100901',
+                    'ExtraNight' => true,
+                    'ExtraRoom' => true,
+                ],
+            ],
+        ]);
+        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
+        $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(['1', 'r', 's']);
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
@@ -259,7 +310,7 @@ class LegacyAvailabilityProviderTest extends TestCase
         $this->experienceManager->filterIdsListWithPartnerChannelManagerCondition(Argument::any(), Argument::any())->willReturn([
             '132982' => '132982',
         ]);
-        $this->availabilityProvider->getRoomAvailabilities(Argument::any(), Argument::any(), Argument::any())->willReturn([
+        $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates(Argument::any(), Argument::any(), Argument::any())->willReturn([
             [
                 'Package' => '132984',
                 'Stock' => 3,

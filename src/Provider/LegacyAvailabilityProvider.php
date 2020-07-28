@@ -19,6 +19,7 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 class LegacyAvailabilityProvider
 {
     private const DATE_TIME_FORMAT = 'Y-m-d\TH:i:s.u';
+    private const PARTNER = 'partner';
 
     protected QuickData $quickData;
 
@@ -28,41 +29,60 @@ class LegacyAvailabilityProvider
 
     protected AvailabilityProvider $availabilityProvider;
 
-    public function __construct(QuickData $quickData, ArrayTransformerInterface $serializer, ExperienceManager $experienceManager, AvailabilityProvider $availabilityProvider)
-    {
+    public function __construct(
+        QuickData $quickData,
+        ArrayTransformerInterface $serializer,
+        ExperienceManager $experienceManager,
+        AvailabilityProvider $availabilityProvider
+    ) {
         $this->quickData = $quickData;
         $this->serializer = $serializer;
         $this->experienceManager = $experienceManager;
         $this->availabilityProvider = $availabilityProvider;
     }
 
-    public function getAvailabilityForExperience(int $experienceId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): QuickDataResponse
-    {
+    public function getAvailabilityForExperience(
+        int $experienceId,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): QuickDataResponse {
         //we check if the experience is CM-enabled here, then we call the appropriate client
         try {
             $data = $this->quickData->getPackage($experienceId, $dateFrom, $dateTo);
             //but we process them the same way, so we have a QuickDataResponse ready
-
             if (!empty($data['ListPrestation'][0]['Availabilities'])) {
                 $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
                 $partner = $experience->partner;
-                if (!$partner->isChannelManagerActive) {
-                    $data['ListPrestation'][0]['Availabilities'] =
-                        AvailabilityHelper::convertToRequestType($data['ListPrestation'][0]['Availabilities']);
+
+                $data['ListPrestation'][0]['Availabilities'] =
+                    AvailabilityHelper::convertToRequestType($data['ListPrestation'][0]['Availabilities']);
+
+                if ($partner->isChannelManagerActive && self::PARTNER === $partner->status) {
+                    $availabilitiesFromDB = $this->availabilityProvider
+                        ->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo);
+                    if (!empty($availabilitiesFromDB)) {
+                        $data['ListPrestation'][0]['Availabilities'] = $availabilitiesFromDB;
+                    }
                 }
             }
 
             return $this->serializer->fromArray($data, GetPackageResponse::class);
         } catch (HttpExceptionInterface $exception) {
-            $response = $this->serializer->fromArray($exception->getResponse()->toArray(false), QuickDataErrorResponse::class);
+            $response = $this->serializer->fromArray($exception->getResponse()
+                ->toArray(false),
+                QuickDataErrorResponse::class
+            );
             $response->httpCode = $exception->getResponse()->getStatusCode();
 
             return $response;
         }
     }
 
-    public function getAvailabilitiesForBox(int $boxId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): GetRangeResponse
-    {
+    public function getAvailabilitiesForBox(
+        int $boxId,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): GetRangeResponse {
         //we check if the experience is CM-enabled here, then we call the appropriate client
         try {
             $data = $this->quickData->getRange($boxId, $dateFrom, $dateTo);
@@ -75,7 +95,8 @@ class LegacyAvailabilityProvider
             $packageList = $data['PackagesList'];
             $availabilitiesFromQD = [];
             $experienceIds = array_column($packageList, 'Package');
-            $inactiveChannelExperienceIds = $this->experienceManager->filterIdsListWithPartnerChannelManagerCondition($experienceIds, false);
+            $inactiveChannelExperienceIds = $this->experienceManager
+                ->filterIdsListWithPartnerChannelManagerCondition($experienceIds, false);
             foreach ($packageList as $package) {
                 $experienceId = $package['Package'];
                 if (!empty($inactiveChannelExperienceIds[$experienceId])) {
@@ -87,7 +108,8 @@ class LegacyAvailabilityProvider
                 }
             }
 
-            $availabilitiesFromDb = $this->availabilityProvider->getRoomAvailabilities($boxId, $dateFrom, $dateTo);
+            $availabilitiesFromDb = $this->availabilityProvider
+                ->getRoomAvailabilitiesByBoxIdAndDates($boxId, $dateFrom, $dateTo);
 
             $data['PackagesList'] = array_merge($availabilitiesFromQD, $availabilitiesFromDb);
         } catch (HttpExceptionInterface $exception) {
@@ -97,18 +119,25 @@ class LegacyAvailabilityProvider
         return $this->serializer->fromArray($data, GetRangeResponse::class);
     }
 
-    public function getAvailabilityForMultipleExperiences(array $packageCodes, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): QuickDataResponse
-    {
+    public function getAvailabilityForMultipleExperiences(
+        array $packageCodes,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): QuickDataResponse {
         //we check if the experience is CM-enabled here, then we call the appropriate client
         try {
             $data = $this->quickData->getPackageV2($packageCodes, $dateFrom, $dateTo);
             //but we process them the same way, so we have a GetRangeResponse ready
 
             if (!empty($data['ListPackage'])) {
-                $inactiveChannelExperienceIds = $this->experienceManager->filterIdsListWithPartnerChannelManagerCondition($packageCodes, false);
+                $inactiveChannelExperienceIds = $this->experienceManager
+                    ->filterIdsListWithPartnerChannelManagerCondition($packageCodes, false);
                 foreach ($data['ListPackage'] as &$package) {
-                    if (!empty($package['ListPrestation'][0]['Availabilities']) && !empty($inactiveChannelExperienceIds[$package['PackageCode']])) {
-                        $package['ListPrestation'][0]['Availabilities'] = AvailabilityHelper::convertToRequestType($package['ListPrestation'][0]['Availabilities']);
+                    if (!empty($package['ListPrestation'][0]['Availabilities']) &&
+                        !empty($inactiveChannelExperienceIds[$package['PackageCode']])
+                    ) {
+                        $package['ListPrestation'][0]['Availabilities'] =
+                            AvailabilityHelper::convertToRequestType($package['ListPrestation'][0]['Availabilities']);
                     }
                 }
             }
@@ -119,8 +148,12 @@ class LegacyAvailabilityProvider
         return $this->serializer->fromArray($data, GetPackageV2Response::class);
     }
 
-    public function getAvailabilityPriceForExperience(int $experienceId, int $prestId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): QuickDataResponse
-    {
+    public function getAvailabilityPriceForExperience(
+        int $experienceId,
+        int $prestId,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): QuickDataResponse {
         //we check if the experience is CM-enabled here, then we call the appropriate client
         try {
             $data = $this->quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo);
@@ -138,7 +171,8 @@ class LegacyAvailabilityProvider
                     ;
 
                     if (!$experience->partner->isChannelManagerActive) {
-                        $data['DaysAvailabilityPrice'][$key]['AvailabilityStatus'] = AvailabilityHelper::convertAvailableValueToRequest($value['AvailabilityStatus']);
+                        $data['DaysAvailabilityPrice'][$key]['AvailabilityStatus'] =
+                            AvailabilityHelper::convertAvailableValueToRequest($value['AvailabilityStatus']);
                     }
                 }
             }

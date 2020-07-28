@@ -156,4 +156,27 @@ class RoomAvailabilityManagerTest extends TestCase
 
         $this->repository->findRoomAvailabilitiesByComponentGoldenIds($compIds, 'instant', new \DateTime('2020-06-20'), new \DateTime('2020-06-30'))->shouldBeCalledOnce();
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getRoomAvailabilitiesListByComponentGoldenId
+     */
+    public function testGetRoomAvailabilitiesListByComponentGoldenId()
+    {
+        $this->repository->findAllByComponentGoldenId(Argument::any(), Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(
+                [
+                    0 => [
+                        'stock' => 10,
+                        'date' => '2020-07-20',
+                        'type' => 'instant',
+                    ],
+                ]
+            );
+        $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal());
+        $manager->getRoomAvailabilitiesListByComponentGoldenId('1234', 'instant', new \DateTime('2020-06-20'), new \DateTime('2020-06-30'));
+
+        $this->repository->findAllByComponentGoldenId('1234', 'instant', new \DateTime('2020-06-20'), new \DateTime('2020-06-30'))
+            ->shouldBeCalledOnce();
+    }
 }
