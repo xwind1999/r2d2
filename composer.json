@@ -79,7 +79,8 @@
         "exclude-from-classmap": [
             "vendor/psr/log/Psr/Log/LoggerInterface.php",
             "vendor/doctrine/orm/lib/Doctrine/ORM/UnitOfWork.php",
-            "vendor/ekino/newrelic-bundle/Listener/ExceptionListener.php"
+            "vendor/ekino/newrelic-bundle/Listener/ExceptionListener.php",
+            "vendor/smartbox/canonical-data-model/legacyClassAliases.php"
         ]
     },
     "autoload-dev": {
