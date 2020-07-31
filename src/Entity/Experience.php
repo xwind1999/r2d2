@@ -68,7 +68,7 @@ class Experience
     public string $status;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetime_milliseconds", nullable=true)
      */
     public ?\DateTime $externalUpdatedAt = null;
 
@@ -88,7 +88,7 @@ class Experience
     public ?string $commission = null;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetime_milliseconds", nullable=true)
      */
     public ?\DateTime $priceUpdatedAt = null;
 

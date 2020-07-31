@@ -52,7 +52,7 @@ class Partner
     public ?\DateTime $ceaseDate = null;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetime_milliseconds", nullable=true)
      */
     public ?\DateTime $externalUpdatedAt = null;
 }
