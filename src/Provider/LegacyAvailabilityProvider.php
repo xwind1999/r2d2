@@ -10,6 +10,7 @@ use App\Contract\Response\QuickData\GetPackageV2Response;
 use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataErrorResponse;
 use App\Contract\Response\QuickData\QuickDataResponse;
+use App\Exception\Repository\EntityNotFoundException;
 use App\Helper\AvailabilityHelper;
 use App\Manager\ExperienceManager;
 use App\QuickData\QuickData;
@@ -18,8 +19,9 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 
 class LegacyAvailabilityProvider
 {
+    public const PARTNER = 'partner';
+
     private const DATE_TIME_FORMAT = 'Y-m-d\TH:i:s.u';
-    private const PARTNER = 'partner';
 
     protected QuickData $quickData;
 
@@ -46,36 +48,45 @@ class LegacyAvailabilityProvider
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): QuickDataResponse {
-        //we check if the experience is CM-enabled here, then we call the appropriate client
         try {
-            $data = $this->quickData->getPackage($experienceId, $dateFrom, $dateTo);
-            //but we process them the same way, so we have a QuickDataResponse ready
-            if (!empty($data['ListPrestation'][0]['Availabilities'])) {
-                $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
-                $partner = $experience->partner;
+            $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
+            $partner = $experience->partner;
+            $availabilitiesFromDB = $this->availabilityProvider
+                ->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo);
 
-                $data['ListPrestation'][0]['Availabilities'] =
-                    AvailabilityHelper::convertToRequestType($data['ListPrestation'][0]['Availabilities']);
+            $dateDiff = $dateTo->diff($dateFrom)->days ?: 0;
+            // DateFrom and DateTo is the stay date, not the checkout one
+            $numberOfNights = $dateDiff + 1;
 
-                if ($partner->isChannelManagerActive && self::PARTNER === $partner->status) {
-                    $availabilitiesFromDB = $this->availabilityProvider
-                        ->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo);
-                    if (!empty($availabilitiesFromDB)) {
-                        $data['ListPrestation'][0]['Availabilities'] = $availabilitiesFromDB;
-                    }
-                }
-            }
-
-            return $this->serializer->fromArray($data, GetPackageResponse::class);
-        } catch (HttpExceptionInterface $exception) {
-            $response = $this->serializer->fromArray($exception->getResponse()
-                ->toArray(false),
+            $returnArray = [
+                'ListPrestation' => [
+                    AvailabilityHelper::buildDataForGetPackage(
+                        $availabilitiesFromDB['availabilities'],
+                        $availabilitiesFromDB['duration'],
+                        $numberOfNights,
+                        $partner->goldenId,
+                        $availabilitiesFromDB['isSellable']
+                    ),
+                ],
+            ];
+        } catch (EntityNotFoundException $exception) {
+            $response = $this->serializer->fromArray(
+                [
+                    'ResponseStatus' => [
+                        'ErrorCode' => 'ArgumentException',
+                        'Message' => 'Invalid Request',
+                        'StackTrace' => '',
+                        'Errors' => [],
+                    ],
+                ],
                 QuickDataErrorResponse::class
             );
-            $response->httpCode = $exception->getResponse()->getStatusCode();
+            $response->httpCode = 400;
 
             return $response;
         }
+
+        return $this->serializer->fromArray($returnArray, GetPackageResponse::class);
     }
 
     public function getAvailabilitiesForBox(

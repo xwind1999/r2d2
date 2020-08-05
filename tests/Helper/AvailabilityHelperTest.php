@@ -195,4 +195,64 @@ class AvailabilityHelperTest extends TestCase
 
         $this->assertEquals($returnArray, AvailabilityHelper::calculateAvailabilitiesByDuration(1, $roomAvailabilities));
     }
+
+    public function testBuildDataForGetPackage()
+    {
+        $availabilities = ['1', '1', '1'];
+        $duration = 1;
+        $numberOfNights = 3;
+        $partnerId = '1234';
+        $isSellable = true;
+
+        $returnArray = [
+            'Availabilities' => $availabilities,
+            'PrestId' => 1,
+            'Duration' => $duration,
+            'LiheId' => 1,
+            'PartnerCode' => $partnerId,
+            'ExtraNight' => $isSellable,
+            'ExtraRoom' => $isSellable,
+        ];
+
+        $this->assertEquals(
+            $returnArray,
+            AvailabilityHelper::buildDataForGetPackage(
+                $availabilities,
+                $duration,
+                $numberOfNights,
+                $partnerId,
+                $isSellable
+            )
+        );
+    }
+
+    public function testBuildDataForGetPackageWithNoAvais()
+    {
+        $availabilities = [];
+        $duration = 1;
+        $numberOfNights = 3;
+        $partnerId = '1234';
+        $isSellable = true;
+
+        $returnArray = [
+            'Availabilities' => ['r', 'r', 'r'],
+            'PrestId' => 1,
+            'Duration' => $duration,
+            'LiheId' => 1,
+            'PartnerCode' => $partnerId,
+            'ExtraNight' => $isSellable,
+            'ExtraRoom' => $isSellable,
+        ];
+
+        $this->assertEquals(
+            $returnArray,
+            AvailabilityHelper::buildDataForGetPackage(
+                $availabilities,
+                $duration,
+                $numberOfNights,
+                $partnerId,
+                $isSellable
+            )
+        );
+    }
 }

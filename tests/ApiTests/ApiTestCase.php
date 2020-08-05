@@ -13,6 +13,7 @@ use App\Tests\ApiTests\Helper\ExperienceComponentHelper;
 use App\Tests\ApiTests\Helper\ExperienceHelper;
 use App\Tests\ApiTests\Helper\HealthCheckHelper;
 use App\Tests\ApiTests\Helper\PartnerHelper;
+use App\Tests\ApiTests\Helper\QuickDataHelper;
 use App\Tests\ApiTests\Helper\RoomAvailabilityHelper;
 use App\Tests\ApiTests\Helper\RoomPriceHelper;
 use JMS\Serializer\Serializer;
@@ -48,6 +49,8 @@ class ApiTestCase extends WebTestCase
     public static ExperienceComponentHelper $experienceComponentHelper;
 
     public static HealthCheckHelper $healthCheckHelper;
+
+    public static QuickDataHelper $quickDataHelper;
 
     public static ?string $baseUrl = null;
 
@@ -86,6 +89,7 @@ class ApiTestCase extends WebTestCase
         static::$boxExperienceHelper = new BoxExperienceHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$experienceComponentHelper = new ExperienceComponentHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$healthCheckHelper = new HealthCheckHelper(clone static::$client, static::$serializer, static::$baseUrl);
+        static::$quickDataHelper = new QuickDataHelper(clone static::$client, static::$serializer, static::$baseUrl);
     }
 
     /**

@@ -100,6 +100,8 @@ class AvailabilityProvider
             return [];
         }
 
+        $partner = $experience->partner;
+
         /** @var ExperienceComponent $experienceComponent */
         $experienceComponent = $experience->experienceComponent->first();
         $roomAvailabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesListByComponentGoldenId(
@@ -110,6 +112,11 @@ class AvailabilityProvider
         );
         $duration = $experienceComponent->component->duration ?: 1;
 
-        return AvailabilityHelper::calculateAvailabilitiesByDuration($duration, $roomAvailabilities);
+        return [
+            'duration' => $duration,
+            'isSellable' => $experienceComponent->component->isSellable,
+            'availabilities' => LegacyAvailabilityProvider::PARTNER === $partner->status ?
+                AvailabilityHelper::calculateAvailabilitiesByDuration($duration, $roomAvailabilities) : [],
+        ];
     }
 }
