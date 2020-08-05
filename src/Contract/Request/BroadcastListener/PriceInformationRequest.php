@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Contract\Request\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\PriceInformation\Price;
-use App\Contract\Request\BroadcastListener\PriceInformation\Product;
+use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use Clogger\ContextualInterface;
@@ -16,11 +16,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 class PriceInformationRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface
 {
     /**
-     * @Assert\Type(type="App\Contract\Request\BroadcastListener\PriceInformation\Product")
+     * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Product")
      * @Assert\NotBlank
      * @Assert\Valid
      *
-     * @JMS\Type("App\Contract\Request\BroadcastListener\PriceInformation\Product")
+     * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Product")
      */
     public Product $product;
 
@@ -54,7 +54,7 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
     public function getContext(): array
     {
         return [
-            'product' => $this->product,
+            'product' => $this->product->getContext(),
             'average_value' => $this->averageValue ? $this->averageValue->amount : '',
             'average_commission_type' => $this->averageCommissionType,
             'average_commission' => $this->averageCommission,

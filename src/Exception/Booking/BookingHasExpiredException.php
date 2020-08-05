@@ -9,5 +9,5 @@ use App\Exception\Http\UnprocessableEntityException;
 class BookingHasExpiredException extends UnprocessableEntityException
 {
     protected const MESSAGE = 'Booking has expired';
-    protected const CODE = 13000010;
+    protected const CODE = 1300010;
 }

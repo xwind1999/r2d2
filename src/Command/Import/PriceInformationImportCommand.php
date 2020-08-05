@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Command\Import;
 
 use App\Contract\Request\BroadcastListener\PriceInformation\Price;
-use App\Contract\Request\BroadcastListener\PriceInformation\Product;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
+use App\Contract\Request\BroadcastListener\Product\Product;
 
 class PriceInformationImportCommand extends AbstractImportCommand
 {

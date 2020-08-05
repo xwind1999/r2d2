@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Handler;
 
 use App\Contract\Request\BroadcastListener\PriceInformation\Price;
-use App\Contract\Request\BroadcastListener\PriceInformation\Product;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
+use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Exception\Manager\Experience\OutdatedExperiencePriceException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Handler\PriceInformationBroadcastHandler;

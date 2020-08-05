@@ -8,6 +8,7 @@ use App\Entity\RoomAvailability;
 use App\Exception\Repository\RoomAvailabilityNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query\QueryException;
 
 /**
  * @method null|RoomAvailability find($id, $lockMode = null, $lockVersion = null)
@@ -93,5 +94,28 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         ;
 
         return $qb->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @return RoomAvailability[]
+     *
+     * @throws QueryException
+     */
+    public function findByComponentAndDateRange(
+        string $componentGoldenId,
+        \DateTime $dateFrom,
+        \DateTime $dateTo
+    ): array {
+        $qb = $this->createQueryBuilder('ra');
+        $qb
+            ->where('ra.componentGoldenId = :componentGoldenId')
+            ->andWhere('ra.date BETWEEN :dateFrom AND :dateTo')
+            ->setParameter('componentGoldenId', $componentGoldenId)
+            ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
+            ->setParameter('dateTo', $dateTo->format('Y-m-d'))
+            ->indexBy('ra', 'ra.date')
+        ;
+
+        return $qb->getQuery()->getResult();
     }
 }

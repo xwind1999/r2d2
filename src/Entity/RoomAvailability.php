@@ -50,4 +50,9 @@ class RoomAvailability
      * @ORM\Column(type="string", length=10)
      */
     public string $type;
+
+    /**
+     * @ORM\Column(type="datetime_milliseconds", nullable=true)
+     */
+    public ?\DateTime $externalUpdatedAt = null;
 }

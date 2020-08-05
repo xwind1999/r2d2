@@ -109,6 +109,22 @@ framework:
                         type: direct
                         default_publish_routing_key: failed-broadcast-listeners
 
+            broadcast-listeners-room-availability:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        broadcast-listeners-room-availability:
+                            binding_keys: [broadcast-listeners-room-availability]
+                            arguments:
+                                x-queue-type: quorum
+                    exchange:
+                        type: direct
+                        default_publish_routing_key: broadcast-listeners-room-availability
+                retry_strategy:
+                    max_retries: 10
+                    delay: 120000
+                    multiplier: 2
+
 
         routing:
             # Route your messages to the transports
@@ -116,5 +132,6 @@ framework:
             'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
             'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
+            'App\Contract\Request\BroadcastListener\RoomAvailabilityRequest': broadcast-listeners-room-availability
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
             'App\Contract\Request\EAI\RoomRequest': push-room-information

@@ -5,7 +5,8 @@
             "src"
         ],
         "excludes": [
-            "src/Kernel.php"
+            "src/Kernel.php",
+            "src/DataFixtures/*"
         ]
     },
     "logs": {
