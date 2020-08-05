@@ -11,6 +11,7 @@ use App\Contract\Response\CMHub\GetAvailabilityResponse;
 use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
+use App\Entity\Partner;
 use App\Manager\ComponentManager;
 use App\Manager\ExperienceManager;
 use App\Manager\RoomAvailabilityManager;
@@ -238,6 +239,7 @@ class AvailabilityProviderTest extends TestCase
 
         $component = new Component();
         $component->duration = 1;
+        $component->isSellable = true;
         $experienceComponent = new ExperienceComponent();
         $experienceComponent->component = $component;
         $experienceComponent->componentGoldenId = '1234';
@@ -245,6 +247,9 @@ class AvailabilityProviderTest extends TestCase
         $collection->add($experienceComponent);
         $experience = new Experience();
         $experience->experienceComponent = $collection;
+        $partner = new Partner();
+        $partner->status = 'partner';
+        $experience->partner = $partner;
 
         $this->roomAvailabilityManager->getRoomAvailabilitiesListByComponentGoldenId(
             '1234', 'stock', $dateFrom, $dateTo
@@ -274,7 +279,11 @@ class AvailabilityProviderTest extends TestCase
                 ]
             );
 
-        $expectedArray = ['1', '1', 'r', '1'];
+        $expectedArray = [
+            'duration' => 1,
+            'isSellable' => true,
+            'availabilities' => ['1', '1', 'r', '1'],
+        ];
 
         $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo));
     }

@@ -11,6 +11,7 @@ use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataErrorResponse;
 use App\Entity\Experience;
 use App\Entity\Partner;
+use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceManager;
 use App\Provider\AvailabilityProvider;
 use App\Provider\LegacyAvailabilityProvider;
@@ -61,20 +62,36 @@ class LegacyAvailabilityProviderTest extends TestCase
      */
     public function testGetAvailabilityForExperience()
     {
-        $experienceId = 1234;
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
+        $experience = new Experience();
+        $experience->goldenId = '1234';
+        $partner = new Partner();
+        $partner->goldenId = '4321';
+        $partner->isChannelManagerActive = false;
+        $partner->status = 'partner';
+        $experience->partner = $partner;
 
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
+        $result = $this->prophesize(GetPackageResponse::class);
+
+        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
+            $this->quickData->reveal(),
             $this->serializer->reveal(),
             $this->experienceManager->reveal(),
             $this->availabilityProvider->reveal()
         );
 
-        $result = $this->prophesize(GetPackageResponse::class);
-        $this->quickData->getPackage($experienceId, $dateFrom, $dateTo)->willReturn([]);
-        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
-        $response = $legacyAvailabilityProvider->getAvailabilityForExperience($experienceId, $dateFrom, $dateTo);
+        $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
+        $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn([
+                'duration' => 1,
+                'isSellable' => true,
+                'availabilities' => ['1', 'r', '1'],
+            ]);
+
+        $response = $legacyAvailabilityProvider->getAvailabilityForExperience(1234, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageResponse::class, $response);
     }
@@ -90,31 +107,22 @@ class LegacyAvailabilityProviderTest extends TestCase
         $experience = new Experience();
         $experience->goldenId = '1234';
         $partner = new Partner();
+        $partner->goldenId = '4321';
         $partner->isChannelManagerActive = false;
         $partner->status = 'not_partner';
         $experience->partner = $partner;
 
         $result = $this->prophesize(GetPackageResponse::class);
 
-        $this->quickData->getPackage((int) $experience->goldenId, $dateFrom, $dateTo)->willReturn([
-            'ListPrestation' => [
-                [
-                    'Availabilities' => [
-                        ['1', 'r', '0'],
-                    ],
-                    'PrestId' => 2896684,
-                    'Duration' => 1,
-                    'LiheId' => 15257,
-                    'PartnerCode' => '00100901',
-                    'ExtraNight' => true,
-                    'ExtraRoom' => true,
-                ],
-            ],
-        ]);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+
         $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
         $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(Argument::any(), Argument::any(), Argument::any())
-            ->willReturn(['1', 'r', 's']);
+            ->willReturn([
+                'duration' => 1,
+                'isSellable' => true,
+                'availabilities' => ['1', 'r', '1'],
+            ]);
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
@@ -138,31 +146,21 @@ class LegacyAvailabilityProviderTest extends TestCase
         $experience = new Experience();
         $experience->goldenId = '1234';
         $partner = new Partner();
+        $partner->goldenId = '4321';
         $partner->isChannelManagerActive = true;
         $partner->status = 'partner';
         $experience->partner = $partner;
 
         $result = $this->prophesize(GetPackageResponse::class);
 
-        $this->quickData->getPackage((int) $experience->goldenId, $dateFrom, $dateTo)->willReturn([
-            'ListPrestation' => [
-                [
-                    'Availabilities' => [
-                        ['1', 'r', '0'],
-                    ],
-                    'PrestId' => 2896684,
-                    'Duration' => 1,
-                    'LiheId' => 15257,
-                    'PartnerCode' => '00100901',
-                    'ExtraNight' => true,
-                    'ExtraRoom' => true,
-                ],
-            ],
-        ]);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
         $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
         $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(Argument::any(), Argument::any(), Argument::any())
-            ->willReturn(['1', 'r', 's']);
+            ->willReturn([
+                'duration' => 1,
+                'isSellable' => true,
+                'availabilities' => ['1', 'r', '1'],
+            ]);
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
@@ -186,30 +184,21 @@ class LegacyAvailabilityProviderTest extends TestCase
         $experience = new Experience();
         $experience->goldenId = '1234';
         $partner = new Partner();
+        $partner->goldenId = '4321';
+        $partner->status = 'partner';
         $partner->isChannelManagerActive = false;
         $experience->partner = $partner;
 
         $result = $this->prophesize(GetPackageResponse::class);
 
-        $this->quickData->getPackage((int) $experience->goldenId, $dateFrom, $dateTo)->willReturn([
-            'ListPrestation' => [
-                [
-                ],
-                [
-                    'Availabilities' => [
-                        ['1', 'r', '0'],
-                    ],
-                    'PrestId' => 2896684,
-                    'Duration' => 1,
-                    'LiheId' => 15257,
-                    'PartnerCode' => '00100901',
-                    'ExtraNight' => true,
-                    'ExtraRoom' => true,
-                ],
-            ],
-        ]);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
         $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
+        $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn([
+                'duration' => 1,
+                'isSellable' => true,
+                'availabilities' => ['1', 'r', '1'],
+            ]);
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
@@ -225,30 +214,26 @@ class LegacyAvailabilityProviderTest extends TestCase
      * @covers ::__construct
      * @covers ::getAvailabilityForExperience
      */
-    public function testGetAvailabilityForExperienceWillFailDueToHttpError()
+    public function testGetAvailabilityForExperienceWithNoExperienceExist()
     {
-        $experienceId = 1234;
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
+        $result = $this->prophesize(QuickDataErrorResponse::class);
+        $result->httpCode = 400;
+
+        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+
+        $this->experienceManager->getOneByGoldenId(Argument::any())
+            ->shouldBeCalledOnce()
+            ->willThrow(ExperienceNotFoundException::class);
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
             $this->experienceManager->reveal(),
             $this->availabilityProvider->reveal()
         );
 
-        $result = $this->prophesize(QuickDataErrorResponse::class);
-        $responseInterface = $this->prophesize(ResponseInterface::class);
-        $exception = $this->prophesize(HttpExceptionInterface::class);
-        $this->quickData->getPackage($experienceId, $dateFrom, $dateTo)->willThrow($exception->reveal());
-        $exception->getResponse()->willReturn($responseInterface->reveal());
-        $responseInterface->getStatusCode()->willReturn(405);
-        $responseInterface->toArray(false)->willReturn([]);
-
-        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
-        $response = $legacyAvailabilityProvider->getAvailabilityForExperience($experienceId, $dateFrom, $dateTo);
-
-        $this->assertInstanceOf(QuickDataErrorResponse::class, $response);
+        $legacyAvailabilityProvider->getAvailabilityForExperience(31209470194830912, $dateFrom, $dateTo);
     }
 
     /**

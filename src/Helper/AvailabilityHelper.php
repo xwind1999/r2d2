@@ -17,9 +17,31 @@ class AvailabilityHelper
         return $availabilities;
     }
 
+    public static function buildDataForGetPackage(
+        array $availabilities,
+        int $duration,
+        int $numberOfNights,
+        string $partnerId,
+        bool $isSellable
+    ): array {
+        if (empty($availabilities)) {
+            $availabilities = array_fill(0, $numberOfNights, 'r');
+        }
+
+        return [
+            'Availabilities' => $availabilities,
+            'PrestId' => 1,
+            'Duration' => $duration,
+            'LiheId' => 1,
+            'PartnerCode' => $partnerId,
+            'ExtraNight' => $isSellable,
+            'ExtraRoom' => $isSellable,
+        ];
+    }
+
     public static function convertAvailableValueToRequest(string $availability): string
     {
-        return ('Available' == $availability) ? 'Request' : $availability;
+        return ('Available' === $availability) ? 'Request' : $availability;
     }
 
     public static function mapRoomAvailabilitiesToExperience(
