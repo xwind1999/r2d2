@@ -8,6 +8,8 @@ use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
+use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
+use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
@@ -109,6 +111,7 @@ class BroadcastListenerController
      *     response=202,
      *     description="Price information handled")
      * )
+     * @Security(name="basic")
      */
     public function priceInformationListener(
         Request $request,
@@ -118,6 +121,38 @@ class BroadcastListenerController
         $priceInformationRequest->updatedAt = $this->getBroadcastDateTimeFromRequest($request);
 
         $messageBus->dispatch($priceInformationRequest);
+
+        return new Response(null, 202);
+    }
+
+    /**
+     * @Route("/broadcast-listener/room-availability", methods={"POST"}, format="json")
+     *
+     * @SWG\Tag(name="broadcast-listener")
+     * @SWG\Parameter(
+     *    name="body",
+     *    in="body",
+     *    @SWG\Schema(
+     *        type="array",
+     *        @SWG\Items(
+     *            ref=@Model(type=RoomAvailabilityRequest::class)
+     *        )
+     *    )
+     * )
+     *
+     * @SWG\Response(
+     *     response=202,
+     *     description="Room availability handled")
+     * )
+     * @Security(name="basic")
+     */
+    public function roomAvailabilityListener(
+        RoomAvailabilityRequestList $roomAvailabilityRequestList,
+        MessageBusInterface $messageBus
+    ): Response {
+        foreach ($roomAvailabilityRequestList->items as $roomAvailabilityRequest) {
+            $messageBus->dispatch($roomAvailabilityRequest);
+        }
 
         return new Response(null, 202);
     }

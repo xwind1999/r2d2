@@ -38,4 +38,12 @@ class BroadcastListenerApiTest extends ApiTestCase
 
         return $response->getStatusCode();
     }
+
+    public function testHandleRoomAvailability(): int
+    {
+        $response = self::$broadcastListenerHelper->testRoomAvailability();
+        $this->assertEquals(202, $response->getStatusCode());
+
+        return $response->getStatusCode();
+    }
 }

@@ -7,6 +7,7 @@ namespace App\Contract\Request\Internal\RoomAvailability;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use JMS\Serializer\Annotation as JMS;
+use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class RoomAvailabilityCreateRequest implements RequestBodyInterface, ValidatableRequest
@@ -31,6 +32,7 @@ class RoomAvailabilityCreateRequest implements RequestBodyInterface, Validatable
     /**
      * @Assert\Type(type="DateTime")
      * @Assert\NotBlank
+     * @SWG\Property(example="2020-07-20")
      *
      * @JMS\Type("DateTime<'Y-m-d'>")
      */

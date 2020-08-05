@@ -71,7 +71,7 @@ class ProductRelationshipBroadcastHandlerTest extends TestCase
      * @covers ::__construct
      * @covers ::__invoke
      */
-    public function testHandlerMessageThrowsNonExistentTypeResolverExcepetion(): void
+    public function testHandlerMessageThrowsNonExistentTypeResolverException(): void
     {
         $parentProduct = '860eb3100e3689e57b5d9772';
         $childProduct = 'cde730104afb457781d05436';

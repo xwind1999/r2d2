@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Manager;
 
 use App\Contract\Request\BroadcastListener\PriceInformation\Price;
-use App\Contract\Request\BroadcastListener\PriceInformation\Product;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
+use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Internal\Experience\ExperienceCreateRequest;
 use App\Contract\Request\Internal\Experience\ExperienceUpdateRequest;

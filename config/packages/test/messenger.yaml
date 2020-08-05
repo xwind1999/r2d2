@@ -59,6 +59,15 @@ framework:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: failed-broadcast-listeners
+
+            broadcast-listeners-room-availability:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: broadcast-listeners-room-availability
+                retry_strategy:
+                    max_retries: 10
+                    delay: 60000
+                    multiplier: 2
         # sync: 'sync://'
 
         routing:
@@ -67,5 +76,6 @@ framework:
             'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
             'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
+            'App\Contract\Request\BroadcastListener\RoomAvailabilityRequest': broadcast-listeners-room-availability
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
             'App\Contract\Request\EAI\RoomRequest': push-room-information
