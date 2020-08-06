@@ -29,26 +29,26 @@ class RoomAvailabilityRequest implements ContextualInterface
 
     /**
      * @Assert\Type(type="DateTime")
-     * @SWG\Property(example="2020-07-16")
+     * @SWG\Property(example="2020-07-16T20:00:00.000000+0000")
      * @Assert\NotBlank
-     * @JMS\Type("DateTime<'Y-m-d'>")
+     * @JMS\Type("DateTime<'Y-m-d\TH:i:s.uP'>")
      */
     public \DateTime $dateFrom;
 
     /**
      * @Assert\Type(type="DateTime")
-     * @SWG\Property(example="2020-07-20")
+     * @SWG\Property(example="2020-07-20T20:00:00.000000+0000")
      * @Assert\NotBlank
-     * @JMS\Type("DateTime<'Y-m-d'>")
+     * @JMS\Type("DateTime<'Y-m-d\TH:i:s.uP'>")
      */
     public \DateTime $dateTo;
 
     /**
      * @Assert\Type(type="DateTime")
-     * @SWG\Property(example="2020-07-20 17:58:32")
-     * @JMS\Type("DateTime<'Y-m-d H:i:s'>")
+     * @SWG\Property(example="2020-07-20T17:58:32.000000+0000")
+     * @JMS\Type("DateTime<'Y-m-d\TH:i:s.uP'>")
      */
-    public ?\DateTime $dateTimeUpdated = null;
+    public ?\DateTime $updatedAt = null;
 
     public function getContext(): array
     {
@@ -57,7 +57,7 @@ class RoomAvailabilityRequest implements ContextualInterface
             'quantity' => $this->quantity,
             'dateFrom' => $this->dateFrom,
             'dateTo' => $this->dateTo,
-            'dateTimeUpdated' => $this->dateTimeUpdated ? $this->dateTimeUpdated->format('Y-m-d H:i:s') : null,
+            'updatedAt' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
         ];
     }
 }

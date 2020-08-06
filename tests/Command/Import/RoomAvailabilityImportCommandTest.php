@@ -47,7 +47,7 @@ class RoomAvailabilityImportCommandTest extends AbstractImportCommandTest
                 'quantity' => 1,
                 'dateFrom' => '2020-01-01',
                 'dateTo' => '2020-01-02',
-                'dateTimeUpdated' => '2020-01-01 00:00:00',
+                'updatedAt' => '2020-01-01 00:00:00',
             ],
         ]);
 
@@ -59,7 +59,7 @@ class RoomAvailabilityImportCommandTest extends AbstractImportCommandTest
                 'quantity' => 1,
                 'dateFrom' => '2020-01-01',
                 'dateTo' => '2020-01-02',
-                'dateTimeUpdated' => null,
+                'updatedAt' => null,
             ],
         ]);
 
@@ -74,7 +74,7 @@ class RoomAvailabilityImportCommandTest extends AbstractImportCommandTest
                 'quantity' => null,
                 'dateFrom' => '2020-01-02',
                 'dateTo' => '2020-01-02',
-                'dateTimeUpdated' => '2020-01-01 00:00:00',
+                'updatedAt' => '2020-01-01 00:00:00',
             ],
         ]);
 

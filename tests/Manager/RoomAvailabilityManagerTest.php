@@ -233,9 +233,9 @@ class RoomAvailabilityManagerTest extends TestCase
         $roomAvailabilityRequest->product = new Product();
         $roomAvailabilityRequest->product->id = $component->goldenId;
         $roomAvailabilityRequest->quantity = 5;
-        $roomAvailabilityRequest->dateFrom = new \DateTime('+10 days');
+        $roomAvailabilityRequest->dateFrom = new \DateTime('2019-03-20T20:00:00.000000+0000');
         $roomAvailabilityRequest->dateTo = (clone $roomAvailabilityRequest->dateFrom)->modify('+3 days');
-        $roomAvailabilityRequest->dateTimeUpdated = new \DateTime('now');
+        $roomAvailabilityRequest->updatedAt = new \DateTime('now');
 
         $roomAvailabilityExistent = new RoomAvailability();
         $roomAvailabilityExistent->uuid = Uuid::uuid4();
@@ -276,7 +276,7 @@ class RoomAvailabilityManagerTest extends TestCase
             }),
             (function ($roomAvailabilityRequest) {
                 $roomAvailabilityRequest->quantity = random_int(0, 9) < 2 ? 0 : 1;
-                $roomAvailabilityRequest->dateTimeUpdated->modify('now');
+                $roomAvailabilityRequest->updatedAt->modify('now');
 
                 return $roomAvailabilityRequest;
             })(clone $roomAvailabilityRequest),
@@ -372,7 +372,7 @@ class RoomAvailabilityManagerTest extends TestCase
             }),
             (function ($roomAvailabilityRequest) {
                 $roomAvailabilityRequest->product->id = '998877665';
-                $roomAvailabilityRequest->dateTimeUpdated = new \DateTime('-2 month');
+                $roomAvailabilityRequest->updatedAt = new \DateTime('-2 month');
 
                 return $roomAvailabilityRequest;
             })(clone $roomAvailabilityRequest),

@@ -50,7 +50,7 @@ class RoomAvailabilityBroadcastHandlerTest extends TestCase
         $roomAvailabilityRequest->dateFrom = new \DateTime('+9 days');
         $roomAvailabilityRequest->dateTo = new \DateTime('+13 days');
         $roomAvailabilityRequest->quantity = 3;
-        $roomAvailabilityRequest->dateTimeUpdated = new \DateTime('-3 days');
+        $roomAvailabilityRequest->updatedAt = new \DateTime('-3 days');
 
         yield 'broadcast-happy-days' => [
             clone $roomAvailabilityRequest,
