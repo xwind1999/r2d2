@@ -131,4 +131,12 @@ class PriceInformationBroadcastHandlerTest extends TestCase
 
         yield [$priceInformationRequest, $priceInformationRequestAmount];
     }
+
+    /**
+     * @covers \App\Contract\Request\BroadcastListener\PriceInformationRequest::getEventName
+     */
+    public function testPriceInformationEventName(): void
+    {
+        $this->assertEquals('Price broadcast', (new PriceInformationRequest())->getEventName());
+    }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Helper\Newrelic;
+namespace App\Messenger;
 
 use Ekino\NewRelicBundle\NewRelic\NewRelicInteractorInterface;
 use Symfony\Component\Messenger\Envelope;

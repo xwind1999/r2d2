@@ -138,4 +138,5 @@ framework:
         buses:
             default:
                 middleware:
-                    - App\Helper\Newrelic\NewrelicMessengerMiddleware
+                    - App\Messenger\NewrelicMessengerMiddleware
+                    - App\Messenger\MessengerLoggerMiddleware

@@ -97,4 +97,12 @@ class ProductRelationshipBroadcastHandlerTest extends TestCase
 
         $this->assertEquals(null, $productRelationshipBroadcastHandler->__invoke($relationshipRequest));
     }
+
+    /**
+     * @covers \App\Contract\Request\BroadcastListener\ProductRelationshipRequest::getEventName
+     */
+    public function testProductRelationshipEventName(): void
+    {
+        $this->assertEquals('Product relationship broadcast', (new ProductRelationshipRequest())->getEventName());
+    }
 }

@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Contract\Request\BroadcastListener;
 
+use App\Event\NamedEventInterface;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use Clogger\ContextualInterface;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class PartnerRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface
+class PartnerRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface, NamedEventInterface
 {
+    private const EVENT_NAME = 'Partner broadcast';
+
     /**
      * @Assert\Type(type="string")
      * @Assert\Length(min="1", max="45")
@@ -66,5 +69,10 @@ class PartnerRequest implements RequestBodyInterface, ValidatableRequest, Contex
             'partner_cease_date' => $this->partnerCeaseDate ? $this->partnerCeaseDate->format('Y-m-d H:i:s') : null,
             'updated_at' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
         ];
+    }
+
+    public function getEventName(): string
+    {
+        return static::EVENT_NAME;
     }
 }
