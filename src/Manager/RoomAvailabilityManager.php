@@ -126,7 +126,7 @@ class RoomAvailabilityManager
             foreach ($datePeriod as $date) {
                 $roomAvailability = $roomAvailabilityList[$date->format('Y-m-d')] ?? new RoomAvailability();
                 if ($roomAvailability->externalUpdatedAt &&
-                    $roomAvailabilityRequest->dateTimeUpdated < $roomAvailability->externalUpdatedAt) {
+                    $roomAvailabilityRequest->updatedAt < $roomAvailability->externalUpdatedAt) {
                     $this->logger->warning(OutdatedRoomAvailabilityInformationException::class, $roomAvailabilityRequest->getContext());
                     continue;
                 }
@@ -136,7 +136,7 @@ class RoomAvailabilityManager
                 $roomAvailability->stock = $roomAvailabilityRequest->quantity;
                 $roomAvailability->date = $date;
                 $roomAvailability->type = $component->roomStockType;
-                $roomAvailability->externalUpdatedAt = $roomAvailabilityRequest->dateTimeUpdated ?? null;
+                $roomAvailability->externalUpdatedAt = $roomAvailabilityRequest->updatedAt ?? null;
 
                 $this->repository->save($roomAvailability);
             }

@@ -16,7 +16,7 @@ class RoomAvailabilityImportCommand extends AbstractImportCommand
         'quantity',
         'dateFrom',
         'dateTo',
-        'dateTimeUpdated',
+        'updatedAt',
     ];
 
     protected function configure(): void
@@ -37,8 +37,8 @@ class RoomAvailabilityImportCommand extends AbstractImportCommand
             $roomAvailabilityRequest->dateFrom = new \DateTime($record['dateFrom']);
             $roomAvailabilityRequest->dateTo = new \DateTime($record['dateTo']);
 
-            if (!empty($record['dateTimeUpdated'])) {
-                $roomAvailabilityRequest->dateTimeUpdated = new \DateTime($record['dateTimeUpdated']);
+            if (!empty($record['updatedAt'])) {
+                $roomAvailabilityRequest->updatedAt = new \DateTime($record['updatedAt']);
             }
             $errors = $this->validator->validate($roomAvailabilityRequest);
             if ($errors->count() > 0) {

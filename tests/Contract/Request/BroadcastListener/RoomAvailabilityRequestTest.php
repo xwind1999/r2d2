@@ -30,7 +30,7 @@ class RoomAvailabilityRequestTest extends TestCase
             $roomAvailabilityRequest->quantity = $request['quantity'];
             $roomAvailabilityRequest->dateFrom = $request['dateFrom'];
             $roomAvailabilityRequest->dateTo = $request['dateTo'];
-            $roomAvailabilityRequest->dateTimeUpdated = $request['dateTimeUpdated'];
+            $roomAvailabilityRequest->updatedAt = $request['updatedAt'];
             $roomAvailabilityRequest = $roomAvailabilityRequest->getContext();
         }
 
@@ -50,7 +50,7 @@ class RoomAvailabilityRequestTest extends TestCase
                 'quantity' => 2,
                 'dateFrom' => new \DateTime('+2 days'),
                 'dateTo' => new \DateTime('+5 days'),
-                'dateTimeUpdated' => new \DateTime('-2 days'),
+                'updatedAt' => new \DateTime('-2 days'),
             ],
         ];
 
@@ -61,7 +61,7 @@ class RoomAvailabilityRequestTest extends TestCase
                 $test->assertEquals($request['dateFrom'], $roomAvailabilityRequest['dateFrom']);
                 $test->assertEquals($request['dateTo'], $roomAvailabilityRequest['dateTo']);
                 $test->assertEquals($request['quantity'], $roomAvailabilityRequest['quantity']);
-                $test->assertEquals($request['dateTimeUpdated']->format('Y-m-d H:i:s'), $roomAvailabilityRequest['dateTimeUpdated']);
+                $test->assertEquals($request['updatedAt']->format('Y-m-d H:i:s'), $roomAvailabilityRequest['updatedAt']);
             }),
         ];
 
@@ -75,7 +75,7 @@ class RoomAvailabilityRequestTest extends TestCase
                     'quantity' => 3,
                     'dateFrom' => (new \DateTime('+5 days'))->format('Y-m-d'),
                     'dateTo' => (new \DateTime('+7 days'))->format('Y-m-d'),
-                    'dateTimeUpdated' => new \DateTime('-3 days'),
+                    'updatedAt' => new \DateTime('-3 days'),
                 ];
 
                 return $requestList;
@@ -86,7 +86,7 @@ class RoomAvailabilityRequestTest extends TestCase
 
         yield 'updated-at-as-null' => [
             (function ($requestList) {
-                $requestList[0]['dateTimeUpdated'] = null;
+                $requestList[0]['updatedAt'] = null;
 
                 return $requestList;
             })($requestList),
@@ -95,13 +95,13 @@ class RoomAvailabilityRequestTest extends TestCase
                 $test->assertEquals($request['dateFrom'], $roomAvailabilityRequest['dateFrom']);
                 $test->assertEquals($request['dateTo'], $roomAvailabilityRequest['dateTo']);
                 $test->assertEquals($request['quantity'], $roomAvailabilityRequest['quantity']);
-                $test->assertEquals($request['dateTimeUpdated'], $roomAvailabilityRequest['dateTimeUpdated']);
+                $test->assertEquals($request['updatedAt'], $roomAvailabilityRequest['updatedAt']);
             }),
         ];
 
         yield 'updated-at-as-string' => [
             (function ($requestList) {
-                $requestList[0]['dateTimeUpdated'] = (new \DateTime('yesterday'))->format('Y-m-d H:i:s');
+                $requestList[0]['updatedAt'] = (new \DateTime('yesterday'))->format('Y-m-d H:i:s');
 
                 return $requestList;
             })($requestList),

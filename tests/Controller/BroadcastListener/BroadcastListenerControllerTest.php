@@ -162,7 +162,7 @@ class BroadcastListenerControllerTest extends TestCase
         $roomAvailabilityRequest->quantity = 2;
         $roomAvailabilityRequest->dateFrom = new \DateTime('+5 days');
         $roomAvailabilityRequest->dateTo = new \DateTime('+8 days');
-        $roomAvailabilityRequest->dateTimeUpdated = new \DateTime('now');
+        $roomAvailabilityRequest->updatedAt = new \DateTime('now');
 
         $roomAvailabilityRequest2 = (clone $roomAvailabilityRequest);
         $roomAvailabilityRequest2->product->id = '218439';
