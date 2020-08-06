@@ -4,33 +4,17 @@ services:
     Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware: ~
     Clogger\Middleware\Exception\StackTraceMiddleware: ~
     App\Helper\Logger\LoggableEventMiddleware: ~
-    App\Helper\Logger\ContextMessageNormalizer: ~
-    App\Helper\Logger\Messenger\MessageNormalizer: ~
 
     Clogger\MiddlewareStack:
         arguments:
             - '@Clogger\Middleware\Context\ContextMiddleware'
-            - '@App\Helper\Logger\ContextMessageNormalizer'
             - '@App\Helper\Logger\LoggableEventMiddleware'
             - '@Clogger\Middleware\Exception\StackTraceMiddleware'
             - '@Clogger\Middleware\Exception\ExceptionCodeMiddleware'
             - '@Clogger\Middleware\Exception\ExceptionSimpleMessageMiddleware'
-
-    clogger.messenger.middlewarestack:
-        class: Clogger\MiddlewareStack
-        arguments:
-            - '@App\Helper\Logger\ContextMessageNormalizer'
-            - '@App\Helper\Logger\Messenger\MessageNormalizer'
 
     logger:
         class: Clogger\Clogger
         arguments:
             - '@monolog.logger'
             - '@Clogger\MiddlewareStack'
-
-    clogger.messenger:
-        class: Clogger\Clogger
-        decorates: 'monolog.logger.messenger'
-        arguments:
-            - '@clogger.messenger.inner'
-            - '@clogger.messenger.middlewarestack'

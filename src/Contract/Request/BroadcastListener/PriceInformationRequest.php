@@ -6,6 +6,7 @@ namespace App\Contract\Request\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\PriceInformation\Price;
 use App\Contract\Request\BroadcastListener\Product\Product;
+use App\Event\NamedEventInterface;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use Clogger\ContextualInterface;
@@ -13,8 +14,10 @@ use JMS\Serializer\Annotation as JMS;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class PriceInformationRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface
+class PriceInformationRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface, NamedEventInterface
 {
+    private const EVENT_NAME = 'Price broadcast';
+
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Product")
      * @Assert\NotBlank
@@ -60,5 +63,10 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
             'average_commission' => $this->averageCommission,
             'updated_at' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
         ];
+    }
+
+    public function getEventName(): string
+    {
+        return static::EVENT_NAME;
     }
 }

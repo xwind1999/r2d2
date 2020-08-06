@@ -135,3 +135,9 @@ framework:
             'App\Contract\Request\BroadcastListener\RoomAvailabilityRequest': broadcast-listeners-room-availability
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
             'App\Contract\Request\EAI\RoomRequest': push-room-information
+
+        buses:
+            default:
+                middleware:
+                    - App\Messenger\NewrelicMessengerMiddleware
+                    - App\Messenger\MessengerLoggerMiddleware

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Helper\Newrelic;
+namespace App\Tests\Messenger;
 
-use App\Helper\Newrelic\NewrelicMessengerMiddleware;
+use App\Messenger\NewrelicMessengerMiddleware;
 use Ekino\NewRelicBundle\NewRelic\NewRelicInteractorInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;

@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Contract\Request\EAI;
 
 use App\Entity\Component;
+use App\Event\NamedEventInterface;
 use Smartbox\CDM\Entity\Partner\Partner;
 use Smartbox\CDM\Entity\Product\Product;
 use Smartbox\CDM\Entity\Product\RoomTypeProduct;
 
-class RoomRequest extends RoomTypeProduct
+class RoomRequest extends RoomTypeProduct implements NamedEventInterface
 {
+    private const EVENT_NAME = 'Push Rooms to EAI';
+
     public static function transformFromComponent(Component $component): self
     {
         $product = new Product();
@@ -48,5 +51,10 @@ class RoomRequest extends RoomTypeProduct
             'component_description' => $this->getProduct()->getDescription() ?? '',
             'component_room_stock_type' => $this->getProduct()->getRoomStockType() ?? '',
         ];
+    }
+
+    public function getEventName(): string
+    {
+        return static::EVENT_NAME;
     }
 }

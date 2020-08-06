@@ -12,14 +12,17 @@ use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Entity\Component;
 use App\Entity\ExperienceComponent;
+use App\Event\NamedEventInterface;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use Clogger\ContextualInterface;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class ProductRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface
+class ProductRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface, NamedEventInterface
 {
+    private const EVENT_NAME = 'Product broadcast';
+
     /**
      * @Assert\Type(type="string")
      * @Assert\Length(min="1", max="45")
@@ -287,5 +290,10 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
             'list_price' => $this->listPrice ? $this->listPrice->getContext() : null,
             'updated_at' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
         ];
+    }
+
+    public function getEventName(): string
+    {
+        return static::EVENT_NAME;
     }
 }

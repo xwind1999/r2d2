@@ -49,4 +49,9 @@ class RoomRequestTest extends TestCase
         $this->assertEquals($result->getProduct()->getRoomStockType(), $component->roomStockType);
         $this->assertEquals($result->getContext(), $expectedContext);
     }
+
+    public function testGetEventName(): void
+    {
+        $this->assertEquals('Push Rooms to EAI', (new RoomRequest())->getEventName());
+    }
 }

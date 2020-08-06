@@ -4,4 +4,4 @@ monolog:
             type: stream
             path: "%kernel.logs_dir%/%env(LOG_FILE)%"
             formatter: Monolog\Formatter\LogstashFormatter
-            channels: ['app', 'messenger', 'php', 'request', 'console']
+            channels: ['app', 'php', 'request', 'console']

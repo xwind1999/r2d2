@@ -85,4 +85,12 @@ class PartnerBroadcastHandlerTest extends TestCase
         $this->expectException(OutdatedPartnerException::class);
         $this->assertEmpty($partnerBroadcastHandler->__invoke($partnerRequest));
     }
+
+    /**
+     * @covers \App\Contract\Request\BroadcastListener\PartnerRequest::getEventName
+     */
+    public function testPartnerEventName(): void
+    {
+        $this->assertEquals('Partner broadcast', (new PartnerRequest())->getEventName());
+    }
 }

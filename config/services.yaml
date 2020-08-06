@@ -62,6 +62,10 @@ services:
         resource: '../src/EventSubscriber'
         tags: ['kernel.event_subscriber']
 
+    App\Messenger\EventListener\MessengerEventsListener:
+        class: App\Messenger\EventListener\MessengerEventsListener
+        tags: ['kernel.event_subscriber']
+
     Nelmio\ApiDocBundle\ApiDocGenerator: '@nelmio_api_doc.generator.default'
 
     Gedmo\Timestampable\TimestampableListener:

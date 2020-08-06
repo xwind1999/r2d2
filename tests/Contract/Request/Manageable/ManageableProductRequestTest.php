@@ -169,4 +169,9 @@ class ManageableProductRequestTest extends TestCase
             $manageableProductRequest->getPartnerRequest()
         );
     }
+
+    public function testGetEventName(): void
+    {
+        $this->assertEquals('Calculate Manageable Product', (new ManageableProductRequest())->getEventName());
+    }
 }

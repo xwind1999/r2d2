@@ -103,4 +103,12 @@ class ProductBroadcastHandlerTest extends TestCase
 
         $this->assertEquals(null, $productBroadcastHandler->__invoke($productRequest));
     }
+
+    /**
+     * @covers \App\Contract\Request\BroadcastListener\ProductRequest::getEventName
+     */
+    public function testProductEventName(): void
+    {
+        $this->assertEquals('Product broadcast', (new ProductRequest())->getEventName());
+    }
 }

@@ -7,11 +7,14 @@ namespace App\Contract\Request\Manageable;
 use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
+use App\Event\NamedEventInterface;
 use Clogger\ContextualInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ManageableProductRequest extends Event implements ContextualInterface
+class ManageableProductRequest extends Event implements ContextualInterface, NamedEventInterface
 {
+    private const EVENT_NAME = 'Calculate Manageable Product';
+
     public string $boxGoldenId = '';
     public string $componentGoldenId = '';
     public string $experienceGoldenId = '';
@@ -58,5 +61,10 @@ class ManageableProductRequest extends Event implements ContextualInterface
             'experience_golden_id' => $this->experienceGoldenId,
             'partner_golden_id' => $this->partnerGoldenId,
         ];
+    }
+
+    public function getEventName(): string
+    {
+        return static::EVENT_NAME;
     }
 }
