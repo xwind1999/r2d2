@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contract\Request\BroadcastListener;
 
-use App\Contract\Request\BroadcastListener\PriceInformation\Price;
+use App\Contract\Request\BroadcastListener\Common\Price;
 use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Event\NamedEventInterface;
 use App\Helper\Request\RequestBodyInterface;
@@ -28,10 +28,10 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
     public Product $product;
 
     /**
-     * @Assert\Type(type="App\Contract\Request\BroadcastListener\PriceInformation\Price")
+     * @Assert\Type(type="App\Contract\Request\BroadcastListener\Common\Price")
      * @Assert\Valid
      *
-     * @JMS\Type("App\Contract\Request\BroadcastListener\PriceInformation\Price")
+     * @JMS\Type("App\Contract\Request\BroadcastListener\Common\Price")
      */
     public ?Price $averageValue = null;
 

@@ -67,6 +67,22 @@ framework:
                     delay: 120000
                     multiplier: 2
 
+            broadcast-listeners-room-price:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        broadcast-listeners-room-price:
+                            binding_keys: [broadcast-listeners-room-price]
+                            arguments:
+                                x-queue-type: quorum
+                    exchange:
+                        type: direct
+                        default_publish_routing_key: broadcast-listeners-room-price
+                retry_strategy:
+                    max_retries: 10
+                    delay: 120000
+                    multiplier: 2
+
             calculate-manageable-flag:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
@@ -133,6 +149,7 @@ framework:
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
             'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
             'App\Contract\Request\BroadcastListener\RoomAvailabilityRequest': broadcast-listeners-room-availability
+            'App\Contract\Request\BroadcastListener\RoomPriceRequest': broadcast-listeners-room-price
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
             'App\Contract\Request\EAI\RoomRequest': push-room-information
 

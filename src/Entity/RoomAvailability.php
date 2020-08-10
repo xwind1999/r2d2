@@ -11,6 +11,11 @@ use Ramsey\Uuid\UuidInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RoomAvailabilityRepository")
+ * @ORM\Table(
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(columns={"component_golden_id","date"})
+ *     }
+ * )
  */
 class RoomAvailability
 {

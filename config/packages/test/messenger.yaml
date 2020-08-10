@@ -39,6 +39,15 @@ framework:
                     delay: 60000
                     multiplier: 2
 
+            broadcast-listeners-room-price:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: broadcast-listeners-room-price
+                retry_strategy:
+                    max_retries: 10
+                    delay: 60000
+                    multiplier: 2
+
             calculate-manageable-flag:
                 dsn: 'doctrine://default'
                 options:
@@ -77,6 +86,7 @@ framework:
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
             'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
             'App\Contract\Request\BroadcastListener\RoomAvailabilityRequest': broadcast-listeners-room-availability
+            'App\Contract\Request\BroadcastListener\RoomPriceRequest': broadcast-listeners-room-price
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
             'App\Contract\Request\EAI\RoomRequest': push-room-information
 

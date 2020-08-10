@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Component;
 use App\Entity\RoomPrice;
 use App\Exception\Repository\RoomPriceNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -43,5 +44,23 @@ class RoomPriceRepository extends ServiceEntityRepository
         }
 
         return $roomPrice;
+    }
+
+    /**
+     * @return RoomPrice[]
+     */
+    public function findByComponentAndDateRange(Component $component, \DateTime $dateFrom, \DateTime $dateTo): array
+    {
+        $qb = $this->createQueryBuilder('rp');
+        $qb
+            ->where('rp.component = :component')
+            ->andWhere('rp.date BETWEEN :dateFrom AND :dateTo')
+            ->setParameter('component', $component)
+            ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
+            ->setParameter('dateTo', $dateTo->format('Y-m-d'))
+            ->indexBy('rp', 'rp.date')
+        ;
+
+        return $qb->getQuery()->getArrayResult();
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
-use App\Contract\Request\BroadcastListener\PriceInformation\Price;
+use App\Contract\Request\BroadcastListener\Common\Price;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Contract\Request\BroadcastListener\ProductRequest;

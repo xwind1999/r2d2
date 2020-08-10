@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Manager;
 
 use App\Constraint\ProductStatusConstraint;
-use App\Contract\Request\BroadcastListener\PriceInformation\Price;
+use App\Contract\Request\BroadcastListener\Common\Price;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
-use App\Contract\Request\BroadcastListener\Product\ListPrice;
 use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
@@ -169,7 +168,7 @@ class BoxManagerTest extends TestCase
         $productRequest->sellableBrand = $brand;
         $productRequest->sellableCountry = $country;
         $productRequest->status = 'active';
-        $productRequest->listPrice = $this->prophesize(ListPrice::class);
+        $productRequest->listPrice = $this->prophesize(Price::class);
         $productRequest->listPrice->currencyCode = 'EUR';
         $universe = new Universe();
         $universe->id = 'STA';
@@ -225,7 +224,7 @@ class BoxManagerTest extends TestCase
         $productRequest->sellableBrand = $brand;
         $productRequest->sellableCountry = $country;
         $productRequest->status = 'active';
-        $productRequest->listPrice = new ListPrice();
+        $productRequest->listPrice = new Price();
         $productRequest->listPrice->currencyCode = 'EUR';
 
         $this->repository

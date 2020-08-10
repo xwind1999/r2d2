@@ -63,7 +63,6 @@
         "vimeo/psalm": "3.10.*"
     },
     "config": {
-        "classmap-authoritative": true,
         "preferred-install": {
             "*": "dist"
         },

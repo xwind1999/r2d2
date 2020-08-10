@@ -28,7 +28,8 @@ class RoomAvailabilityBroadcastHandler implements MessageHandlerInterface
         try {
             $this->roomAvailabilityManager->replace($roomAvailabilityRequest);
         } catch (\Exception $exception) {
-            $this->logger->warning($exception->getMessage());
+            $this->logger->warning($exception, $roomAvailabilityRequest->getContext());
+
             throw $exception;
         }
     }
