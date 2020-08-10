@@ -17,7 +17,7 @@ class RoomPriceRequest implements ContextualInterface
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Product")
      * @Assert\Valid
      * @Assert\NotBlank
-     * @JMS\Type("App\Contract\Request\BroadcastListener\PriceInformation\Product")
+     * @JMS\Type("App\Contract\Request\BroadcastListener\Product\Product")
      */
     public Product $product;
 
