@@ -25,17 +25,17 @@ class RoomAvailabilityBroadcastHandlerTest extends TestCase
      */
     public function testHandleBroadcastRoomAvailability(
         RoomAvailabilityRequest $roomAvailabilityRequest,
-        ?string $exceptionClass = null)
+        ?\Throwable $exception = null)
     {
         $manager = $this->prophesize(RoomAvailabilityManager::class);
         $manager->replace(Argument::any())->shouldBeCalled();
         $logger = $this->prophesize(LoggerInterface::class);
         $handler = new RoomAvailabilityBroadcastHandler($logger->reveal(), $manager->reveal());
 
-        if ($exceptionClass) {
-            $this->expectException(ComponentNotFoundException::class);
-            $manager->replace(Argument::any())->willThrow($exceptionClass);
-            $logger->warning(Argument::is('Component not found'))->shouldBeCalled();
+        if ($exception) {
+            $this->expectException(get_class($exception));
+            $manager->replace(Argument::any())->willThrow($exception);
+            $logger->warning($exception, $roomAvailabilityRequest->getContext())->shouldBeCalled();
         }
 
         $this->assertNull($handler($roomAvailabilityRequest));
@@ -70,7 +70,7 @@ class RoomAvailabilityBroadcastHandlerTest extends TestCase
 
                 return $roomAvailabilityRequest;
             })(clone $roomAvailabilityRequest),
-            ComponentNotFoundException::class,
+            new ComponentNotFoundException(),
         ];
     }
 }

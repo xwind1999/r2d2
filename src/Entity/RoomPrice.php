@@ -11,6 +11,11 @@ use Ramsey\Uuid\UuidInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RoomPriceRepository")
+ * @ORM\Table(
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(columns={"component_golden_id","date"})
+ *     }
+ * )
  */
 class RoomPrice
 {
@@ -45,4 +50,9 @@ class RoomPrice
      * @ORM\Column(type="integer", options={"unsigned"=true})
      */
     public int $price;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    public ?\DateTime $externalUpdatedAt = null;
 }

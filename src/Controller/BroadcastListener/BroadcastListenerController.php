@@ -10,6 +10,7 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
+use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
@@ -152,6 +153,37 @@ class BroadcastListenerController
     ): Response {
         foreach ($roomAvailabilityRequestList->items as $roomAvailabilityRequest) {
             $messageBus->dispatch($roomAvailabilityRequest);
+        }
+
+        return new Response(null, 202);
+    }
+
+    /**
+     * @Route("/broadcast-listener/room-price", methods={"POST"}, format="json")
+     *
+     * @SWG\Tag(name="broadcast-listener")
+     * @SWG\Parameter(
+     *    name="body",
+     *    in="body",
+     *    @SWG\Schema(
+     *        type="array",
+     *        @SWG\Items(
+     *            ref=@Model(type=App\Contract\Request\BroadcastListener\RoomPriceRequestList::class)
+     *        )
+     *    )
+     * )
+     * @SWG\Response(
+     *     response=202,
+     *     description="Room price handled")
+     * )
+     * @Security(name="basic")
+     */
+    public function roomPriceListener(
+        RoomPriceRequestList $roomPriceRequestList,
+        MessageBusInterface $messageBus
+    ): Response {
+        foreach ($roomPriceRequestList->items as $roomPriceRequest) {
+            $messageBus->dispatch($roomPriceRequest);
         }
 
         return new Response(null, 202);

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Handler;
 
+use App\Contract\Request\BroadcastListener\Common\Price;
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
-use App\Contract\Request\BroadcastListener\Product\ListPrice;
 use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRequest;
@@ -39,7 +39,7 @@ class ProductBroadcastHandlerTest extends TestCase
         $productRequest->sellableCountry = $country;
         $productRequest->status = 'active';
         $productRequest->type = 'MEV';
-        $productRequest->listPrice = new ListPrice();
+        $productRequest->listPrice = new Price();
         $productRequest->listPrice->currencyCode = 'EUR';
 
         $logger = $this->prophesize(LoggerInterface::class);
@@ -63,7 +63,7 @@ class ProductBroadcastHandlerTest extends TestCase
      * @covers ::__construct
      * @covers ::__invoke
      * @covers \App\Contract\Request\BroadcastListener\ProductRequest::getContext
-     * @covers \App\Contract\Request\BroadcastListener\Product\ListPrice::getContext
+     * @covers \App\Contract\Request\BroadcastListener\Common\Price::getContext
      */
     public function testHandlerMessageThrowsNonExistentTypeResolverException(): void
     {
@@ -83,7 +83,7 @@ class ProductBroadcastHandlerTest extends TestCase
         $productRequest->sellableCountry = $country;
         $productRequest->status = 'active';
         $productRequest->type = 'MEV';
-        $productRequest->listPrice = new ListPrice();
+        $productRequest->listPrice = new Price();
         $productRequest->listPrice->currencyCode = 'EUR';
         $productRequest->listPrice->amount = 11;
 

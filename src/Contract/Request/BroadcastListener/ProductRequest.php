@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Contract\Request\BroadcastListener;
 
 use App\Constraint\ProductTypeConstraint;
+use App\Contract\Request\BroadcastListener\Common\Price;
 use App\Contract\Request\BroadcastListener\Product\Brand;
 use App\Contract\Request\BroadcastListener\Product\Country;
-use App\Contract\Request\BroadcastListener\Product\ListPrice;
 use App\Contract\Request\BroadcastListener\Product\Partner;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Entity\Component;
@@ -155,13 +155,13 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
     public ?string $productDurationUnit = null;
 
     /**
-     * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\ListPrice")
+     * @Assert\Type(type="App\Contract\Request\BroadcastListener\Common\Price")
      * @Assert\Valid
      *
-     * @JMS\Type("App\Contract\Request\BroadcastListener\Product\ListPrice")
+     * @JMS\Type("App\Contract\Request\BroadcastListener\Common\Price")
      * @JMS\SerializedName("listPrice")
      */
-    public ?ListPrice $listPrice = null;
+    public ?Price $listPrice = null;
 
     public ?\DateTime $updatedAt = null;
 
@@ -219,7 +219,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
         }
 
         if (!empty($product['listPrice.amount']) && !empty($product['listPrice.currencyCode'])) {
-            $productRequest->listPrice = ListPrice::createFromAmountAndCurrencyCode(
+            $productRequest->listPrice = Price::fromAmountAndCurrencyCode(
                 $product['listPrice.amount'],
                 $product['listPrice.currencyCode']
             );

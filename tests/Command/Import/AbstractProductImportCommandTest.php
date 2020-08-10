@@ -35,7 +35,7 @@ abstract class AbstractProductImportCommandTest extends AbstractImportCommandTes
      * @covers ::execute
      * @covers ::process
      * @covers \App\Contract\Request\BroadcastListener\ProductRequest::fromArray
-     * @covers \App\Contract\Request\BroadcastListener\Product\ListPrice::createFromAmountAndCurrencyCode
+     * @covers \App\Contract\Request\BroadcastListener\Common\Price::fromAmountAndCurrencyCode
      * @dataProvider requestProviderInvalidData
      */
     public function testExecuteWithInvalidData(\Iterator $productRequests): void
