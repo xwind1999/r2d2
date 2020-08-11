@@ -49,6 +49,9 @@ class ProductRelationshipRequest implements RequestBodyInterface, ValidatableReq
 
     public ?\DateTime $updatedAt = null;
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getContext(): array
     {
         return [

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "47361a9b2fd07dc8215c6adf6f2f1728",
+    "content-hash": "c9108b3375b87523a9d96fd0c3e1f01d",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -3527,11 +3527,11 @@
         },
         {
             "name": "smartbox/canonical-data-model",
-            "version": "v8.48.0",
+            "version": "v8.52.0",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.production.smartbox.com:smartesb/canonical-data-model.git",
-                "reference": "5b745c15d6f8e87e99a2afd8eba5c4e0a85da1b0"
+                "reference": "443f8d2a90fb5bed17f1b96d1925d254dc9aa1ce"
             },
             "require": {
                 "jms/serializer": "*",
@@ -3556,7 +3556,7 @@
                 "proprietary"
             ],
             "description": "Repository containing the JSON schema files for the canonical data model used in the EAI project",
-            "time": "2020-06-22T14:52:33+00:00"
+            "time": "2020-07-24T14:06:02+00:00"
         },
         {
             "name": "symfony/amqp-messenger",
@@ -9000,7 +9000,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-06-27T23:57:46+00:00"
+            "time": "2020-04-15T18:51:10+00:00"
         },
         {
             "name": "infection/infection",

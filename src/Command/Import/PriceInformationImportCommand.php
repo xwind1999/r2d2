@@ -11,7 +11,6 @@ use App\Contract\Request\BroadcastListener\Product\Product;
 class PriceInformationImportCommand extends AbstractImportCommand
 {
     protected static $defaultName = 'r2d2:price-information:import';
-
     protected const IMPORT_FIELDS = [
         'product.id',
         'averageValue.amount',
@@ -20,6 +19,8 @@ class PriceInformationImportCommand extends AbstractImportCommand
         'averageCommission',
         'updatedAt',
     ];
+
+    private const MULTIPLIER_VALUE = 100;
 
     protected function process(\Iterator $records): void
     {
@@ -31,7 +32,7 @@ class PriceInformationImportCommand extends AbstractImportCommand
 
             $price = new Price();
             $price->currencyCode = $record['averageValue.currencyCode'];
-            $price->amount = (int) $record['averageValue.amount'] * 100;
+            $price->amount = (int) $record['averageValue.amount'] * self::MULTIPLIER_VALUE;
 
             $priceInformationRequest->product = $product;
             $priceInformationRequest->averageValue = $price;

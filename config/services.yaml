@@ -138,3 +138,5 @@ services:
             - '%env(APP_EAI_ENV)%'
             - '%env(APP_EAI_USER)%'
             - '%env(APP_EAI_PASSWORD)%'
+
+    App\Contract\Request\EAI\ChannelManagerBookingRequest: ~

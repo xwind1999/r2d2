@@ -268,6 +268,9 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
         return $productRequest;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getContext(): array
     {
         return [

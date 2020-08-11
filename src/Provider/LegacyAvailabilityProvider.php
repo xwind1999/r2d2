@@ -15,6 +15,7 @@ use App\Helper\AvailabilityHelper;
 use App\Manager\ExperienceManager;
 use App\QuickData\QuickData;
 use JMS\Serializer\ArrayTransformerInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 
 class LegacyAvailabilityProvider
@@ -22,6 +23,9 @@ class LegacyAvailabilityProvider
     public const PARTNER = 'partner';
 
     private const DATE_TIME_FORMAT = 'Y-m-d\TH:i:s.u';
+    private const AVAILABILITY_INDEX = 0;
+    private const QUANTITY_OF_DAYS = 1;
+    private const DEFAULT_DATE_DIFF = 0;
 
     protected QuickData $quickData;
 
@@ -54,9 +58,9 @@ class LegacyAvailabilityProvider
             $availabilitiesFromDB = $this->availabilityProvider
                 ->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo);
 
-            $dateDiff = $dateTo->diff($dateFrom)->days ?: 0;
+            $dateDiff = $dateTo->diff($dateFrom)->days ?: self::DEFAULT_DATE_DIFF;
             // DateFrom and DateTo is the stay date, not the checkout one
-            $numberOfNights = $dateDiff + 1;
+            $numberOfNights = $dateDiff + self::QUANTITY_OF_DAYS;
 
             $returnArray = [
                 'ListPrestation' => [
@@ -81,7 +85,7 @@ class LegacyAvailabilityProvider
                 ],
                 QuickDataErrorResponse::class
             );
-            $response->httpCode = 400;
+            $response->httpCode = Response::HTTP_BAD_REQUEST;
 
             return $response;
         }
@@ -144,11 +148,11 @@ class LegacyAvailabilityProvider
                 $inactiveChannelExperienceIds = $this->experienceManager
                     ->filterIdsListWithPartnerChannelManagerCondition($packageCodes, false);
                 foreach ($data['ListPackage'] as &$package) {
-                    if (!empty($package['ListPrestation'][0]['Availabilities']) &&
+                    if (!empty($package['ListPrestation'][self::AVAILABILITY_INDEX]['Availabilities']) &&
                         !empty($inactiveChannelExperienceIds[$package['PackageCode']])
                     ) {
-                        $package['ListPrestation'][0]['Availabilities'] =
-                            AvailabilityHelper::convertToRequestType($package['ListPrestation'][0]['Availabilities']);
+                        $package['ListPrestation'][self::AVAILABILITY_INDEX]['Availabilities'] =
+                            AvailabilityHelper::convertToRequestType($package['ListPrestation'][self::AVAILABILITY_INDEX]['Availabilities']);
                     }
                 }
             }

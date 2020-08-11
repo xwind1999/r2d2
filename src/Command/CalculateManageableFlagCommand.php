@@ -21,6 +21,9 @@ use Symfony\Component\Messenger\MessageBusInterface;
 class CalculateManageableFlagCommand extends Command
 {
     protected static $defaultName = 'r2d2:calculate-manageable-flag';
+
+    private const LOOP_DEFAULT_VALUE = 1;
+    private const LINES_QUANTITY = 2;
     private const IMPORT_FIELDS = [
         'golden_id',
     ];
@@ -74,7 +77,7 @@ class CalculateManageableFlagCommand extends Command
             foreach ($goldenIdList as $key => $goldenId) {
                 $goldenIdArray[] = $goldenId['golden_id'];
                 $intKey = (int) $key;
-                if (0 === ($intKey + 1) % $batchSizeInt) {
+                if (0 === ($intKey + self::LOOP_DEFAULT_VALUE) % $batchSizeInt) {
                     $offset = ($intKey - $batchSizeInt);
                     $components = $this->componentRepository->findListByGoldenId(
                         array_slice($goldenIdArray, $offset, $batchSizeInt)
@@ -90,7 +93,7 @@ class CalculateManageableFlagCommand extends Command
             return 1;
         }
         $progressBar->finish();
-        $symfonyStyle->newLine(2);
+        $symfonyStyle->newLine(self::LINES_QUANTITY);
         $symfonyStyle->note(sprintf('Total Collection IDs read: %s', $this->componentsTotal));
         $symfonyStyle->note(sprintf('Finishing at : %s', (new \DateTime())->format('Y-m-d H:i:s')));
         $symfonyStyle->success('Command executed');

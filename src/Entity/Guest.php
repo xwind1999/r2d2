@@ -35,14 +35,14 @@ class Guest
     public string $bookingGoldenId;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
-    public ?string $firstName = null;
+    public string $firstName;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
-    public ?string $lastName = null;
+    public string $lastName;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)

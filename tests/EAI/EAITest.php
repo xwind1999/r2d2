@@ -11,6 +11,7 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Smartbox\ApiRestClient\ApiRestResponse;
 use Smartbox\ApiRestClient\Clients\EaiV0Client;
+use Smartbox\CDM\Entity\Booking\ChannelManagerBooking;
 
 /**
  * @coversDefaultClass \App\EAI\EAI
@@ -30,7 +31,6 @@ class EAITest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::pushRoom
-     * @covers \App\Contract\Request\EAI\RoomRequest::transformFromComponent
      */
     public function testPushRoom()
     {
@@ -44,5 +44,23 @@ class EAITest extends TestCase
             ->willReturn($apiRestResponse->reveal())
         ;
         $eai->pushRoom($roomRequest->reveal());
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::pushChannelManagerBooking
+     */
+    public function testPushChannelManagerBooking()
+    {
+        $channelManagerBooking = $this->prophesize(ChannelManagerBooking::class);
+        $apiRestResponse = $this->prophesize(ApiRestResponse::class);
+        $eai = new EAI($this->eaiClient->reveal());
+
+        $this->eaiClient
+            ->request('POST', Argument::any(), Argument::any(), Argument::any())
+            ->shouldBeCalledOnce()
+            ->willReturn($apiRestResponse->reveal())
+        ;
+        $eai->pushChannelManagerBooking($channelManagerBooking->reveal());
     }
 }

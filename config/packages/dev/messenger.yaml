@@ -113,6 +113,22 @@ framework:
                     delay: 120000
                     multiplier: 2
 
+            push-booking-cmh:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        push-room-information:
+                            binding_keys: [push-booking-cmh]
+                            arguments:
+                                x-queue-type: quorum
+                    exchange:
+                        type: direct
+                        default_publish_routing_key: push-booking-cmh
+                retry_strategy:
+                    max_retries: 7
+                    delay: 10000
+                    multiplier: 2
+
             failed-broadcast-listeners:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
@@ -152,6 +168,8 @@ framework:
             'App\Contract\Request\BroadcastListener\RoomPriceRequest': broadcast-listeners-room-price
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
             'App\Contract\Request\EAI\RoomRequest': push-room-information
+            'App\Contract\Request\EAI\ChannelManagerBookingRequest': push-booking-cmh
+
 
         buses:
             default:

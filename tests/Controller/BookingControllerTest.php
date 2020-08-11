@@ -7,6 +7,8 @@ namespace App\Tests\Controller;
 use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Controller\BookingController;
+use App\Exception\Http\ResourceNotFoundException;
+use App\Exception\Repository\BookingNotFoundException;
 use App\Manager\BookingManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,5 +45,22 @@ class BookingControllerTest extends TestCase
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(204, $response->getStatusCode());
+    }
+
+    /**
+     * @covers ::update
+     */
+    public function testUpdateCatchesException()
+    {
+        $controller = new BookingController();
+        $bookingUpdateRequest = new BookingUpdateRequest();
+        $manager = $this->prophesize(BookingManager::class);
+        $manager->update($bookingUpdateRequest)->shouldBeCalled()->willThrow(BookingNotFoundException::class);
+        $this->expectException(ResourceNotFoundException::class);
+        $this->expectExceptionMessage('Resource Not Found');
+        $response = $controller->update($bookingUpdateRequest, $manager->reveal());
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(404, $response->getStatusCode());
     }
 }
