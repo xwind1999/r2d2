@@ -1,2 +1,6 @@
 parameters:
     checkMissingIterableValueType: false
+    ignoreErrors:
+        -
+            message: '/Parameter #3 \$object of method Smartbox\\ApiRestClient\\ApiRestInternalClient::request\(\) expects null, Smartbox\\CDM\\Entity\\Booking\\ChannelManagerBooking given\./'
+            path: src/EAI/EAI.php

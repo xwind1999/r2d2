@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Contract\Request\Booking;
 
 use App\Contract\Request\Booking\BookingCreate\Experience;
+use App\Contract\Request\Booking\BookingCreate\Guest;
+use App\Contract\Request\Booking\BookingCreate\Room;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use JMS\Serializer\Annotation as JMS;
@@ -102,7 +104,7 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("array<App\Contract\Request\Booking\BookingCreate\Guest>")
      *
-     * @var \App\Contract\Request\Booking\BookingCreate\Guest[]
+     * @var Guest[]
      */
     public array $guests;
 
@@ -113,7 +115,7 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("array<App\Contract\Request\Booking\BookingCreate\Room>")
      *
-     * @var \App\Contract\Request\Booking\BookingCreate\Room[]
+     * @var Room[]
      */
     public array $rooms;
 }

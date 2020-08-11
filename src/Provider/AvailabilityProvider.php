@@ -22,6 +22,8 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 class AvailabilityProvider
 {
     private const STOCK_TYPE = 'stock';
+    private const COMPONENT_DURATION = 1;
+    private const DEFAULT_DATE_DIFF_VALUE = 0;
 
     protected CMHub $cmHub;
     protected SerializerInterface $serializer;
@@ -76,7 +78,7 @@ class AvailabilityProvider
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): array {
-        $dateDiff = $dateTo->diff($dateFrom)->days ?: 0;
+        $dateDiff = $dateTo->diff($dateFrom)->days ?: self::DEFAULT_DATE_DIFF_VALUE;
         // DateFrom and DateTo is the stay date, not the checkout one
         $numberOfNights = $dateDiff + 1;
         $activeChannelExperienceIds = $this->experienceManager->filterListExperienceIdsByBoxId($boxId);
@@ -110,7 +112,7 @@ class AvailabilityProvider
             $dateFrom,
             $dateTo
         );
-        $duration = $experienceComponent->component->duration ?: 1;
+        $duration = $experienceComponent->component->duration ?: self::COMPONENT_DURATION;
 
         return [
             'duration' => $duration,

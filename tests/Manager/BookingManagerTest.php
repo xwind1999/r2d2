@@ -312,6 +312,9 @@ class BookingManagerTest extends TestCase
         $baseBookingCreateRequest->guests[0]->lastName = 'Guido';
         $baseBookingCreateRequest->guests[0]->email = 'maradona@worldcup.ar';
         $baseBookingCreateRequest->guests[0]->phone = '123 123 123';
+        $baseBookingCreateRequest->guests[0]->isPrimary = true;
+        $baseBookingCreateRequest->guests[0]->age = 30;
+        $baseBookingCreateRequest->guests[0]->country = 'AR';
 
         yield 'happy days' => [
             (function ($bookingCreateRequest) {

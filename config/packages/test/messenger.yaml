@@ -64,6 +64,15 @@ framework:
                     delay: 60000
                     multiplier: 2
 
+            push-booking-cmh:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: push-booking-cmh
+                retry_strategy:
+                    max_retries: 7
+                    delay: 10000
+                    multiplier: 2
+
             failed-broadcast-listeners:
                 dsn: 'doctrine://default'
                 options:
@@ -89,6 +98,7 @@ framework:
             'App\Contract\Request\BroadcastListener\RoomPriceRequest': broadcast-listeners-room-price
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
             'App\Contract\Request\EAI\RoomRequest': push-room-information
+            'App\Contract\Request\EAI\ChannelManagerBookingRequest': push-booking-cmh
 
         buses:
             default:

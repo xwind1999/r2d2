@@ -98,6 +98,8 @@ class CalculateManageableFlagCommandTest extends KernelTestCase
         $this->assertStringContainsString('Total CSV IDs received: 1', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Total Collection IDs read: 1', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Command executed', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Starting at: ', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Finishing at : ', $this->commandTester->getDisplay());
     }
 
     /**
@@ -151,6 +153,8 @@ class CalculateManageableFlagCommandTest extends KernelTestCase
         $this->commandTester->getDisplay();
         $this->assertEquals(0, $this->commandTester->getStatusCode());
         $this->assertStringContainsString('Command executed', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Starting at: ', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Finishing at : ', $this->commandTester->getDisplay());
     }
 
     /**

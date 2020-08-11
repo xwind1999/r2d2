@@ -228,6 +228,11 @@ class BookingManager
         return $booking;
     }
 
+    /**
+     * @throws BookingAlreadyInFinalStatusException
+     * @throws BookingNotFoundException
+     * @throws InvalidBookingNewStatus
+     */
     public function update(BookingUpdateRequest $bookingUpdateRequest): void
     {
         $booking = $this->repository->findOneByGoldenId($bookingUpdateRequest->bookingId);
@@ -242,9 +247,6 @@ class BookingManager
         $this->em->persist($booking);
         $this->em->flush();
         $this->eventDispatcher->dispatch(new BookingStatusEvent($booking));
-
-        //TODO: send the booking to CMHub
-        //TODO: send the booking cancellation to CMHub
     }
 
     private function validateBookingExpirationTime(Booking $booking): void
@@ -261,7 +263,10 @@ class BookingManager
     {
         $this->validateBookingExpirationTime($booking);
 
-        if (BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $booking->status || BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status) {
+        if (
+            BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $booking->status
+            || BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status
+        ) {
             throw new BookingAlreadyInFinalStatusException();
         }
 
