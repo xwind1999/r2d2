@@ -174,6 +174,10 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
         $productRequest->type = $product['type'];
         $productRequest->description = $product['description'] ?? null;
 
+        if (!empty($product['universe.id'])) {
+            $productRequest->universe = Universe::create($product['universe.id']);
+        }
+
         if (!empty($product['roomStockType'])) {
             $productRequest->roomStockType = $product['roomStockType'];
         }

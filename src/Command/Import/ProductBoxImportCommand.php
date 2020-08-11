@@ -15,6 +15,7 @@ class ProductBoxImportCommand extends AbstractProductImportCommand
         'status',
         'listPrice.amount',
         'listPrice.currencyCode',
+        'universe.id',
         'type',
         'updatedAt',
     ];

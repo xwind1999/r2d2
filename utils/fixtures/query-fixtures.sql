@@ -1,57 +1,104 @@
-SET session group_concat_max_len=150000;
+DROP TEMPORARY TABLE IF EXISTS export_box;
+DROP TEMPORARY TABLE IF EXISTS export_experience;
+DROP TEMPORARY TABLE IF EXISTS export_component;
+DROP TEMPORARY TABLE IF EXISTS export_partner;
 
-SET @boxes :=
-        '851518,851469,848592,733694,552132,847577,1796,2061,872404,905234,847557,2143,848490,2161,870009,884728,873304,
-        1043346,1045720,1045741,1045846';
-        
-SET @experiences := (SELECT GROUP_CONCAT(distinct e.golden_id) FROM experience e JOIN (SELECT be.box_golden_id, GROUP_CONCAT(e.golden_id) as ids FROM experience e
-                 JOIN box_experience be ON be.experience_golden_id = e.golden_id WHERE FIND_IN_SET(box_golden_id, @boxes COLLATE utf8mb4_general_ci)
-          AND e.status = 'active'
-          AND be.is_enabled = 1
-          AND e.partner_golden_id IN (SELECT p.golden_id FROM partner p WHERE p.cease_date IS NULL)
-            GROUP BY be.box_golden_id) gr ON FIND_IN_SET(e.golden_id, gr.ids) BETWEEN 1 AND 50);
-            
-SET @components := (SELECT GROUP_CONCAT(c.golden_id)
-                   FROM component c
-                            JOIN experience_component ec ON ec.component_golden_id = c.golden_id
-                   WHERE ec.is_enabled = 1
-                     AND c.is_reservable = 1
-                     AND c.status = 'active'
-                     -- AND c.duration IS NOT NULL
-                     AND c.partner_golden_id IN (SELECT p.golden_id FROM partner p WHERE p.cease_date IS NULL)
-                     AND FIND_IN_SET(experience_golden_id, @experiences COLLATE utf8mb4_general_ci));
-                     
-SET @partners = (SELECT GROUP_CONCAT(p.golden_id)
-                 FROM partner p
-                 WHERE 
-                     p.status = 'partner' AND
-                     p.cease_date IS NULL AND
-                     p.golden_id IN (SELECT partner_golden_id
-                                                 FROM experience e
-                                                 WHERE FIND_IN_SET(e.golden_id, @experiences COLLATE utf8mb4_general_ci))
-                    OR p.golden_id IN (SELECT partner_golden_id
-                                                 FROM component c
-                                           WHERE FIND_IN_SET(c.golden_id, @components COLLATE utf8mb4_general_ci))
-					);
-                     
+CREATE TEMPORARY TABLE export_box AS (
+    select uuid
+    from box
+    where golden_id in
+          ('851518', '851469', '848592', '733694', '552132', '847577', '1796', '2061', '872404', '905234', '847557',
+           '2143', '848490', '2161', '870009', '884728', '873304',
+           '1043346', '1045720', '1045741', '1045846')
+);
+
+CREATE TEMPORARY TABLE export_experience AS (
+    SELECT e.uuid, partner_uuid
+    FROM experience e
+             JOIN (
+        SELECT g.uuid AS uuid
+        FROM (
+                 SELECT (
+                            row_number() OVER (PARTITION BY be.box_golden_id ORDER BY e.uuid)
+                            )         AS rn,
+                        box_golden_id,
+                        e.uuid        AS uuid,
+                        count(c.uuid) as num_components
+                 FROM experience e
+                          JOIN box_experience be ON be.experience_uuid = e.uuid
+                          JOIN experience_component ec on e.uuid = ec.experience_uuid
+                          JOIN component c on ec.component_uuid = c.uuid
+                          JOIN partner p2 ON e.partner_uuid = p2.uuid
+                          JOIN export_box cb ON cb.uuid = be.box_uuid
+                 WHERE e.status = 'active'
+                   AND be.is_enabled = 1
+                   AND p2.status = 'partner'
+                   AND p2.cease_date IS NULL
+                   AND c.inventory != ''
+                   AND c.is_reservable = 1
+                   AND ec.is_enabled = 1
+                   AND c.is_manageable = 1
+                   AND c.status = 'active'
+                   AND c.duration_unit = 'Nights'
+                   AND c.duration IS NOT NULL
+                 GROUP BY be.box_golden_id, e.uuid
+                 HAVING num_components > 0
+                 ORDER BY be.box_golden_id
+             ) g
+        WHERE g.rn <= 200
+    ) rows_exp ON rows_exp.uuid = e.uuid
+    GROUP BY e.uuid
+);
+
+CREATE TEMPORARY TABLE export_component AS (
+    SELECT distinct c.uuid
+    FROM component c
+             JOIN experience_component ec ON ec.component_uuid = c.uuid
+             JOIN export_experience ce ON ce.uuid = ec.experience_uuid
+    GROUP BY c.uuid
+);
+
+CREATE TEMPORARY TABLE export_partner AS (
+    SELECT distinct p.uuid
+    FROM partner p
+             JOIN export_experience ce ON ce.partner_uuid = p.uuid
+    GROUP BY p.uuid
+);
+
 -- box
-select golden_id as id, brand as sellableBrand, country as sellableCountry, status, 0 as 'listPrice.amount', currency as 'listPrice.currencyCode', 'mev' as type, box.updated_at as updatedAt from box where FIND_IN_SET(golden_id, @boxes COLLATE utf8mb4_general_ci);
+select b.*
+from box b
+         JOIN export_box eb on b.uuid = eb.uuid
+group by b.uuid;
 
 -- experience
-SELECT e.golden_id as id, e.partner_golden_id as partner, e.name, e.description, 'experience' as type, e.status, e.people_number as productPeopleNumber, e.updated_at as updatedAt
-FROM experience e WHERE FIND_IN_SET(e.golden_id, @experiences COLLATE utf8mb4_general_ci);
+select e.*
+from experience e
+         JOIN export_experience ee on e.uuid = ee.uuid
+group by e.uuid;
 
 -- component
-SELECT c.golden_id as id, replace(concat("'", c.partner_golden_id, "'"), "\'", '') as partner, replace(c.name, '\"', '') as name, c.description, ifnull(c.inventory, '') as stockAllotment, ifnull(c.duration, 1) as productDuration, ifnull(c.duration_unit, '') as productDurationUnit, ifnull(c.room_stock_type, '') as roomStockType, c.is_sellable as isSellable, c.is_reservable as isReservable, c.status, 'component' as type, c.updated_at as updatedAt FROM component c WHERE FIND_IN_SET(c.golden_id, @components COLLATE utf8mb4_general_ci);
+select c.*
+from component c
+         JOIN export_component ec on c.uuid = ec.uuid
+group by c.uuid;
 
--- partners
-SELECT p.golden_id as id,  p.status as type, p.currency as currencyCode, ifnull(p.cease_date, '') as partnerCeaseDate, p.is_channel_manager_active as isChannelManagerEnabled, ifnull(p.updated_at, '') as updatedAt FROM partner p WHERE FIND_IN_SET(p.golden_id, @partners COLLATE utf8mb4_general_ci);
-
--- price
-SELECT e.golden_id as 'product.id', CAST(e.price as DECIMAL(9,2)) 'averageValue.amount', p.currency as 'averageValue.currencyCode', ifnull(e.commission_type, '') as 'averageCommissionType', CAST(e.commission as DECIMAL(5,2)) 'averageCommission', e.updated_at as 'updatedAt' FROM experience e JOIN partner p ON p.golden_id = e.partner_golden_id WHERE FIND_IN_SET(e.golden_id, @experiences COLLATE utf8mb4_general_ci);
+-- partner
+select p.*
+from partner p
+         JOIN export_partner ep on p.uuid = ep.uuid
+group by p.uuid;
 
 -- box_experience
-SELECT be.box_golden_id as 'parentProduct', be.experience_golden_id as 'childProduct', be.is_enabled as 'isEnabled', 'Box-Experience' as 'relationshipType', be.updated_at as 'updatedAt' FROM box_experience be WHERE FIND_IN_SET(be.box_golden_id, @boxes COLLATE utf8mb4_general_ci) AND FIND_IN_SET(be.experience_golden_id, @experiences COLLATE utf8mb4_general_ci);
+SELECT be.*
+FROM box_experience be
+         JOIN export_box cb ON cb.uuid = be.box_uuid
+         JOIN export_experience ce ON ce.uuid = be.experience_uuid
+group by be.box_uuid, be.experience_uuid;
 
 -- experience_component
-SELECT ec.experience_golden_id as 'parentProduct', ec.component_golden_id as 'childProduct', ec.is_enabled as 'isEnabled', 'Experience-Component' as 'relationshipType', ec.updated_at as 'updatedAt' FROM experience_component ec WHERE FIND_IN_SET(ec.experience_golden_id, @experiences COLLATE utf8mb4_general_ci) AND FIND_IN_SET(ec.component_golden_id, @components COLLATE utf8mb4_general_ci);
+SELECT ec.*
+FROM experience_component ec
+         JOIN export_experience ce ON ce.uuid = ec.experience_uuid
+         JOIN export_component cc ON cc.uuid = ec.component_uuid
+group by ec.experience_uuid, ec.component_uuid;

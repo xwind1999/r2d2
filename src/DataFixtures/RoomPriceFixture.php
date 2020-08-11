@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
-use App\Entity\RoomAvailability;
+use App\Entity\RoomPrice;
 use App\Repository\ComponentRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class RoomAvailabilityFixture extends Fixture implements FixtureGroupInterface
+class RoomPriceFixture extends Fixture implements FixtureGroupInterface
 {
     private ComponentRepository $componentRepository;
 
@@ -26,13 +26,12 @@ class RoomAvailabilityFixture extends Fixture implements FixtureGroupInterface
         foreach ($components as $component) {
             $calendar = CalendarFixtureHelper::getAvailabilityCalendar();
             foreach ($calendar as $date => $availability) {
-                $roomAvailability = new RoomAvailability();
-                $roomAvailability->component = $component;
-                $roomAvailability->componentGoldenId = $component->goldenId;
-                $roomAvailability->type = $component->roomStockType ?? '';
-                $roomAvailability->date = new \DateTime($date);
-                $roomAvailability->stock = $availability;
-                $manager->persist($roomAvailability);
+                $roomPrice = new RoomPrice();
+                $roomPrice->component = $component;
+                $roomPrice->componentGoldenId = $component->goldenId;
+                $roomPrice->price = random_int(45, 85);
+                $roomPrice->date = new \DateTime($date);
+                $manager->persist($roomPrice);
             }
         }
         $manager->flush();

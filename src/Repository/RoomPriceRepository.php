@@ -55,12 +55,12 @@ class RoomPriceRepository extends ServiceEntityRepository
         $qb
             ->where('rp.component = :component')
             ->andWhere('rp.date BETWEEN :dateFrom AND :dateTo')
-            ->setParameter('component', $component)
+            ->setParameter('component', $component->uuid->getBytes())
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d'))
             ->indexBy('rp', 'rp.date')
         ;
 
-        return $qb->getQuery()->getArrayResult();
+        return $qb->getQuery()->getResult();
     }
 }

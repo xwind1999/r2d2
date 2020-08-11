@@ -15,6 +15,7 @@ class BroadcastListenerHelper
     private const API_RELATIONSHIP_BASE_URL = '/broadcast-listener/product-relationship';
     private const API_PRICE_INFORMATION_BASE_URL = '/broadcast-listener/price-information';
     private const API_ROOM_AVAILABILITY_BASE_URL = '/broadcast-listener/room-availability';
+    private const API_ROOM_PRICE_BASE_URL = '/broadcast-listener/room-price';
 
     protected AbstractBrowser $client;
     protected Serializer $serializer;
@@ -118,6 +119,26 @@ class BroadcastListenerHelper
         return $overrides + $payload;
     }
 
+    public function getDefaultRoomPrice(array $overrides = []): array
+    {
+        $payload = [
+            [
+                'product' => [
+                    'id' => '315618',
+                ],
+                'price' => [
+                    'amount' => 20.00,
+                    'currencyCode' => 'EUR',
+                ],
+                'dateFrom' => '2020-07-16T20:00:00.000000+0000',
+                'dateTo' => '2020-07-20T20:00:00.000000+0000',
+                'updatedAt' => '2020-07-20T17:58:32.000000+0000',
+            ],
+        ];
+
+        return $overrides + $payload;
+    }
+
     /**
      * @return JsonResponse|object
      */
@@ -201,6 +222,27 @@ class BroadcastListenerHelper
         $this->client->request(
             'POST',
             $this->baseUrl.self::API_ROOM_AVAILABILITY_BASE_URL,
+            [],
+            [],
+            [],
+            $this->serializer->serialize($payload, 'json')
+        );
+
+        return $this->client->getResponse();
+    }
+
+    /**
+     * @return JsonResponse|object
+     */
+    public function testRoomPrice(array $payload = [])
+    {
+        if (empty($payload)) {
+            $payload = $this->getDefaultRoomPrice();
+        }
+
+        $this->client->request(
+            'POST',
+            $this->baseUrl.self::API_ROOM_PRICE_BASE_URL,
             [],
             [],
             [],
