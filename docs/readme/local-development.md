@@ -14,7 +14,9 @@
 To make things easier in local environments, we are using the D.E.F.U.S.E tool to wrap up some commands we constantly need to run.
 
 ## How to run it
-```sbx r2d2 COMMAND EXTRA_PARAMETERS```
+```shell script
+sbx r2d2 COMMAND EXTRA_PARAMETERS
+```
 
 ## Available commands  
 
@@ -26,18 +28,20 @@ As the script should run locally, you need to have a MySQL database installed an
 
 From the r2d2 directory, type the following command in the terminal:
 
-``` sh utils/fixtures/create-dump.sh ```
+```shell script
+sh utils/fixtures/create-dump.sh
+```
 
 To create the database dump from another host, just replace the connection variables in the file to the desirable host. 
 
 ## Load local database dump
 
-Check if you already have the dump file (you can check if it already exists on _utils/fixtures/load-dump.sql_). 
+Type the following commands in the terminal:
 
-Type the following command in the terminal:
-
-    - sbx r2d2 console doctrine:database:import utils/fixtures/data.sql
-    - sbx r2d2 console doctrine:fixtures:load --append
+```shell script
+sbx r2d2 console doctrine:database:import $(realpath --relative-to=. utils/fixtures/dumps/*)
+sbx r2d2 console doctrine:fixtures:load --append
+```
     
-PS: Make sure to use the _--append_ at the end of the fixtures:load command. Otherwise, it will purge the database.
+> Make sure to use the _--append_ at the end of the fixtures:load command. Otherwise, it will purge the database.
  

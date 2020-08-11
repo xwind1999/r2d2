@@ -1,16 +1,16 @@
 #!/bin/bash
+(
+  DIR=$(readlink -f $(dirname "$0"))
+  cd "$DIR" || return
 
-DIR=$(readlink -f $(dirname "$0"))
+  echo "Dumping database"
 
-cd "$DIR" || return
+  mysqldump -uroot -padmin123 -h127.0.0.1 --port 3308 --databases r2d2 --no-create-db  --no-create-info --complete-insert --compact --tables box > dumps/00_box.sql
+  mysqldump -uroot -padmin123 -h127.0.0.1 --port 3308 --databases r2d2 --no-create-db  --no-create-info --complete-insert --compact --tables partner > dumps/01_partner.sql
+  mysqldump -uroot -padmin123 -h127.0.0.1 --port 3308 --databases r2d2 --no-create-db  --no-create-info --complete-insert --compact --tables experience > dumps/02_experience.sql
+  mysqldump -uroot -padmin123 -h127.0.0.1 --port 3308 --databases r2d2 --no-create-db  --no-create-info --complete-insert --compact --tables component > dumps/03_component.sql
+  mysqldump -uroot -padmin123 -h127.0.0.1 --port 3308 --databases r2d2 --no-create-db  --no-create-info --complete-insert --compact --tables box_experience > dumps/04_box_experience.sql
+  mysqldump -uroot -padmin123 -h127.0.0.1 --port 3308 --databases r2d2 --no-create-db  --no-create-info --complete-insert --compact --tables experience_component > dumps/05_experience_component.sql
 
-filename="load-dump.sql"
-
-echo "Export $filename database"
-
-mysqldump -uroot -padmin123 -h127.0.0.1 --port 3308 --databases r2d2 --tables box partner experience component box_experience experience_component --no-create-db  --no-create-info --complete-insert --compact >  "$filename"
-
-echo "Output file :"
-
-ls -lh "$filename"
-
+  echo "Done!"
+)

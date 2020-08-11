@@ -9,9 +9,9 @@ class QuickDataApiTest extends ApiTestCase
     public function testGetPackage(): void
     {
         $response = self::$quickDataHelper->getPackage(
-            18474,
-            '2020-09-01',
-            '2020-09-05'
+            7307,
+            date('Y-m-d', strtotime('first day of next month')),
+            date('Y-m-\0\5', strtotime('first day of next month'))
         );
         $this->assertEquals(200, $response->getStatusCode());
     }
@@ -20,8 +20,8 @@ class QuickDataApiTest extends ApiTestCase
     {
         $response = self::$quickDataHelper->getPackage(
             124125234332,
-            '2020-09-01',
-            '2020-09-05'
+            date('Y-m-d', strtotime('first day of next month')),
+            date('Y-m-\0\5', strtotime('first day of next month'))
         );
         $this->assertEquals(400, $response->getStatusCode());
     }

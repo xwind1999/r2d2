@@ -31,11 +31,12 @@ api-tests:
     MYSQL_ROOT_PASSWORD: admin123
     MYSQL_USER: root
     DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_ROOT_PASSWORD}@mysql/${MYSQL_DATABASE}?serverVersion=8.0"
-  script:
+  before_script:
     - until bin/console doctrine:database:create -e test --if-not-exists --no-interaction; do sleep 1; done
     - bin/console doctrine:schema:update --force
-    - bin/console doctrine:database:import $(pwd)/utils/fixtures/data.sql
-    - bin/console doctrine:fixtures:load --append
+    - bin/console doctrine:database:import $(realpath --relative-to=. utils/fixtures/dumps/*)
+    - php -dmemory_limit=-1 bin/console doctrine:fixtures:load --append
+  script:
     - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
   artifacts:
     expire_in: 1 day
