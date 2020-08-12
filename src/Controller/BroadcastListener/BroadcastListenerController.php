@@ -10,6 +10,7 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
+use App\Contract\Request\BroadcastListener\RoomPriceRequest;
 use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -168,7 +169,7 @@ class BroadcastListenerController
      *    @SWG\Schema(
      *        type="array",
      *        @SWG\Items(
-     *            ref=@Model(type=App\Contract\Request\BroadcastListener\RoomPriceRequestList::class)
+     *            ref=@Model(type=RoomPriceRequest::class)
      *        )
      *    )
      * )
