@@ -7,6 +7,7 @@ namespace App\Contract\Request\Internal\Experience;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use JMS\Serializer\Annotation as JMS;
+use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class ExperienceCreateRequest implements RequestBodyInterface, ValidatableRequest
@@ -66,6 +67,8 @@ class ExperienceCreateRequest implements RequestBodyInterface, ValidatableReques
      * @Assert\PositiveOrZero
      *
      * @JMS\Type("strict_integer")
+     *
+     * @SWG\Property(type="integer", example=1000)
      */
     public ?int $price = null;
 }

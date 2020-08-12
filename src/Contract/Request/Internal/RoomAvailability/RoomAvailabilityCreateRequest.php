@@ -26,6 +26,8 @@ class RoomAvailabilityCreateRequest implements RequestBodyInterface, Validatable
      * @Assert\NotBlank
      *
      * @JMS\Type("strict_integer")
+     *
+     * @SWG\Property(type="integer", example=10)
      */
     public int $stock;
 

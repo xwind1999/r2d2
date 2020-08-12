@@ -17,6 +17,7 @@ use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use Clogger\ContextualInterface;
 use JMS\Serializer\Annotation as JMS;
+use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class ProductRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface, NamedEventInterface
@@ -135,6 +136,8 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\PositiveOrZero
      *
      * @JMS\Type("strict_integer")
+     *
+     * @SWG\Property(type="integer", example=10)
      */
     public ?int $stockAllotment = null;
 
@@ -143,6 +146,7 @@ class ProductRequest implements RequestBodyInterface, ValidatableRequest, Contex
      * @Assert\PositiveOrZero
      *
      * @JMS\Type("strict_integer")
+     * @SWG\Property(type="integer", example=10)
      */
     public ?int $productDuration = null;
 

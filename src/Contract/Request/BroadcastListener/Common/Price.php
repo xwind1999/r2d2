@@ -16,7 +16,7 @@ class Price implements ContextualInterface
      * @Assert\NotBlank()
      *
      * @JMS\Type("float_to_integer")
-     * @SWG\Property(example=10.50)
+     * @SWG\Property(example=10.50, type="float")
      */
     public int $amount;
 

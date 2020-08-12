@@ -7,6 +7,7 @@ namespace App\Contract\Request\Internal\RoomPrice;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use JMS\Serializer\Annotation as JMS;
+use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class RoomPriceCreateRequest implements RequestBodyInterface, ValidatableRequest
@@ -34,6 +35,7 @@ class RoomPriceCreateRequest implements RequestBodyInterface, ValidatableRequest
      * @Assert\NotBlank
      *
      * @JMS\Type("strict_integer")
+     * @SWG\Property(type="integer", example=10)
      */
     public int $price;
 }
