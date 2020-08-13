@@ -39,7 +39,7 @@ To create the database dump from another host, just replace the connection varia
 Type the following commands in the terminal:
 
 ```shell script
-sbx r2d2 console doctrine:database:import $(realpath --relative-to=. utils/fixtures/dumps/*)
+sbx r2d2 console doctrine:database:import utils/fixtures/dumps/*
 sbx r2d2 console doctrine:fixtures:load --append
 ```
     
