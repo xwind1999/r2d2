@@ -34,8 +34,9 @@ api-tests:
   before_script:
     - until bin/console doctrine:database:create -e test --if-not-exists --no-interaction; do sleep 1; done
     - bin/console doctrine:schema:update --force
-    - bin/console doctrine:database:import $(realpath --relative-to=. utils/fixtures/dumps/*)
+    - bin/console doctrine:database:import utils/fixtures/dumps/*
     - php -dmemory_limit=-1 bin/console doctrine:fixtures:load --append
+    - bin/console -e test messenger:setup-transports
   script:
     - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
   artifacts:

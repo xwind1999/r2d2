@@ -36,7 +36,7 @@ class BroadcastListenerHelper
             'name' => 'product name',
             'description' => 'product description',
             'universe' => [
-                'id' => 'product universe',
+                'id' => 'STA',
             ],
             'isSellable' => true,
             'isReservable' => true,
