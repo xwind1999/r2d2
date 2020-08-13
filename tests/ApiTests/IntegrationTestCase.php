@@ -22,8 +22,13 @@ class IntegrationTestCase extends ApiTestCase
         }
         parent::setUpBeforeClass();
 
-        // need to clear all the messages before starting these tests
-        self::$container
+        static::cleanUp();
+    }
+
+    public static function cleanUp(): void
+    {
+        self::bootKernel();
+        static::$container
             ->get('doctrine.orm.entity_manager')
             ->getConnection()
             ->exec('TRUNCATE messenger_messages')
