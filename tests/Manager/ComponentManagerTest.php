@@ -6,6 +6,7 @@ namespace App\Tests\Manager;
 
 use App\Contract\Request\BroadcastListener\Product\Partner as PartnerDTO;
 use App\Contract\Request\BroadcastListener\ProductRequest;
+use App\Contract\Request\EAI\RoomRequest;
 use App\Contract\Request\Internal\Component\ComponentCreateRequest;
 use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
 use App\Entity\Component;
@@ -23,6 +24,8 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @coversDefaultClass \App\Manager\ComponentManager
@@ -49,6 +52,11 @@ class ComponentManagerTest extends TestCase
      */
     private $partnerManager;
 
+    /**
+     * @var MessageBusInterface|ObjectProphecy
+     */
+    private $messageBus;
+
     private ComponentManager $manager;
 
     public function setUp(): void
@@ -57,11 +65,13 @@ class ComponentManagerTest extends TestCase
         $this->partnerRepository = $this->prophesize(PartnerRepository::class);
         $this->manageableProductService = $this->prophesize(ManageableProductService::class);
         $this->partnerManager = $this->prophesize(PartnerManager::class);
+        $this->messageBus = $this->prophesize(MessageBusInterface::class);
         $this->manager = new ComponentManager(
             $this->repository->reveal(),
             $this->partnerRepository->reveal(),
             $this->manageableProductService->reveal(),
-            $this->partnerManager->reveal()
+            $this->partnerManager->reveal(),
+            $this->messageBus->reveal()
         );
     }
 
@@ -292,7 +302,7 @@ class ComponentManagerTest extends TestCase
 
     /**
      * @covers ::__construct
-     * @covers ::findAndSetManageableComponent
+     * @covers ::calculateManageableFlag
      * @covers ::createComponentRequiredCriteria
      * @covers ::createManageableCriteria
      */
@@ -300,7 +310,12 @@ class ComponentManagerTest extends TestCase
     {
         $component = $this->prophesize(Component::class);
         $component->goldenId = '12345';
+        $component->name = '123';
+        $component->isSellable = false;
         $component->isManageable = false;
+        $partner = new Partner();
+        $partner->goldenId = '1234';
+        $component->partner = $partner;
         $this->repository
             ->findComponentWithManageableCriteria(Argument::any())
             ->shouldBeCalledOnce()
@@ -310,14 +325,41 @@ class ComponentManagerTest extends TestCase
             ->findComponentWithManageableRelationships(Argument::any())
             ->shouldNotBeCalled();
         $this->repository->save(Argument::type(Component::class))->shouldBeCalledOnce();
+        $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldBeCalled()->willReturn(new Envelope(new \stdClass()));
 
-        $component = $this->manager->findAndSetManageableComponent($component->goldenId);
-        $this->assertEquals(true, $component->isManageable);
+        $this->manager->calculateManageableFlag($component->goldenId);
+        $this->assertTrue($component->isManageable);
     }
 
     /**
      * @covers ::__construct
-     * @covers ::findAndSetManageableComponent
+     * @covers ::calculateManageableFlag
+     * @covers ::createComponentRequiredCriteria
+     * @covers ::createManageableCriteria
+     */
+    public function testFindAndSetManageableComponentWontChangeAnything(): void
+    {
+        $component = $this->prophesize(Component::class);
+        $component->goldenId = '12345';
+        $component->isManageable = true;
+        $this->repository
+            ->findComponentWithManageableCriteria(Argument::any())
+            ->shouldBeCalledOnce()
+            ->willReturn($component->reveal())
+        ;
+        $this->repository
+            ->findComponentWithManageableRelationships(Argument::any())
+            ->shouldNotBeCalled();
+        $this->repository->save(Argument::type(Component::class))->shouldNotBeCalled();
+        $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldNotBeCalled();
+
+        $this->manager->calculateManageableFlag($component->goldenId);
+        $this->assertTrue($component->isManageable);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::calculateManageableFlag
      * @covers ::createComponentRequiredCriteria
      * @covers ::createManageableCriteria
      */
@@ -326,6 +368,12 @@ class ComponentManagerTest extends TestCase
         $component = $this->prophesize(Component::class);
         $component->goldenId = '12345';
         $component->isManageable = true;
+        $component->name = '123';
+        $component->isSellable = false;
+        $component->isManageable = true;
+        $partner = new Partner();
+        $partner->goldenId = '1234';
+        $component->partner = $partner;
         $this->repository
             ->findComponentWithManageableCriteria(Argument::any())
             ->shouldBeCalledOnce()
@@ -337,9 +385,40 @@ class ComponentManagerTest extends TestCase
             ->willReturn($component->reveal())
         ;
         $this->repository->save(Argument::type(Component::class))->shouldBeCalledOnce();
+        $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldBeCalled()->willReturn(new Envelope(new \stdClass()));
 
-        $component = $this->manager->findAndSetManageableComponent($component->goldenId);
-        $this->assertEquals(false, $component->isManageable);
+        $this->manager->calculateManageableFlag($component->goldenId);
+
+        $this->assertFalse($component->isManageable);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::calculateManageableFlag
+     * @covers ::createComponentRequiredCriteria
+     * @covers ::createManageableCriteria
+     */
+    public function testFindAndSetManageableComponentCatchesManageableProductNotFoundExceptionAndWontChangeAnything(): void
+    {
+        $component = $this->prophesize(Component::class);
+        $component->goldenId = '12345';
+        $component->isManageable = false;
+        $this->repository
+            ->findComponentWithManageableCriteria(Argument::any())
+            ->shouldBeCalledOnce()
+            ->willThrow(ManageableProductNotFoundException::class)
+        ;
+        $this->repository
+            ->findComponentWithManageableRelationships(Argument::any())
+            ->shouldBeCalledOnce()
+            ->willReturn($component->reveal())
+        ;
+        $this->repository->save(Argument::type(Component::class))->shouldNotBeCalled();
+        $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldNotBeCalled();
+
+        $this->manager->calculateManageableFlag($component->goldenId);
+
+        $this->assertFalse($component->isManageable);
     }
 
     /**
@@ -356,7 +435,8 @@ class ComponentManagerTest extends TestCase
             $this->repository->reveal(),
             $this->partnerRepository->reveal(),
             $this->manageableProductService->reveal(),
-            $this->partnerManager->reveal()
+            $this->partnerManager->reveal(),
+            $this->messageBus->reveal()
         );
         $manager->getRoomsByExperienceGoldenIdsList($compIds);
         $this->repository->findRoomsByExperienceGoldenIdsList($compIds)->shouldBeCalledOnce();
