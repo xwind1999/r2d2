@@ -7,6 +7,7 @@ namespace App\Manager;
 use App\Constraint\PartnerStatusConstraint;
 use App\Constraint\ProductStatusConstraint;
 use App\Contract\Request\BroadcastListener\ProductRequest;
+use App\Contract\Request\EAI\RoomRequest;
 use App\Contract\Request\Internal\Component\ComponentCreateRequest;
 use App\Contract\Request\Internal\Component\ComponentUpdateRequest;
 use App\Entity\Component;
@@ -20,6 +21,7 @@ use App\Repository\ComponentRepository;
 use App\Repository\PartnerRepository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\NonUniqueResultException;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class ComponentManager
 {
@@ -27,17 +29,20 @@ class ComponentManager
     private PartnerRepository $partnerRepository;
     private ManageableProductService $manageableProductService;
     private PartnerManager $partnerManager;
+    private MessageBusInterface $messageBus;
 
     public function __construct(
         ComponentRepository $repository,
         PartnerRepository $partnerRepository,
         ManageableProductService $manageableProductService,
-        PartnerManager $partnerManager
+        PartnerManager $partnerManager,
+        MessageBusInterface $messageBus
     ) {
         $this->repository = $repository;
         $this->partnerRepository = $partnerRepository;
         $this->manageableProductService = $manageableProductService;
         $this->partnerManager = $partnerManager;
+        $this->messageBus = $messageBus;
     }
 
     public function create(ComponentCreateRequest $componentCreateRequest): Component
@@ -153,9 +158,8 @@ class ComponentManager
     /**
      * @throws NonUniqueResultException
      */
-    public function findAndSetManageableComponent(string $componentGoldenId): Component
+    public function calculateManageableFlag(string $componentGoldenId): void
     {
-        $component = null;
         try {
             $component = $this->repository->findComponentWithManageableCriteria(
                 $this->createComponentRequiredCriteria($componentGoldenId, $this->createManageableCriteria())
@@ -163,6 +167,7 @@ class ComponentManager
             if (false === $component->isManageable) {
                 $component->isManageable = true;
                 $this->repository->save($component);
+                $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
             }
         } catch (ManageableProductNotFoundException $exception) {
             $component = $this->repository->findComponentWithManageableRelationships(
@@ -171,10 +176,9 @@ class ComponentManager
             if (true === $component->isManageable) {
                 $component->isManageable = false;
                 $this->repository->save($component);
+                $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
             }
         }
-
-        return $component;
     }
 
     private function createManageableCriteria(): Criteria
@@ -190,6 +194,9 @@ class ComponentManager
                 [
                     ProductStatusConstraint::PRODUCT_STATUS_LIVE,
                     ProductStatusConstraint::PRODUCT_STATUS_REDEEMABLE,
+                    ProductStatusConstraint::PRODUCT_STATUS_PRODUCTION,
+                    ProductStatusConstraint::PRODUCT_STATUS_PROSPECT,
+                    ProductStatusConstraint::PRODUCT_STATUS_READY,
                 ]
             )
         );

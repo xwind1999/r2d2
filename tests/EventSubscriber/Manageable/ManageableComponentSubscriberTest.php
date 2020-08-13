@@ -13,8 +13,6 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @coversDefaultClass \App\EventSubscriber\Manageable\ManageableComponentSubscriber
@@ -30,10 +28,6 @@ class ManageableComponentSubscriberTest extends TestCase
      * @var ComponentManager|ObjectProphecy
      */
     private $manager;
-    /**
-     * @var MessageBusInterface|ObjectProphecy
-     */
-    private $messageBus;
 
     /**
      * @var ManageableComponentEvent|ObjectProphecy
@@ -46,13 +40,11 @@ class ManageableComponentSubscriberTest extends TestCase
     {
         $this->logger = $this->prophesize(LoggerInterface::class);
         $this->manager = $this->prophesize(ComponentManager::class);
-        $this->messageBus = $this->prophesize(MessageBusInterface::class);
         $this->event = $this->prophesize(ManageableComponentEvent::class);
         $this->event->boxGoldenId = '12345';
         $this->subscriber = new ManageableComponentSubscriber(
             $this->logger->reveal(),
-            $this->manager->reveal(),
-            $this->messageBus->reveal()
+            $this->manager->reveal()
         );
     }
 
@@ -78,11 +70,9 @@ class ManageableComponentSubscriberTest extends TestCase
     public function testHandleMessage(ObjectProphecy $component): void
     {
         $this->manager
-            ->findAndSetManageableComponent(Argument::any())
+            ->calculateManageableFlag(Argument::any())
             ->shouldBeCalledOnce()
-            ->willReturn($component->reveal())
         ;
-        $this->messageBus->dispatch(Argument::any())->shouldBeCalledOnce()->willReturn(new Envelope(new \stdClass()));
         $this->logger->error(Argument::any(), Argument::any())->shouldNotBeCalled();
         $this->subscriber->handleMessage($this->event->reveal());
     }
@@ -96,12 +86,10 @@ class ManageableComponentSubscriberTest extends TestCase
     public function testHandleMessageCatchesException(ObjectProphecy $component): void
     {
         $this->manager
-            ->findAndSetManageableComponent(Argument::any())
-            ->shouldBeCalledOnce()
-            ->willReturn($component->reveal())
+            ->calculateManageableFlag(Argument::any())
+            ->willThrow(new \Exception())
         ;
         $exception = \Exception::class;
-        $this->messageBus->dispatch(Argument::any())->shouldBeCalledOnce()->willThrow($exception);
         $this->logger->error(Argument::any(), Argument::any())->shouldBeCalledOnce();
         $this->event->getContext()->shouldBeCalledOnce()->willReturn([
             'box_golden_id' => $this->event->boxGoldenId,
