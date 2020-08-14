@@ -29,6 +29,8 @@ class RoomRequestHandler implements MessageHandlerInterface
             $this->logger->info(self::SUCCESS_MESSAGE, $roomRequest->getContext());
         } catch (\Exception $exception) {
             $this->logger->error($exception, $roomRequest->getContext());
+
+            throw $exception;
         }
     }
 }

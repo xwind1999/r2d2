@@ -11,7 +11,6 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
-use Smartbox\ApiRestClient\ApiRestException;
 use Smartbox\CDM\Entity\Partner\Partner;
 use Smartbox\CDM\Entity\Product\Product;
 
@@ -79,11 +78,11 @@ class RoomRequestHandlerTest extends TestCase
      */
     public function testHandlerMessageThrowsException(): void
     {
-        $this->eaiProvider->pushRoom(Argument::any())->shouldBeCalledOnce()->willThrow(ApiRestException::class);
+        $this->eaiProvider->pushRoom(Argument::any())->shouldBeCalledOnce()->willThrow(new \Exception());
         $this->logger->info(Argument::any(), Argument::any())->shouldNotBeCalled();
         $this->roomRequest->getContext()->shouldBeCalledOnce();
         $this->logger->error(Argument::any(), Argument::any())->shouldBeCalledOnce();
-
+        $this->expectException(\Exception::class);
         $this->roomRequestHandler->__invoke($this->roomRequest->reveal());
     }
 }

@@ -31,6 +31,7 @@ class ChannelManagerBookingHandler implements MessageHandlerInterface
             );
         } catch (\Exception $exception) {
             $this->logger->error($exception, $bookingRequest->getContext());
+
             throw $exception;
         }
     }

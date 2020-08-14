@@ -94,12 +94,13 @@ class ManageableProductHandlerTest extends TestCase
         $this->manageableProductResolver
             ->resolve($this->manageableProductRequest->reveal())
             ->shouldBeCalledOnce()
-            ->willThrow(UnprocessableManageableProductTypeException::class)
+            ->willThrow(new UnprocessableManageableProductTypeException())
         ;
         $this->manageableProductRequest->getContext()->shouldBeCalled();
         $this->eventDispatcher->dispatch(Argument::any())->shouldNotBeCalled();
         $this->logger->warning(Argument::any(), Argument::any())->shouldBeCalledOnce();
 
+        $this->expectException(UnprocessableManageableProductTypeException::class);
         $this->manageableBroadcastHandler->__invoke($this->manageableProductRequest->reveal());
     }
 }
