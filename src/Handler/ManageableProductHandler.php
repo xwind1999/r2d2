@@ -33,6 +33,8 @@ class ManageableProductHandler implements MessageHandlerInterface
             $this->eventDispatcher->dispatch($manageableEvent);
         } catch (\Exception $exception) {
             $this->logger->warning($exception, $manageableProductRequest->getContext());
+
+            throw $exception;
         }
     }
 }
