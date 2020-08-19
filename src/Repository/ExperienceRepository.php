@@ -73,6 +73,21 @@ class ExperienceRepository extends ServiceEntityRepository
         return $qb->getQuery()->getArrayResult();
     }
 
+    public function filterListExperienceIdsWithPartnerStatus(array $experienceIds, string $partnerStatus): array
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb
+            ->join('e.partner', 'ep')
+            ->select('e.goldenId')
+            ->where($qb->expr()->in('e.goldenId', $experienceIds))
+            ->andWhere('ep.status = :partner')
+            ->setParameter('partner', $partnerStatus)
+            ->indexBy('e', 'e.goldenId')
+        ;
+
+        return $qb->getQuery()->getArrayResult();
+    }
+
     public function filterListExperienceIdsByBoxId(int $boxId): array
     {
         $qb = $this->createQueryBuilder('e');

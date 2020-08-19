@@ -10,7 +10,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class QuickDataHelper
 {
-    const API_BASE_URL = '/quickdata/GetPackage/1/12345';
+    const API_GETPACKAGE_V1 = '/quickdata/GetPackage/1/12345';
+    const API_GETPACKAGE_V2 = '/quickdata/GetPackageV2/1/12345';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;
@@ -31,8 +32,30 @@ class QuickDataHelper
             'GET',
             sprintf(
                 '%s?PackageCode=%s&dateFrom=%s&dateTo=%s',
-                $this->baseUrl.self::API_BASE_URL,
+                $this->baseUrl.self::API_GETPACKAGE_V1,
                 $packageCode,
+                $dateFrom,
+                $dateTo
+            ),
+            [],
+            [],
+            []
+        );
+
+        return $this->client->getResponse();
+    }
+
+    /**
+     * @return JsonResponse|object
+     */
+    public function getPackageV2(string $packageCodes, string $dateFrom, string $dateTo)
+    {
+        $this->client->request(
+            'GET',
+            sprintf(
+                '%s?ListPackageCode=%s&dateFrom=%s&dateTo=%s',
+                $this->baseUrl.self::API_GETPACKAGE_V2,
+                $packageCodes,
                 $dateFrom,
                 $dateTo
             ),

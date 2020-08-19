@@ -13,15 +13,6 @@ class AvailabilityHelperTest extends TestCase
         '0', '1', 'r', '0', '1', '1', 'r', 'r', '0', '1',
     ];
 
-    public function testConvertToRequestType()
-    {
-        $expectedArray = [
-            '0', 'r', 'r', '0', 'r', 'r', 'r', 'r', '0', 'r',
-        ];
-
-        $this->assertEquals($expectedArray, AvailabilityHelper::convertToRequestType($this->availabilitiesTestArray));
-    }
-
     public function testconvertAvailableValueToRequest()
     {
         $inputString = 'Available';
@@ -106,101 +97,10 @@ class AvailabilityHelperTest extends TestCase
         $this->assertEquals(AvailabilityHelper::mapRoomAvailabilitiesToExperience($comps, $roomAvailabilities, 5), $returnArray);
     }
 
-    public function testCalculateAvailabilitiesByDuration()
-    {
-        $roomAvailabilities = [
-            0 => [
-                'stock' => 10,
-                'date' => '2020-07-20',
-                'type' => 'instant',
-            ],
-            1 => [
-                'stock' => 10,
-                'date' => '2020-07-21',
-                'type' => 'instant',
-            ],
-            2 => [
-                'stock' => 0,
-                'date' => '2020-07-22',
-                'type' => 'instant',
-            ],
-            3 => [
-                'stock' => 10,
-                'date' => '2020-07-23',
-                'type' => 'instant',
-            ],
-            4 => [
-                'stock' => 10,
-                'date' => '2020-07-24',
-                'type' => 'instant',
-            ],
-            5 => [
-                'stock' => 10,
-                'date' => '2020-07-25',
-                'type' => 'instant',
-            ],
-            6 => [
-                'stock' => 0,
-                'date' => '2020-07-26',
-                'type' => 'instant',
-            ],
-        ];
-
-        $returnArray = ['1', '1', 'r', '1', '1', '1', 'r'];
-
-        $this->assertEquals($returnArray, AvailabilityHelper::calculateAvailabilitiesByDuration(1, $roomAvailabilities));
-    }
-
-    public function testCalculateAvailabilitiesByDurationWithAvailabilityAtLastDate()
-    {
-        $roomAvailabilities = [
-            0 => [
-                'stock' => 10,
-                'date' => '2020-07-20',
-                'type' => 'instant',
-            ],
-            1 => [
-                'stock' => 10,
-                'date' => '2020-07-21',
-                'type' => 'instant',
-            ],
-            2 => [
-                'stock' => 0,
-                'date' => '2020-07-22',
-                'type' => 'instant',
-            ],
-            3 => [
-                'stock' => 10,
-                'date' => '2020-07-23',
-                'type' => 'instant',
-            ],
-            4 => [
-                'stock' => 10,
-                'date' => '2020-07-24',
-                'type' => 'instant',
-            ],
-            5 => [
-                'stock' => 10,
-                'date' => '2020-07-25',
-                'type' => 'instant',
-            ],
-            6 => [
-                'stock' => 10,
-                'date' => '2020-07-26',
-                'type' => 'instant',
-            ],
-        ];
-
-        $returnArray = ['1', '1', 'r', '1', '1', '1', '1'];
-
-        $this->assertEquals($returnArray, AvailabilityHelper::calculateAvailabilitiesByDuration(1, $roomAvailabilities));
-    }
-
     public function testBuildDataForGetPackage()
     {
         $availabilities = ['1', '1', '1'];
         $duration = 1;
-        $numberOfNights = 3;
         $partnerId = '1234';
         $isSellable = true;
 
@@ -219,40 +119,142 @@ class AvailabilityHelperTest extends TestCase
             AvailabilityHelper::buildDataForGetPackage(
                 $availabilities,
                 $duration,
-                $numberOfNights,
                 $partnerId,
                 $isSellable
             )
         );
     }
 
-    public function testBuildDataForGetPackageWithNoAvais()
+    public function testConvertToShortType()
     {
-        $availabilities = [];
-        $duration = 1;
-        $numberOfNights = 3;
-        $partnerId = '1234';
-        $isSellable = true;
+        $availabilities = [
+            0 => [
+                'stock' => 10,
+                'date' => new \DateTime('2020-06-20'),
+                'type' => 'stock',
+                'componentGoldenId' => '1111',
+            ],
+            1 => [
+                'stock' => 0,
+                'date' => new \DateTime('2020-06-21'),
+                'type' => 'stock',
+                'componentGoldenId' => '1111',
+            ],
+            2 => [
+                'stock' => 10,
+                'date' => new \DateTime('2020-06-22'),
+                'type' => 'on_request',
+                'componentGoldenId' => '1111',
+            ],
+        ];
+
+        $returnArray = ['1', '0', 'r'];
+
+        $this->assertEquals($returnArray, AvailabilityHelper::convertToShortType($availabilities));
+    }
+
+    public function testFillMissingAvailabilities()
+    {
+        $availabilities = [
+            0 => [
+                'stock' => 10,
+                'date' => new \DateTime('2020-06-20'),
+                'type' => 'stock',
+                'componentGoldenId' => '1111',
+            ],
+            1 => [
+                'stock' => 0,
+                'date' => new \DateTime('2020-06-21'),
+                'type' => 'stock',
+                'componentGoldenId' => '1111',
+            ],
+            2 => [
+                'stock' => 10,
+                'date' => new \DateTime('2020-06-23'),
+                'type' => 'on_request',
+                'componentGoldenId' => '1111',
+            ],
+        ];
+
+        $componentId = '1111';
+        $dateFrom = new \DateTime('2020-06-20');
+        $dateTo = new \DateTime('2020-06-25');
 
         $returnArray = [
-            'Availabilities' => ['r', 'r', 'r'],
-            'PrestId' => 1,
-            'Duration' => $duration,
-            'LiheId' => 1,
-            'PartnerCode' => $partnerId,
-            'ExtraNight' => $isSellable,
-            'ExtraRoom' => $isSellable,
+            0 => [
+                'stock' => 10,
+                'date' => new \DateTime('2020-06-20'),
+                'type' => 'stock',
+                'componentGoldenId' => '1111',
+            ],
+            1 => [
+                'stock' => 0,
+                'date' => new \DateTime('2020-06-21'),
+                'type' => 'stock',
+                'componentGoldenId' => '1111',
+            ],
+            2 => [
+                'stock' => 0,
+                'date' => new \DateTime('2020-06-22'),
+                'type' => 'stock',
+                'componentGoldenId' => '1111',
+            ],
+            3 => [
+                'stock' => 10,
+                'date' => new \DateTime('2020-06-23'),
+                'type' => 'on_request',
+                'componentGoldenId' => '1111',
+            ],
+            4 => [
+                'stock' => 0,
+                'date' => new \DateTime('2020-06-24'),
+                'type' => 'stock',
+                'componentGoldenId' => '1111',
+            ],
+            5 => [
+                'stock' => 0,
+                'date' => new \DateTime('2020-06-25'),
+                'type' => 'stock',
+                'componentGoldenId' => '1111',
+            ],
         ];
 
         $this->assertEquals(
             $returnArray,
-            AvailabilityHelper::buildDataForGetPackage(
-                $availabilities,
-                $duration,
-                $numberOfNights,
-                $partnerId,
-                $isSellable
-            )
+            AvailabilityHelper::fillMissingAvailabilities($availabilities, $componentId, $dateFrom, $dateTo)
+        );
+    }
+
+    public function testFillMissingAvailabilitiesWithEnoughDate()
+    {
+        $availabilities = [
+            0 => [
+                'stock' => 10,
+                'date' => new \DateTime('2020-06-20'),
+                'type' => 'stock',
+                'componentGoldenId' => '1111',
+            ],
+            1 => [
+                'stock' => 0,
+                'date' => new \DateTime('2020-06-21'),
+                'type' => 'stock',
+                'componentGoldenId' => '1111',
+            ],
+            2 => [
+                'stock' => 10,
+                'date' => new \DateTime('2020-06-22'),
+                'type' => 'on_request',
+                'componentGoldenId' => '1111',
+            ],
+        ];
+
+        $componentId = '1111';
+        $dateFrom = new \DateTime('2020-06-20');
+        $dateTo = new \DateTime('2020-06-22');
+
+        $this->assertEquals(
+            $availabilities,
+            AvailabilityHelper::fillMissingAvailabilities($availabilities, $componentId, $dateFrom, $dateTo)
         );
     }
 }
