@@ -86,22 +86,20 @@ class RoomAvailabilityManager
         return $roomAvailability;
     }
 
-    public function getRoomAvailabilitiesByComponentGoldenIds(
-        array $componentIds,
-        string $type,
+    public function getRoomAvailabilitiesByMultipleComponentGoldenIds(
+        array $componentGoldenIds,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): array {
-        return $this->repository->findRoomAvailabilitiesByComponentGoldenIds($componentIds, $type, $dateFrom, $dateTo);
+        return $this->repository->findRoomAvailabilitiesByMultipleComponentGoldenIds($componentGoldenIds, $dateFrom, $dateTo);
     }
 
-    public function getRoomAvailabilitiesListByComponentGoldenId(
+    public function getRoomAvailabilitiesByComponentGoldenId(
         string $componentGoldenId,
-        string $type,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): array {
-        return $this->repository->findAllByComponentGoldenId($componentGoldenId, $type, $dateFrom, $dateTo);
+        return $this->repository->findRoomAvailabilitiesByComponentGoldenId($componentGoldenId, $dateFrom, $dateTo);
     }
 
     /**

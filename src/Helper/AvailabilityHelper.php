@@ -6,28 +6,78 @@ namespace App\Helper;
 
 class AvailabilityHelper
 {
-    public static function convertToRequestType(array $availabilities): array
+    public const AVAILABILITY_TYPE_ON_REQUEST = 'on_request';
+    public const AVAILABILITY_SHORTEN_INSTANT = '1';
+    public const AVAILABILITY_SHORTEN_ON_REQUEST = 'r';
+    public const AVAILABILITY_SHORTEN_NOT_AVAILABLE = '0';
+
+    private const DEFAULT_DATE_TIME_FORMAT = 'Y-m-d';
+    private const DEFAULT_DATE_DIFF_VALUE = 0;
+
+    public static function convertToShortType(array $availabilities): array
     {
-        foreach ($availabilities as &$availability) {
-            if ('1' == $availability) {
-                $availability = 'r';
+        $shortenArray = [];
+
+        foreach ($availabilities as $availability) {
+            if (0 === $availability['stock']) {
+                $shortenArray[] = self::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
+            } elseif (self::AVAILABILITY_TYPE_ON_REQUEST === $availability['type']) {
+                $shortenArray[] = self::AVAILABILITY_SHORTEN_ON_REQUEST;
+            } else {
+                $shortenArray[] = self::AVAILABILITY_SHORTEN_INSTANT;
             }
         }
 
-        return $availabilities;
+        return $shortenArray;
+    }
+
+    public static function fillMissingAvailabilities(
+        array $availabilities,
+        string $componentId,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): array {
+        $dateFrom = new \DateTime($dateFrom->format(self::DEFAULT_DATE_TIME_FORMAT));
+        $dateTo = new \DateTime($dateTo->format(self::DEFAULT_DATE_TIME_FORMAT));
+        $dateDiff = $dateTo->diff($dateFrom)->days ?? self::DEFAULT_DATE_DIFF_VALUE;
+        $numberOfNights = $dateDiff + 1;
+
+        if ($numberOfNights === count($availabilities)) {
+            return $availabilities;
+        }
+
+        $returnAvailabilities = [];
+
+        $dateFlag = $dateFrom->setTime(0, 0, 0);
+        $availabilityPosition = 0;
+
+        for ($i = 0; $i < $numberOfNights; ++$i) {
+            if (
+                empty($availabilities[$availabilityPosition]['date']) ||
+                0 !== $dateFlag->diff($availabilities[$availabilityPosition]['date'])->days
+            ) {
+                $returnAvailabilities[] = [
+                    'stock' => 0,
+                    'date' => clone $dateFlag,
+                    'type' => 'stock',
+                    'componentGoldenId' => $componentId,
+                ];
+            } else {
+                $returnAvailabilities[] = $availabilities[$availabilityPosition];
+                ++$availabilityPosition;
+            }
+            $dateFlag->modify('+1 day');
+        }
+
+        return $returnAvailabilities;
     }
 
     public static function buildDataForGetPackage(
         array $availabilities,
         int $duration,
-        int $numberOfNights,
         string $partnerId,
         bool $isSellable
     ): array {
-        if (empty($availabilities)) {
-            $availabilities = array_fill(0, $numberOfNights, 'r');
-        }
-
         return [
             'Availabilities' => $availabilities,
             'PrestId' => 1,
@@ -65,52 +115,6 @@ class AvailabilityHelper
                     'Request' => $numberOfNights,
                     'Stock' => 0,
                 ];
-            }
-        }
-
-        return $returnArray;
-    }
-
-    public static function calculateAvailabilitiesByDuration(int $duration, array $roomAvailabilities): array
-    {
-        $returnArray = [];
-        $numberOfAvailabilities = 0;
-        $lastKey = array_key_last($roomAvailabilities);
-
-        // Set default of return array as Reserve and set the number of Availabilities
-        // Return array will be like [numberOfAvailabilities,'r','r,...]
-        foreach ($roomAvailabilities as $index => $availability) {
-            $index = (int) $index;
-            $returnArray[] = 'r';
-            // In case there is available and not the end of array, increase the numberOfAvailabilities
-            if (0 < $availability['stock'] && $lastKey !== $index) {
-                ++$numberOfAvailabilities;
-                continue;
-            }
-
-            // In case there is available and the end of array, increase the numberOfAvailabilities and index
-            if (0 < $availability['stock'] && $lastKey === $index) {
-                ++$numberOfAvailabilities;
-                ++$index;
-            }
-
-            // Set the legit $numberOfAvailabilities of the start index of Availabilities if suitable with the Component duration
-            $returnArray[$index - $numberOfAvailabilities] = ($numberOfAvailabilities - $duration) >= 0 ?
-                ($numberOfAvailabilities - $duration + 1) : 'r';
-            $numberOfAvailabilities = 0;
-        }
-
-        $numberOfAvailabilities = 0;
-        // Run through the array to fill all the availabilities
-        foreach ($returnArray as &$item) {
-            if ('r' !== $item) {
-                $numberOfAvailabilities = $item;
-                $item = '1';
-            } elseif (0 < $numberOfAvailabilities - 1) {
-                $item = '1';
-                --$numberOfAvailabilities;
-            } else {
-                $numberOfAvailabilities = 0;
             }
         }
 

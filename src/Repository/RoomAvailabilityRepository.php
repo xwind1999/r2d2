@@ -46,51 +46,38 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         return $roomAvailability;
     }
 
-    public function findRoomAvailabilitiesByComponentGoldenIds(
+    public function findRoomAvailabilitiesByMultipleComponentGoldenIds(
         array $componentIds,
-        string $type,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): array {
-        $dateDiff = $dateTo->diff($dateFrom)->days ?: 0;
-        // DateFrom and DateTo is the stay date, not the checkout one
-        $numberOfNights = $dateDiff + 1;
         $qb = $this->createQueryBuilder('r');
         $qb
-            ->select('r.componentGoldenId')
+            ->select('r.stock, r.date, r.type, r.componentGoldenId')
             ->where($qb->expr()->in('r.componentGoldenId', $componentIds))
             ->andWhere('r.date BETWEEN :dateFrom AND :dateTo')
-            ->andWhere('r.type = :type')
-            ->andWhere('r.stock > 0')
-            ->groupBy('r.componentGoldenId')
-            ->having('count(r.date) = :numberOfDays')
+            ->orderBy('r.date', 'ASC')
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d'))
-            ->setParameter('numberOfDays', $numberOfNights)
-            ->setParameter('type', $type)
-            ->indexBy('r', 'r.componentGoldenId')
         ;
 
         return $qb->getQuery()->getArrayResult();
     }
 
-    public function findAllByComponentGoldenId(
+    public function findRoomAvailabilitiesByComponentGoldenId(
         string $componentGoldenId,
-        string $type,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo): array
     {
         $qb = $this->createQueryBuilder('r');
         $qb
-            ->select('r.stock, r.date, r.type')
+            ->select('r.stock, r.date, r.type, r.componentGoldenId')
             ->where('r.componentGoldenId = :componentGoldenId')
             ->andWhere('r.date BETWEEN :dateFrom AND :dateTo')
-            ->andWhere('r.type = :type')
             ->orderBy('r.date', 'ASC')
             ->setParameter('componentGoldenId', $componentGoldenId)
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d'))
-            ->setParameter('type', $type)
         ;
 
         return $qb->getQuery()->getArrayResult();

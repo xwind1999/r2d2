@@ -348,64 +348,30 @@ class LegacyAvailabilityProviderTest extends TestCase
     {
         $experienceIds = [1234, 5678];
         $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
-
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
-
-        $result = $this->prophesize(GetPackageResponse::class);
-        $this->quickData->getPackageV2($experienceIds, $dateFrom, $dateTo)->willReturn([]);
-        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
-        $response = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
-
-        $this->assertInstanceOf(GetPackageResponse::class, $response);
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getAvailabilityForMultipleExperiences
-     */
-    public function testGetAvailabilityForMultipleExperiencesWithConverter()
-    {
-        $experienceIds = [1234, 5678];
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
-
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
+        $dateTo = new \DateTime('2020-01-05');
 
         $result = $this->prophesize(GetPackageV2Response::class);
-        $this->quickData->getPackageV2($experienceIds, $dateFrom, $dateTo)->willReturn([
-            'ListPackage' => [
-                [
-                    'PackageCode' => 88826,
-                    'ListPrestation' => [
-                        [
-                            'Availabilities' => [
-                                '0', '1', 'r',
-                            ],
-                            'PrestId' => 2896684,
-                            'Duration' => 1,
-                            'LiheId' => 15257,
-                            'PartnerCode' => '00100901',
-                            'ExtraNight' => true,
-                            'ExtraRoom' => true,
-                        ],
-                    ],
+        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
+            $this->serializer->reveal(),
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal()
+        );
+
+        $returnArray = [
+            '1234' => [
+                'duration' => 1,
+                'isSellable' => true,
+                'partnerId' => '123',
+                'availabilities' => [
+                    '1', '1', '1', '1', '1',
                 ],
             ],
-        ]);
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
-        $this->experienceManager->filterIdsListWithPartnerChannelManagerCondition(Argument::any(), Argument::any())->willReturn([
-            '88826' => '88826',
-            '88827' => '88827',
-        ]);
+        ];
+
+        $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList($experienceIds, $dateFrom, $dateTo)
+            ->willReturn($returnArray);
         $response = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageV2Response::class, $response);
@@ -415,60 +381,16 @@ class LegacyAvailabilityProviderTest extends TestCase
      * @covers ::__construct
      * @covers ::getAvailabilityForMultipleExperiences
      */
-    public function testGetAvailabilityForMultipleExperiencesWithConverterWrongFormat()
+    public function testGetAvailabilityForMultipleExperiencesWithException()
     {
         $experienceIds = [1234, 5678];
         $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-05');
 
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
-
+        $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList(Argument::any(), Argument::any(), Argument::any())
+            ->willThrow(new \Exception());
         $result = $this->prophesize(GetPackageV2Response::class);
-        $this->quickData->getPackageV2($experienceIds, $dateFrom, $dateTo)->willReturn([
-            'ListPackage' => [
-                [
-                    'PackageCode' => 88826,
-                    'ListPrestation' => [
-                        [
-                        ],
-                        [
-                            'Availabilities' => [
-                                '0', '1', 'r',
-                            ],
-                            'PrestId' => 2896684,
-                            'Duration' => 1,
-                            'LiheId' => 15257,
-                            'PartnerCode' => '00100901',
-                            'ExtraNight' => true,
-                            'ExtraRoom' => true,
-                        ],
-                    ],
-                ],
-            ],
-        ]);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
-        $this->experienceManager->filterIdsListWithPartnerChannelManagerCondition(Argument::any(), Argument::any())->willReturn([
-            '88826' => '88826',
-            '88827' => '88827',
-        ]);
-        $response = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
-
-        $this->assertInstanceOf(GetPackageV2Response::class, $response);
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getAvailabilityForMultipleExperiences
-     */
-    public function testGetAvailabilityForMultipleExperiencesWillFailDueToHttpError()
-    {
-        $experienceIds = [1234, 5678];
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
             $this->serializer->reveal(),
@@ -476,16 +398,9 @@ class LegacyAvailabilityProviderTest extends TestCase
             $this->availabilityProvider->reveal()
         );
 
-        $exception = $this->prophesize(HttpExceptionInterface::class);
-        $result = $this->prophesize(GetPackageV2Response::class);
-
-        $this->quickData->getPackageV2($experienceIds, $dateFrom, $dateTo)->willThrow($exception->reveal());
-
-        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
         $response = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageV2Response::class, $response);
-        $this->assertEmpty($response->listPackage);
     }
 
     /**
