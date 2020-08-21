@@ -1,0 +1,113 @@
+version: '3.4'
+
+services:
+  api:
+    image: "${APP_IMAGE}"
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+    stop_grace_period: 10s
+    volumes:
+      - /var/log/jarvis/:/app/var/log/
+
+  worker-broadcast-listeners-partner:
+    image: "${APP_IMAGE}"
+    deploy:
+      replicas: 2
+    environment:
+      APP_NAME: jarvis-r2d2-worker
+      LOG_FILE: r2d2-worker.log
+      QUEUES: broadcast-listeners-partner
+    command: ['/app/bin/start-command.sh']
+    volumes:
+      - /var/log/jarvis/:/app/var/log/
+
+  worker-broadcast-listeners-product:
+    image: "${APP_IMAGE}"
+    deploy:
+      replicas: 2
+    environment:
+      APP_NAME: jarvis-r2d2-worker
+      LOG_FILE: r2d2-worker.log
+      QUEUES: broadcast-listeners-product
+    command: ['/app/bin/start-command.sh']
+    volumes:
+      - /var/log/jarvis/:/app/var/log/
+
+  worker-broadcast-listeners-price-information:
+    image: "${APP_IMAGE}"
+    deploy:
+      replicas: 2
+    environment:
+      APP_NAME: jarvis-r2d2-worker
+      LOG_FILE: r2d2-worker.log
+      QUEUES: broadcast-listeners-price-information
+    command: ['/app/bin/start-command.sh']
+    volumes:
+      - /var/log/jarvis/:/app/var/log/
+
+  worker-broadcast-listeners-product-relationship:
+    image: "${APP_IMAGE}"
+    deploy:
+      replicas: 2
+    environment:
+      APP_NAME: jarvis-r2d2-worker
+      LOG_FILE: r2d2-worker.log
+      QUEUES: broadcast-listeners-product-relationship
+    command: ['/app/bin/start-command.sh']
+    volumes:
+      - /var/log/jarvis/:/app/var/log/
+
+  worker-calculate-manageable-flag:
+    image: "${APP_IMAGE}"
+    deploy:
+      replicas: 2
+    environment:
+      APP_NAME: jarvis-r2d2-worker
+      LOG_FILE: r2d2-worker.log
+      QUEUES: calculate-manageable-flag
+    command: ['/app/bin/start-command.sh']
+    volumes:
+      - /var/log/jarvis/:/app/var/log/
+
+  worker-push-room-information:
+    image: "${APP_IMAGE}"
+    deploy:
+      replicas: 2
+    environment:
+      APP_NAME: jarvis-r2d2-worker
+      LOG_FILE: r2d2-worker.log
+      QUEUES: push-room-information
+    command: ['/app/bin/start-command.sh']
+    volumes:
+      - /var/log/jarvis/:/app/var/log/
+
+  worker-broadcast-listeners-room-availability:
+    image: "${APP_IMAGE}"
+    deploy:
+      replicas: 2
+    environment:
+      APP_NAME: jarvis-r2d2-worker
+      LOG_FILE: r2d2-worker.log
+      QUEUES: broadcast-listeners-room-availability
+    command: ['/app/bin/start-command.sh']
+    volumes:
+      - /var/log/jarvis/:/app/var/log/
+
+  worker-broadcast-listeners-room-price:
+    image: "${APP_IMAGE}"
+    deploy:
+      replicas: 2
+    environment:
+      APP_NAME: jarvis-r2d2-worker
+      LOG_FILE: r2d2-worker.log
+      QUEUES: broadcast-listeners-room-price
+    command: ['/app/bin/start-command.sh']
+    volumes:
+      - /var/log/jarvis/:/app/var/log/

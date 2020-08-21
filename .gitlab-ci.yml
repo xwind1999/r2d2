@@ -23,8 +23,6 @@ variables:
 
 default:
   image: ${BASE_IMAGE}
-  before_script:
-    - echo '10.11.0.178 ie1-i-chef-02' >> /etc/hosts
   tags:
     - k8s
 
@@ -47,6 +45,7 @@ composer:
   script:
     - echo ${CI_COMMIT_SHA} > public/version.txt
     - echo ${CI_COMMIT_TAG} > public/tag.txt
+    - echo ${CI_PIPELINE_ID} > public/pipeline.txt
     - /load-key.sh "${SSH_KNOWN_HOSTS}" "${SSH_KEY}"
     - composer config cache-dir cache/composer
     - composer install -n --no-progress
