@@ -2,7 +2,7 @@ variables:
   CONSOLE_NEWRELIC_COMPLETED: bin/console newrelic:notify-deployment --user=${GITLAB_USER_EMAIL} --revision=${CI_PIPELINE_ID}_${CI_COMMIT_SHA}
 
 .deploy:
-  image: docker-registry.production.smartbox.com/moby/moby-docker:test5
+  image: docker-registry.production.smartbox.com/moby/moby-docker:test6
   dependencies:
     - build-app-container
   script:
