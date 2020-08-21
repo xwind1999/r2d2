@@ -41,7 +41,7 @@ class IntegrationTestCase extends ApiTestCase
          * TODO: find a way to test in a real environment (devint),
          *       maybe by waiting a second for the workers to pick up the message.
          */
-        $transport = self::$container->get('messenger.transport.'.$queue);
+        $transport = static::$container->get('messenger.transport.'.$queue);
         (new DisposableWorker(
             [$transport],
             self::$container->get(MessageBusInterface::class),
