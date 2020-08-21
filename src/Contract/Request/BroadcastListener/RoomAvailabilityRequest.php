@@ -28,6 +28,14 @@ class RoomAvailabilityRequest implements ContextualInterface
     public int $quantity;
 
     /**
+     * @Assert\Type(type="boolean")
+     * @Assert\NotNull
+     *
+     * @JMS\Type("strict_boolean")
+     */
+    public bool $isStopSale = false;
+
+    /**
      * @Assert\Type(type="DateTime")
      * @SWG\Property(example="2020-07-16T20:00:00.000000+0000")
      * @Assert\NotBlank
@@ -60,6 +68,7 @@ class RoomAvailabilityRequest implements ContextualInterface
             'quantity' => $this->quantity,
             'dateFrom' => $this->dateFrom,
             'dateTo' => $this->dateTo,
+            'isStopSale' => $this->isStopSale,
             'updatedAt' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
         ];
     }

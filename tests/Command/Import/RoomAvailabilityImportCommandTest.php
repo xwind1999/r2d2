@@ -45,6 +45,7 @@ class RoomAvailabilityImportCommandTest extends AbstractImportCommandTest
             [
                 'product.id' => '1234567',
                 'quantity' => 1,
+                'isStopSale' => true,
                 'dateFrom' => '2020-01-01',
                 'dateTo' => '2020-01-02',
                 'updatedAt' => '2020-01-01 00:00:00',
@@ -57,6 +58,7 @@ class RoomAvailabilityImportCommandTest extends AbstractImportCommandTest
             [
                 'product.id' => '1234567',
                 'quantity' => 1,
+                'isStopSale' => true,
                 'dateFrom' => '2020-01-01',
                 'dateTo' => '2020-01-02',
                 'updatedAt' => null,
@@ -72,6 +74,7 @@ class RoomAvailabilityImportCommandTest extends AbstractImportCommandTest
             [
                 'product.id' => '1234567',
                 'quantity' => null,
+                'isStopSale' => true,
                 'dateFrom' => '2020-01-02',
                 'dateTo' => '2020-01-02',
                 'updatedAt' => '2020-01-01 00:00:00',
@@ -99,6 +102,9 @@ class RoomAvailabilityImportCommandTest extends AbstractImportCommandTest
         $this->assertStringContainsString('Total records: 1', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Starting at:', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Finishing at :', $this->commandTester->getDisplay());
+        $this->messageBus
+            ->dispatch(Argument::type(RoomAvailabilityRequest::class))
+            ->shouldBeCalledTimes(count($arrayRoomAvailabilityRequest));
     }
 
     /**

@@ -30,6 +30,7 @@ class RoomAvailabilityFixture extends Fixture implements FixtureGroupInterface
                 $roomAvailability->component = $component;
                 $roomAvailability->componentGoldenId = $component->goldenId;
                 $roomAvailability->type = $component->roomStockType ?? '';
+                $roomAvailability->isStopSale = false;
                 $roomAvailability->date = new \DateTime($date);
                 $roomAvailability->stock = $availability;
                 $manager->persist($roomAvailability);

@@ -6,6 +6,7 @@ namespace App\Tests\Command\Import;
 
 use App\Command\Import\PartnerImportCommand;
 use App\Contract\Request\BroadcastListener\PartnerRequest;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -60,6 +61,9 @@ class PartnerImportCommandTest extends AbstractImportCommandTest
         $this->executeWithValidData($partnerRequests);
 
         $this->assertEquals('r2d2:partner:import', $this->command::getDefaultName());
+        $this->messageBus
+            ->dispatch(Argument::type(PartnerRequest::class))
+            ->shouldBeCalledTimes(count($partnerRequests));
     }
 
     public function requestProvider(): ?\Generator
@@ -99,6 +103,20 @@ class PartnerImportCommandTest extends AbstractImportCommandTest
                 'partnerCeaseDate' => new \DateTime('now'),
                 'isChannelManagerEnabled' => '',
                 'updatedAt' => '2020-01-01 00:00:00',
+            ],
+            [
+                'id' => '9999999999999999999999',
+                'type' => 'partner',
+                'partnerCeaseDate' => null,
+                'isChannelManagerEnabled' => '',
+                'updatedAt' => '2020-01-01 00:00:00',
+            ],
+            [
+                'id' => '9999999999999999999999',
+                'type' => 'partner',
+                'partnerCeaseDate' => null,
+                'isChannelManagerEnabled' => '',
+                'updatedAt' => null,
             ],
         ]);
 

@@ -30,6 +30,7 @@ class RoomAvailabilityRequestTest extends TestCase
             $roomAvailabilityRequest->quantity = $request['quantity'];
             $roomAvailabilityRequest->dateFrom = $request['dateFrom'];
             $roomAvailabilityRequest->dateTo = $request['dateTo'];
+            $roomAvailabilityRequest->isStopSale = $request['isStopSale'];
             $roomAvailabilityRequest->updatedAt = $request['updatedAt'];
             $roomAvailabilityRequest = $roomAvailabilityRequest->getContext();
         }
@@ -48,6 +49,7 @@ class RoomAvailabilityRequestTest extends TestCase
             [
                 'product' => $product,
                 'quantity' => 2,
+                'isStopSale' => true,
                 'dateFrom' => new \DateTime('+2 days'),
                 'dateTo' => new \DateTime('+5 days'),
                 'updatedAt' => new \DateTime('-2 days'),

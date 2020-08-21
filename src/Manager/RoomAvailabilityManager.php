@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
-use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityCreateRequest;
-use App\Contract\Request\Internal\RoomAvailability\RoomAvailabilityUpdateRequest;
 use App\Entity\RoomAvailability;
 use App\Exception\Manager\RoomAvailability\InvalidRoomStockTypeException;
 use App\Exception\Manager\RoomAvailability\OutdatedRoomAvailabilityInformationException;
-use App\Exception\Repository\EntityNotFoundException;
 use App\Repository\ComponentRepository;
 use App\Repository\RoomAvailabilityRepository;
 use Psr\Log\LoggerInterface;
@@ -30,60 +27,6 @@ class RoomAvailabilityManager
         $this->repository = $repository;
         $this->componentRepository = $componentRepository;
         $this->logger = $logger;
-    }
-
-    public function create(RoomAvailabilityCreateRequest $roomAvailabilityCreateRequest): RoomAvailability
-    {
-        $component = $this->componentRepository->findOneByGoldenId($roomAvailabilityCreateRequest->componentGoldenId);
-
-        $roomAvailability = new RoomAvailability();
-
-        $roomAvailability->component = $component;
-        $roomAvailability->componentGoldenId = $roomAvailabilityCreateRequest->componentGoldenId;
-        $roomAvailability->stock = $roomAvailabilityCreateRequest->stock;
-        $roomAvailability->date = $roomAvailabilityCreateRequest->date;
-        $roomAvailability->type = $roomAvailabilityCreateRequest->type;
-
-        $this->repository->save($roomAvailability);
-
-        return $roomAvailability;
-    }
-
-    /**
-     * @throws EntityNotFoundException
-     */
-    public function get(string $uuid): RoomAvailability
-    {
-        return $this->repository->findOne($uuid);
-    }
-
-    /**
-     * @throws EntityNotFoundException
-     */
-    public function delete(string $uuid): void
-    {
-        $roomAvailability = $this->get($uuid);
-        $this->repository->delete($roomAvailability);
-    }
-
-    /**
-     * @throws EntityNotFoundException
-     */
-    public function update(string $uuid, RoomAvailabilityUpdateRequest $roomAvailabilityUpdateRequest): RoomAvailability
-    {
-        $component = $this->componentRepository->findOneByGoldenId($roomAvailabilityUpdateRequest->componentGoldenId);
-
-        $roomAvailability = $this->get($uuid);
-
-        $roomAvailability->component = $component;
-        $roomAvailability->componentGoldenId = $roomAvailabilityUpdateRequest->componentGoldenId;
-        $roomAvailability->stock = $roomAvailabilityUpdateRequest->stock;
-        $roomAvailability->date = $roomAvailabilityUpdateRequest->date;
-        $roomAvailability->type = $roomAvailabilityUpdateRequest->type;
-
-        $this->repository->save($roomAvailability);
-
-        return $roomAvailability;
     }
 
     public function getRoomAvailabilitiesByMultipleComponentGoldenIds(
@@ -133,6 +76,7 @@ class RoomAvailabilityManager
                 $roomAvailability->component = $component;
                 $roomAvailability->stock = $roomAvailabilityRequest->quantity;
                 $roomAvailability->date = $date;
+                $roomAvailability->isStopSale = $roomAvailabilityRequest->isStopSale;
                 $roomAvailability->type = $component->roomStockType;
                 $roomAvailability->externalUpdatedAt = $roomAvailabilityRequest->updatedAt ?? null;
 
