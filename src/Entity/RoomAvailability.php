@@ -57,6 +57,11 @@ class RoomAvailability
     public string $type;
 
     /**
+     * @ORM\Column(type="boolean", options={"default": false})
+     */
+    public bool $isStopSale = false;
+
+    /**
      * @ORM\Column(type="datetime_milliseconds", nullable=true)
      */
     public ?\DateTime $externalUpdatedAt = null;

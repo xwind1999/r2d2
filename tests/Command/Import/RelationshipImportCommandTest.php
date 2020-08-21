@@ -98,6 +98,9 @@ class RelationshipImportCommandTest extends AbstractImportCommandTest
         $this->assertStringContainsString('Total records: 1', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Starting at:', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Finishing at :', $this->commandTester->getDisplay());
+        $this->messageBus
+            ->dispatch(Argument::type(ProductRelationshipRequest::class))
+            ->shouldBeCalledTimes(count($arrayProductRelationshipRequest));
     }
 
     /**

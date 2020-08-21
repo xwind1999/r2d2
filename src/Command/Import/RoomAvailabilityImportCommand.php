@@ -16,6 +16,7 @@ class RoomAvailabilityImportCommand extends AbstractImportCommand
         'quantity',
         'dateFrom',
         'dateTo',
+        'isStopSale',
         'updatedAt',
     ];
 
@@ -36,6 +37,10 @@ class RoomAvailabilityImportCommand extends AbstractImportCommand
             $roomAvailabilityRequest->quantity = (int) $record['quantity'];
             $roomAvailabilityRequest->dateFrom = new \DateTime($record['dateFrom']);
             $roomAvailabilityRequest->dateTo = new \DateTime($record['dateTo']);
+
+            if (!empty($record['isStopSale'])) {
+                $roomAvailabilityRequest->isStopSale = (bool) $record['isStopSale'];
+            }
 
             if (!empty($record['updatedAt'])) {
                 $roomAvailabilityRequest->updatedAt = new \DateTime($record['updatedAt']);

@@ -14,8 +14,6 @@ use App\Tests\ApiTests\Helper\ExperienceHelper;
 use App\Tests\ApiTests\Helper\HealthCheckHelper;
 use App\Tests\ApiTests\Helper\PartnerHelper;
 use App\Tests\ApiTests\Helper\QuickDataHelper;
-use App\Tests\ApiTests\Helper\RoomAvailabilityHelper;
-use App\Tests\ApiTests\Helper\RoomPriceHelper;
 use JMS\Serializer\Serializer;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
@@ -35,10 +33,6 @@ class ApiTestCase extends WebTestCase
     public static ExperienceHelper $experienceHelper;
 
     public static ComponentHelper $componentHelper;
-
-    public static RoomPriceHelper $roomPriceHelper;
-
-    public static RoomAvailabilityHelper $roomAvailabilityHelper;
 
     public static BoxHelper $boxHelper;
 
@@ -82,8 +76,6 @@ class ApiTestCase extends WebTestCase
         static::$broadcastListenerHelper = new BroadcastListenerHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$experienceHelper = new ExperienceHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$componentHelper = new ComponentHelper(clone static::$client, static::$serializer, static::$baseUrl);
-        static::$roomPriceHelper = new RoomPriceHelper(clone static::$client, static::$serializer, static::$baseUrl);
-        static::$roomAvailabilityHelper = new RoomAvailabilityHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$boxHelper = new BoxHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$bookingHelper = new BookingHelper(clone static::$client, static::$serializer, static::$baseUrl);
         static::$boxExperienceHelper = new BoxExperienceHelper(clone static::$client, static::$serializer, static::$baseUrl);
