@@ -7,9 +7,8 @@ variables:
     - build-app-container
   script:
     - moby-docker
-    - source env-vault
     - docker run -t --env-file=${ENV_FILE} ${APP_IMAGE} bin/console d:m:m -n --allow-no-migration
-    - docker stack deploy --compose-file .ci/deploy/docker-compose.${CI_ENVIRONMENT_SLUG}.yaml r2d2
+    - env-vault docker stack deploy --compose-file .ci/deploy/docker-compose.${CI_ENVIRONMENT_SLUG}.yaml r2d2
     - >
       if [ "$NR_ENABLE" = "true" ]; then
         docker run -t --env-file=${ENV_FILE} ${APP_IMAGE} ${CONSOLE_NEWRELIC_COMPLETED} || true
