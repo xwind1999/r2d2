@@ -342,6 +342,11 @@ class ComponentManagerTest extends TestCase
         $component = $this->prophesize(Component::class);
         $component->goldenId = '12345';
         $component->isManageable = true;
+        $component->name = '123';
+        $component->isSellable = false;
+        $partner = new Partner();
+        $partner->goldenId = '1234';
+        $component->partner = $partner;
         $this->repository
             ->findComponentWithManageableCriteria(Argument::any())
             ->shouldBeCalledOnce()
@@ -351,7 +356,7 @@ class ComponentManagerTest extends TestCase
             ->findComponentWithManageableRelationships(Argument::any())
             ->shouldNotBeCalled();
         $this->repository->save(Argument::type(Component::class))->shouldNotBeCalled();
-        $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldNotBeCalled();
+        $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldBeCalled()->willReturn(new Envelope(new \stdClass()));
 
         $this->manager->calculateManageableFlag($component->goldenId);
         $this->assertTrue($component->isManageable);
@@ -370,7 +375,6 @@ class ComponentManagerTest extends TestCase
         $component->isManageable = true;
         $component->name = '123';
         $component->isSellable = false;
-        $component->isManageable = true;
         $partner = new Partner();
         $partner->goldenId = '1234';
         $component->partner = $partner;
@@ -403,6 +407,11 @@ class ComponentManagerTest extends TestCase
         $component = $this->prophesize(Component::class);
         $component->goldenId = '12345';
         $component->isManageable = false;
+        $component->name = '123';
+        $component->isSellable = false;
+        $partner = new Partner();
+        $partner->goldenId = '1234';
+        $component->partner = $partner;
         $this->repository
             ->findComponentWithManageableCriteria(Argument::any())
             ->shouldBeCalledOnce()
@@ -414,7 +423,7 @@ class ComponentManagerTest extends TestCase
             ->willReturn($component->reveal())
         ;
         $this->repository->save(Argument::type(Component::class))->shouldNotBeCalled();
-        $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldNotBeCalled();
+        $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldBeCalled()->willReturn(new Envelope(new \stdClass()));
 
         $this->manager->calculateManageableFlag($component->goldenId);
 

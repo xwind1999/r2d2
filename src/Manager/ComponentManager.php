@@ -167,7 +167,6 @@ class ComponentManager
             if (false === $component->isManageable) {
                 $component->isManageable = true;
                 $this->repository->save($component);
-                $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
             }
         } catch (ManageableProductNotFoundException $exception) {
             $component = $this->repository->findComponentWithManageableRelationships(
@@ -176,9 +175,9 @@ class ComponentManager
             if (true === $component->isManageable) {
                 $component->isManageable = false;
                 $this->repository->save($component);
-                $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
             }
         }
+        $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
     }
 
     private function createManageableCriteria(): Criteria
