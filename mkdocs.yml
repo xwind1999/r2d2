@@ -26,6 +26,7 @@ nav:
   - Project details: readme/project-details.md
   - Development Guidelines: readme/development-guidelines.md
   - CI/CD: readme/ci-cd.md
+  - Swarm: swarm.md
   - Test automation guidelines: readme/test-automation.md
   - Initial tools and libraries: readme/tools-and-libraries.md
   - Environments: environments.md
