@@ -136,22 +136,6 @@ services:
   api:
     image: any_image:any-version
     deploy:
-      replicas: 2
-    ports:
-      - target: 80
-        published: 80
-        protocol: tcp
-        mode: host
-``` 
-The key `mode: host` here means that it won't use any swarm feature to route the traffic between nodes. If we were to
-use ingress, where we could spin a bigger number of api nodes, we can use `mode: ingress`
-```yaml
-version: '3.4'
-
-services:
-  api:
-    image: any_image:any-version
-    deploy:
       replicas: 4
     ports:
       - target: 80
@@ -159,7 +143,8 @@ services:
         protocol: tcp
         mode: ingress
 ``` 
-
+The key `mode: ingress` here means that it will use swarm ingress to load-balance traffic between nodes. If we were to
+use host, we would be able to spin up only one api container per node.
 
 ## Blue-green deployment
 
