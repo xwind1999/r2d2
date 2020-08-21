@@ -3,6 +3,8 @@ version: '3.4'
 services:
   api:
     image: "${APP_IMAGE}"
+    env_file:
+      - "${ENV_FILE}"
     ports:
       - target: 80
         published: 80
@@ -20,6 +22,8 @@ services:
     image: "${APP_IMAGE}"
     deploy:
       replicas: 2
+    env_file:
+      - "${ENV_FILE}"
     environment:
       APP_NAME: jarvis-r2d2-worker
       LOG_FILE: r2d2-worker.log
@@ -32,6 +36,8 @@ services:
     image: "${APP_IMAGE}"
     deploy:
       replicas: 2
+    env_file:
+      - "${ENV_FILE}"
     environment:
       APP_NAME: jarvis-r2d2-worker
       LOG_FILE: r2d2-worker.log
@@ -44,6 +50,8 @@ services:
     image: "${APP_IMAGE}"
     deploy:
       replicas: 2
+    env_file:
+      - "${ENV_FILE}"
     environment:
       APP_NAME: jarvis-r2d2-worker
       LOG_FILE: r2d2-worker.log
@@ -56,6 +64,8 @@ services:
     image: "${APP_IMAGE}"
     deploy:
       replicas: 2
+    env_file:
+      - "${ENV_FILE}"
     environment:
       APP_NAME: jarvis-r2d2-worker
       LOG_FILE: r2d2-worker.log
@@ -68,6 +78,8 @@ services:
     image: "${APP_IMAGE}"
     deploy:
       replicas: 2
+    env_file:
+      - "${ENV_FILE}"
     environment:
       APP_NAME: jarvis-r2d2-worker
       LOG_FILE: r2d2-worker.log
@@ -80,6 +92,8 @@ services:
     image: "${APP_IMAGE}"
     deploy:
       replicas: 2
+    env_file:
+      - "${ENV_FILE}"
     environment:
       APP_NAME: jarvis-r2d2-worker
       LOG_FILE: r2d2-worker.log
@@ -92,6 +106,8 @@ services:
     image: "${APP_IMAGE}"
     deploy:
       replicas: 2
+    env_file:
+      - "${ENV_FILE}"
     environment:
       APP_NAME: jarvis-r2d2-worker
       LOG_FILE: r2d2-worker.log
@@ -104,6 +120,8 @@ services:
     image: "${APP_IMAGE}"
     deploy:
       replicas: 2
+    env_file:
+      - "${ENV_FILE}"
     environment:
       APP_NAME: jarvis-r2d2-worker
       LOG_FILE: r2d2-worker.log
