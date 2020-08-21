@@ -30,6 +30,7 @@ nav:
   - Test automation guidelines: readme/test-automation.md
   - Initial tools and libraries: readme/tools-and-libraries.md
   - Environments: environments.md
+  - Production Credentials: 'https://smartbox.atlassian.net/wiki/spaces/R2D2/pages/1720647893/Production+Credentials'
   - Exceptions and Error Codes: exceptions.md
   # DO NOT MODIFY ANYTHING BELOW THIS LINE
   - Architecture Decision Records:
