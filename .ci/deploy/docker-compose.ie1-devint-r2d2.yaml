@@ -3,7 +3,6 @@ version: '3.4'
 services:
   api:
     image: "${APP_IMAGE}"
-    hostname: : "{{.Node.Hostname}}"
     env_file:
       - "${ENV_FILE}"
     ports:
@@ -23,7 +22,6 @@ services:
 
   worker-broadcast-listeners-partner:
     image: "${APP_IMAGE}"
-    hostname: : "{{.Node.Hostname}}-worker"
     env_file:
       - "${ENV_FILE}"
     environment:
@@ -36,7 +34,6 @@ services:
 
   worker-broadcast-listeners-product:
     image: "${APP_IMAGE}"
-    hostname: : "{{.Node.Hostname}}-worker"
     env_file:
       - "${ENV_FILE}"
     environment:
@@ -49,7 +46,6 @@ services:
 
   worker-broadcast-listeners-price-information:
     image: "${APP_IMAGE}"
-    hostname: : "{{.Node.Hostname}}-worker"
     env_file:
       - "${ENV_FILE}"
     environment:
@@ -62,7 +58,6 @@ services:
 
   worker-broadcast-listeners-product-relationship:
     image: "${APP_IMAGE}"
-    hostname: : "{{.Node.Hostname}}-worker"
     env_file:
       - "${ENV_FILE}"
     environment:
@@ -75,7 +70,6 @@ services:
 
   worker-calculate-manageable-flag:
     image: "${APP_IMAGE}"
-    hostname: : "{{.Node.Hostname}}-worker"
     env_file:
       - "${ENV_FILE}"
     environment:
@@ -88,7 +82,6 @@ services:
 
   worker-push-room-information:
     image: "${APP_IMAGE}"
-    hostname: : "{{.Node.Hostname}}-worker"
     env_file:
       - "${ENV_FILE}"
     environment:
@@ -101,7 +94,6 @@ services:
 
   worker-broadcast-listeners-room-availability:
     image: "${APP_IMAGE}"
-    hostname: : "{{.Node.Hostname}}-worker"
     env_file:
       - "${ENV_FILE}"
     environment:
@@ -114,7 +106,6 @@ services:
 
   worker-broadcast-listeners-room-price:
     image: "${APP_IMAGE}"
-    hostname: : "{{.Node.Hostname}}-worker"
     env_file:
       - "${ENV_FILE}"
     environment:
