@@ -211,7 +211,7 @@ class ComponentManagerTest extends TestCase
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
         $this->repository->findOneByGoldenId($productRequest->id)->willReturn($component->reveal());
         $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
-        $this->manageableProductService->dispatchForComponent(Argument::any(), Argument::any())->shouldBeCalled();
+        $this->manageableProductService->dispatchForProduct(Argument::any())->shouldBeCalled();
         $this->manager->replace($productRequest->reveal());
     }
 
@@ -244,7 +244,7 @@ class ComponentManagerTest extends TestCase
         $this->partnerManager->createPlaceholder($productRequest->partner->id)->shouldBeCalled()->willReturn($partnerEntity);
         $this->repository->findOneByGoldenId($productRequest->id)->willReturn($component->reveal());
         $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
-        $this->manageableProductService->dispatchForComponent(Argument::any(), Argument::any())->shouldBeCalled();
+        $this->manageableProductService->dispatchForProduct(Argument::any(), Argument::any())->shouldBeCalled();
         $this->manager->replace($productRequest->reveal());
     }
 

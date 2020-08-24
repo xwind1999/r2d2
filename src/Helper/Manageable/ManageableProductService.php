@@ -9,7 +9,6 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Manageable\ManageableProductRequest;
 use App\Entity\Box;
-use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\Partner;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -37,16 +36,6 @@ class ManageableProductService
         }
     }
 
-    public function dispatchForComponent(ProductRequest $productRequest, Component $previousComponent): void
-    {
-        if (
-            (isset($previousComponent->status) && $previousComponent->status !== $productRequest->status)
-            || (isset($previousComponent->isReservable) && $previousComponent->isReservable !== $productRequest->isReservable)
-        ) {
-            $this->dispatchForProduct($productRequest);
-        }
-    }
-
     public function dispatchForExperience(ProductRequest $productRequest, Experience $previousExperience): void
     {
         if (isset($previousExperience->status) && $previousExperience->status !== $productRequest->status) {
@@ -66,7 +55,7 @@ class ManageableProductService
         }
     }
 
-    private function dispatchForProduct(ProductRequest $productRequest): void
+    public function dispatchForProduct(ProductRequest $productRequest): void
     {
         $manageableProductRequest = new ManageableProductRequest();
         $manageableProductRequest->setProductRequest($productRequest);
