@@ -18,6 +18,8 @@ use Doctrine\ORM\Query\QueryException;
  */
 class RoomAvailabilityRepository extends ServiceEntityRepository
 {
+    private const CLEANUP_AVAILABILITY_OLDER_THAN = '7 days ago';
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, RoomAvailability::class);
@@ -104,5 +106,18 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         ;
 
         return $qb->getQuery()->getResult();
+    }
+
+    public function cleanup(): void
+    {
+        $cleanUpOlderThan = (new \DateTime(self::CLEANUP_AVAILABILITY_OLDER_THAN))->setTime(0, 0, 0, 0);
+        $this
+            ->createQueryBuilder('ra')
+            ->delete('RoomAvailability', 'ra')
+            ->where('ra.date < :oldAvailabilityDate')
+            ->setParameter('oldAvailabilityDate', $cleanUpOlderThan->format('Y-m-d'))
+            ->getQuery()
+            ->execute()
+        ;
     }
 }

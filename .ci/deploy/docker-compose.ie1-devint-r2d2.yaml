@@ -27,6 +27,10 @@ services:
         order: start-first
     stop_grace_period: 10s
 
+  cron:
+    <<: *service-template
+    command: ['/app/bin/start-crond.sh']
+
   worker-broadcast-listeners-partner:
     <<: *worker-template
     environment:
