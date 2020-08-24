@@ -8,7 +8,6 @@ use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Entity\Box;
-use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\Partner;
 use App\Helper\Manageable\ManageableProductService;
@@ -68,24 +67,6 @@ class ManageableProductServiceTest extends KernelTestCase
         $this->messageBus->dispatch(Argument::any())->shouldBeCalled()->willReturn($this->envelope);
         $manageableProductService = new ManageableProductService($this->messageBus->reveal());
         $manageableProductService->dispatchForExperience($productRequest->reveal(), $experience->reveal());
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::dispatchForComponent
-     * @covers ::dispatchForProduct
-     * @dataProvider statusProvider
-     */
-    public function testDispatchForComponent(string $boxStatus, string $productRequestStatus): void
-    {
-        $component = $this->prophesize(Component::class);
-        $component->status = $boxStatus;
-        $component->isReservable = (bool) rand(0, 1);
-        $productRequest = $this->prophesize(ProductRequest::class);
-        $productRequest->status = $productRequestStatus;
-        $this->messageBus->dispatch(Argument::any())->shouldBeCalled()->willReturn($this->envelope);
-        $manageableProductService = new ManageableProductService($this->messageBus->reveal());
-        $manageableProductService->dispatchForComponent($productRequest->reveal(), $component->reveal());
     }
 
     /**

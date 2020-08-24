@@ -147,7 +147,7 @@ class ComponentManager
         $component->durationUnit = $productRequest->productDurationUnit;
 
         $this->repository->save($component);
-        $this->manageableProductService->dispatchForComponent($productRequest, $currentEntity);
+        $this->manageableProductService->dispatchForProduct($productRequest);
     }
 
     public function getRoomsByExperienceGoldenIdsList(array $experienceIds): array
