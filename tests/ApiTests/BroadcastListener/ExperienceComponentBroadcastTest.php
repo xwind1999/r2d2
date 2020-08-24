@@ -37,7 +37,7 @@ class ExperienceComponentBroadcastTest extends IntegrationTestCase
             ],
         ];
 
-        $response = self::$broadcastListenerHelper->testProducts($component);
+        $response = self::$broadcastListenerHelper->testComponentProduct($component);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
@@ -57,7 +57,7 @@ class ExperienceComponentBroadcastTest extends IntegrationTestCase
             'price' => 50,
         ];
 
-        $response = self::$broadcastListenerHelper->testProducts($experience);
+        $response = self::$broadcastListenerHelper->testExperienceProduct($experience);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
@@ -71,7 +71,7 @@ class ExperienceComponentBroadcastTest extends IntegrationTestCase
             'isEnabled' => true,
         ];
 
-        $response = self::$broadcastListenerHelper->testRelationships($payload);
+        $response = self::$broadcastListenerHelper->testExperienceComponentRelationship($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume('broadcast-listeners-product-relationship');

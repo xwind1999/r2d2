@@ -36,7 +36,7 @@ class RoomAvailabilityBroadcastTest extends IntegrationTestCase
             ],
         ];
 
-        $response = self::$broadcastListenerHelper->testProducts($component);
+        $response = self::$broadcastListenerHelper->testComponentProduct($component);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
