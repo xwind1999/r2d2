@@ -28,10 +28,9 @@ class BroadcastListenerHelper
         $this->serializer = $serializer;
     }
 
-    public function getDefaultProduct(array $overrides = []): array
+    public function getDefaultBoxProduct(array $overrides = []): array
     {
         $payload = [
-            'uuid' => '3fa85f64-5717-4562-b3fc-2c963f66afa6',
             'id' => bin2hex(random_bytes(12)),
             'name' => 'product name',
             'description' => 'product description',
@@ -59,10 +58,71 @@ class BroadcastListenerHelper
         return $overrides + $payload;
     }
 
+    public function getDefaultExperienceProduct(array $overrides = []): array
+    {
+        $payload = [
+            'id' => bin2hex(random_bytes(12)),
+            'name' => 'Test Experience',
+            'description' => 'Test Experience Description',
+            'isSellable' => true,
+            'isReservable' => true,
+            'partner' => [
+                'id' => bin2hex(random_bytes(12)),
+            ],
+            'sellableBrand' => [
+                'code' => 'SBX',
+            ],
+            'sellableCountry' => [
+                'code' => 'FR',
+            ],
+            'status' => 'active',
+            'type' => 'experience',
+            'productDuration' => 2,
+            'productDurationUnit' => 'Nights',
+            'roomStockType' => 'stock',
+            'listPrice' => [
+                'currencyCode' => 'EUR',
+                'amount' => 100,
+            ],
+        ];
+
+        return $overrides + $payload;
+    }
+
+    public function getDefaultComponentProduct(array $overrides = []): array
+    {
+        $payload = [
+            'id' => bin2hex(random_bytes(12)),
+            'name' => 'Test Component',
+            'description' => 'Test Component Description',
+            'isSellable' => true,
+            'isReservable' => true,
+            'partner' => [
+                'id' => bin2hex(random_bytes(12)),
+            ],
+            'sellableBrand' => [
+                'code' => 'SBX',
+            ],
+            'sellableCountry' => [
+                'code' => 'FR',
+            ],
+            'status' => 'active',
+            'type' => 'component',
+            'productDuration' => 2,
+            'productDurationUnit' => 'Nights',
+            'roomStockType' => 'stock',
+            'listPrice' => [
+              'currencyCode' => 'EUR',
+              'amount' => 100,
+          ],
+        ];
+
+        return $overrides + $payload;
+    }
+
     public function getDefaultPartner(array $overrides = []): array
     {
         $payload = [
-            'uuid' => '3fa85f64-5717-4562-b3fc-2c963f66afa6',
             'id' => bin2hex(random_bytes(12)),
             'status' => 'new partner',
             'currencyCode' => 'USD',
@@ -73,13 +133,25 @@ class BroadcastListenerHelper
         return $overrides + $payload;
     }
 
-    public function getDefaultRelationship(array $overrides = []): array
+    public function getDefaultBoxExperienceRelationship(array $overrides = []): array
     {
         $payload = [
             'parentProduct' => 'BB0000335658',
             'childProduct' => 'HG0000335654',
             'isEnabled' => true,
             'relationshipType' => 'Box-Experience',
+        ];
+
+        return $overrides + $payload;
+    }
+
+    public function getDefaultExperienceComponentRelationship(array $overrides = []): array
+    {
+        $payload = [
+            'parentProduct' => 'HG0000335654',
+            'childProduct' => 'CM0000335658',
+            'isEnabled' => true,
+            'relationshipType' => 'Experience-Component',
         ];
 
         return $overrides + $payload;
@@ -142,10 +214,36 @@ class BroadcastListenerHelper
     /**
      * @return JsonResponse|object
      */
-    public function testProducts(array $payload = [])
+    public function testBoxProduct(array $payload = [])
     {
         if (empty($payload)) {
-            $payload = $this->getDefaultProduct();
+            $payload = $this->getDefaultBoxProduct();
+        }
+        $this->client->request('POST', $this->baseUrl.self::API_PRODUCT_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+
+        return $this->client->getResponse();
+    }
+
+    /**
+     * @return JsonResponse|object
+     */
+    public function testExperienceProduct(array $payload = [])
+    {
+        if (empty($payload)) {
+            $payload = $this->getDefaultExperienceProduct();
+        }
+        $this->client->request('POST', $this->baseUrl.self::API_PRODUCT_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
+
+        return $this->client->getResponse();
+    }
+
+    /**
+     * @return JsonResponse|object
+     */
+    public function testComponentProduct(array $payload = [])
+    {
+        if (empty($payload)) {
+            $payload = $this->getDefaultComponentProduct();
         }
         $this->client->request('POST', $this->baseUrl.self::API_PRODUCT_BASE_URL, [], [], [], $this->serializer->serialize($payload, 'json'));
 
@@ -174,10 +272,29 @@ class BroadcastListenerHelper
     /**
      * @return JsonResponse|object
      */
-    public function testRelationships(array $payload = [])
+    public function testExperienceComponentRelationship(array $payload = [])
     {
         if (empty($payload)) {
-            $payload = $this->getDefaultRelationship();
+            $payload = $this->getDefaultExperienceComponentRelationship();
+        }
+        $this->client->request('POST',
+            $this->baseUrl.self::API_RELATIONSHIP_BASE_URL,
+            [],
+            [],
+            [],
+            $this->serializer->serialize($payload, 'json')
+        );
+
+        return $this->client->getResponse();
+    }
+
+    /**
+     * @return JsonResponse|object
+     */
+    public function testBoxExperienceRelationship(array $payload = [])
+    {
+        if (empty($payload)) {
+            $payload = $this->getDefaultBoxExperienceRelationship();
         }
         $this->client->request('POST',
             $this->baseUrl.self::API_RELATIONSHIP_BASE_URL,

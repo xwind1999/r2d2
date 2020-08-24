@@ -19,7 +19,7 @@ class IsManageableFlagTest extends IntegrationTestCase
     {
         static::cleanUp();
 
-        $response = self::$broadcastListenerHelper->testProducts($box);
+        $response = self::$broadcastListenerHelper->testBoxProduct($box);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
@@ -32,23 +32,23 @@ class IsManageableFlagTest extends IntegrationTestCase
         $this->consume(self::QUEUE_BROADCAST_PARTNER);
         self::$container->get(PartnerRepository::class)->findOneByGoldenId($partner['id']);
 
-        $response = self::$broadcastListenerHelper->testProducts($experience);
+        $response = self::$broadcastListenerHelper->testExperienceProduct($experience);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
         self::$container->get(ExperienceRepository::class)->findOneByGoldenId($experience['id']);
 
-        $response = self::$broadcastListenerHelper->testProducts($component);
+        $response = self::$broadcastListenerHelper->testComponentProduct($component);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
         self::$container->get(ComponentRepository::class)->findOneByGoldenId($component['id']);
 
-        $response = self::$broadcastListenerHelper->testRelationships($boxExperience);
+        $response = self::$broadcastListenerHelper->testBoxExperienceRelationship($boxExperience);
         $this->assertEquals(202, $response->getStatusCode());
         $this->consume(self::QUEUE_BROADCAST_RELATIONSHIP);
 
-        $response = self::$broadcastListenerHelper->testRelationships($experienceComponent);
+        $response = self::$broadcastListenerHelper->testExperienceComponentRelationship($experienceComponent);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_RELATIONSHIP);

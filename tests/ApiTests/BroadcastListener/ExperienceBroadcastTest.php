@@ -24,7 +24,7 @@ class ExperienceBroadcastTest extends IntegrationTestCase
             'price' => 500,
         ];
 
-        $response = self::$broadcastListenerHelper->testProducts($payload);
+        $response = self::$broadcastListenerHelper->testExperienceProduct($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume('broadcast-listeners-product');
