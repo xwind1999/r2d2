@@ -105,7 +105,12 @@ class AvailabilityProvider
         $partner = $experience->partner;
 
         /** @var ExperienceComponent $experienceComponent */
-        $experienceComponent = $experience->experienceComponent->first();
+        $experienceComponent = $experience->experienceComponent->filter(
+            static function ($experienceComponent) {
+                return $experienceComponent->component->isReservable;
+            }
+        )->first();
+
         $roomAvailabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesByComponentGoldenId(
             $experienceComponent->componentGoldenId,
             $dateFrom,

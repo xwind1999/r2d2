@@ -240,6 +240,7 @@ class AvailabilityProviderTest extends TestCase
         $component = new Component();
         $component->duration = 1;
         $component->isSellable = true;
+        $component->isReservable = true;
         $component->goldenId = '1234';
         $experienceComponent = new ExperienceComponent();
         $experienceComponent->component = $component;
