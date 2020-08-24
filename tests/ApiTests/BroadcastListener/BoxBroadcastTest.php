@@ -28,7 +28,7 @@ class BoxBroadcastTest extends IntegrationTestCase
             'type' => 'mev',
         ];
 
-        $response = self::$broadcastListenerHelper->testProducts($payload);
+        $response = self::$broadcastListenerHelper->testBoxProduct($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume('broadcast-listeners-product');
