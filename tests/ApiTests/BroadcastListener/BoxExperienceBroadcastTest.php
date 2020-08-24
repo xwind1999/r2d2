@@ -32,7 +32,7 @@ class BoxExperienceBroadcastTest extends IntegrationTestCase
             'type' => 'mev',
         ];
 
-        $response = self::$broadcastListenerHelper->testProducts($box);
+        $response = self::$broadcastListenerHelper->testBoxProduct($box);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
@@ -52,7 +52,7 @@ class BoxExperienceBroadcastTest extends IntegrationTestCase
             'price' => 500,
         ];
 
-        $response = self::$broadcastListenerHelper->testProducts($experience);
+        $response = self::$broadcastListenerHelper->testExperienceProduct($experience);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
@@ -66,7 +66,7 @@ class BoxExperienceBroadcastTest extends IntegrationTestCase
             'isEnabled' => true,
         ];
 
-        $response = self::$broadcastListenerHelper->testRelationships($payload);
+        $response = self::$broadcastListenerHelper->testBoxExperienceRelationship($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
         $this->consume('broadcast-listeners-product-relationship');
