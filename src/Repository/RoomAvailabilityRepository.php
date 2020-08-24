@@ -112,8 +112,9 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
     {
         $cleanUpOlderThan = (new \DateTime(self::CLEANUP_AVAILABILITY_OLDER_THAN))->setTime(0, 0, 0, 0);
         $this
-            ->createQueryBuilder('ra')
-            ->delete('RoomAvailability', 'ra')
+            ->_em
+            ->createQueryBuilder()
+            ->delete(RoomAvailability::class, 'ra')
             ->where('ra.date < :oldAvailabilityDate')
             ->setParameter('oldAvailabilityDate', $cleanUpOlderThan->format('Y-m-d'))
             ->getQuery()
