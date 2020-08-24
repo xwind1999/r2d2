@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Provider;
 
 use App\CMHub\CMHub;
+use App\Constraint\PartnerStatusConstraint;
 use App\Contract\Response\CMHub\CMHubErrorResponse;
 use App\Contract\Response\CMHub\CMHubResponse;
 use App\Contract\Response\CMHub\GetAvailability\AvailabilityResponse;
@@ -23,7 +24,6 @@ class AvailabilityProvider
 {
     private const DEFAULT_COMPONENT_DURATION = 1;
     private const DEFAULT_DATE_DIFF_VALUE = 0;
-    private const PARTNER_STATUS_PARTNER = 'partner';
 
     protected CMHub $cmHub;
     protected SerializerInterface $serializer;
@@ -98,39 +98,42 @@ class AvailabilityProvider
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): array {
-        if (empty($experience->experienceComponent->first())) {
-            return [];
-        }
-
         $partner = $experience->partner;
 
         /** @var ExperienceComponent $experienceComponent */
         $experienceComponent = $experience->experienceComponent->filter(
             static function ($experienceComponent) {
-                return $experienceComponent->component->isReservable;
+                return $experienceComponent->component->isReservable && $experienceComponent->isEnabled;
             }
         )->first();
 
-        $roomAvailabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesByComponentGoldenId(
-            $experienceComponent->componentGoldenId,
-            $dateFrom,
-            $dateTo
-        );
+        if (false == $experienceComponent || PartnerStatusConstraint::PARTNER_STATUS_PARTNER !== $partner->status) {
+            $roomAvailabilities = [];
+            $componentGoldenId = '';
+            $componentSellable = false;
+        } else {
+            $roomAvailabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesByComponentGoldenId(
+                $experienceComponent->componentGoldenId,
+                $dateFrom,
+                $dateTo
+            );
+            $componentGoldenId = $experienceComponent->componentGoldenId;
+            $componentSellable = $experienceComponent->component->isSellable;
+        }
 
         $roomAvailabilities = AvailabilityHelper::fillMissingAvailabilities(
             $roomAvailabilities,
-            $experienceComponent->componentGoldenId,
+            $componentGoldenId,
             $dateFrom,
             $dateTo
         );
 
-        $duration = $experienceComponent->component->duration ?: self::DEFAULT_COMPONENT_DURATION;
+        $duration = $experienceComponent->component->duration ?? self::DEFAULT_COMPONENT_DURATION;
 
         return [
             'duration' => $duration,
-            'isSellable' => $experienceComponent->component->isSellable,
-            'availabilities' => LegacyAvailabilityProvider::PARTNER === $partner->status ?
-                AvailabilityHelper::convertToShortType($roomAvailabilities) : [],
+            'isSellable' => $componentSellable,
+            'availabilities' => AvailabilityHelper::convertToShortType($roomAvailabilities),
         ];
     }
 
@@ -142,7 +145,7 @@ class AvailabilityProvider
         $returnArray = [];
         $experiencesWithLegitPartner = $this->experienceManager->filterIdsListWithPartnerStatus(
             $experienceIds,
-            self::PARTNER_STATUS_PARTNER
+            PartnerStatusConstraint::PARTNER_STATUS_PARTNER
         );
         $componentList = $this->componentManager->getRoomsByExperienceGoldenIdsList(
             array_keys($experiencesWithLegitPartner)

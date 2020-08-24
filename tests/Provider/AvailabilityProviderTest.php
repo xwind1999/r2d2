@@ -244,6 +244,7 @@ class AvailabilityProviderTest extends TestCase
         $component->goldenId = '1234';
         $experienceComponent = new ExperienceComponent();
         $experienceComponent->component = $component;
+        $experienceComponent->isEnabled = true;
         $experienceComponent->componentGoldenId = '1234';
         $collection = new ArrayCollection();
         $collection->add($experienceComponent);
@@ -312,8 +313,17 @@ class AvailabilityProviderTest extends TestCase
         $dateTo = new \DateTime('2020-06-25');
 
         $experience = new Experience();
+        $partner = new Partner();
+        $partner->status = 'partner';
+        $experience->partner = $partner;
 
-        $expectedArray = [];
+        $expectedArray = [
+            'duration' => 1,
+            'isSellable' => false,
+            'availabilities' => [
+                '0', '0', '0', '0', '0', '0',
+            ],
+        ];
 
         $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo));
     }
