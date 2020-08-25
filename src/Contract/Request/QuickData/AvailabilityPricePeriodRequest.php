@@ -12,14 +12,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 class AvailabilityPricePeriodRequest implements RequestQueryInterface, ValidatableRequest
 {
     /**
-     * @Assert\Type(type="integer")
-     * @Assert\Positive()
+     * @Assert\Type(type="string")
      * @Assert\NotBlank
      *
      * @JMS\SerializedName("ExperienceId")
-     * @JMS\Type("integer")
+     * @JMS\Type("string")
      */
-    public int $experienceId;
+    public string $experienceId;
 
     /**
      * @Assert\Type(type="integer")

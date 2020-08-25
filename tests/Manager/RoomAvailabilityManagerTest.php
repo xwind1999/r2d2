@@ -65,11 +65,12 @@ class RoomAvailabilityManagerTest extends TestCase
 
     /**
      * @covers ::__construct
-     * @covers ::getRoomAvailabilitiesByComponentGoldenId
+     * @covers ::getRoomAvailabilitiesByComponent
      */
     public function testGetRoomAvailabilitiesListByComponentGoldenId()
     {
-        $this->repository->findRoomAvailabilitiesByComponentGoldenId(Argument::any(), Argument::any(), Argument::any())
+        $component = new Component();
+        $this->repository->findRoomAvailabilitiesByComponent($component, Argument::any(), Argument::any())
             ->willReturn(
                 [
                     0 => [
@@ -80,9 +81,9 @@ class RoomAvailabilityManagerTest extends TestCase
                 ]
             );
         $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->logger->reveal());
-        $manager->getRoomAvailabilitiesByComponentGoldenId('1234', new \DateTime('2020-06-20'), new \DateTime('2020-06-30'));
+        $manager->getRoomAvailabilitiesByComponent($component, new \DateTime('2020-06-20'), new \DateTime('2020-06-30'));
 
-        $this->repository->findRoomAvailabilitiesByComponentGoldenId('1234', new \DateTime('2020-06-20'), new \DateTime('2020-06-30'))
+        $this->repository->findRoomAvailabilitiesByComponent($component, new \DateTime('2020-06-20'), new \DateTime('2020-06-30'))
             ->shouldBeCalledOnce();
     }
 

@@ -18,7 +18,7 @@ class QuickDataControllerTest extends TestCase
 {
     public function testGetPackage()
     {
-        $experienceId = 1234;
+        $experienceId = '1234';
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
@@ -39,7 +39,7 @@ class QuickDataControllerTest extends TestCase
 
     public function testGetRange()
     {
-        $boxId = 1234;
+        $boxId = '1234';
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
@@ -60,7 +60,7 @@ class QuickDataControllerTest extends TestCase
 
     public function testGetPackageV2()
     {
-        $experienceIds = [1234, 5678];
+        $experienceIds = ['1234', '5678'];
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
@@ -82,7 +82,7 @@ class QuickDataControllerTest extends TestCase
     public function testAvailabilityPricePeriod()
     {
         $prestId = 5678;
-        $experienceId = 1234;
+        $experienceId = '1234';
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 

@@ -85,8 +85,10 @@ class RoomAvailabilityBroadcastTest extends IntegrationTestCase
         $this->consume('broadcast-listeners-room-availability', 3);
 
         /** @var RoomAvailabilityRepository $roomAvailabilityRepository */
+        $componentRepository = self::$container->get(ComponentRepository::class);
+        $component1 = $componentRepository->findOneByGoldenId($payload[0]['product']['id']);
         $roomAvailabilityRepository = self::$container->get(RoomAvailabilityRepository::class);
-        $roomAvailability = $roomAvailabilityRepository->findByComponentAndDateRange($payload[0]['product']['id'], new \DateTime($payload[0]['dateFrom']), new \DateTime($payload[0]['dateTo']));
+        $roomAvailability = $roomAvailabilityRepository->findByComponentAndDateRange($component1, new \DateTime($payload[0]['dateFrom']), new \DateTime($payload[0]['dateTo']));
         $this->assertEquals($payload[0]['product']['id'], $roomAvailability[$date1->format('Y-m-d')]->componentGoldenId);
         $this->assertEquals($payload[0]['quantity'], $roomAvailability[$date1->format('Y-m-d')]->stock);
         $this->assertEquals(false, $roomAvailability[$date1->format('Y-m-d')]->isStopSale);
@@ -94,12 +96,14 @@ class RoomAvailabilityBroadcastTest extends IntegrationTestCase
         $this->assertEquals($payload[0]['quantity'], $roomAvailability[$date2->format('Y-m-d')]->stock);
         $this->assertEquals(false, $roomAvailability[$date1->format('Y-m-d')]->isStopSale);
 
-        $roomAvailability = $roomAvailabilityRepository->findByComponentAndDateRange($payload[1]['product']['id'], new \DateTime($payload[1]['dateFrom']), new \DateTime($payload[1]['dateTo']));
+        $component2 = $componentRepository->findOneByGoldenId($payload[1]['product']['id']);
+        $roomAvailability = $roomAvailabilityRepository->findByComponentAndDateRange($component2, new \DateTime($payload[1]['dateFrom']), new \DateTime($payload[1]['dateTo']));
         $this->assertEquals($payload[1]['product']['id'], $roomAvailability[$date3->format('Y-m-d')]->componentGoldenId);
         $this->assertEquals($payload[1]['quantity'], $roomAvailability[$date3->format('Y-m-d')]->stock);
         $this->assertEquals($payload[1]['isStopSale'], $roomAvailability[$date3->format('Y-m-d')]->isStopSale);
 
-        $roomAvailability = $roomAvailabilityRepository->findByComponentAndDateRange($payload[2]['product']['id'], new \DateTime($payload[2]['dateFrom']), new \DateTime($payload[2]['dateTo']));
+        $component3 = $componentRepository->findOneByGoldenId($payload[2]['product']['id']);
+        $roomAvailability = $roomAvailabilityRepository->findByComponentAndDateRange($component3, new \DateTime($payload[2]['dateFrom']), new \DateTime($payload[2]['dateTo']));
         $this->assertEquals($payload[2]['product']['id'], $roomAvailability[$date4->format('Y-m-d')]->componentGoldenId);
         $this->assertEquals($payload[2]['quantity'], $roomAvailability[$date4->format('Y-m-d')]->stock);
         $this->assertEquals($payload[2]['isStopSale'], $roomAvailability[$date4->format('Y-m-d')]->isStopSale);

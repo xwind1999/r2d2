@@ -168,7 +168,7 @@ class ExperienceManager
         return $this->repository->filterListExperienceIdsWithPartnerStatus($experienceIds, $partnerStatus);
     }
 
-    public function filterListExperienceIdsByBoxId(int $boxId): array
+    public function filterListExperienceIdsByBoxId(string $boxId): array
     {
         return $this->repository->filterListExperienceIdsByBoxId($boxId);
     }

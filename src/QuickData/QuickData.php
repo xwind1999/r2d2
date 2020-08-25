@@ -23,11 +23,11 @@ class QuickData
         $this->httpClient = $httpClientFactory->buildWithOptions(self::CLIENT_ID, $options);
     }
 
-    public function getPackage(int $packageCode, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
+    public function getPackage(string $packageCode, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
     {
         $q = $this->httpClient->request('GET', sprintf(self::GET_PACKAGE_ENDPOINT, self::ENGINE_ID), [
             'format' => 'json',
-            'PackageCode' => (string) $packageCode,
+            'PackageCode' => $packageCode,
             'dateFrom' => $dateFrom->format('Y-m-d'),
             'dateTo' => $dateTo->format('Y-m-d'),
         ]);
@@ -35,11 +35,11 @@ class QuickData
         return $q->toArray();
     }
 
-    public function getRange(int $boxId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
+    public function getRange(string $boxId, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
     {
         $q = $this->httpClient->request('GET', sprintf(self::GET_RANGE_ENDPOINT, self::ENGINE_ID), [
             'format' => 'json',
-            'boxVersion' => (string) $boxId,
+            'boxVersion' => $boxId,
             'dateFrom' => $dateFrom->format('Y-m-d'),
             'dateTo' => $dateTo->format('Y-m-d'),
         ]);

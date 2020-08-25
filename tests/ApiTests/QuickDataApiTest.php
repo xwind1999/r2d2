@@ -45,4 +45,14 @@ class QuickDataApiTest extends ApiTestCase
         );
         $this->assertEquals(200, $response->getStatusCode());
     }
+
+    public function testAvailabilityPricePeriod(): void
+    {
+        $response = self::$quickDataHelper->availabilityPricePeriod(
+            '49544',
+            '2020-09-01',
+            '2020-09-05'
+        );
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }

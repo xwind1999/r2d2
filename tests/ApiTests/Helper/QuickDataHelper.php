@@ -12,6 +12,7 @@ class QuickDataHelper
 {
     const API_GETPACKAGE_V1 = '/quickdata/GetPackage/1/12345';
     const API_GETPACKAGE_V2 = '/quickdata/GetPackageV2/1/12345';
+    const API_AVAILABILITY_PRICE_PERIOD = '/quickdata/availabilitypriceperiod/1/12345';
     protected AbstractBrowser $client;
     protected Serializer $serializer;
     protected ?string $baseUrl = null;
@@ -56,6 +57,28 @@ class QuickDataHelper
                 '%s?ListPackageCode=%s&dateFrom=%s&dateTo=%s',
                 $this->baseUrl.self::API_GETPACKAGE_V2,
                 $packageCodes,
+                $dateFrom,
+                $dateTo
+            ),
+            [],
+            [],
+            []
+        );
+
+        return $this->client->getResponse();
+    }
+
+    /**
+     * @return JsonResponse|object
+     */
+    public function availabilityPricePeriod(string $experienceId, string $dateFrom, string $dateTo)
+    {
+        $this->client->request(
+            'GET',
+            sprintf(
+                '%s?ExperienceId=%s&prestid=1&datefrom=%s&dateto=%s',
+                $this->baseUrl.self::API_AVAILABILITY_PRICE_PERIOD,
+                $experienceId,
                 $dateFrom,
                 $dateTo
             ),

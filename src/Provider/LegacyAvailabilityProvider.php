@@ -45,7 +45,7 @@ class LegacyAvailabilityProvider
     }
 
     public function getAvailabilityForExperience(
-        int $experienceId,
+        string $experienceId,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): QuickDataResponse {
@@ -58,7 +58,7 @@ class LegacyAvailabilityProvider
             $returnArray = [
                 'ListPrestation' => [
                     AvailabilityHelper::buildDataForGetPackage(
-                        $availabilitiesFromDB['availabilities'],
+                        AvailabilityHelper::convertToShortType($availabilitiesFromDB['availabilities']),
                         $availabilitiesFromDB['duration'],
                         $partner->goldenId,
                         $availabilitiesFromDB['isSellable']
@@ -86,7 +86,7 @@ class LegacyAvailabilityProvider
     }
 
     public function getAvailabilitiesForBox(
-        int $boxId,
+        string $boxId,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): GetRangeResponse {
@@ -139,12 +139,12 @@ class LegacyAvailabilityProvider
                 $dateTo
             );
 
-            foreach ($availabilities as $key => $availability) {
+            foreach ($availabilities as $componentId => $availability) {
                 $availabilitiesArray['ListPackage'][] = [
-                    'PackageCode' => $key,
+                    'PackageCode' => $componentId,
                     'ListPrestation' => [
                         AvailabilityHelper::buildDataForGetPackage(
-                            $availability['availabilities'],
+                            AvailabilityHelper::convertToShortType($availability['availabilities']),
                             $availability['duration'],
                             $availability['partnerId'],
                             $availability['isSellable']
@@ -160,36 +160,33 @@ class LegacyAvailabilityProvider
     }
 
     public function getAvailabilityPriceForExperience(
-        int $experienceId,
+        string $experienceId,
         int $prestId,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): QuickDataResponse {
-        //we check if the experience is CM-enabled here, then we call the appropriate client
-        try {
-            $data = $this->quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo);
-            //but we process them the same way, so we have a GetRangeResponse ready
+        $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
+        $roomAvailabilityAndPrices = $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo);
 
-            $isAvailabilityConvertNeeded = false;
+        $availabilities = [];
 
-            if (!empty($data['DaysAvailabilityPrice'])) {
-                $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
+        foreach ($roomAvailabilityAndPrices['availabilities'] as $date => $av) {
+            $availability = [
+                'Date' => (new \DateTime($date))->format('Y-m-d\TH:i:s.u'),
+                'AvailabilityValue' => $av['stock'],
+                'AvailabilityStatus' => AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue($av['type'], $av['stock'], $av['isStopSale']),
+                'SellingPrice' => 0,
+                'BuyingPrice' => 0,
+            ];
 
-                foreach ($data['DaysAvailabilityPrice'] as $key => $value) {
-                    $data['DaysAvailabilityPrice'][$key]['Date'] = (new \DateTime($value['Date']))
-                        ->setTime(0, 0, 0, 0)
-                        ->format(self::DATE_TIME_FORMAT)
-                    ;
-
-                    if (!$experience->partner->isChannelManagerActive) {
-                        $data['DaysAvailabilityPrice'][$key]['AvailabilityStatus'] =
-                            AvailabilityHelper::convertAvailableValueToRequest($value['AvailabilityStatus']);
-                    }
-                }
+            if (isset($roomAvailabilityAndPrices['prices'][$date])) {
+                $availability['SellingPrice'] = $roomAvailabilityAndPrices['prices'][$date]->price / 100;
+                $availability['BuyingPrice'] = $roomAvailabilityAndPrices['prices'][$date]->price / 100;
             }
-        } catch (HttpExceptionInterface $exception) {
-            $data = [];
+
+            $availabilities[] = $availability;
         }
+        $data = ['DaysAvailabilityPrice' => $availabilities];
 
         return $this->serializer->fromArray($data, AvailabilityPricePeriodResponse::class);
     }

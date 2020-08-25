@@ -49,7 +49,7 @@ class RoomPriceRepository extends ServiceEntityRepository
     /**
      * @return RoomPrice[]
      */
-    public function findByComponentAndDateRange(Component $component, \DateTime $dateFrom, \DateTime $dateTo): array
+    public function findByComponentAndDateRange(Component $component, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): array
     {
         $qb = $this->createQueryBuilder('rp');
         $qb

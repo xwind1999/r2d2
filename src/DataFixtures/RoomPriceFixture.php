@@ -29,7 +29,7 @@ class RoomPriceFixture extends Fixture implements FixtureGroupInterface
                 $roomPrice = new RoomPrice();
                 $roomPrice->component = $component;
                 $roomPrice->componentGoldenId = $component->goldenId;
-                $roomPrice->price = random_int(45, 85);
+                $roomPrice->price = random_int(4500, 12000);
                 $roomPrice->date = new \DateTime($date);
                 $manager->persist($roomPrice);
             }

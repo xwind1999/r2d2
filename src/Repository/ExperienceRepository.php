@@ -88,7 +88,7 @@ class ExperienceRepository extends ServiceEntityRepository
         return $qb->getQuery()->getArrayResult();
     }
 
-    public function filterListExperienceIdsByBoxId(int $boxId): array
+    public function filterListExperienceIdsByBoxId(string $boxId): array
     {
         $qb = $this->createQueryBuilder('e');
         $qb

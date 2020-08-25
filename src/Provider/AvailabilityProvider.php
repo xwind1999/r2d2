@@ -16,6 +16,7 @@ use App\Helper\AvailabilityHelper;
 use App\Manager\ComponentManager;
 use App\Manager\ExperienceManager;
 use App\Manager\RoomAvailabilityManager;
+use App\Manager\RoomPriceManager;
 use JMS\Serializer\ArrayTransformerInterface;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
@@ -31,6 +32,7 @@ class AvailabilityProvider
     protected ExperienceManager $experienceManager;
     protected ComponentManager $componentManager;
     protected RoomAvailabilityManager $roomAvailabilityManager;
+    private RoomPriceManager $roomPriceManager;
 
     public function __construct(
         CMHub $cmHub,
@@ -38,7 +40,8 @@ class AvailabilityProvider
         ArrayTransformerInterface $arraySerializer,
         ExperienceManager $experienceManager,
         ComponentManager $componentManager,
-        RoomAvailabilityManager $roomAvailabilityManager
+        RoomAvailabilityManager $roomAvailabilityManager,
+        RoomPriceManager $roomPriceManager
     ) {
         $this->cmHub = $cmHub;
         $this->serializer = $serializer;
@@ -46,6 +49,7 @@ class AvailabilityProvider
         $this->experienceManager = $experienceManager;
         $this->componentManager = $componentManager;
         $this->roomAvailabilityManager = $roomAvailabilityManager;
+        $this->roomPriceManager = $roomPriceManager;
     }
 
     public function getAvailability(
@@ -74,7 +78,7 @@ class AvailabilityProvider
     }
 
     public function getRoomAvailabilitiesByBoxIdAndDates(
-        int $boxId,
+        string $boxId,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): array {
@@ -111,12 +115,15 @@ class AvailabilityProvider
             $roomAvailabilities = [];
             $componentGoldenId = '';
             $componentSellable = false;
+            $roomPrices = [];
         } else {
-            $roomAvailabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesByComponentGoldenId(
-                $experienceComponent->componentGoldenId,
+            $roomAvailabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesByComponent(
+                $experienceComponent->component,
                 $dateFrom,
                 $dateTo
             );
+
+            $roomPrices = $this->roomPriceManager->getRoomPricesByComponentAndDateRange($experienceComponent->component, $dateFrom, $dateTo);
             $componentGoldenId = $experienceComponent->componentGoldenId;
             $componentSellable = $experienceComponent->component->isSellable;
         }
@@ -133,7 +140,8 @@ class AvailabilityProvider
         return [
             'duration' => $duration,
             'isSellable' => $componentSellable,
-            'availabilities' => AvailabilityHelper::convertToShortType($roomAvailabilities),
+            'availabilities' => $roomAvailabilities,
+            'prices' => $roomPrices,
         ];
     }
 
@@ -156,23 +164,15 @@ class AvailabilityProvider
             $dateTo
         );
 
-        $availabilitiesGroup = [];
-        foreach ($roomAvailabilities as $availability) {
-            $componentId = $availability['componentGoldenId'];
-            $experienceId = $componentList[$componentId]['experienceGoldenId'];
-            $availabilitiesGroup[$experienceId][] = $availability;
-        }
-
-        foreach ($availabilitiesGroup as $key => $item) {
-            $componentId = $item[0]['componentGoldenId'];
-            $item = AvailabilityHelper::fillMissingAvailabilities($item, $componentId, $dateFrom, $dateTo);
+        foreach ($roomAvailabilities as $componentId => $item) {
+            $item = AvailabilityHelper::fillMissingAvailabilities($item, (string) $componentId, $dateFrom, $dateTo);
             $duration = $componentList[$componentId][0]['duration'] ?: self::DEFAULT_COMPONENT_DURATION;
 
-            $returnArray[$key] = [
+            $returnArray[$componentId] = [
                 'duration' => $duration,
                 'isSellable' => $componentList[$componentId][0]['isSellable'],
                 'partnerId' => $componentList[$componentId][0]['partnerGoldenId'],
-                'availabilities' => AvailabilityHelper::convertToShortType($item),
+                'availabilities' => $item,
             ];
         }
 
