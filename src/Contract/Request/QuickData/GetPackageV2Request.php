@@ -13,7 +13,6 @@ class GetPackageV2Request implements RequestQueryInterface, ValidatableRequest
 {
     /**
      * @Assert\Type(type="array")
-     * @Assert\Positive()
      * @Assert\NotBlank
      *
      * @JMS\SerializedName("ListPackageCode")

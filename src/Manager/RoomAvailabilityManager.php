@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
+use App\Entity\Component;
 use App\Entity\RoomAvailability;
 use App\Exception\Manager\RoomAvailability\InvalidRoomStockTypeException;
 use App\Exception\Manager\RoomAvailability\OutdatedRoomAvailabilityInformationException;
@@ -37,12 +38,12 @@ class RoomAvailabilityManager
         return $this->repository->findRoomAvailabilitiesByMultipleComponentGoldenIds($componentGoldenIds, $dateFrom, $dateTo);
     }
 
-    public function getRoomAvailabilitiesByComponentGoldenId(
-        string $componentGoldenId,
+    public function getRoomAvailabilitiesByComponent(
+        Component $component,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): array {
-        return $this->repository->findRoomAvailabilitiesByComponentGoldenId($componentGoldenId, $dateFrom, $dateTo);
+        return $this->repository->findRoomAvailabilitiesByComponent($component, $dateFrom, $dateTo);
     }
 
     /**
@@ -59,7 +60,7 @@ class RoomAvailabilityManager
             }
 
             $roomAvailabilityList = $this->repository->findByComponentAndDateRange(
-                $roomAvailabilityRequest->product->id,
+                $component,
                 $roomAvailabilityRequest->dateFrom,
                 $roomAvailabilityRequest->dateTo
             );

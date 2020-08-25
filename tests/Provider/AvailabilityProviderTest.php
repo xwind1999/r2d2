@@ -12,9 +12,11 @@ use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
 use App\Entity\Partner;
+use App\Entity\RoomPrice;
 use App\Manager\ComponentManager;
 use App\Manager\ExperienceManager;
 use App\Manager\RoomAvailabilityManager;
+use App\Manager\RoomPriceManager;
 use App\Provider\AvailabilityProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\ArrayTransformerInterface;
@@ -60,6 +62,11 @@ class AvailabilityProviderTest extends TestCase
      */
     protected $roomAvailabilityManager;
 
+    /**
+     * @var ObjectProphecy|RoomPriceManager
+     */
+    protected $roomPriceManager;
+
     public function setUp(): void
     {
         $this->cmHub = $this->prophesize(CMHub::class);
@@ -68,6 +75,7 @@ class AvailabilityProviderTest extends TestCase
         $this->experienceManager = $this->prophesize(ExperienceManager::class);
         $this->componentManager = $this->prophesize(ComponentManager::class);
         $this->roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
+        $this->roomPriceManager = $this->prophesize(RoomPriceManager::class);
     }
 
     /**
@@ -104,7 +112,8 @@ class AvailabilityProviderTest extends TestCase
             $this->arraySerializer->reveal(),
             $this->experienceManager->reveal(),
             $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal()
+            $this->roomAvailabilityManager->reveal(),
+            $this->roomPriceManager->reveal()
         );
         $response = $availabilityProvider->getAvailability($productId, $dateFrom, $dateTo);
 
@@ -128,7 +137,8 @@ class AvailabilityProviderTest extends TestCase
             $this->arraySerializer->reveal(),
             $this->experienceManager->reveal(),
             $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal()
+            $this->roomAvailabilityManager->reveal(),
+            $this->roomPriceManager->reveal()
         );
 
         $result = $this->prophesize(CMHubErrorResponse::class);
@@ -183,7 +193,8 @@ class AvailabilityProviderTest extends TestCase
             $this->arraySerializer->reveal(),
             $this->experienceManager->reveal(),
             $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal()
+            $this->roomAvailabilityManager->reveal(),
+            $this->roomPriceManager->reveal()
         );
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-25');
@@ -217,7 +228,7 @@ class AvailabilityProviderTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates(1, $dateFrom, $dateTo));
+        $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates('1', $dateFrom, $dateTo));
     }
 
     /**
@@ -232,7 +243,8 @@ class AvailabilityProviderTest extends TestCase
             $this->arraySerializer->reveal(),
             $this->experienceManager->reveal(),
             $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal()
+            $this->roomAvailabilityManager->reveal(),
+            $this->roomPriceManager->reveal()
         );
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-25');
@@ -254,30 +266,30 @@ class AvailabilityProviderTest extends TestCase
         $partner->status = 'partner';
         $experience->partner = $partner;
 
-        $this->roomAvailabilityManager->getRoomAvailabilitiesByComponentGoldenId(
+        $this->roomAvailabilityManager->getRoomAvailabilitiesByComponent(
             Argument::any(), Argument::any(), Argument::any()
         )
             ->willReturn(
                 [
-                    0 => [
+                    '2020-06-21' => [
                         'stock' => 10,
                         'date' => new \DateTime('2020-06-21'),
                         'type' => 'stock',
                         'componentGoldenId' => '1234',
                     ],
-                    1 => [
+                    '2020-06-22' => [
                         'stock' => 10,
                         'date' => new \DateTime('2020-06-22'),
                         'type' => 'stock',
                         'componentGoldenId' => '1234',
                     ],
-                    2 => [
+                    '2020-06-23' => [
                         'stock' => 0,
                         'date' => new \DateTime('2020-06-23'),
                         'type' => 'stock',
                         'componentGoldenId' => '1234',
                     ],
-                    3 => [
+                    '2020-06-24' => [
                         'stock' => 10,
                         'date' => new \DateTime('2020-06-24'),
                         'type' => 'on_request',
@@ -286,10 +298,55 @@ class AvailabilityProviderTest extends TestCase
                 ]
             );
 
+        $prices = [
+            '2020-06-20' => (function () {
+                $roomPrice = new RoomPrice();
+                $roomPrice->price = 1000;
+
+                return $roomPrice;
+            })(),
+            '2020-06-21' => (function () {
+                $roomPrice = new RoomPrice();
+                $roomPrice->price = 1000;
+
+                return $roomPrice;
+            })(),
+            '2020-06-22' => (function () {
+                $roomPrice = new RoomPrice();
+                $roomPrice->price = 1000;
+
+                return $roomPrice;
+            })(),
+            '2020-06-23' => (function () {
+                $roomPrice = new RoomPrice();
+                $roomPrice->price = 1000;
+
+                return $roomPrice;
+            })(),
+        ];
+
+        $this
+            ->roomPriceManager
+            ->getRoomPricesByComponentAndDateRange($component, $dateFrom, $dateTo)
+            ->willReturn($prices);
+
         $expectedArray = [
             'duration' => 1,
             'isSellable' => true,
-            'availabilities' => ['0', '1', '1', '0', 'r', '0'],
+            'availabilities' => [
+                '2020-06-20' => ['stock' => 0, 'date' => new \DateTime('2020-06-20'), 'type' => 'stock', 'componentGoldenId' => '1234'],
+                '2020-06-21' => ['stock' => 10, 'date' => new \DateTime('2020-06-21'), 'type' => 'stock', 'componentGoldenId' => '1234'],
+                '2020-06-22' => ['stock' => 10, 'date' => new \DateTime('2020-06-22'), 'type' => 'stock', 'componentGoldenId' => '1234'],
+                '2020-06-23' => ['stock' => 0, 'date' => new \DateTime('2020-06-23'), 'type' => 'stock', 'componentGoldenId' => '1234'],
+                '2020-06-24' => ['stock' => 10, 'date' => new \DateTime('2020-06-24'), 'type' => 'on_request', 'componentGoldenId' => '1234'],
+                '2020-06-25' => ['stock' => 0, 'date' => new \DateTime('2020-06-25'), 'type' => 'stock', 'componentGoldenId' => '1234'],
+            ],
+            'prices' => [
+                '2020-06-20' => $prices['2020-06-20'],
+                '2020-06-21' => $prices['2020-06-21'],
+                '2020-06-22' => $prices['2020-06-22'],
+                '2020-06-23' => $prices['2020-06-23'],
+            ],
         ];
 
         $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo));
@@ -307,7 +364,8 @@ class AvailabilityProviderTest extends TestCase
             $this->arraySerializer->reveal(),
             $this->experienceManager->reveal(),
             $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal()
+            $this->roomAvailabilityManager->reveal(),
+            $this->roomPriceManager->reveal()
         );
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-25');
@@ -321,10 +379,15 @@ class AvailabilityProviderTest extends TestCase
             'duration' => 1,
             'isSellable' => false,
             'availabilities' => [
-                '0', '0', '0', '0', '0', '0',
+                '2020-06-20' => ['stock' => 0, 'date' => new \DateTime('2020-06-20'), 'type' => 'stock', 'componentGoldenId' => ''],
+                '2020-06-21' => ['stock' => 0, 'date' => new \DateTime('2020-06-21'), 'type' => 'stock', 'componentGoldenId' => ''],
+                '2020-06-22' => ['stock' => 0, 'date' => new \DateTime('2020-06-22'), 'type' => 'stock', 'componentGoldenId' => ''],
+                '2020-06-23' => ['stock' => 0, 'date' => new \DateTime('2020-06-23'), 'type' => 'stock', 'componentGoldenId' => ''],
+                '2020-06-24' => ['stock' => 0, 'date' => new \DateTime('2020-06-24'), 'type' => 'stock', 'componentGoldenId' => ''],
+                '2020-06-25' => ['stock' => 0, 'date' => new \DateTime('2020-06-25'), 'type' => 'stock', 'componentGoldenId' => ''],
             ],
+            'prices' => [],
         ];
-
         $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo));
     }
 
@@ -341,7 +404,8 @@ class AvailabilityProviderTest extends TestCase
             $this->arraySerializer->reveal(),
             $this->experienceManager->reveal(),
             $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal()
+            $this->roomAvailabilityManager->reveal(),
+            $this->roomPriceManager->reveal()
         );
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-25');
@@ -377,33 +441,42 @@ class AvailabilityProviderTest extends TestCase
             Argument::any()
         )->willReturn(
             [
-                0 => [
-                    'stock' => 10,
-                    'date' => new \DateTime('2020-06-20'),
-                    'type' => 'stock',
-                    'componentGoldenId' => '1111',
-                ],
-                1 => [
-                    'stock' => 0,
-                    'date' => new \DateTime('2020-06-22'),
-                    'type' => 'stock',
-                    'componentGoldenId' => '1111',
-                ],
-                2 => [
-                    'stock' => 10,
-                    'date' => new \DateTime('2020-06-24'),
-                    'type' => 'on_request',
-                    'componentGoldenId' => '1111',
+                '1111' => [
+                    '2020-06-20' => [
+                        'stock' => 10,
+                        'date' => new \DateTime('2020-06-20'),
+                        'type' => 'stock',
+                        'componentGoldenId' => '1111',
+                    ],
+                    '2020-06-22' => [
+                        'stock' => 0,
+                        'date' => new \DateTime('2020-06-22'),
+                        'type' => 'stock',
+                        'componentGoldenId' => '1111',
+                    ],
+                    '2020-06-24' => [
+                        'stock' => 10,
+                        'date' => new \DateTime('2020-06-24'),
+                        'type' => 'on_request',
+                        'componentGoldenId' => '1111',
+                    ],
                 ],
             ]
         );
 
         $expectedArray = [
-            '1234' => [
+            '1111' => [
                 'duration' => 1,
                 'isSellable' => true,
                 'partnerId' => '1234',
-                'availabilities' => ['1', '0', '0', '0', 'r', '0'],
+                'availabilities' => [
+                    '2020-06-20' => ['stock' => 10, 'type' => 'stock', 'date' => new \DateTime('2020-06-20'), 'componentGoldenId' => '1111'],
+                    '2020-06-21' => ['stock' => 0, 'type' => 'stock', 'date' => new \DateTime('2020-06-21'), 'componentGoldenId' => '1111'],
+                    '2020-06-22' => ['stock' => 0, 'type' => 'stock', 'date' => new \DateTime('2020-06-22'), 'componentGoldenId' => '1111'],
+                    '2020-06-23' => ['stock' => 0, 'type' => 'stock', 'date' => new \DateTime('2020-06-23'), 'componentGoldenId' => '1111'],
+                    '2020-06-24' => ['stock' => 10, 'type' => 'on_request', 'date' => new \DateTime('2020-06-24'), 'componentGoldenId' => '1111'],
+                    '2020-06-25' => ['stock' => 0, 'type' => 'stock', 'date' => new \DateTime('2020-06-25'), 'componentGoldenId' => '1111'],
+                ],
             ],
         ];
 

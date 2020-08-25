@@ -15,12 +15,14 @@ class AvailabilityHelperTest extends TestCase
 
     public function testconvertAvailableValueToRequest()
     {
-        $inputString = 'Available';
-        $expectedString = 'Request';
-        $randomString = 'SomeThingElse';
-
-        $this->assertEquals($expectedString, AvailabilityHelper::convertAvailableValueToRequest($inputString));
-        $this->assertEquals($randomString, AvailabilityHelper::convertAvailableValueToRequest($randomString));
+        $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('stock', 0, false));
+        $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('stock', 0, true));
+        $this->assertEquals('Available', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('stock', 1, false));
+        $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('stock', 1, true));
+        $this->assertEquals('Request', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('on_request', 0, false));
+        $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('on_request', 0, true));
+        $this->assertEquals('Request', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('on_request', 1, false));
+        $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('on_request', 1, true));
     }
 
     public function testMapRoomAvailabilitiesToExperience()
@@ -156,19 +158,19 @@ class AvailabilityHelperTest extends TestCase
     public function testFillMissingAvailabilities()
     {
         $availabilities = [
-            0 => [
+            '2020-06-20' => [
                 'stock' => 10,
                 'date' => new \DateTime('2020-06-20'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
             ],
-            1 => [
+            '2020-06-21' => [
                 'stock' => 0,
                 'date' => new \DateTime('2020-06-21'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
             ],
-            2 => [
+            '2020-06-23' => [
                 'stock' => 10,
                 'date' => new \DateTime('2020-06-23'),
                 'type' => 'on_request',
@@ -181,37 +183,37 @@ class AvailabilityHelperTest extends TestCase
         $dateTo = new \DateTime('2020-06-25');
 
         $returnArray = [
-            0 => [
+            '2020-06-20' => [
                 'stock' => 10,
                 'date' => new \DateTime('2020-06-20'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
             ],
-            1 => [
+            '2020-06-21' => [
                 'stock' => 0,
                 'date' => new \DateTime('2020-06-21'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
             ],
-            2 => [
+            '2020-06-22' => [
                 'stock' => 0,
                 'date' => new \DateTime('2020-06-22'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
             ],
-            3 => [
+            '2020-06-23' => [
                 'stock' => 10,
                 'date' => new \DateTime('2020-06-23'),
                 'type' => 'on_request',
                 'componentGoldenId' => '1111',
             ],
-            4 => [
+            '2020-06-24' => [
                 'stock' => 0,
                 'date' => new \DateTime('2020-06-24'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
             ],
-            5 => [
+            '2020-06-25' => [
                 'stock' => 0,
                 'date' => new \DateTime('2020-06-25'),
                 'type' => 'stock',
@@ -228,19 +230,19 @@ class AvailabilityHelperTest extends TestCase
     public function testFillMissingAvailabilitiesWithEnoughDate()
     {
         $availabilities = [
-            0 => [
+            '2020-06-20' => [
                 'stock' => 10,
                 'date' => new \DateTime('2020-06-20'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
             ],
-            1 => [
+            '2020-06-21' => [
                 'stock' => 0,
                 'date' => new \DateTime('2020-06-21'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
             ],
-            2 => [
+            '2020-06-22' => [
                 'stock' => 10,
                 'date' => new \DateTime('2020-06-22'),
                 'type' => 'on_request',

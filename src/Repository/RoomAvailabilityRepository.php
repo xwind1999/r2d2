@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Component;
 use App\Entity\RoomAvailability;
 use App\Exception\Repository\RoomAvailabilityNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -54,32 +55,47 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         \DateTimeInterface $dateTo
     ): array {
         $qb = $this->createQueryBuilder('r');
-        $qb
+        $result = $qb
             ->select('r.stock, r.date, r.type, r.componentGoldenId')
             ->where($qb->expr()->in('r.componentGoldenId', $componentIds))
             ->andWhere('r.date BETWEEN :dateFrom AND :dateTo')
             ->orderBy('r.date', 'ASC')
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d'))
+            ->getQuery()
+            ->getArrayResult()
         ;
 
-        return $qb->getQuery()->getArrayResult();
+        $resultSet = [];
+        foreach ($result as $item) {
+            $date = $item['date']->format('Y-m-d');
+            if (!isset($resultSet[$item['componentGoldenId']])) {
+                $resultSet[$item['componentGoldenId']] = [];
+            }
+            $resultSet[$item['componentGoldenId']][$date] = $item;
+        }
+
+        return $resultSet;
     }
 
-    public function findRoomAvailabilitiesByComponentGoldenId(
-        string $componentGoldenId,
+    /**
+     * @throws QueryException
+     */
+    public function findRoomAvailabilitiesByComponent(
+        Component $component,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo): array
     {
         $qb = $this->createQueryBuilder('r');
         $qb
-            ->select('r.stock, r.date, r.type, r.componentGoldenId')
-            ->where('r.componentGoldenId = :componentGoldenId')
+            ->select('r.stock, r.date, r.type, r.componentGoldenId, r.isStopSale')
+            ->where('r.component = :component')
             ->andWhere('r.date BETWEEN :dateFrom AND :dateTo')
             ->orderBy('r.date', 'ASC')
-            ->setParameter('componentGoldenId', $componentGoldenId)
+            ->setParameter('component', $component->uuid->getBytes())
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d'))
+            ->indexBy('r', 'r.date')
         ;
 
         return $qb->getQuery()->getArrayResult();
@@ -91,15 +107,15 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
      * @throws QueryException
      */
     public function findByComponentAndDateRange(
-        string $componentGoldenId,
+        Component $component,
         \DateTime $dateFrom,
         \DateTime $dateTo
     ): array {
         $qb = $this->createQueryBuilder('ra');
         $qb
-            ->where('ra.componentGoldenId = :componentGoldenId')
+            ->where('ra.component = :component')
             ->andWhere('ra.date BETWEEN :dateFrom AND :dateTo')
-            ->setParameter('componentGoldenId', $componentGoldenId)
+            ->setParameter('component', $component->uuid->getBytes())
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d'))
             ->indexBy('ra', 'ra.date')

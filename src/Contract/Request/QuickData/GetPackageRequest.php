@@ -12,14 +12,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 class GetPackageRequest implements RequestQueryInterface, ValidatableRequest
 {
     /**
-     * @Assert\Type(type="integer")
-     * @Assert\Positive()
+     * @Assert\Type(type="string")
      * @Assert\NotBlank
      *
      * @JMS\SerializedName("PackageCode")
-     * @JMS\Type("integer")
+     * @JMS\Type("string")
      */
-    public int $packageCode;
+    public string $packageCode;
 
     /**
      * @Assert\Type(type="DateTime")

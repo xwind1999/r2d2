@@ -154,8 +154,12 @@ class PartnerManagerTest extends TestCase
         $partnerRequest->currencyCode = 'EUR';
         $partnerRequest->isChannelManagerEnabled = true;
         $partnerRequest->partnerCeaseDate = new \DateTime('2015-10-12T23:03:09.000000+0000');
+        $partnerRequest->updatedAt = new \DateTime('2020-01-01 01:00:00');
 
-        $this->repository->findOneByGoldenId($partnerRequest->id)->shouldBeCalled();
+        $partner = new Partner();
+        $partner->externalUpdatedAt = new \DateTime('2020-01-01 01:00:00');
+
+        $this->repository->findOneByGoldenId($partnerRequest->id)->shouldBeCalled()->willReturn($partner);
         $this->repository->save(Argument::type(Partner::class))->shouldBeCalled();
         $this->manageableProductService->dispatchForPartner($partnerRequest, Argument::type(Partner::class))->shouldBeCalled();
 

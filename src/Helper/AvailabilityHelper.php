@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Helper;
 
+use App\Constraint\RoomStockTypeConstraint;
+
 class AvailabilityHelper
 {
     public const AVAILABILITY_TYPE_ON_REQUEST = 'on_request';
@@ -13,22 +15,25 @@ class AvailabilityHelper
 
     private const DEFAULT_DATE_TIME_FORMAT = 'Y-m-d';
     private const DEFAULT_DATE_DIFF_VALUE = 0;
+    private const AVAILABILITY_PRICE_PERIOD_AVAILABLE = 'Available';
+    private const AVAILABILITY_PRICE_PERIOD_REQUEST = 'Request';
+    private const AVAILABILITY_PRICE_PERIOD_UNAVAILABLE = 'Unavailable';
 
     public static function convertToShortType(array $availabilities): array
     {
         $shortenArray = [];
 
-        foreach ($availabilities as $availability) {
+        foreach ($availabilities as $date => $availability) {
             if (0 === $availability['stock']) {
-                $shortenArray[] = self::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
+                $shortenArray[$date] = self::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
             } elseif (self::AVAILABILITY_TYPE_ON_REQUEST === $availability['type']) {
-                $shortenArray[] = self::AVAILABILITY_SHORTEN_ON_REQUEST;
+                $shortenArray[$date] = self::AVAILABILITY_SHORTEN_ON_REQUEST;
             } else {
-                $shortenArray[] = self::AVAILABILITY_SHORTEN_INSTANT;
+                $shortenArray[$date] = self::AVAILABILITY_SHORTEN_INSTANT;
             }
         }
 
-        return $shortenArray;
+        return array_values($shortenArray);
     }
 
     public static function fillMissingAvailabilities(
@@ -48,25 +53,19 @@ class AvailabilityHelper
 
         $returnAvailabilities = [];
 
-        $dateFlag = $dateFrom->setTime(0, 0, 0);
-        $availabilityPosition = 0;
-
-        for ($i = 0; $i < $numberOfNights; ++$i) {
-            if (
-                empty($availabilities[$availabilityPosition]['date']) ||
-                0 !== $dateFlag->diff($availabilities[$availabilityPosition]['date'])->days
-            ) {
-                $returnAvailabilities[] = [
+        $datePeriod = new \DatePeriod($dateFrom, new \DateInterval('P1D'), (clone $dateTo)->modify('+1 day'));
+        foreach ($datePeriod as $date) {
+            $date = $date->format('Y-m-d');
+            if (!isset($availabilities[$date])) {
+                $returnAvailabilities[$date] = [
                     'stock' => 0,
-                    'date' => clone $dateFlag,
+                    'date' => new \DateTime($date),
                     'type' => 'stock',
                     'componentGoldenId' => $componentId,
                 ];
             } else {
-                $returnAvailabilities[] = $availabilities[$availabilityPosition];
-                ++$availabilityPosition;
+                $returnAvailabilities[$date] = $availabilities[$date];
             }
-            $dateFlag->modify('+1 day');
         }
 
         return $returnAvailabilities;
@@ -89,9 +88,17 @@ class AvailabilityHelper
         ];
     }
 
-    public static function convertAvailableValueToRequest(string $availability): string
+    public static function convertAvailabilityTypeToExplicitQuickdataValue(string $type, int $stock, bool $isStopSale): string
     {
-        return ('Available' === $availability) ? 'Request' : $availability;
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK === $type && $stock > 0 && false === $isStopSale) {
+            return self::AVAILABILITY_PRICE_PERIOD_AVAILABLE;
+        }
+
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $type && false === $isStopSale) {
+            return self::AVAILABILITY_PRICE_PERIOD_REQUEST;
+        }
+
+        return self::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE;
     }
 
     public static function mapRoomAvailabilitiesToExperience(

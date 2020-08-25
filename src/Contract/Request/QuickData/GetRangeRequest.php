@@ -12,14 +12,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class GetRangeRequest implements RequestQueryInterface, ValidatableRequest
 {
     /**
-     * @Assert\Type(type="integer")
+     * @Assert\Type(type="string")
      * @Assert\Positive()
      * @Assert\NotBlank
      *
      * @JMS\SerializedName("boxVersion")
-     * @JMS\Type("integer")
+     * @JMS\Type("string")
      */
-    public int $boxVersion;
+    public string $boxVersion;
 
     /**
      * @Assert\Type(type="DateTime")

@@ -260,7 +260,7 @@ class ExperienceManagerTest extends TestCase
      * @covers ::__construct
      * @covers ::insertPriceInfo
      */
-    public function testinsertPriceInfo()
+    public function testInsertPriceInfo()
     {
         $productDTO = new Product();
         $productDTO->id = '1264';
@@ -271,11 +271,15 @@ class ExperienceManagerTest extends TestCase
         $priceInformationRequest->averageValue = $priceDTO;
         $priceInformationRequest->averageCommission = '5.556';
         $priceInformationRequest->averageCommissionType = 'percentage';
+        $priceInformationRequest->updatedAt = new \DateTime('2020-01-01 01:00:00');
+
+        $experience = new Experience();
+        $experience->priceUpdatedAt = new \DateTime('2020-01-01 01:00:00');
 
         $this->repository
             ->findOneByGoldenId($priceInformationRequest->product->id)
             ->shouldBeCalledOnce()
-            ->willReturn(($this->prophesize(Experience::class))->reveal())
+            ->willReturn($experience)
         ;
         $this->repository->save(Argument::type(Experience::class))->shouldBeCalledOnce();
         $this->assertEmpty($this->manager->insertPriceInfo($priceInformationRequest));
@@ -345,9 +349,9 @@ class ExperienceManagerTest extends TestCase
             '1234', '4321', '1111',
         ];
         $this->repository->filterListExperienceIdsByBoxId(Argument::any())->willReturn($expIds);
-        $this->manager->filterListExperienceIdsByBoxId(1);
+        $this->manager->filterListExperienceIdsByBoxId('1');
 
-        $this->repository->filterListExperienceIdsByBoxId(1)->shouldBeCalledOnce();
+        $this->repository->filterListExperienceIdsByBoxId('1')->shouldBeCalledOnce();
     }
 
     /**

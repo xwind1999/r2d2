@@ -11,6 +11,7 @@ use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataErrorResponse;
 use App\Entity\Experience;
 use App\Entity\Partner;
+use App\Entity\RoomPrice;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceManager;
 use App\Provider\AvailabilityProvider;
@@ -88,10 +89,14 @@ class LegacyAvailabilityProviderTest extends TestCase
             ->willReturn([
                 'duration' => 1,
                 'isSellable' => true,
-                'availabilities' => ['1', 'r', '1'],
+                'availabilities' => [
+                    '2020-01-01' => ['stock' => 1, 'type' => 'stock'],
+                    '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
+                    '2020-01-03' => ['stock' => 1, 'type' => 'stock'],
+                ],
             ]);
 
-        $response = $legacyAvailabilityProvider->getAvailabilityForExperience(1234, $dateFrom, $dateTo);
+        $response = $legacyAvailabilityProvider->getAvailabilityForExperience('1234', $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageResponse::class, $response);
     }
@@ -121,7 +126,11 @@ class LegacyAvailabilityProviderTest extends TestCase
             ->willReturn([
                 'duration' => 1,
                 'isSellable' => true,
-                'availabilities' => ['1', 'r', '1'],
+                'availabilities' => [
+                    '2020-01-01' => ['stock' => 1, 'type' => 'stock'],
+                    '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
+                    '2020-01-03' => ['stock' => 1, 'type' => 'stock'],
+                ],
             ]);
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
@@ -130,7 +139,7 @@ class LegacyAvailabilityProviderTest extends TestCase
             $this->availabilityProvider->reveal()
         );
 
-        $response = $legacyAvailabilityProvider->getAvailabilityForExperience((int) $experience->goldenId, $dateFrom, $dateTo);
+        $response = $legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageResponse::class, $response);
     }
@@ -142,7 +151,7 @@ class LegacyAvailabilityProviderTest extends TestCase
     public function testGetAvailabilityForExperienceWithConverter()
     {
         $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-03');
         $experience = new Experience();
         $experience->goldenId = '1234';
         $partner = new Partner();
@@ -159,7 +168,20 @@ class LegacyAvailabilityProviderTest extends TestCase
             ->willReturn([
                 'duration' => 1,
                 'isSellable' => true,
-                'availabilities' => ['1', 'r', '1'],
+                'availabilities' => [
+                    '2020-01-01' => [
+                        'stock' => 1,
+                        'type' => 'stock',
+                    ],
+                    '2020-01-02' => [
+                        'stock' => 1,
+                        'type' => 'on_request',
+                    ],
+                    '2020-01-03' => [
+                        'stock' => 1,
+                        'type' => 'stock',
+                    ],
+                ],
             ]);
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
@@ -168,7 +190,7 @@ class LegacyAvailabilityProviderTest extends TestCase
             $this->availabilityProvider->reveal()
         );
 
-        $response = $legacyAvailabilityProvider->getAvailabilityForExperience((int) $experience->goldenId, $dateFrom, $dateTo);
+        $response = $legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageResponse::class, $response);
     }
@@ -197,7 +219,11 @@ class LegacyAvailabilityProviderTest extends TestCase
             ->willReturn([
                 'duration' => 1,
                 'isSellable' => true,
-                'availabilities' => ['1', 'r', '1'],
+                'availabilities' => [
+                    '2020-01-01' => ['stock' => 1, 'type' => 'stock'],
+                    '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
+                    '2020-01-03' => ['stock' => 1, 'type' => 'stock'],
+                ],
             ]);
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
@@ -205,7 +231,7 @@ class LegacyAvailabilityProviderTest extends TestCase
             $this->experienceManager->reveal(),
             $this->availabilityProvider->reveal()
         );
-        $response = $legacyAvailabilityProvider->getAvailabilityForExperience((int) $experience->goldenId, $dateFrom, $dateTo);
+        $response = $legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageResponse::class, $response);
     }
@@ -233,7 +259,7 @@ class LegacyAvailabilityProviderTest extends TestCase
             $this->availabilityProvider->reveal()
         );
 
-        $legacyAvailabilityProvider->getAvailabilityForExperience(31209470194830912, $dateFrom, $dateTo);
+        $legacyAvailabilityProvider->getAvailabilityForExperience('31209470194830912', $dateFrom, $dateTo);
     }
 
     /**
@@ -242,7 +268,7 @@ class LegacyAvailabilityProviderTest extends TestCase
      */
     public function testGetAvailabilitiesForBox()
     {
-        $boxId = 1234;
+        $boxId = '1234';
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
@@ -266,7 +292,7 @@ class LegacyAvailabilityProviderTest extends TestCase
      */
     public function testGetAvailabilitiesForBoxWithConverter()
     {
-        $boxId = 1234;
+        $boxId = '1234';
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
@@ -318,7 +344,7 @@ class LegacyAvailabilityProviderTest extends TestCase
      */
     public function testGetAvailabilitiesForBoxWillFailDueToHttpError()
     {
-        $boxId = 1234;
+        $boxId = '1234';
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
@@ -365,7 +391,31 @@ class LegacyAvailabilityProviderTest extends TestCase
                 'isSellable' => true,
                 'partnerId' => '123',
                 'availabilities' => [
-                    '1', '1', '1', '1', '1',
+                    '2020-01-01' => [
+                        'stock' => 1,
+                        'type' => 'stock',
+                        'isStopSale' => false,
+                    ],
+                    '2020-01-02' => [
+                        'stock' => 1,
+                        'type' => 'stock',
+                        'isStopSale' => false,
+                    ],
+                    '2020-01-03' => [
+                        'stock' => 1,
+                        'type' => 'stock',
+                        'isStopSale' => false,
+                    ],
+                    '2020-01-04' => [
+                        'stock' => 1,
+                        'type' => 'stock',
+                        'isStopSale' => false,
+                    ],
+                    '2020-01-05' => [
+                        'stock' => 1,
+                        'type' => 'stock',
+                        'isStopSale' => false,
+                    ],
                 ],
             ],
         ];
@@ -410,7 +460,7 @@ class LegacyAvailabilityProviderTest extends TestCase
     public function testGetAvailabilityPriceForExperience()
     {
         $prestId = 1234;
-        $experienceId = 4321;
+        $experienceId = '4321';
         $experience = new Experience();
         $experience->goldenId = '4321';
         $partner = new Partner();
@@ -418,57 +468,23 @@ class LegacyAvailabilityProviderTest extends TestCase
         $partner->isChannelManagerActive = true;
         $experience->partner = $partner;
         $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-02');
         $quickdataResponse = ['DaysAvailabilityPrice' => [['Date' => '2020-01-01T01:00:00.00000000+03:00']]];
-        $formattedResponse = ['DaysAvailabilityPrice' => [['Date' => '2020-01-01T00:00:00.000000']]];
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
-
-        $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
-        $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
-        $this->quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo)->willReturn($quickdataResponse);
-        $this->serializer->fromArray($formattedResponse, Argument::any())->willReturn($result->reveal());
-        $response = $legacyAvailabilityProvider->getAvailabilityPriceForExperience($experienceId, $prestId, $dateFrom, $dateTo);
-
-        $this->assertInstanceOf(AvailabilityPricePeriodResponse::class, $response);
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getAvailabilityPriceForExperience
-     */
-    public function testGetAvailabilityPriceForExperienceWithConverter()
-    {
-        $prestId = 1234;
-        $experienceId = 4321;
-        $experience = new Experience();
-        $partner = new Partner();
-        $partner->isChannelManagerActive = false;
-        $experience->partner = $partner;
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
-        $quickdataResponse = [
-            'DaysAvailabilityPrice' => [
-                [
-                    'Date' => '2020-01-01T01:00:00.00000000+03:00',
-                    'AvailabilityValue' => 0,
-                    'AvailabilityStatus' => 'Available',
-                    'SellingPrice' => 0,
-                    'BuyingPrice' => 0,
-                ],
-            ],
-        ];
         $formattedResponse = [
             'DaysAvailabilityPrice' => [
                 [
                     'Date' => '2020-01-01T00:00:00.000000',
-                    'AvailabilityValue' => 0,
-                    'AvailabilityStatus' => 'Request',
-                    'SellingPrice' => 0,
-                    'BuyingPrice' => 0,
+                    'AvailabilityValue' => 1,
+                    'AvailabilityStatus' => 'Available',
+                    'BuyingPrice' => 0.05,
+                    'SellingPrice' => 0.05,
+                ],
+                [
+                    'Date' => '2020-01-02T00:00:00.000000',
+                    'AvailabilityValue' => 1,
+                    'AvailabilityStatus' => 'Available',
+                    'BuyingPrice' => 0.1,
+                    'SellingPrice' => 0.1,
                 ],
             ],
         ];
@@ -482,37 +498,42 @@ class LegacyAvailabilityProviderTest extends TestCase
         $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
         $this->quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo)->willReturn($quickdataResponse);
         $this->serializer->fromArray($formattedResponse, Argument::any())->willReturn($result->reveal());
+
+        $this->availabilityProvider
+            ->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo)
+            ->willReturn([
+                'duration' => 1,
+                'isSellable' => 1,
+                'availabilities' => [
+                    '2020-01-01' => [
+                        'stock' => 1,
+                        'type' => 'stock',
+                        'isStopSale' => false,
+                    ],
+                    '2020-01-02' => [
+                        'stock' => 1,
+                        'type' => 'stock',
+                        'isStopSale' => false,
+                    ],
+                ],
+                'prices' => [
+                    '2020-01-01' => (function () {
+                        $roomPrice = new RoomPrice();
+                        $roomPrice->price = 5;
+
+                        return $roomPrice;
+                    })(),
+                    '2020-01-02' => (function () {
+                        $roomPrice = new RoomPrice();
+                        $roomPrice->price = 10;
+
+                        return $roomPrice;
+                    })(),
+                ],
+            ]);
+
         $response = $legacyAvailabilityProvider->getAvailabilityPriceForExperience($experienceId, $prestId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(AvailabilityPricePeriodResponse::class, $response);
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getAvailabilityPriceForExperience
-     */
-    public function testGetAvailabilityPriceForExperienceWillFailDueToHttpError()
-    {
-        $prestId = 1234;
-        $experienceId = 4321;
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
-
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
-
-        $exception = $this->prophesize(HttpExceptionInterface::class);
-        $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
-
-        $this->quickData->availabilityPricePeriod($prestId, $dateFrom, $dateTo)->willThrow($exception->reveal());
-
-        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
-        $response = $legacyAvailabilityProvider->getAvailabilityPriceForExperience($experienceId, $prestId, $dateFrom, $dateTo);
-
-        $this->assertInstanceOf(AvailabilityPricePeriodResponse::class, $response);
-        $this->assertEmpty($response->daysAvailabilityPrice);
     }
 }

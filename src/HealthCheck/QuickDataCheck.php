@@ -13,7 +13,7 @@ use Laminas\Diagnostics\Result\Success;
 
 class QuickDataCheck extends AbstractCheck
 {
-    protected const EXPERIENCE_ID = 2501;
+    protected const EXPERIENCE_ID = '2501';
 
     protected QuickData $quickData;
 

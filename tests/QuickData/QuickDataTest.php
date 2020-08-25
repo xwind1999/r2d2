@@ -35,7 +35,7 @@ class QuickDataTest extends TestCase
         $this->httpClientFactory->buildWithOptions(Argument::type('string'), [])->willReturn($this->httpClient->reveal());
         $quickData = new QuickData([], $this->httpClientFactory->reveal());
 
-        $packageCode = 1234;
+        $packageCode = '1234';
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
@@ -56,7 +56,7 @@ class QuickDataTest extends TestCase
         $this->httpClientFactory->buildWithOptions(Argument::type('string'), [])->willReturn($this->httpClient->reveal());
         $quickData = new QuickData([], $this->httpClientFactory->reveal());
 
-        $boxId = 1234;
+        $boxId = '1234';
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
