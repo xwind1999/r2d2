@@ -172,6 +172,7 @@ class AvailabilityProvider
                 'duration' => $duration,
                 'isSellable' => $componentList[$componentId][0]['isSellable'],
                 'partnerId' => $componentList[$componentId][0]['partnerGoldenId'],
+                'experienceId' => $componentList[$componentId]['experienceGoldenId'],
                 'availabilities' => $item,
             ];
         }

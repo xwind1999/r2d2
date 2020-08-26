@@ -469,6 +469,7 @@ class AvailabilityProviderTest extends TestCase
                 'duration' => 1,
                 'isSellable' => true,
                 'partnerId' => '1234',
+                'experienceId' => '1234',
                 'availabilities' => [
                     '2020-06-20' => ['stock' => 10, 'type' => 'stock', 'date' => new \DateTime('2020-06-20'), 'componentGoldenId' => '1111'],
                     '2020-06-21' => ['stock' => 0, 'type' => 'stock', 'date' => new \DateTime('2020-06-21'), 'componentGoldenId' => '1111'],

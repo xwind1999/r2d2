@@ -89,6 +89,7 @@ class LegacyAvailabilityProviderTest extends TestCase
             ->willReturn([
                 'duration' => 1,
                 'isSellable' => true,
+                'experienceId' => '1234',
                 'availabilities' => [
                     '2020-01-01' => ['stock' => 1, 'type' => 'stock'],
                     '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
@@ -126,6 +127,7 @@ class LegacyAvailabilityProviderTest extends TestCase
             ->willReturn([
                 'duration' => 1,
                 'isSellable' => true,
+                'experienceId' => '1234',
                 'availabilities' => [
                     '2020-01-01' => ['stock' => 1, 'type' => 'stock'],
                     '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
@@ -168,6 +170,7 @@ class LegacyAvailabilityProviderTest extends TestCase
             ->willReturn([
                 'duration' => 1,
                 'isSellable' => true,
+                'experienceId' => '4321',
                 'availabilities' => [
                     '2020-01-01' => [
                         'stock' => 1,
@@ -219,6 +222,7 @@ class LegacyAvailabilityProviderTest extends TestCase
             ->willReturn([
                 'duration' => 1,
                 'isSellable' => true,
+                'experienceId' => '4321',
                 'availabilities' => [
                     '2020-01-01' => ['stock' => 1, 'type' => 'stock'],
                     '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
@@ -386,10 +390,11 @@ class LegacyAvailabilityProviderTest extends TestCase
         );
 
         $returnArray = [
-            '1234' => [
+            '4444' => [
                 'duration' => 1,
                 'isSellable' => true,
                 'partnerId' => '123',
+                'experienceId' => '1234',
                 'availabilities' => [
                     '2020-01-01' => [
                         'stock' => 1,
