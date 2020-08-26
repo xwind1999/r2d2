@@ -141,7 +141,7 @@ class LegacyAvailabilityProvider
 
             foreach ($availabilities as $componentId => $availability) {
                 $availabilitiesArray['ListPackage'][] = [
-                    'PackageCode' => $componentId,
+                    'PackageCode' => $availability['experienceId'],
                     'ListPrestation' => [
                         AvailabilityHelper::buildDataForGetPackage(
                             AvailabilityHelper::convertToShortType($availability['availabilities']),

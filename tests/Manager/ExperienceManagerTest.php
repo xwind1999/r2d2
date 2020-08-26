@@ -172,7 +172,21 @@ class ExperienceManagerTest extends TestCase
 
         $this->partnerRepository->findOneByGoldenId($productRequest->partner->id)->shouldBeCalled();
         $this->repository->findOneByGoldenId($productRequest->id)->shouldBeCalled();
-        $this->repository->save(Argument::type(Experience::class))->shouldBeCalled();
+
+        (function ($tester, $productRequest) {
+            $this->repository
+                ->save(Argument::type(Experience::class))
+                ->will(function ($test) use ($tester, $productRequest) {
+                    /** @var Experience $experience */
+                    $experience = $test[0];
+                    $tester->assertEquals($productRequest->id, $experience->goldenId);
+                    $tester->assertEquals($productRequest->partner->id, $experience->partnerGoldenId);
+                    $tester->assertEquals($productRequest->name, $experience->name);
+                    $tester->assertEquals($productRequest->description, $experience->description);
+                    $tester->assertEquals($productRequest->productPeopleNumber, $experience->peopleNumber);
+                    $tester->assertEquals($productRequest->status, $experience->status);
+                });
+        })($this, $productRequest);
         $this->manageableProductService->dispatchForExperience(Argument::any(), Argument::any())->shouldBeCalled();
 
         $this->manager->replace($productRequest);
