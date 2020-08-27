@@ -111,4 +111,10 @@ class RoomAvailabilityRequestTest extends TestCase
             \TypeError::class,
         ];
     }
+
+    public function testGetEventName()
+    {
+        $request = new RoomAvailabilityRequest();
+        $this->assertEquals('Room availability broadcast', $request->getEventName());
+    }
 }

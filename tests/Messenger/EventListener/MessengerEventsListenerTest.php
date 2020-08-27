@@ -13,6 +13,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 
 /**
  * @coversDefaultClass \App\Messenger\EventListener\MessengerEventsListener
@@ -30,6 +32,34 @@ class MessengerEventsListenerTest extends TestCase
     {
         $this->logger = $this->prophesize(LoggerInterface::class);
         $this->messengerEventsListener = new MessengerEventsListener($this->logger->reveal());
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::onMessageHandled
+     * @covers ::generateContext
+     *
+     * @dataProvider dataProvider
+     */
+    public function testOnMessageHandled(object $message, array $context)
+    {
+        $event = new WorkerMessageHandledEvent(new Envelope($message, []), '');
+        $this->logger->info('Message handled', $context)->shouldBeCalled();
+        $this->messengerEventsListener->onMessageHandled($event);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::onMessageReceived
+     * @covers ::generateContext
+     *
+     * @dataProvider dataProvider
+     */
+    public function testOnMessageReceived(object $message, array $context)
+    {
+        $event = new WorkerMessageReceivedEvent(new Envelope($message, []), '');
+        $this->logger->info('Message received', $context)->shouldBeCalled();
+        $this->messengerEventsListener->onMessageReceived($event);
     }
 
     /**
@@ -54,6 +84,8 @@ class MessengerEventsListenerTest extends TestCase
         $this->assertEquals([
             WorkerMessageFailedEvent::class => ['onMessageFailed', 100],
             SendMessageToTransportsEvent::class => ['onMessageSent', 100],
+            WorkerMessageHandledEvent::class => ['onMessageHandled', 100],
+            WorkerMessageReceivedEvent::class => ['onMessageReceived', 100],
         ], MessengerEventsListener::getSubscribedEvents());
     }
 

@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Contract\Request\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\Product\Product;
+use App\Event\NamedEventInterface;
 use Clogger\ContextualInterface;
 use JMS\Serializer\Annotation as JMS;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class RoomAvailabilityRequest implements ContextualInterface
+class RoomAvailabilityRequest implements ContextualInterface, NamedEventInterface
 {
+    private const EVENT_NAME = 'Room availability broadcast';
+
     /**
      * @Assert\Type(type="App\Contract\Request\BroadcastListener\Product\Product")
      * @Assert\Valid
@@ -71,5 +74,10 @@ class RoomAvailabilityRequest implements ContextualInterface
             'isStopSale' => $this->isStopSale,
             'updatedAt' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
         ];
+    }
+
+    public function getEventName(): string
+    {
+        return static::EVENT_NAME;
     }
 }
