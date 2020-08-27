@@ -109,4 +109,3 @@ framework:
             default:
                 middleware:
                     - App\Messenger\NewrelicMessengerMiddleware
-                    - App\Messenger\MessengerLoggerMiddleware
