@@ -82,19 +82,7 @@ class AvailabilityProvider
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): array {
-        $dateDiff = $dateTo->diff($dateFrom)->days ?: self::DEFAULT_DATE_DIFF_VALUE;
-        // DateFrom and DateTo is the stay date, not the checkout one
-        $numberOfNights = $dateDiff + 1;
-        $activeChannelExperienceIds = $this->experienceManager->filterListExperienceIdsByBoxId($boxId);
-        $activeChannelComponents = $this->componentManager->getRoomsByExperienceGoldenIdsList(
-            array_keys($activeChannelExperienceIds));
-        $roomAvailabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesByMultipleComponentGoldenIds(
-            array_keys($activeChannelComponents), $dateFrom, $dateTo
-        );
-        $roomAvailabilities = AvailabilityHelper::mapRoomAvailabilitiesToExperience(
-            $activeChannelComponents, $roomAvailabilities, $numberOfNights);
-
-        return $roomAvailabilities;
+        return $this->roomAvailabilityManager->getRoomAvailabilitiesByBoxId($boxId, $dateFrom, $dateTo);
     }
 
     public function getRoomAvailabilitiesByExperienceAndDates(

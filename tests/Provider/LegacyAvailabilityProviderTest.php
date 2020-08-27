@@ -21,8 +21,6 @@ use JMS\Serializer\ArrayTransformerInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @coversDefaultClass \App\Provider\LegacyAvailabilityProvider
@@ -274,100 +272,80 @@ class LegacyAvailabilityProviderTest extends TestCase
     {
         $boxId = '1234';
         $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-05');
 
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
+            $this->quickData->reveal(),
             $this->serializer->reveal(),
             $this->experienceManager->reveal(),
             $this->availabilityProvider->reveal()
         );
 
-        $result = $this->prophesize(GetRangeResponse::class);
-        $this->quickData->getRange($boxId, $dateFrom, $dateTo)->willReturn([]);
-        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
-        $response = $legacyAvailabilityProvider->getAvailabilitiesForBox($boxId, $dateFrom, $dateTo);
-
-        $this->assertInstanceOf(GetRangeResponse::class, $response);
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getAvailabilitiesForBox
-     */
-    public function testGetAvailabilitiesForBoxWithConverter()
-    {
-        $boxId = '1234';
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
-
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
-
-        $result = $this->prophesize(GetRangeResponse::class);
-        $this->quickData->getRange($boxId, $dateFrom, $dateTo)->willReturn([
-            'PackagesList' => [
-                [
-                    'Package' => '132982',
-                    'Stock' => 0,
-                    'Request' => 31,
-                ],
-                [
-                    'Package' => '132983',
-                    'Stock' => 0,
-                    'Request' => 31,
-                ],
+        $returnArray = [
+            [
+                'roomAvailabilities' => 'stock,stock,stock',
+                'experienceGoldenId' => '1234',
             ],
-        ]);
+            [
+                'roomAvailabilities' => 'on_request,on_request,on_request',
+                'experienceGoldenId' => '1235',
+            ],
+            [
+                'roomAvailabilities' => 'stock,allotment,on_request',
+                'experienceGoldenId' => '1236',
+            ],
+        ];
+
+        $result = $this->prophesize(GetRangeResponse::class);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
-        $this->experienceManager->filterIdsListWithPartnerChannelManagerCondition(Argument::any(), Argument::any())->willReturn([
-            '132982' => '132982',
-        ]);
-        $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates(Argument::any(), Argument::any(), Argument::any())->willReturn([
-            [
-                'Package' => '132984',
-                'Stock' => 3,
-                'Request' => 0,
-            ],
-            [
-                'Package' => '132985',
-                'Stock' => 3,
-                'Request' => 0,
-            ],
-        ]);
-        $response = $legacyAvailabilityProvider->getAvailabilitiesForBox($boxId, $dateFrom, $dateTo);
 
-        $this->assertInstanceOf(GetRangeResponse::class, $response);
+        $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates(
+            Argument::any(),
+            Argument::any(),
+            Argument::any()
+        )->willReturn($returnArray);
+
+        $expected['PackagesList'] = $returnArray;
+
+        $this->assertInstanceOf(
+            GetRangeResponse::class,
+            $legacyAvailabilityProvider->getAvailabilitiesForBox($boxId, $dateFrom, $dateTo)
+        );
     }
 
     /**
      * @covers ::__construct
      * @covers ::getAvailabilitiesForBox
      */
-    public function testGetAvailabilitiesForBoxWillFailDueToHttpError()
+    public function testGetAvailabilitiesForBoxWillFail()
     {
         $boxId = '1234';
         $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-05');
 
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider($this->quickData->reveal(),
+        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
+            $this->quickData->reveal(),
             $this->serializer->reveal(),
             $this->experienceManager->reveal(),
             $this->availabilityProvider->reveal()
         );
+        $returnArray = [];
 
         $result = $this->prophesize(GetRangeResponse::class);
-        $responseInterface = $this->prophesize(ResponseInterface::class);
-        $exception = $this->prophesize(HttpExceptionInterface::class);
-        $this->quickData->getRange($boxId, $dateFrom, $dateTo)->willThrow($exception->reveal());
+        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
 
-        $this->serializer->fromArray([], Argument::any())->willReturn($result->reveal());
-        $response = $legacyAvailabilityProvider->getAvailabilitiesForBox($boxId, $dateFrom, $dateTo);
+        $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates(
+            Argument::any(),
+            Argument::any(),
+            Argument::any()
+        )->willReturn($returnArray);
 
-        $this->assertInstanceOf(GetRangeResponse::class, $response);
-        $this->assertEmpty($response->packagesList);
+        $expected['PackagesList'] = [];
+
+        $this->assertInstanceOf(
+            GetRangeResponse::class,
+            $legacyAvailabilityProvider->getAvailabilitiesForBox($boxId, $dateFrom, $dateTo)
+        );
     }
 
     /**

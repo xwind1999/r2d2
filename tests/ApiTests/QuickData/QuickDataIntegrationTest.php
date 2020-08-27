@@ -180,4 +180,46 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
         $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
+
+    public function testGetRangeV2()
+    {
+        static::cleanUp();
+
+        $boxId = '851518';
+        $dateFrom = new \DateTime(date('Y-m-d', strtotime('first day of next month')));
+        $dateTo = (clone $dateFrom)->modify('+5 day');
+        $nights = 6;
+
+        $avs = self::$container->get(RoomAvailabilityRepository::class)
+            ->findAvailableRoomsByBoxId($boxId, $dateFrom, $dateTo);
+
+        $data = [];
+        foreach ($avs as $comp => $avs) {
+            $itemCounts = array_count_values(
+                explode(',', $avs['roomAvailabilities'])
+            );
+
+            $data[] = [
+                'Package' => $avs['experienceGoldenId'],
+                'Stock' => $itemCounts['stock'] ?? 0,
+                'Request' => $itemCounts['on_request'] ?? 0,
+            ];
+        }
+
+        $expectedResult = [
+            'PackagesList' => $data,
+        ];
+
+        usort($expectedResult['PackagesList'], function ($current, $next) {
+            return $current['Package'] > $next['Package'];
+        });
+
+        $response = json_decode(self::$quickDataHelper->getRangeV2($boxId, $dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d'))->getContent(), true);
+
+        usort($response['PackagesList'], function ($current, $next) {
+            return $current['Package'] > $next['Package'];
+        });
+
+        $this->assertEquals($expectedResult, $response);
+    }
 }
