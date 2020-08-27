@@ -9,7 +9,7 @@ class QuickDataApiTest extends ApiTestCase
     public function testGetPackage(): void
     {
         $response = self::$quickDataHelper->getPackage(
-            7307,
+            '7307',
             date('Y-m-d', strtotime('first day of next month')),
             date('Y-m-\0\5', strtotime('first day of next month'))
         );
@@ -19,7 +19,7 @@ class QuickDataApiTest extends ApiTestCase
     public function testGetPackageBadRequest(): void
     {
         $response = self::$quickDataHelper->getPackage(
-            124125234332,
+            '124125234332',
             date('Y-m-d', strtotime('first day of next month')),
             date('Y-m-\0\5', strtotime('first day of next month'))
         );
