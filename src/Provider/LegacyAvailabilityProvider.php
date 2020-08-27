@@ -16,14 +16,9 @@ use App\Manager\ExperienceManager;
 use App\QuickData\QuickData;
 use JMS\Serializer\ArrayTransformerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 
 class LegacyAvailabilityProvider
 {
-    public const PARTNER = 'partner';
-
-    private const DATE_TIME_FORMAT = 'Y-m-d\TH:i:s.u';
-
     protected QuickData $quickData;
 
     protected ArrayTransformerInterface $serializer;
@@ -90,40 +85,13 @@ class LegacyAvailabilityProvider
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): GetRangeResponse {
-        //we check if the experience is CM-enabled here, then we call the appropriate client
-        try {
-            $data = $this->quickData->getRange($boxId, $dateFrom, $dateTo);
-            //but we process them the same way, so we have a GetRangeResponse ready
-
-            if (empty($data['PackagesList'])) {
-                return $this->serializer->fromArray($data, GetRangeResponse::class);
-            }
-
-            $packageList = $data['PackagesList'];
-            $availabilitiesFromQD = [];
-            $experienceIds = array_column($packageList, 'Package');
-            $inactiveChannelExperienceIds = $this->experienceManager
-                ->filterIdsListWithPartnerChannelManagerCondition($experienceIds, false);
-            foreach ($packageList as $package) {
-                $experienceId = $package['Package'];
-                if (!empty($inactiveChannelExperienceIds[$experienceId])) {
-                    $availabilitiesFromQD[] = [
-                        'Package' => $experienceId,
-                        'Request' => (int) $package['Request'] + (int) $package['Stock'],
-                        'Stock' => 0,
-                    ];
-                }
-            }
-
-            $availabilitiesFromDb = $this->availabilityProvider
+        $roomAvailabilities = [];
+        $roomAvailabilities = $this->availabilityProvider
                 ->getRoomAvailabilitiesByBoxIdAndDates($boxId, $dateFrom, $dateTo);
+        $roomAvailabilities = AvailabilityHelper::buildDataForGetRange($roomAvailabilities);
+        $roomAvailabilities['PackagesList'] = $roomAvailabilities;
 
-            $data['PackagesList'] = array_merge($availabilitiesFromQD, $availabilitiesFromDb);
-        } catch (HttpExceptionInterface $exception) {
-            $data = [];
-        }
-
-        return $this->serializer->fromArray($data, GetRangeResponse::class);
+        return $this->serializer->fromArray($roomAvailabilities, GetRangeResponse::class);
     }
 
     public function getAvailabilityForMultipleExperiences(

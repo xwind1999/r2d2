@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Constraint\RoomStockTypeConstraint;
 use App\Entity\Component;
 use App\Entity\RoomAvailability;
 use App\Exception\Repository\RoomAvailabilityNotFoundException;
@@ -20,6 +21,7 @@ use Doctrine\ORM\Query\QueryException;
 class RoomAvailabilityRepository extends ServiceEntityRepository
 {
     private const CLEANUP_AVAILABILITY_OLDER_THAN = '7 days ago';
+    private const ROOM_AVAILABILITY_MINIMAL_STOCK = 0;
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -47,6 +49,44 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         }
 
         return $roomAvailability;
+    }
+
+    public function findAvailableRoomsByBoxId(
+        string $boxId,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): array {
+        $dateDiff = $dateTo->diff($dateFrom)->days ?: 0;
+        $numberOfNights = $dateDiff + 1;
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'SELECT e.golden_id as experienceGoldenId, group_concat(ra.type) as roomAvailabilities
+            FROM room_availability ra
+            JOIN component c on ra.component_uuid = c.uuid
+            JOIN experience_component ec on c.uuid = ec.component_uuid
+            JOIN experience e on e.uuid = ec.experience_uuid
+            JOIN box_experience be on e.uuid = be.experience_uuid
+            WHERE be.box_golden_id = :boxId
+            AND ra.date BETWEEN :dateFrom AND :dateTo
+            AND ra.is_stop_sale = false
+            AND ((ra.type in (:stockType,:allotmentType)) and ra.stock > :minimalStock) OR (ra.type = :onRequestType)
+            GROUP BY e.golden_id, c.duration
+            HAVING (
+                COUNT(ra.date) = (CASE WHEN :numberOfNights > c.duration THEN :numberOfNights ELSE c.duration END)
+            )';
+
+        $statement = $this->getEntityManager()->getConnection()->prepare($sql);
+        $statement->bindValue('boxId', $boxId);
+        $statement->bindValue('dateFrom', $dateFrom->format('Y-m-d'));
+        $statement->bindValue('dateTo', $dateTo->format('Y-m-d'));
+        $statement->bindValue('numberOfNights', $numberOfNights);
+        $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
+        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
+        $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
+        $statement->bindValue('minimalStock', self::ROOM_AVAILABILITY_MINIMAL_STOCK);
+        $statement->execute();
+
+        return $statement->fetchAll();
     }
 
     public function findRoomAvailabilitiesByMultipleComponentGoldenIds(

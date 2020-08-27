@@ -127,6 +127,47 @@ class AvailabilityHelperTest extends TestCase
         );
     }
 
+    public function testBuildDataForGetRange()
+    {
+        $availabilities = [
+            [
+                'roomAvailabilities' => 'stock,stock,stock',
+                'experienceGoldenId' => '1234',
+            ],
+            [
+                'roomAvailabilities' => 'on_request,on_request,on_request',
+                'experienceGoldenId' => '1235',
+            ],
+            [
+                'roomAvailabilities' => 'stock,allotment,on_request',
+                'experienceGoldenId' => '1236',
+            ],
+        ];
+
+        $returnArray = [
+            [
+                'Package' => '1234',
+                'Stock' => 3,
+                'Request' => 0,
+            ],
+            [
+                'Package' => '1235',
+                'Stock' => 0,
+                'Request' => 3,
+            ],
+            [
+                'Package' => '1236',
+                'Stock' => 2,
+                'Request' => 1,
+            ],
+        ];
+
+        $this->assertEquals(
+            $returnArray,
+            AvailabilityHelper::buildDataForGetRange($availabilities)
+        );
+    }
+
     public function testConvertToShortType()
     {
         $availabilities = [

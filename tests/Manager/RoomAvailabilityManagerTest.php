@@ -88,6 +88,37 @@ class RoomAvailabilityManagerTest extends TestCase
     }
 
     /**
+     * @covers ::__construct
+     * @covers ::getRoomAvailabilitiesByBoxId
+     */
+    public function testGetRoomAvailabilitiesByBoxId()
+    {
+        $boxId = '1234';
+        $this->repository->findAvailableRoomsByBoxId($boxId, Argument::any(), Argument::any())
+            ->willReturn(
+                [
+                    [
+                        'roomAvailabilities' => 'stock,stock,stock',
+                        'experienceGoldenId' => '1234',
+                    ],
+                    [
+                        'roomAvailabilities' => 'on_request,on_request,on_request',
+                        'experienceGoldenId' => '1235',
+                    ],
+                    [
+                        'roomAvailabilities' => 'stock,stock,on_request',
+                        'experienceGoldenId' => '1236',
+                    ],
+                ]
+            );
+        $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->logger->reveal());
+        $manager->getRoomAvailabilitiesByBoxId($boxId, new \DateTime('2020-06-20'), new \DateTime('2020-06-30'));
+
+        $this->repository->findAvailableRoomsByBoxId($boxId, new \DateTime('2020-06-20'), new \DateTime('2020-06-30'))
+            ->shouldBeCalledOnce();
+    }
+
+    /**
      * @dataProvider roomAvailabilityRequestProvider
      * @covers ::replace
      * @covers ::createDatePeriod

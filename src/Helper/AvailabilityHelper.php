@@ -18,6 +18,7 @@ class AvailabilityHelper
     private const AVAILABILITY_PRICE_PERIOD_AVAILABLE = 'Available';
     private const AVAILABILITY_PRICE_PERIOD_REQUEST = 'Request';
     private const AVAILABILITY_PRICE_PERIOD_UNAVAILABLE = 'Unavailable';
+    private const AVAILABILITIES_DELIMITER = ',';
 
     public static function convertToShortType(array $availabilities): array
     {
@@ -88,13 +89,37 @@ class AvailabilityHelper
         ];
     }
 
+    public static function buildDataForGetRange(array $availabilities): array
+    {
+        $returnArray = [];
+        foreach ($availabilities as $availability) {
+            $itemCounts = array_count_values(
+                explode(self::AVAILABILITIES_DELIMITER, $availability['roomAvailabilities'])
+            );
+            $stock = $itemCounts[RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK] ?? 0;
+            $allotment = $itemCounts[RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT] ?? 0;
+            $onRequest = $itemCounts[RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST] ?? 0;
+            $returnArray[] = [
+                'Package' => $availability['experienceGoldenId'],
+                'Stock' => $stock + $allotment,
+                'Request' => $onRequest,
+            ];
+        }
+
+        return $returnArray;
+    }
+
     public static function convertAvailabilityTypeToExplicitQuickdataValue(string $type, int $stock, bool $isStopSale): string
     {
-        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK === $type && $stock > 0 && false === $isStopSale) {
+        if (true === $isStopSale) {
+            return self::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE;
+        }
+
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK === $type && $stock > 0) {
             return self::AVAILABILITY_PRICE_PERIOD_AVAILABLE;
         }
 
-        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $type && false === $isStopSale) {
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $type) {
             return self::AVAILABILITY_PRICE_PERIOD_REQUEST;
         }
 

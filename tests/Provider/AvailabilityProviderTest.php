@@ -166,27 +166,6 @@ class AvailabilityProviderTest extends TestCase
      */
     public function testGetRoomAvailabilitiesByBoxId()
     {
-        $expIds = [
-            '1', '2', '3', '4',
-        ];
-
-        $components = [
-            '11' => [
-                [
-                    'goldenId' => '11',
-                    'duration' => 2,
-                ],
-                'experienceGoldenId' => '1',
-            ],
-            '22' => [
-                [
-                    'goldenId' => '22',
-                    'duration' => 1,
-                ],
-                'experienceGoldenId' => '2',
-            ],
-        ];
-
         $availabilityProvider = new AvailabilityProvider(
             $this->cmHub->reveal(),
             $this->serializer->reveal(),
@@ -196,39 +175,38 @@ class AvailabilityProviderTest extends TestCase
             $this->roomAvailabilityManager->reveal(),
             $this->roomPriceManager->reveal()
         );
+        $boxId = '1234';
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-25');
 
-        $this->experienceManager->filterListExperienceIdsByBoxId(Argument::any())->willReturn($expIds);
-        $this->componentManager->getRoomsByExperienceGoldenIdsList(Argument::any())->willReturn($components);
-        $this->roomAvailabilityManager->getRoomAvailabilitiesByMultipleComponentGoldenIds(['11', '22'], $dateFrom, $dateTo)
-            ->willReturn(
-                [
-                    '11' => [
-                        'componentGoldenId' => '11',
-                        'duration' => 2,
-                    ],
-                    '22' => [
-                        'componentGoldenId' => '22',
-                        'duration' => 1,
-                    ],
-                ]
-            );
-
         $expectedArray = [
             [
-                'Package' => '1',
+                'Package' => '1234',
+                'Stock' => 3,
                 'Request' => 0,
-                'Stock' => 6,
             ],
             [
-                'Package' => '2',
-                'Request' => 0,
-                'Stock' => 6,
+                'Package' => '1235',
+                'Stock' => 0,
+                'Request' => 3,
+            ],
+            [
+                'Package' => '1236',
+                'Stock' => 2,
+                'Request' => 1,
             ],
         ];
 
-        $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates('1', $dateFrom, $dateTo));
+        $this->roomAvailabilityManager->getRoomAvailabilitiesByBoxId(
+            $boxId,
+            Argument::any(),
+            Argument::any()
+        )->willReturn($expectedArray);
+
+        $this->assertEquals(
+            $expectedArray,
+            $availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates($boxId, $dateFrom, $dateTo)
+        );
     }
 
     /**

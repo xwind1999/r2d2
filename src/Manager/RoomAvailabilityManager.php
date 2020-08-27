@@ -38,6 +38,14 @@ class RoomAvailabilityManager
         return $this->repository->findRoomAvailabilitiesByMultipleComponentGoldenIds($componentGoldenIds, $dateFrom, $dateTo);
     }
 
+    public function getRoomAvailabilitiesByBoxId(
+        string $boxId,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): array {
+        return $this->repository->findAvailableRoomsByBoxId($boxId, $dateFrom, $dateTo);
+    }
+
     public function getRoomAvailabilitiesByComponent(
         Component $component,
         \DateTimeInterface $dateFrom,
