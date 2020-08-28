@@ -37,7 +37,8 @@ RUN curl -s -f -L -o /tmp/composer-setup.php https://getcomposer.org/installer \
 RUN mkdir -p /etc/php7; \
     mkdir -p /etc/php7/php-fpm.d; \
     mkdir -p /etc/nginx/; \
-    mkdir -p /etc/nginx/conf.d
+    mkdir -p /etc/nginx/conf.d; \
+    chown www-data.www-data /var/lib/nginx -R;
 
 COPY ./runit/sv /etc/sv
 COPY ./runit/runit /etc/runit
