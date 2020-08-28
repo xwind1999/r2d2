@@ -140,3 +140,7 @@ services:
             - '%env(APP_EAI_PASSWORD)%'
 
     App\Contract\Request\EAI\ChannelManagerBookingRequest: ~
+
+    App\Messenger\EventListener\EntityManagerClosedExceptionListener:
+        arguments:
+            - '@cache.messenger.restart_workers_signal'
