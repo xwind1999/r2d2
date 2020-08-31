@@ -113,7 +113,7 @@ class ComponentRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('c');
         $qb
-            ->addSelect('ec.experienceGoldenId')
+            ->select('ec.experienceGoldenId, c.duration, c.goldenId, c.isSellable, c.partnerGoldenId')
             ->join('c.experienceComponent', 'ec')
             ->where('c.isReservable = 1')
             ->andWhere('ec.isEnabled = true')

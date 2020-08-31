@@ -45,7 +45,7 @@ class LegacyAvailabilityProvider
         \DateTimeInterface $dateTo
     ): QuickDataResponse {
         try {
-            $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
+            $experience = $this->experienceManager->getOneByGoldenId($experienceId);
             $partner = $experience->partner;
             $availabilitiesFromDB = $this->availabilityProvider
                 ->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo);
@@ -85,10 +85,12 @@ class LegacyAvailabilityProvider
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): GetRangeResponse {
-        $roomAvailabilities = [];
-        $roomAvailabilities = $this->availabilityProvider
-                ->getRoomAvailabilitiesByBoxIdAndDates($boxId, $dateFrom, $dateTo);
-        $roomAvailabilities = AvailabilityHelper::buildDataForGetRange($roomAvailabilities);
+        $roomAvailabilities = AvailabilityHelper::buildDataForGetRange(
+            $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates(
+                $boxId,
+                $dateFrom,
+                $dateTo)
+        );
         $roomAvailabilities['PackagesList'] = $roomAvailabilities;
 
         return $this->serializer->fromArray($roomAvailabilities, GetRangeResponse::class);
@@ -133,7 +135,7 @@ class LegacyAvailabilityProvider
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): QuickDataResponse {
-        $experience = $this->experienceManager->getOneByGoldenId((string) $experienceId);
+        $experience = $this->experienceManager->getOneByGoldenId($experienceId);
         $roomAvailabilityAndPrices = $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo);
 
         $availabilities = [];

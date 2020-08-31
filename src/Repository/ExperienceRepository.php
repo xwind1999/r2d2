@@ -73,15 +73,13 @@ class ExperienceRepository extends ServiceEntityRepository
         return $qb->getQuery()->getArrayResult();
     }
 
-    public function filterListExperienceIdsWithPartnerStatus(array $experienceIds, string $partnerStatus): array
+    public function filterListExperienceIds(array $experienceIds): array
     {
         $qb = $this->createQueryBuilder('e');
         $qb
+            ->select('e.goldenId, ep.ceaseDate, ep.status')
             ->join('e.partner', 'ep')
-            ->select('e.goldenId')
             ->where($qb->expr()->in('e.goldenId', $experienceIds))
-            ->andWhere('ep.status = :partner')
-            ->setParameter('partner', $partnerStatus)
             ->indexBy('e', 'e.goldenId')
         ;
 
@@ -92,9 +90,9 @@ class ExperienceRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('e');
         $qb
+            ->select('e.goldenId, ep.ceaseDate, ep.status')
             ->join('e.boxExperience', 'be')
             ->join('e.partner', 'ep')
-            ->select('e.goldenId')
             ->where('be.boxGoldenId = :boxId')
             ->andWhere('ep.isChannelManagerActive = 1')
             ->setParameter('boxId', $boxId)
