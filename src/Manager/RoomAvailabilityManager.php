@@ -51,7 +51,23 @@ class RoomAvailabilityManager
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): array {
-        return $this->repository->findRoomAvailabilitiesByComponent($component, $dateFrom, $dateTo);
+        return $this->repository->findRoomAvailabilitiesByComponent(
+            $component,
+            $dateFrom,
+            $dateTo
+        );
+    }
+
+    public function getRoomAvailabilitiesByComponentGoldenIdAndDates(
+        string $componentGoldenId,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): array {
+        return $this->repository->findRoomAvailabilitiesByComponentGoldenIdAndDates(
+            $componentGoldenId,
+            $dateFrom,
+            $dateTo
+        );
     }
 
     /**

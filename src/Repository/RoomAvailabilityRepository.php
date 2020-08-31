@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Constraint\PartnerStatusConstraint;
 use App\Constraint\RoomStockTypeConstraint;
 use App\Entity\Component;
 use App\Entity\RoomAvailability;
@@ -59,16 +60,18 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         $dateDiff = $dateTo->diff($dateFrom)->days ?: 0;
         $numberOfNights = $dateDiff + 1;
 
-        $conn = $this->getEntityManager()->getConnection();
         $sql = 'SELECT e.golden_id as experienceGoldenId, group_concat(ra.type) as roomAvailabilities
             FROM room_availability ra
             JOIN component c on ra.component_uuid = c.uuid
             JOIN experience_component ec on c.uuid = ec.component_uuid
             JOIN experience e on e.uuid = ec.experience_uuid
             JOIN box_experience be on e.uuid = be.experience_uuid
+            JOIN partner p ON p.uuid = c.partner_uuid
             WHERE be.box_golden_id = :boxId
             AND ra.date BETWEEN :dateFrom AND :dateTo
             AND ra.is_stop_sale = false
+            AND p.status != :partnerStatus
+            AND (p.cease_date IS NULL OR ra.date <= (p.cease_date - INTERVAL c.duration DAY))
             AND ((ra.type in (:stockType,:allotmentType)) and ra.stock > :minimalStock) OR (ra.type = :onRequestType)
             GROUP BY e.golden_id, c.duration
             HAVING (
@@ -79,6 +82,7 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         $statement->bindValue('boxId', $boxId);
         $statement->bindValue('dateFrom', $dateFrom->format('Y-m-d'));
         $statement->bindValue('dateTo', $dateTo->format('Y-m-d'));
+        $statement->bindValue('partnerStatus', PartnerStatusConstraint::PARTNER_STATUS_CEASED);
         $statement->bindValue('numberOfNights', $numberOfNights);
         $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
         $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
@@ -124,8 +128,8 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
     public function findRoomAvailabilitiesByComponent(
         Component $component,
         \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo): array
-    {
+        \DateTimeInterface $dateTo
+    ): array {
         $qb = $this->createQueryBuilder('r');
         $qb
             ->select('r.stock, r.date, r.type, r.componentGoldenId, r.isStopSale')
@@ -133,6 +137,29 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
             ->andWhere('r.date BETWEEN :dateFrom AND :dateTo')
             ->orderBy('r.date', 'ASC')
             ->setParameter('component', $component->uuid->getBytes())
+            ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
+            ->setParameter('dateTo', $dateTo->format('Y-m-d'))
+            ->indexBy('r', 'r.date')
+        ;
+
+        return $qb->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @throws QueryException
+     */
+    public function findRoomAvailabilitiesByComponentGoldenIdAndDates(
+        string $componentGoldendId,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo
+    ): array {
+        $qb = $this->createQueryBuilder('r');
+        $qb
+            ->select('r.stock, r.date, r.type, r.componentGoldenId, r.isStopSale')
+            ->where('r.componentGoldenId = :component')
+            ->andWhere('r.date BETWEEN :dateFrom AND :dateTo')
+            ->orderBy('r.date', 'ASC')
+            ->setParameter('component', $componentGoldendId)
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d'))
             ->indexBy('r', 'r.date')

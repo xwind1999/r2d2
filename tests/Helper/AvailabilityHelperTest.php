@@ -7,12 +7,11 @@ namespace App\Tests\Helper;
 use App\Helper\AvailabilityHelper;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversDefaultClass \App\Helper\AvailabilityHelper
+ */
 class AvailabilityHelperTest extends TestCase
 {
-    private $availabilitiesTestArray = [
-        '0', '1', 'r', '0', '1', '1', 'r', 'r', '0', '1',
-    ];
-
     public function testconvertAvailableValueToRequest()
     {
         $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('stock', 0, false));
@@ -29,31 +28,23 @@ class AvailabilityHelperTest extends TestCase
     {
         $comps = [
             '1234' => [
-                [
-                    'duration' => 0,
-                    'goldenId' => '1234',
-                ],
+                'duration' => 0,
+                'goldenId' => '1234',
                 'experienceGoldenId' => '1111',
             ],
             '4321' => [
-                [
-                    'duration' => 0,
-                    'goldenId' => '4321',
-                ],
+                'duration' => 0,
+                'goldenId' => '4321',
                 'experienceGoldenId' => '2222',
             ],
             '4323' => [
-                [
-                    'duration' => 0,
-                    'goldenId' => '4323',
-                ],
+                'duration' => 0,
+                'goldenId' => '4323',
                 'experienceGoldenId' => '3333',
             ],
             '4324' => [
-                [
-                    'duration' => 0,
-                    'goldenId' => '4324',
-                ],
+                'duration' => 0,
+                'goldenId' => '4324',
                 'experienceGoldenId' => '4444',
             ],
         ];
