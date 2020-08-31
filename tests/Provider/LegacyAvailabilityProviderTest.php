@@ -266,7 +266,7 @@ class LegacyAvailabilityProviderTest extends TestCase
 
     /**
      * @covers ::__construct
-     * @covers ::getAvailabilitiesForBox
+     * @covers ::getAvailabilitiesForBoxAndStartDate
      */
     public function testGetAvailabilitiesForBox()
     {
@@ -283,15 +283,15 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $returnArray = [
             [
-                'roomAvailabilities' => 'stock,stock,stock',
+                'roomStockType' => 'stock',
                 'experienceGoldenId' => '1234',
             ],
             [
-                'roomAvailabilities' => 'on_request,on_request,on_request',
+                'roomStockType' => 'on_request',
                 'experienceGoldenId' => '1235',
             ],
             [
-                'roomAvailabilities' => 'stock,allotment,on_request',
+                'roomStockType' => 'allotment',
                 'experienceGoldenId' => '1236',
             ],
         ];
@@ -299,7 +299,7 @@ class LegacyAvailabilityProviderTest extends TestCase
         $result = $this->prophesize(GetRangeResponse::class);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
 
-        $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates(
+        $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate(
             Argument::any(),
             Argument::any(),
             Argument::any()
@@ -309,13 +309,13 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $this->assertInstanceOf(
             GetRangeResponse::class,
-            $legacyAvailabilityProvider->getAvailabilitiesForBox($boxId, $dateFrom, $dateTo)
+            $legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $dateFrom, $dateTo)
         );
     }
 
     /**
      * @covers ::__construct
-     * @covers ::getAvailabilitiesForBox
+     * @covers ::getAvailabilitiesForBoxAndStartDate
      */
     public function testGetAvailabilitiesForBoxWillFail()
     {
@@ -334,7 +334,7 @@ class LegacyAvailabilityProviderTest extends TestCase
         $result = $this->prophesize(GetRangeResponse::class);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
 
-        $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates(
+        $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate(
             Argument::any(),
             Argument::any(),
             Argument::any()
@@ -344,7 +344,7 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $this->assertInstanceOf(
             GetRangeResponse::class,
-            $legacyAvailabilityProvider->getAvailabilitiesForBox($boxId, $dateFrom, $dateTo)
+            $legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $dateFrom, $dateTo)
         );
     }
 

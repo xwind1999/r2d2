@@ -70,3 +70,8 @@ services:
     <<: *worker-template
     environment:
       QUEUES: broadcast-listeners-room-price
+
+  calculate-flat-manageable-component:
+    <<: *worker-template
+    environment:
+      QUEUES: calculate-flat-manageable-component

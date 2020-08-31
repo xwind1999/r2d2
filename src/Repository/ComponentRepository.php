@@ -184,4 +184,15 @@ class ComponentRepository extends ServiceEntityRepository
             ->andWhere('partner.goldenId = component.partnerGoldenId')
         ;
     }
+
+    public function getAllManageableGoldenIds(): array
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb
+            ->select('c.goldenId')
+            ->where('c.isManageable = 1')
+        ;
+
+        return array_column($qb->getQuery()->getArrayResult(), 'goldenId');
+    }
 }

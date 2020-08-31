@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Contract\Message\CalculateFlatManageableComponent;
 use App\Contract\Request\BroadcastListener\Product\Partner as PartnerDTO;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\EAI\RoomRequest;
@@ -326,6 +327,14 @@ class ComponentManagerTest extends TestCase
             ->shouldNotBeCalled();
         $this->repository->save(Argument::type(Component::class))->shouldBeCalledOnce();
         $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldBeCalled()->willReturn(new Envelope(new \stdClass()));
+        (function ($test, $goldenId) {
+            $this->messageBus->dispatch(Argument::type(CalculateFlatManageableComponent::class))->will(function ($args) use ($test, $goldenId) {
+                $test->assertEquals($goldenId, $args[0]->componentGoldenId);
+
+                return new Envelope(new \stdClass());
+            })
+            ->shouldBeCalled();
+        })($this, $component->goldenId);
 
         $this->manager->calculateManageableFlag($component->goldenId);
         $this->assertTrue($component->isManageable);
@@ -357,6 +366,14 @@ class ComponentManagerTest extends TestCase
             ->shouldNotBeCalled();
         $this->repository->save(Argument::type(Component::class))->shouldNotBeCalled();
         $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldBeCalled()->willReturn(new Envelope(new \stdClass()));
+        (function ($test, $goldenId) {
+            $this->messageBus->dispatch(Argument::type(CalculateFlatManageableComponent::class))->will(function ($args) use ($test, $goldenId) {
+                $test->assertEquals($goldenId, $args[0]->componentGoldenId);
+
+                return new Envelope(new \stdClass());
+            })
+                ->shouldBeCalled();
+        })($this, $component->goldenId);
 
         $this->manager->calculateManageableFlag($component->goldenId);
         $this->assertTrue($component->isManageable);
@@ -390,6 +407,14 @@ class ComponentManagerTest extends TestCase
         ;
         $this->repository->save(Argument::type(Component::class))->shouldBeCalledOnce();
         $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldBeCalled()->willReturn(new Envelope(new \stdClass()));
+        (function ($test, $goldenId) {
+            $this->messageBus->dispatch(Argument::type(CalculateFlatManageableComponent::class))->will(function ($args) use ($test, $goldenId) {
+                $test->assertEquals($goldenId, $args[0]->componentGoldenId);
+
+                return new Envelope(new \stdClass());
+            })
+                ->shouldBeCalled();
+        })($this, $component->goldenId);
 
         $this->manager->calculateManageableFlag($component->goldenId);
 
@@ -424,6 +449,14 @@ class ComponentManagerTest extends TestCase
         ;
         $this->repository->save(Argument::type(Component::class))->shouldNotBeCalled();
         $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldBeCalled()->willReturn(new Envelope(new \stdClass()));
+        (function ($test, $goldenId) {
+            $this->messageBus->dispatch(Argument::type(CalculateFlatManageableComponent::class))->will(function ($args) use ($test, $goldenId) {
+                $test->assertEquals($goldenId, $args[0]->componentGoldenId);
+
+                return new Envelope(new \stdClass());
+            })
+                ->shouldBeCalled();
+        })($this, $component->goldenId);
 
         $this->manager->calculateManageableFlag($component->goldenId);
 

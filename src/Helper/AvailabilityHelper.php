@@ -93,17 +93,18 @@ class AvailabilityHelper
     {
         $returnArray = [];
         foreach ($availabilities as $availability) {
-            $itemCounts = array_count_values(
-                explode(self::AVAILABILITIES_DELIMITER, $availability['roomAvailabilities'])
-            );
-            $stock = $itemCounts[RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK] ?? 0;
-            $allotment = $itemCounts[RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT] ?? 0;
-            $onRequest = $itemCounts[RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST] ?? 0;
-            $returnArray[] = [
+            $data = [
                 'Package' => $availability['experienceGoldenId'],
-                'Stock' => $stock + $allotment,
-                'Request' => $onRequest,
+                'Stock' => 0,
+                'Request' => 0,
             ];
+            if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $availability['roomStockType']) {
+                $data['Request'] = 1;
+            } else {
+                $data['Stock'] = 1;
+            }
+
+            $returnArray[] = $data;
         }
 
         return $returnArray;

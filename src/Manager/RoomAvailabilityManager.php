@@ -40,10 +40,9 @@ class RoomAvailabilityManager
 
     public function getRoomAvailabilitiesByBoxId(
         string $boxId,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
+        \DateTimeInterface $startDate
     ): array {
-        return $this->repository->findAvailableRoomsByBoxId($boxId, $dateFrom, $dateTo);
+        return $this->repository->findAvailableRoomsByBoxId($boxId, $startDate);
     }
 
     public function getRoomAvailabilitiesByComponent(
