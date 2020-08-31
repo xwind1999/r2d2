@@ -93,6 +93,15 @@ framework:
                     delay: 60000
                     multiplier: 2
 
+            calculate-flat-manageable-component:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: calculate-flat-manageable-component
+                retry_strategy:
+                    max_retries: 10
+                    delay: 60000
+                    multiplier: 2
+
         routing:
         # Route your messages to the transports
             'App\Contract\Request\BroadcastListener\PartnerRequest': broadcast-listeners-partner
@@ -104,6 +113,7 @@ framework:
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
             'App\Contract\Request\EAI\RoomRequest': push-room-information
             'App\Contract\Request\EAI\ChannelManagerBookingRequest': push-booking-cmh
+            'App\Contract\Message\CalculateFlatManageableComponent': calculate-flat-manageable-component
 
         buses:
             default:

@@ -149,9 +149,9 @@ class RoomAvailabilityManagerTest extends TestCase
                 ]
             );
         $manager = new RoomAvailabilityManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->logger->reveal());
-        $manager->getRoomAvailabilitiesByBoxId($boxId, new \DateTime('2020-06-20'), new \DateTime('2020-06-30'));
+        $manager->getRoomAvailabilitiesByBoxId($boxId, new \DateTime('2020-06-20'));
 
-        $this->repository->findAvailableRoomsByBoxId($boxId, new \DateTime('2020-06-20'), new \DateTime('2020-06-30'))
+        $this->repository->findAvailableRoomsByBoxId($boxId, new \DateTime('2020-06-20'))
             ->shouldBeCalledOnce();
     }
 

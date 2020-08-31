@@ -162,7 +162,7 @@ class AvailabilityProviderTest extends TestCase
 
     /**
      * @covers ::__construct
-     * @covers ::getRoomAvailabilitiesByBoxIdAndDates
+     * @covers ::getRoomAvailabilitiesByBoxIdAndStartDate
      */
     public function testGetRoomAvailabilitiesByBoxId()
     {
@@ -205,7 +205,7 @@ class AvailabilityProviderTest extends TestCase
 
         $this->assertEquals(
             $expectedArray,
-            $availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates($boxId, $dateFrom, $dateTo)
+            $availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate($boxId, $dateFrom, $dateTo)
         );
     }
 

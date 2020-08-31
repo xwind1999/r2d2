@@ -122,15 +122,15 @@ class AvailabilityHelperTest extends TestCase
     {
         $availabilities = [
             [
-                'roomAvailabilities' => 'stock,stock,stock',
+                'roomStockType' => 'stock',
                 'experienceGoldenId' => '1234',
             ],
             [
-                'roomAvailabilities' => 'on_request,on_request,on_request',
+                'roomStockType' => 'on_request',
                 'experienceGoldenId' => '1235',
             ],
             [
-                'roomAvailabilities' => 'stock,allotment,on_request',
+                'roomStockType' => 'allotment',
                 'experienceGoldenId' => '1236',
             ],
         ];
@@ -138,18 +138,18 @@ class AvailabilityHelperTest extends TestCase
         $returnArray = [
             [
                 'Package' => '1234',
-                'Stock' => 3,
+                'Stock' => 1,
                 'Request' => 0,
             ],
             [
                 'Package' => '1235',
                 'Stock' => 0,
-                'Request' => 3,
+                'Request' => 1,
             ],
             [
                 'Package' => '1236',
-                'Stock' => 2,
-                'Request' => 1,
+                'Stock' => 1,
+                'Request' => 0,
             ],
         ];
 

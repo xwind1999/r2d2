@@ -80,16 +80,14 @@ class LegacyAvailabilityProvider
         return $this->serializer->fromArray($returnArray, GetPackageResponse::class);
     }
 
-    public function getAvailabilitiesForBox(
+    public function getAvailabilitiesForBoxAndStartDate(
         string $boxId,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
+        \DateTimeInterface $startDate
     ): GetRangeResponse {
         $roomAvailabilities = AvailabilityHelper::buildDataForGetRange(
-            $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndDates(
+            $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate(
                 $boxId,
-                $dateFrom,
-                $dateTo)
+                $startDate)
         );
         $roomAvailabilities['PackagesList'] = $roomAvailabilities;
 

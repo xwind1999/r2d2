@@ -6,6 +6,7 @@ namespace App\Manager;
 
 use App\Constraint\PartnerStatusConstraint;
 use App\Constraint\ProductStatusConstraint;
+use App\Contract\Message\CalculateFlatManageableComponent;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\EAI\RoomRequest;
 use App\Contract\Request\Internal\Component\ComponentCreateRequest;
@@ -178,6 +179,7 @@ class ComponentManager
             }
         }
         $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
+        $this->messageBus->dispatch(new CalculateFlatManageableComponent($componentGoldenId));
     }
 
     private function createManageableCriteria(): Criteria

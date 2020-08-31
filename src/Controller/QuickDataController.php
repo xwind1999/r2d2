@@ -84,7 +84,8 @@ class QuickDataController
      *     name="dateTo",
      *     in="query",
      *     type="string",
-     *     format="date"
+     *     format="date",
+     *     description="Ignored"
      * )
      * @SWG\Tag(name="quickdata")
      * @SWG\Response(
@@ -94,9 +95,7 @@ class QuickDataController
      */
     public function getRange(GetRangeRequest $getRangeRequest, LegacyAvailabilityProvider $legacyAvailabilityProvider): QuickDataResponse
     {
-        $quickDataResponse = $legacyAvailabilityProvider->getAvailabilitiesForBox($getRangeRequest->boxVersion, $getRangeRequest->dateFrom, $getRangeRequest->dateTo);
-
-        return $quickDataResponse;
+        return $legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($getRangeRequest->boxVersion, $getRangeRequest->dateFrom);
     }
 
     /**

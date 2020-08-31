@@ -79,12 +79,11 @@ class AvailabilityProvider
         return $result;
     }
 
-    public function getRoomAvailabilitiesByBoxIdAndDates(
+    public function getRoomAvailabilitiesByBoxIdAndStartDate(
         string $boxId,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
+        \DateTimeInterface $startDate
     ): array {
-        return $this->roomAvailabilityManager->getRoomAvailabilitiesByBoxId($boxId, $dateFrom, $dateTo);
+        return $this->roomAvailabilityManager->getRoomAvailabilitiesByBoxId($boxId, $startDate);
     }
 
     public function getRoomAvailabilitiesByExperienceAndDates(

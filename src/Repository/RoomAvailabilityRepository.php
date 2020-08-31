@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Constraint\PartnerStatusConstraint;
 use App\Constraint\RoomStockTypeConstraint;
 use App\Entity\Component;
 use App\Entity\RoomAvailability;
@@ -54,40 +53,27 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
 
     public function findAvailableRoomsByBoxId(
         string $boxId,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
+        \DateTimeInterface $startDate
     ): array {
-        $dateDiff = $dateTo->diff($dateFrom)->days ?: 0;
-        $numberOfNights = $dateDiff + 1;
-
-        $sql = 'SELECT e.golden_id as experienceGoldenId, group_concat(ra.type) as roomAvailabilities
-            FROM room_availability ra
-            JOIN component c on ra.component_uuid = c.uuid
-            JOIN experience_component ec on c.uuid = ec.component_uuid
-            JOIN experience e on e.uuid = ec.experience_uuid
-            JOIN box_experience be on e.uuid = be.experience_uuid
-            JOIN partner p ON p.uuid = c.partner_uuid
-            WHERE be.box_golden_id = :boxId
-            AND ra.date BETWEEN :dateFrom AND :dateTo
-            AND ra.is_stop_sale = false
-            AND p.status != :partnerStatus
-            AND (p.cease_date IS NULL OR ra.date <= (p.cease_date - INTERVAL c.duration DAY))
-            AND ((ra.type in (:stockType,:allotmentType)) and ra.stock > :minimalStock) OR (ra.type = :onRequestType)
-            GROUP BY e.golden_id, c.duration
-            HAVING (
-                COUNT(ra.date) = (CASE WHEN :numberOfNights > c.duration THEN :numberOfNights ELSE c.duration END)
-            )';
+        $sql = <<<SQL
+SELECT
+   ar.experience_golden_id as experienceGoldenId, ar.room_stock_type as roomStockType
+FROM flat_manageable_component ar
+JOIN room_availability ra on ar.component_uuid = ra.component_uuid
+where ar.box_golden_id = :boxId AND
+      ra.is_stop_sale = false AND
+      (ar.last_bookable_date IS NULL OR ra.date <= (ar.last_bookable_date - INTERVAL ar.duration DAY)) AND 
+      (((ra.type in (:stockType,:allotmentType)) and ra.stock > 0) OR (ra.type = :onRequestType)) AND
+      ra.date BETWEEN :dateFrom AND DATE_ADD(:dateFrom, interval ar.duration - 1 day)
+GROUP BY ar.experience_golden_id, ar.duration, ar.room_stock_type HAVING count(ra.date) = ar.duration;
+SQL;
 
         $statement = $this->getEntityManager()->getConnection()->prepare($sql);
         $statement->bindValue('boxId', $boxId);
-        $statement->bindValue('dateFrom', $dateFrom->format('Y-m-d'));
-        $statement->bindValue('dateTo', $dateTo->format('Y-m-d'));
-        $statement->bindValue('partnerStatus', PartnerStatusConstraint::PARTNER_STATUS_CEASED);
-        $statement->bindValue('numberOfNights', $numberOfNights);
+        $statement->bindValue('dateFrom', $startDate->format('Y-m-d'));
         $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
         $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
         $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
-        $statement->bindValue('minimalStock', self::ROOM_AVAILABILITY_MINIMAL_STOCK);
         $statement->execute();
 
         return $statement->fetchAll();
