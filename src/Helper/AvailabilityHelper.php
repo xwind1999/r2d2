@@ -62,6 +62,7 @@ class AvailabilityHelper
                     'stock' => 0,
                     'date' => new \DateTime($date),
                     'type' => 'stock',
+                    'isStopSale' => true,
                     'componentGoldenId' => $componentId,
                 ];
             } else {
