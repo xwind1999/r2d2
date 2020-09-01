@@ -94,7 +94,7 @@ class QuickDataHelper
     /**
      * @return JsonResponse|object
      */
-    public function getRangeV2(string $boxId, string $dateFrom, string $dateTo)
+    public function getRangeV2(string $boxId, string $dateFrom)
     {
         $this->client->request(
             'GET',
@@ -103,7 +103,7 @@ class QuickDataHelper
                 $this->baseUrl.self::API_GETRANGE_V2,
                 $boxId,
                 $dateFrom,
-                $dateTo
+                $dateFrom
             ),
             [],
             [],

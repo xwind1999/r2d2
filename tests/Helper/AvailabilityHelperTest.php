@@ -195,18 +195,21 @@ class AvailabilityHelperTest extends TestCase
                 'date' => new \DateTime('2020-06-20'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
+                'isStopSale' => true,
             ],
             '2020-06-21' => [
                 'stock' => 0,
                 'date' => new \DateTime('2020-06-21'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
+                'isStopSale' => true,
             ],
             '2020-06-23' => [
                 'stock' => 10,
                 'date' => new \DateTime('2020-06-23'),
                 'type' => 'on_request',
                 'componentGoldenId' => '1111',
+                'isStopSale' => false,
             ],
         ];
 
@@ -220,36 +223,42 @@ class AvailabilityHelperTest extends TestCase
                 'date' => new \DateTime('2020-06-20'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
+                'isStopSale' => true,
             ],
             '2020-06-21' => [
                 'stock' => 0,
                 'date' => new \DateTime('2020-06-21'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
+                'isStopSale' => true,
             ],
             '2020-06-22' => [
                 'stock' => 0,
                 'date' => new \DateTime('2020-06-22'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
+                'isStopSale' => true,
             ],
             '2020-06-23' => [
                 'stock' => 10,
                 'date' => new \DateTime('2020-06-23'),
                 'type' => 'on_request',
                 'componentGoldenId' => '1111',
+                'isStopSale' => false,
             ],
             '2020-06-24' => [
                 'stock' => 0,
                 'date' => new \DateTime('2020-06-24'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
+                'isStopSale' => true,
             ],
             '2020-06-25' => [
                 'stock' => 0,
                 'date' => new \DateTime('2020-06-25'),
                 'type' => 'stock',
                 'componentGoldenId' => '1111',
+                'isStopSale' => true,
             ],
         ];
 

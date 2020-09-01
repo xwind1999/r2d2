@@ -78,7 +78,7 @@ api-tests-DEV-INT:
   script:
     - echo "Running Locust tests...."
     - echo ${CI_PROJECT_DIR}
-    - locust -f ${CI_PROJECT_DIR}/tests/LoadTests/${LOCUST_FILE}  --host=${LOCUST_HOST} ${LOCUST_OPTS} --csv=report/html/locust/${LOCUST_ENV}_${LOCUST_FILE} --only-summary
+    - locust -f ${CI_PROJECT_DIR}/tests/LoadTests/${LOCUST_FILE}  --host=${LOCUST_HOST} ${LOCUST_OPTS} --csv=report/html/locust/${LOCUST_ENV}_${LOCUST_FILE} --only-summary ${EXTRA_PARAMETERS}
   artifacts:
     expire_in: 3 days
     paths:
@@ -113,6 +113,21 @@ locust-DEV-INT:
     LOCUST_HOST: "http://r2-d2-api-devint.sbxtest.net"
     LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
     LOCUST_FILE: "end2EndTests.py"
+
+locust-PRODUCTION:
+  <<: *locust
+  stage: Production Validation
+  allow_failure: true
+  needs: ['deploy-PROD']
+  when: on_success
+  only:
+    - tags
+  variables:
+    LOCUST_ENV: "prod"
+    LOCUST_HOST: "https://r2-d2-api.production.smartbox.com"
+    LOCUST_OPTS: "--headless -u 150 -r 5 --run-time 3m"
+    LOCUST_FILE: "end2EndTests.py"
+    EXTRA_PARAMETERS: "QuickData"
 
 .health-smoke-test:
   allow_failure: true

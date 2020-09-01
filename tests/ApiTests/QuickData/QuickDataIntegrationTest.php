@@ -187,23 +187,23 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
         $boxId = '851518';
         $dateFrom = new \DateTime(date('Y-m-d', strtotime('first day of next month')));
-        $dateTo = (clone $dateFrom)->modify('+5 day');
-        $nights = 6;
 
         $avs = self::$container->get(RoomAvailabilityRepository::class)
-            ->findAvailableRoomsByBoxId($boxId, $dateFrom, $dateTo);
+            ->findAvailableRoomsByBoxId($boxId, $dateFrom);
 
         $data = [];
         foreach ($avs as $comp => $avs) {
-            $itemCounts = array_count_values(
-                explode(',', $avs['roomAvailabilities'])
-            );
-
-            $data[] = [
+            $d = [
                 'Package' => $avs['experienceGoldenId'],
-                'Stock' => $itemCounts['stock'] ?? 0,
-                'Request' => $itemCounts['on_request'] ?? 0,
+                'Stock' => 0,
+                'Request' => 0,
             ];
+            if ('on_request' === $avs['roomStockType']) {
+                $d['Request'] = 1;
+            } else {
+                $d['Stock'] = 1;
+            }
+            $data[] = $d;
         }
 
         $expectedResult = [
@@ -214,7 +214,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             return $current['Package'] > $next['Package'];
         });
 
-        $response = json_decode(self::$quickDataHelper->getRangeV2($boxId, $dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d'))->getContent(), true);
+        $response = json_decode(self::$quickDataHelper->getRangeV2($boxId, $dateFrom->format('Y-m-d'))->getContent(), true);
 
         usort($response['PackagesList'], function ($current, $next) {
             return $current['Package'] > $next['Package'];
