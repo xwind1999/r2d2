@@ -12,7 +12,10 @@ use PHPUnit\Framework\TestCase;
  */
 class AvailabilityHelperTest extends TestCase
 {
-    public function testconvertAvailableValueToRequest()
+    /**
+     * @covers ::convertAvailabilityTypeToExplicitQuickdataValue
+     */
+    public function testconvertAvailableValueToRequest(): void
     {
         $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('stock', 0, false));
         $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('stock', 0, true));
@@ -24,7 +27,10 @@ class AvailabilityHelperTest extends TestCase
         $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('on_request', 1, true));
     }
 
-    public function testMapRoomAvailabilitiesToExperience()
+    /**
+     * @covers ::mapRoomAvailabilitiesToExperience
+     */
+    public function testMapRoomAvailabilitiesToExperience(): void
     {
         $comps = [
             '1234' => [
@@ -87,10 +93,51 @@ class AvailabilityHelperTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(AvailabilityHelper::mapRoomAvailabilitiesToExperience($comps, $roomAvailabilities, 5), $returnArray);
+        $this->assertEquals(
+            $returnArray,
+            AvailabilityHelper::mapRoomAvailabilitiesToExperience($comps, $roomAvailabilities, 5)
+        );
     }
 
-    public function testBuildDataForGetPackage()
+    /**
+     * @covers ::buildDataForGetPackage
+     */
+    public function testBuildDataForGetPackage(): void
+    {
+        $availabilities = ['1', '1', '1'];
+        $duration = 1;
+        $partnerId = '1234';
+        $isSellable = false;
+        $partnerCurrency = 'EUR';
+        $boxCurrency = 'BRL';
+
+        $returnArray = [
+            'Availabilities' => $availabilities,
+            'PrestId' => 1,
+            'Duration' => $duration,
+            'LiheId' => 1,
+            'PartnerCode' => $partnerId,
+            'ExtraNight' => $isSellable,
+            'ExtraRoom' => $isSellable,
+        ];
+
+        $this->assertEquals(
+            $returnArray,
+            AvailabilityHelper::buildDataForGetPackage(
+                $availabilities,
+                $duration,
+                $partnerId,
+                $isSellable,
+                $partnerCurrency,
+                $boxCurrency
+            )
+        );
+    }
+
+    /**
+     * @covers ::buildDataForGetPackageV2
+     */
+    public function testBuildDataForGetPackageV2(): void
     {
         $availabilities = ['1', '1', '1'];
         $duration = 1;
@@ -109,7 +156,7 @@ class AvailabilityHelperTest extends TestCase
 
         $this->assertEquals(
             $returnArray,
-            AvailabilityHelper::buildDataForGetPackage(
+            AvailabilityHelper::buildDataForGetPackageV2(
                 $availabilities,
                 $duration,
                 $partnerId,
@@ -118,7 +165,10 @@ class AvailabilityHelperTest extends TestCase
         );
     }
 
-    public function testBuildDataForGetRange()
+    /**
+     * @covers ::buildDataForGetRange
+     */
+    public function testBuildDataForGetRange(): void
     {
         $availabilities = [
             [
@@ -159,7 +209,10 @@ class AvailabilityHelperTest extends TestCase
         );
     }
 
-    public function testConvertToShortType()
+    /**
+     * @covers ::convertToShortType
+     */
+    public function testConvertToShortType(): void
     {
         $availabilities = [
             0 => [
@@ -187,7 +240,10 @@ class AvailabilityHelperTest extends TestCase
         $this->assertEquals($returnArray, AvailabilityHelper::convertToShortType($availabilities));
     }
 
-    public function testFillMissingAvailabilities()
+    /**
+     * @covers ::fillMissingAvailabilities
+     */
+    public function testFillMissingAvailabilities(): void
     {
         $availabilities = [
             '2020-06-20' => [
@@ -268,7 +324,10 @@ class AvailabilityHelperTest extends TestCase
         );
     }
 
-    public function testFillMissingAvailabilitiesWithEnoughDate()
+    /**
+     * @covers ::fillMissingAvailabilities
+     */
+    public function testFillMissingAvailabilitiesWithEnoughDate(): void
     {
         $availabilities = [
             '2020-06-20' => [

@@ -9,6 +9,7 @@ use App\Contract\Response\QuickData\GetPackageResponse;
 use App\Contract\Response\QuickData\GetPackageV2Response;
 use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataErrorResponse;
+use App\Entity\Box;
 use App\Entity\Experience;
 use App\Entity\Partner;
 use App\Entity\RoomPrice;
@@ -61,7 +62,10 @@ class LegacyAvailabilityProviderTest extends TestCase
         $partner = new Partner();
         $partner->goldenId = '4321';
         $partner->status = 'partner';
+        $partner->currency = 'EUR';
         $experience->partner = $partner;
+        $box = new Box();
+        $box->currency = 'EUR';
 
         $result = $this->prophesize(GetPackageResponse::class);
 
@@ -84,6 +88,8 @@ class LegacyAvailabilityProviderTest extends TestCase
                     '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
                     '2020-01-03' => ['stock' => 1, 'type' => 'stock'],
                 ],
+                'box' => $box,
+                'partner' => $partner,
             ]);
 
         $response = $legacyAvailabilityProvider->getAvailabilityForExperience('1234', $dateFrom, $dateTo);
@@ -104,7 +110,10 @@ class LegacyAvailabilityProviderTest extends TestCase
         $partner = new Partner();
         $partner->goldenId = '4321';
         $partner->status = 'not_partner';
+        $partner->currency = 'EUR';
         $experience->partner = $partner;
+        $box = new Box();
+        $box->currency = 'EUR';
 
         $result = $this->prophesize(GetPackageResponse::class);
 
@@ -121,6 +130,8 @@ class LegacyAvailabilityProviderTest extends TestCase
                     '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
                     '2020-01-03' => ['stock' => 1, 'type' => 'stock'],
                 ],
+                'box' => $box,
+                'partner' => $partner,
             ]);
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
@@ -147,7 +158,10 @@ class LegacyAvailabilityProviderTest extends TestCase
         $partner = new Partner();
         $partner->goldenId = '4321';
         $partner->status = 'partner';
+        $partner->currency = 'EUR';
         $experience->partner = $partner;
+        $box = new Box();
+        $box->currency = 'EUR';
 
         $result = $this->prophesize(GetPackageResponse::class);
 
@@ -172,6 +186,8 @@ class LegacyAvailabilityProviderTest extends TestCase
                         'type' => 'stock',
                     ],
                 ],
+                'box' => $box,
+                'partner' => $partner,
             ]);
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
@@ -198,7 +214,10 @@ class LegacyAvailabilityProviderTest extends TestCase
         $partner = new Partner();
         $partner->goldenId = '4321';
         $partner->status = 'partner';
+        $partner->currency = 'EUR';
         $experience->partner = $partner;
+        $box = new Box();
+        $box->currency = 'EUR';
 
         $result = $this->prophesize(GetPackageResponse::class);
 
@@ -214,6 +233,8 @@ class LegacyAvailabilityProviderTest extends TestCase
                     '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
                     '2020-01-03' => ['stock' => 1, 'type' => 'stock'],
                 ],
+                'box' => $box,
+                'partner' => $partner,
             ]);
 
         $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
@@ -428,16 +449,17 @@ class LegacyAvailabilityProviderTest extends TestCase
      */
     public function testGetAvailabilityPriceForExperience()
     {
-        $prestId = 1234;
         $experienceId = '4321';
         $experience = new Experience();
         $experience->goldenId = '4321';
         $partner = new Partner();
         $partner->goldenId = '1111';
+        $partner->currency = 'EUR';
         $experience->partner = $partner;
+        $box = new Box();
+        $box->currency = 'EUR';
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-02');
-        $quickdataResponse = ['DaysAvailabilityPrice' => [['Date' => '2020-01-01T01:00:00.00000000+03:00']]];
         $formattedResponse = [
             'DaysAvailabilityPrice' => [
                 [
@@ -483,6 +505,8 @@ class LegacyAvailabilityProviderTest extends TestCase
                         'isStopSale' => false,
                     ],
                 ],
+                'box' => $box,
+                'partner' => $partner,
                 'prices' => [
                     '2020-01-01' => (function () {
                         $roomPrice = new RoomPrice();
@@ -499,7 +523,7 @@ class LegacyAvailabilityProviderTest extends TestCase
                 ],
             ]);
 
-        $response = $legacyAvailabilityProvider->getAvailabilityPriceForExperience($experienceId, $prestId, $dateFrom, $dateTo);
+        $response = $legacyAvailabilityProvider->getAvailabilityPriceForExperience($experienceId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(AvailabilityPricePeriodResponse::class, $response);
     }

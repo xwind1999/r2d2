@@ -50,11 +50,15 @@ class QuickDataController
      *     response="200"
      * )
      */
-    public function getPackage(GetPackageRequest $getPackageRequest, LegacyAvailabilityProvider $legacyAvailabilityProvider): QuickDataResponse
-    {
-        $quickDataResponse = $legacyAvailabilityProvider->getAvailabilityForExperience($getPackageRequest->packageCode, $getPackageRequest->dateFrom, $getPackageRequest->dateTo);
-
-        return $quickDataResponse;
+    public function getPackage(
+        GetPackageRequest $getPackageRequest,
+        LegacyAvailabilityProvider $legacyAvailabilityProvider
+    ): QuickDataResponse {
+        return $legacyAvailabilityProvider->getAvailabilityForExperience(
+            $getPackageRequest->packageCode,
+            $getPackageRequest->dateFrom,
+            $getPackageRequest->dateTo
+        );
     }
 
     /**
@@ -93,9 +97,14 @@ class QuickDataController
      *     response="200"
      * )
      */
-    public function getRange(GetRangeRequest $getRangeRequest, LegacyAvailabilityProvider $legacyAvailabilityProvider): QuickDataResponse
-    {
-        return $legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($getRangeRequest->boxVersion, $getRangeRequest->dateFrom);
+    public function getRange(
+        GetRangeRequest $getRangeRequest,
+        LegacyAvailabilityProvider $legacyAvailabilityProvider
+    ): QuickDataResponse {
+        return $legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate(
+            $getRangeRequest->boxVersion,
+            $getRangeRequest->dateFrom
+        );
     }
 
     /**
@@ -133,11 +142,15 @@ class QuickDataController
      *     response="200"
      * )
      */
-    public function getPackageV2(GetPackageV2Request $getPackageV2Request, LegacyAvailabilityProvider $legacyAvailabilityProvider): QuickDataResponse
-    {
-        $quickDataResponse = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($getPackageV2Request->listPackageCode, $getPackageV2Request->dateFrom, $getPackageV2Request->dateTo);
-
-        return $quickDataResponse;
+    public function getPackageV2(
+        GetPackageV2Request $getPackageV2Request,
+        LegacyAvailabilityProvider $legacyAvailabilityProvider
+    ): QuickDataResponse {
+        return $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences(
+            $getPackageV2Request->listPackageCode,
+            $getPackageV2Request->dateFrom,
+            $getPackageV2Request->dateTo
+        );
     }
 
     /**
@@ -182,11 +195,12 @@ class QuickDataController
      *     response="200"
      * )
      */
-    public function availabilityPricePeriod(AvailabilityPricePeriodRequest $availabilityPricePeriodRequest, LegacyAvailabilityProvider $legacyAvailabilityProvider): QuickDataResponse
-    {
+    public function availabilityPricePeriod(
+        AvailabilityPricePeriodRequest $availabilityPricePeriodRequest,
+        LegacyAvailabilityProvider $legacyAvailabilityProvider
+    ): QuickDataResponse {
         return $legacyAvailabilityProvider->getAvailabilityPriceForExperience(
             $availabilityPricePeriodRequest->experienceId,
-            $availabilityPricePeriodRequest->prestId,
             $availabilityPricePeriodRequest->dateFrom,
             $availabilityPricePeriodRequest->dateTo);
     }

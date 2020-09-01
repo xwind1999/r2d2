@@ -8,6 +8,8 @@ use App\CMHub\CMHub;
 use App\Contract\Response\CMHub\CMHubErrorResponse;
 use App\Contract\Response\CMHub\CMHubResponse;
 use App\Contract\Response\CMHub\GetAvailabilityResponse;
+use App\Entity\Box;
+use App\Entity\BoxExperience;
 use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
@@ -67,6 +69,8 @@ class AvailabilityProviderTest extends TestCase
      */
     protected $roomPriceManager;
 
+    private AvailabilityProvider $availabilityProvider;
+
     public function setUp(): void
     {
         $this->cmHub = $this->prophesize(CMHub::class);
@@ -76,6 +80,15 @@ class AvailabilityProviderTest extends TestCase
         $this->componentManager = $this->prophesize(ComponentManager::class);
         $this->roomAvailabilityManager = $this->prophesize(RoomAvailabilityManager::class);
         $this->roomPriceManager = $this->prophesize(RoomPriceManager::class);
+        $this->availabilityProvider = new AvailabilityProvider(
+            $this->cmHub->reveal(),
+            $this->serializer->reveal(),
+            $this->arraySerializer->reveal(),
+            $this->experienceManager->reveal(),
+            $this->componentManager->reveal(),
+            $this->roomAvailabilityManager->reveal(),
+            $this->roomPriceManager->reveal()
+        );
     }
 
     /**
@@ -106,16 +119,7 @@ class AvailabilityProviderTest extends TestCase
             ]
             )->shouldBeCalled();
 
-        $availabilityProvider = new AvailabilityProvider(
-            $this->cmHub->reveal(),
-            $this->serializer->reveal(),
-            $this->arraySerializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal(),
-            $this->roomPriceManager->reveal()
-        );
-        $response = $availabilityProvider->getAvailability($productId, $dateFrom, $dateTo);
+        $response = $this->availabilityProvider->getAvailability($productId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(CMHubResponse::class, $response);
     }
@@ -130,16 +134,6 @@ class AvailabilityProviderTest extends TestCase
         $productId = 286201;
         $dateFrom = new \DateTime('2020-04-04');
         $dateTo = new \DateTime('2020-04-04');
-
-        $availabilityProvider = new AvailabilityProvider(
-            $this->cmHub->reveal(),
-            $this->serializer->reveal(),
-            $this->arraySerializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal(),
-            $this->roomPriceManager->reveal()
-        );
 
         $result = $this->prophesize(CMHubErrorResponse::class);
         $responseInterface = $this->prophesize(ResponseInterface::class);
@@ -156,7 +150,7 @@ class AvailabilityProviderTest extends TestCase
 
         $this->assertInstanceOf(
             CMHubErrorResponse::class,
-            $availabilityProvider->getAvailability($productId, $dateFrom, $dateTo))
+            $this->availabilityProvider->getAvailability($productId, $dateFrom, $dateTo))
         ;
     }
 
@@ -166,15 +160,6 @@ class AvailabilityProviderTest extends TestCase
      */
     public function testGetRoomAvailabilitiesByBoxId()
     {
-        $availabilityProvider = new AvailabilityProvider(
-            $this->cmHub->reveal(),
-            $this->serializer->reveal(),
-            $this->arraySerializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal(),
-            $this->roomPriceManager->reveal()
-        );
         $boxId = '1234';
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-25');
@@ -205,7 +190,7 @@ class AvailabilityProviderTest extends TestCase
 
         $this->assertEquals(
             $expectedArray,
-            $availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate($boxId, $dateFrom, $dateTo)
+            $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate($boxId, $dateFrom, $dateTo)
         );
     }
 
@@ -217,15 +202,6 @@ class AvailabilityProviderTest extends TestCase
      */
     public function testGetRoomAvailabilitiesListByExperience()
     {
-        $availabilityProvider = new AvailabilityProvider(
-            $this->cmHub->reveal(),
-            $this->serializer->reveal(),
-            $this->arraySerializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal(),
-            $this->roomPriceManager->reveal()
-        );
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-25');
 
@@ -234,10 +210,16 @@ class AvailabilityProviderTest extends TestCase
         $component->isSellable = true;
         $component->isReservable = true;
         $component->goldenId = '1234';
+        $box = new Box();
+        $boxExperience = new BoxExperience();
+        $boxExperience->box = $box;
+        $experience = new Experience();
+        $experience->boxExperience = new ArrayCollection([$boxExperience]);
         $experienceComponent = new ExperienceComponent();
         $experienceComponent->component = $component;
         $experienceComponent->isEnabled = true;
         $experienceComponent->componentGoldenId = '1234';
+        $experienceComponent->experience = $experience;
         $collection = new ArrayCollection();
         $collection->add($experienceComponent);
         $experience = new Experience();
@@ -331,9 +313,14 @@ class AvailabilityProviderTest extends TestCase
                 '2020-06-22' => $prices['2020-06-22'],
                 '2020-06-23' => $prices['2020-06-23'],
             ],
+            'box' => $box,
+            'partner' => $partner,
         ];
 
-        $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo));
+        $this->assertEquals(
+            $expectedArray,
+            $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo)
+        );
     }
 
     /**
@@ -344,18 +331,8 @@ class AvailabilityProviderTest extends TestCase
      */
     public function testGetRoomAvailabilitiesListByExperienceWithNoData()
     {
-        $availabilityProvider = new AvailabilityProvider(
-            $this->cmHub->reveal(),
-            $this->serializer->reveal(),
-            $this->arraySerializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal(),
-            $this->roomPriceManager->reveal()
-        );
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-25');
-
         $experience = new Experience();
         $partner = new Partner();
         $partner->status = 'partner';
@@ -373,8 +350,10 @@ class AvailabilityProviderTest extends TestCase
                 '2020-06-25' => ['stock' => 0, 'date' => new \DateTime('2020-06-25'), 'type' => 'stock', 'componentGoldenId' => '', 'isStopSale' => true],
             ],
             'prices' => [],
+            'box' => null,
+            'partner' => $partner,
         ];
-        $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo));
+        $this->assertEquals($expectedArray, $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo));
     }
 
     /**
@@ -386,15 +365,6 @@ class AvailabilityProviderTest extends TestCase
      */
     public function testGetRoomAvailabilitiesByExperienceIdList()
     {
-        $availabilityProvider = new AvailabilityProvider(
-            $this->cmHub->reveal(),
-            $this->serializer->reveal(),
-            $this->arraySerializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->componentManager->reveal(),
-            $this->roomAvailabilityManager->reveal(),
-            $this->roomPriceManager->reveal()
-        );
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-25');
 
@@ -474,6 +444,6 @@ class AvailabilityProviderTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedArray, $availabilityProvider->getRoomAvailabilitiesByExperienceIdsList($experienceIds, $dateFrom, $dateTo));
+        $this->assertEquals($expectedArray, $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList($experienceIds, $dateFrom, $dateTo));
     }
 }
