@@ -10,6 +10,7 @@ use App\Entity\RoomAvailability;
 use App\Exception\Repository\RoomAvailabilityNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\QueryException;
 
 /**
@@ -21,10 +22,14 @@ use Doctrine\ORM\Query\QueryException;
 class RoomAvailabilityRepository extends ServiceEntityRepository
 {
     private const CLEANUP_AVAILABILITY_OLDER_THAN = '7 days ago';
+    private const AVAILABILITY_READ_DATABASE = 'availability_read';
     private const ROOM_AVAILABILITY_MINIMAL_STOCK = 0;
+
+    private ManagerRegistry $registry;
 
     public function __construct(ManagerRegistry $registry)
     {
+        $this->registry = $registry;
         parent::__construct($registry, RoomAvailability::class);
     }
 
@@ -68,7 +73,7 @@ where ar.box_golden_id = :boxId AND
 GROUP BY ar.experience_golden_id, ar.duration, ar.room_stock_type HAVING count(ra.date) = ar.duration;
 SQL;
 
-        $statement = $this->getEntityManager()->getConnection()->prepare($sql);
+        $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
         $statement->bindValue('boxId', $boxId);
         $statement->bindValue('dateFrom', $startDate->format('Y-m-d'));
         $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
@@ -189,5 +194,16 @@ SQL;
             ->getQuery()
             ->execute()
         ;
+    }
+
+    public function getAvailabilityReadOnlyConnection(): Connection
+    {
+        $conn = $this->registry->getConnection(static::AVAILABILITY_READ_DATABASE);
+
+        if ($conn instanceof Connection) {
+            return $conn;
+        }
+
+        return $this->getEntityManager()->getConnection();
     }
 }
