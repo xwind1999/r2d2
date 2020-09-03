@@ -36,14 +36,6 @@ class PartnerCreateRequest implements RequestBodyInterface, ValidatableRequest
     public string $currency;
 
     /**
-     * @Assert\Type(type="boolean")
-     * @Assert\NotNull()
-     *
-     * @JMS\Type("strict_boolean")
-     */
-    public bool $isChannelManagerActive;
-
-    /**
      * @Assert\Type(type="DateTime")
      *
      * @JMS\Type("DateTime<'Y-m-d'>")

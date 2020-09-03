@@ -15,7 +15,6 @@ class PartnerBroadcastTest extends IntegrationTestCase
             'id' => bin2hex(random_bytes(12)),
             'status' => 'partner',
             'currencyCode' => 'EUR',
-            'isChannelManagerEnabled' => true,
         ];
 
         $response = self::$broadcastListenerHelper->testPartners($payload);
@@ -29,6 +28,5 @@ class PartnerBroadcastTest extends IntegrationTestCase
         $this->assertEquals($payload['id'], $partner->goldenId);
         $this->assertEquals($payload['status'], $partner->status);
         $this->assertEquals($payload['currencyCode'], $partner->currency);
-        $this->assertEquals($payload['isChannelManagerEnabled'], $partner->isChannelManagerActive);
     }
 }

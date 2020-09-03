@@ -325,21 +325,6 @@ class ExperienceManagerTest extends TestCase
 
     /**
      * @covers ::__construct
-     * @covers ::filterIdsListWithPartnerChannelManagerCondition
-     */
-    public function testFilterIdsListWithPartnerChannelManagerCondition()
-    {
-        $expIds = [
-            '1234', '4321', '1111',
-        ];
-        $this->repository->filterListExperienceIdsWithPartnerChannelManagerCondition(Argument::any(), Argument::any())->willReturn($expIds);
-        $this->manager->filterIdsListWithPartnerChannelManagerCondition($expIds, true);
-
-        $this->repository->filterListExperienceIdsWithPartnerChannelManagerCondition($expIds, true)->shouldBeCalledOnce();
-    }
-
-    /**
-     * @covers ::__construct
      * @covers ::filterIdsListWithExperienceIds
      */
     public function testFilterIdsListWithPartnerStatus()
@@ -351,21 +336,6 @@ class ExperienceManagerTest extends TestCase
         $this->manager->filterIdsListWithExperienceIds($expIds);
 
         $this->repository->filterListExperienceIds($expIds)->shouldBeCalledOnce();
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::filterListExperienceIdsByBoxId
-     */
-    public function testFilterListExperienceIdsByBoxId()
-    {
-        $expIds = [
-            '1234', '4321', '1111',
-        ];
-        $this->repository->filterListExperienceIdsByBoxId(Argument::any())->willReturn($expIds);
-        $this->manager->filterListExperienceIdsByBoxId('1');
-
-        $this->repository->filterListExperienceIdsByBoxId('1')->shouldBeCalledOnce();
     }
 
     /**
