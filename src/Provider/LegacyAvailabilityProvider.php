@@ -13,14 +13,11 @@ use App\Contract\Response\QuickData\QuickDataResponse;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Helper\AvailabilityHelper;
 use App\Manager\ExperienceManager;
-use App\QuickData\QuickData;
 use JMS\Serializer\ArrayTransformerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class LegacyAvailabilityProvider
 {
-    protected QuickData $quickData;
-
     protected ArrayTransformerInterface $serializer;
 
     protected ExperienceManager $experienceManager;
@@ -28,12 +25,10 @@ class LegacyAvailabilityProvider
     protected AvailabilityProvider $availabilityProvider;
 
     public function __construct(
-        QuickData $quickData,
         ArrayTransformerInterface $serializer,
         ExperienceManager $experienceManager,
         AvailabilityProvider $availabilityProvider
     ) {
-        $this->quickData = $quickData;
         $this->serializer = $serializer;
         $this->experienceManager = $experienceManager;
         $this->availabilityProvider = $availabilityProvider;
