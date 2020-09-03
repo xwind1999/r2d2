@@ -98,11 +98,6 @@ services:
 
     App\Http\HttpClientFactory: ~
 
-    App\QuickData\QuickData:
-        arguments:
-            - '%clients.quickdata%'
-            - '@App\Http\HttpClientFactory'
-
     Ramsey\Uuid\UuidFactory: ~
 
     App\CMHub\CMHub:
