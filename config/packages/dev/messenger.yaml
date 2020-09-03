@@ -15,9 +15,7 @@ framework:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-partner
                 retry_strategy:
-                    max_retries: 10
-                    delay: 120000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             broadcast-listeners-product:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -31,9 +29,7 @@ framework:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-product
                 retry_strategy:
-                    max_retries: 10
-                    delay: 120000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             broadcast-listeners-product-relationship:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -47,9 +43,7 @@ framework:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-product-relationship
                 retry_strategy:
-                    max_retries: 10
-                    delay: 120000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             broadcast-listeners-price-information:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -63,9 +57,7 @@ framework:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-price-information
                 retry_strategy:
-                    max_retries: 10
-                    delay: 120000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             broadcast-listeners-room-price:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -79,9 +71,7 @@ framework:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-room-price
                 retry_strategy:
-                    max_retries: 10
-                    delay: 120000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             calculate-manageable-flag:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -95,7 +85,7 @@ framework:
                         type: direct
                         default_publish_routing_key: calculate-manageable-flag
                 retry_strategy:
-                    max_retries: 0
+                    service: App\Messenger\RetryCustomStrategy
 
             push-room-information:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -109,9 +99,7 @@ framework:
                         type: direct
                         default_publish_routing_key: push-room-information
                 retry_strategy:
-                    max_retries: 10
-                    delay: 120000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             push-booking-cmh:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -125,9 +113,7 @@ framework:
                         type: direct
                         default_publish_routing_key: push-booking-cmh
                 retry_strategy:
-                    max_retries: 7
-                    delay: 10000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             failed-broadcast-listeners:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -153,9 +139,7 @@ framework:
                         type: direct
                         default_publish_routing_key: broadcast-listeners-room-availability
                 retry_strategy:
-                    max_retries: 10
-                    delay: 120000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             calculate-flat-manageable-component:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -170,9 +154,7 @@ framework:
                         type: direct
                         default_publish_routing_key: calculate-flat-manageable-component
                 retry_strategy:
-                    max_retries: 10
-                    delay: 120000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
         routing:
             # Route your messages to the transports

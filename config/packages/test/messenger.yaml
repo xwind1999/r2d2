@@ -8,99 +8,77 @@ framework:
                 options:
                     queue_name: broadcast-listeners-partner
                 retry_strategy:
-                    max_retries: 10
-                    delay: 60000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             broadcast-listeners-product:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: broadcast-listeners-product
                 retry_strategy:
-                    max_retries: 10
-                    delay: 60000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             broadcast-listeners-product-relationship:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: broadcast-listeners-product-relationship
                 retry_strategy:
-                    max_retries: 10
-                    delay: 60000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             broadcast-listeners-price-information:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: broadcast-listeners-price-information
                 retry_strategy:
-                    max_retries: 10
-                    delay: 60000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             broadcast-listeners-room-price:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: broadcast-listeners-room-price
                 retry_strategy:
-                    max_retries: 10
-                    delay: 60000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             calculate-manageable-flag:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: calculate-manageable-flag
                 retry_strategy:
-                    max_retries: 10
-                    delay: 60000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             push-room-information:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: push-room-information
                 retry_strategy:
-                    max_retries: 10
-                    delay: 60000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             push-booking-cmh:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: push-booking-cmh
                 retry_strategy:
-                    max_retries: 7
-                    delay: 10000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             failed-broadcast-listeners:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: failed-broadcast-listeners
                 retry_strategy:
-                    max_retries: 10
-                    delay: 60000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             broadcast-listeners-room-availability:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: broadcast-listeners-room-availability
                 retry_strategy:
-                    max_retries: 10
-                    delay: 60000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
             calculate-flat-manageable-component:
                 dsn: 'doctrine://default'
                 options:
                     queue_name: calculate-flat-manageable-component
                 retry_strategy:
-                    max_retries: 10
-                    delay: 60000
-                    multiplier: 2
+                    service: App\Messenger\RetryCustomStrategy
 
         routing:
         # Route your messages to the transports
