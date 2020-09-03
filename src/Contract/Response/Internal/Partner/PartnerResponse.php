@@ -51,14 +51,6 @@ abstract class PartnerResponse extends ResponseContract
     public ?\DateTime $ceaseDate;
 
     /**
-     * @Assert\Type(type="boolean")
-     * @Assert\NotNull()
-     *
-     * @JMS\Type("strict_boolean")
-     */
-    public bool $isChannelManagerActive;
-
-    /**
      * @Assert\NotBlank
      *
      * @JMS\Type("DateTime")
@@ -78,7 +70,6 @@ abstract class PartnerResponse extends ResponseContract
         $this->goldenId = $partner->goldenId;
         $this->status = $partner->status;
         $this->currency = $partner->currency;
-        $this->isChannelManagerActive = $partner->isChannelManagerActive;
         $this->ceaseDate = $partner->ceaseDate;
         $this->createdAt = $partner->createdAt;
         $this->updatedAt = $partner->updatedAt;

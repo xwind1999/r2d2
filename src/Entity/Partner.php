@@ -43,8 +43,10 @@ class Partner
 
     /**
      * @ORM\Column(type="boolean")
+     *
+     * @deprecated remove this attribute soon
      */
-    public bool $isChannelManagerActive;
+    public bool $isChannelManagerActive = true;
 
     /**
      * @ORM\Column(type="date", nullable=true)

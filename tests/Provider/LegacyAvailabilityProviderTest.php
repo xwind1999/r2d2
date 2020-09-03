@@ -67,7 +67,6 @@ class LegacyAvailabilityProviderTest extends TestCase
         $experience->goldenId = '1234';
         $partner = new Partner();
         $partner->goldenId = '4321';
-        $partner->isChannelManagerActive = false;
         $partner->status = 'partner';
         $experience->partner = $partner;
 
@@ -112,7 +111,6 @@ class LegacyAvailabilityProviderTest extends TestCase
         $experience->goldenId = '1234';
         $partner = new Partner();
         $partner->goldenId = '4321';
-        $partner->isChannelManagerActive = false;
         $partner->status = 'not_partner';
         $experience->partner = $partner;
 
@@ -156,7 +154,6 @@ class LegacyAvailabilityProviderTest extends TestCase
         $experience->goldenId = '1234';
         $partner = new Partner();
         $partner->goldenId = '4321';
-        $partner->isChannelManagerActive = true;
         $partner->status = 'partner';
         $experience->partner = $partner;
 
@@ -209,7 +206,6 @@ class LegacyAvailabilityProviderTest extends TestCase
         $partner = new Partner();
         $partner->goldenId = '4321';
         $partner->status = 'partner';
-        $partner->isChannelManagerActive = false;
         $experience->partner = $partner;
 
         $result = $this->prophesize(GetPackageResponse::class);
@@ -448,7 +444,6 @@ class LegacyAvailabilityProviderTest extends TestCase
         $experience->goldenId = '4321';
         $partner = new Partner();
         $partner->goldenId = '1111';
-        $partner->isChannelManagerActive = true;
         $experience->partner = $partner;
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-02');

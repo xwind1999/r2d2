@@ -50,7 +50,6 @@ class PartnerControllerTest extends TestCase
         $partner->goldenId = '1234';
         $partner->status = 'alive';
         $partner->currency = 'USD';
-        $partner->isChannelManagerActive = true;
         $partner->ceaseDate = new \DateTime();
         $partner->createdAt = new \DateTime();
         $partner->updatedAt = new \DateTime();
@@ -151,7 +150,6 @@ class PartnerControllerTest extends TestCase
         $partner->goldenId = '1234';
         $partner->status = 'active';
         $partner->currency = 'EUR';
-        $partner->isChannelManagerActive = true;
         $partner->ceaseDate = null;
         $partner->createdAt = new \DateTime();
         $partner->updatedAt = new \DateTime();

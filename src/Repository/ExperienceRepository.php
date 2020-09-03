@@ -56,23 +56,6 @@ class ExperienceRepository extends ServiceEntityRepository
         return $experience;
     }
 
-    public function filterListExperienceIdsWithPartnerChannelManagerCondition(array $experienceIds, bool $isChannelManagerActive): array
-    {
-        $qb = $this->createQueryBuilder('e');
-        $qb
-            ->join('e.partner', 'ep')
-            ->select('e.goldenId')
-            ->where($qb->expr()->in('e.goldenId', $experienceIds))
-            ->andWhere('ep.status = :partner')
-            ->andWhere('ep.isChannelManagerActive = :isChannelManagerActive')
-            ->setParameter('isChannelManagerActive', $isChannelManagerActive)
-            ->setParameter('partner', 'partner')
-            ->indexBy('e', 'e.goldenId')
-        ;
-
-        return $qb->getQuery()->getArrayResult();
-    }
-
     public function filterListExperienceIds(array $experienceIds): array
     {
         $qb = $this->createQueryBuilder('e');
@@ -82,21 +65,6 @@ class ExperienceRepository extends ServiceEntityRepository
             ->where($qb->expr()->in('e.goldenId', $experienceIds))
             ->indexBy('e', 'e.goldenId')
         ;
-
-        return $qb->getQuery()->getArrayResult();
-    }
-
-    public function filterListExperienceIdsByBoxId(string $boxId): array
-    {
-        $qb = $this->createQueryBuilder('e');
-        $qb
-            ->select('e.goldenId, ep.ceaseDate, ep.status')
-            ->join('e.boxExperience', 'be')
-            ->join('e.partner', 'ep')
-            ->where('be.boxGoldenId = :boxId')
-            ->andWhere('ep.isChannelManagerActive = 1')
-            ->setParameter('boxId', $boxId)
-            ->indexBy('e', 'e.goldenId');
 
         return $qb->getQuery()->getArrayResult();
     }
