@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class RoomAvailabilityManager
 {
+    private const LOG_MESSAGE_AVAILABILITY_UNKNOWN_COMPONENT = 'Received room availability for unknown component';
+
     protected RoomAvailabilityRepository $repository;
 
     protected ComponentRepository $componentRepository;
@@ -138,6 +140,7 @@ class RoomAvailabilityManager
 
         foreach ($roomAvailabilityRequestList->items as $roomAvailabilityRequest) {
             if (!isset($existingComponents[$roomAvailabilityRequest->product->id])) {
+                $this->logger->warning(static::LOG_MESSAGE_AVAILABILITY_UNKNOWN_COMPONENT, $roomAvailabilityRequest->getContext());
                 continue;
             }
 

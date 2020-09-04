@@ -190,6 +190,11 @@ class RoomAvailabilityManagerTest extends TestCase
             ->dispatch(Argument::is($roomAvailabilityRequest3))->willReturn(new Envelope(new \stdClass()))
             ->shouldNotBeCalled();
 
+        $this
+            ->logger
+            ->warning('Received room availability for unknown component', $roomAvailabilityRequest3->getContext())
+            ->shouldBeCalled();
+
         $this->manager->dispatchRoomAvailabilitiesRequest($roomAvailabilityRequestList);
     }
 

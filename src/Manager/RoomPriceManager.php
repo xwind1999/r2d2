@@ -17,6 +17,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class RoomPriceManager
 {
+    private const LOG_MESSAGE_PRICE_UNKNOWN_COMPONENT = 'Received room price for unknown component';
+
     protected RoomPriceRepository $repository;
 
     protected ComponentRepository $componentRepository;
@@ -99,6 +101,7 @@ class RoomPriceManager
 
         foreach ($roomPriceRequestList->items as $roomPriceRequest) {
             if (!isset($existingComponents[$roomPriceRequest->product->id])) {
+                $this->logger->warning(static::LOG_MESSAGE_PRICE_UNKNOWN_COMPONENT, $roomPriceRequest->getContext());
                 continue;
             }
             $this->messageBus->dispatch($roomPriceRequest);
