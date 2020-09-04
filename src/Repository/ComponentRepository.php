@@ -195,4 +195,16 @@ class ComponentRepository extends ServiceEntityRepository
 
         return array_column($qb->getQuery()->getArrayResult(), 'goldenId');
     }
+
+    public function filterManageableComponetsByComponentId(array $componentGoldenIds): array
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb
+            ->select('c.goldenId')
+            ->where($qb->expr()->in('c.goldenId', $componentGoldenIds))
+            ->indexBy('c', 'c.goldenId')
+        ;
+
+        return $qb->getQuery()->getArrayResult();
+    }
 }

@@ -7,6 +7,7 @@ namespace App\Tests\Manager;
 use App\Contract\Request\BroadcastListener\Common\Price;
 use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Contract\Request\BroadcastListener\RoomPriceRequest;
+use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
 use App\Entity\Component;
 use App\Entity\RoomPrice;
 use App\Exception\Repository\ComponentNotFoundException;
@@ -18,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @coversDefaultClass \App\Manager\RoomPriceManager
@@ -44,12 +47,27 @@ class RoomPriceManagerTest extends TestCase
      */
     protected $logger;
 
+    /**
+     * @var MessageBusInterface|ObjectProphecy
+     */
+    private $messageBus;
+
+    private RoomPriceManager $manager;
+
     public function setUp(): void
     {
         $this->repository = $this->prophesize(RoomPriceRepository::class);
         $this->componentRepository = $this->prophesize(ComponentRepository::class);
         $this->em = $this->prophesize(EntityManagerInterface::class);
         $this->logger = $this->prophesize(LoggerInterface::class);
+        $this->messageBus = $this->prophesize(MessageBusInterface::class);
+        $this->manager = new RoomPriceManager(
+            $this->repository->reveal(),
+            $this->componentRepository->reveal(),
+            $this->em->reveal(),
+            $this->messageBus->reveal(),
+            $this->logger->reveal()
+        );
     }
 
     /**
@@ -58,8 +76,6 @@ class RoomPriceManagerTest extends TestCase
      */
     public function testReplace()
     {
-        $manager = new RoomPriceManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->em->reveal(), $this->logger->reveal());
-
         $roomPriceRequest = new RoomPriceRequest();
         $roomPriceRequest->product = new Product();
         $roomPriceRequest->product->id = '1234';
@@ -88,7 +104,7 @@ class RoomPriceManagerTest extends TestCase
         $this->em->flush()->shouldBeCalled();
         $this->em->persist(Argument::type(RoomPrice::class))->shouldBeCalledTimes(2);
 
-        $manager->replace($roomPriceRequest);
+        $this->manager->replace($roomPriceRequest);
     }
 
     /**
@@ -97,8 +113,6 @@ class RoomPriceManagerTest extends TestCase
      */
     public function testReplaceWithOutdatedValue()
     {
-        $manager = new RoomPriceManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->em->reveal(), $this->logger->reveal());
-
         $roomPriceRequest = new RoomPriceRequest();
         $roomPriceRequest->product = new Product();
         $roomPriceRequest->product->id = '1234';
@@ -132,7 +146,7 @@ class RoomPriceManagerTest extends TestCase
         $this->em->persist($roomPrice)->shouldBeCalledTimes(1);
         $this->logger->warning('Outdated room price received', $roomPriceRequest->getContext())->shouldBeCalledTimes(1);
 
-        $manager->replace($roomPriceRequest);
+        $this->manager->replace($roomPriceRequest);
     }
 
     /**
@@ -141,8 +155,6 @@ class RoomPriceManagerTest extends TestCase
      */
     public function testReplaceWithNonExistentComponent()
     {
-        $manager = new RoomPriceManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->em->reveal(), $this->logger->reveal());
-
         $roomPriceRequest = new RoomPriceRequest();
         $roomPriceRequest->product = new Product();
         $roomPriceRequest->product->id = '1234';
@@ -151,17 +163,61 @@ class RoomPriceManagerTest extends TestCase
 
         $this->expectException(ComponentNotFoundException::class);
 
-        $manager->replace($roomPriceRequest);
+        $this->manager->replace($roomPriceRequest);
     }
 
     public function testGetRoomPricesByComponentAndDateRange(): void
     {
-        $manager = new RoomPriceManager($this->repository->reveal(), $this->componentRepository->reveal(), $this->em->reveal(), $this->logger->reveal());
-
         $component = new Component();
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-05');
         $this->repository->findByComponentAndDateRange($component, $dateFrom, $dateTo)->willReturn([])->shouldBeCalled();
-        $manager->getRoomPricesByComponentAndDateRange($component, $dateFrom, $dateTo);
+        $this->manager->getRoomPricesByComponentAndDateRange($component, $dateFrom, $dateTo);
+    }
+
+    /**
+     * @covers ::dispatchRoomPricesRequest
+     */
+    public function testDispatchRoomPricesRequest()
+    {
+        $product = new Product();
+        $product->id = '299994';
+        $roomPriceRequestList = new RoomPriceRequestList();
+        $roomPriceRequest = new RoomPriceRequest();
+
+        $roomPriceRequest->product = $product;
+        $roomPriceRequest->price = new Price();
+        $roomPriceRequest->price->amount = 123;
+        $roomPriceRequest->price->currencyCode = 'EUR';
+        $roomPriceRequest->dateFrom = new \DateTime('+5 days');
+        $roomPriceRequest->dateTo = new \DateTime('+8 days');
+        $roomPriceRequest->updatedAt = new \DateTime('now');
+
+        $roomPriceRequest2 = (clone $roomPriceRequest);
+        $roomPriceRequest2->product = clone $product;
+        $roomPriceRequest2->product->id = '218439';
+
+        $roomPriceRequest3 = (clone $roomPriceRequest);
+        $roomPriceRequest3->product = clone $product;
+        $roomPriceRequest3->product->id = '315172';
+
+        $roomPriceRequestList->items = [
+            $roomPriceRequest,
+            $roomPriceRequest2,
+            $roomPriceRequest3,
+        ];
+
+        $this->componentRepository->filterManageableComponetsByComponentId(['299994', '218439', '315172'])->willReturn(['299994' => [], '218439' => []]);
+
+        $this
+            ->messageBus
+            ->dispatch(Argument::is($roomPriceRequest))->willReturn(new Envelope(new \stdClass()))
+            ->shouldBeCalled();
+        $this
+            ->messageBus
+            ->dispatch(Argument::is($roomPriceRequest2))->willReturn(new Envelope(new \stdClass()))
+            ->shouldBeCalled();
+
+        $this->manager->dispatchRoomPricesRequest($roomPriceRequestList);
     }
 }
