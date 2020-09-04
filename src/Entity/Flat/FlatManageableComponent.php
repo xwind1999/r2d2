@@ -42,6 +42,11 @@ class FlatManageableComponent
     public UuidInterface $componentUuid;
 
     /**
+     * @ORM\Column(type="string", length=45, nullable=true)
+     */
+    public ?string $partnerGoldenId = null;
+
+    /**
      * @ORM\Column(type="integer", options={"unsigned"=true})
      */
     public int $duration;

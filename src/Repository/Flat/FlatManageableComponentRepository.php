@@ -30,10 +30,12 @@ DELETE FROM flat_manageable_component WHERE component_golden_id = :componentGold
 
 INSERT INTO
     flat_manageable_component
+    (box_golden_id, experience_golden_id, component_golden_id, component_uuid, partner_golden_id, duration, is_sellable, room_stock_type, last_bookable_date) 
 SELECT
        box_golden_id,
        be.experience_golden_id,
        component_golden_id,
+       c.partner_golden_id,
        c.uuid,
        c.duration,
        c.is_sellable,
