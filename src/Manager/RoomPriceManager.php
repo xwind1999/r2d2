@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Contract\Request\BroadcastListener\RoomPriceRequest;
+use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
 use App\Entity\Component;
 use App\Entity\RoomPrice;
 use App\Exception\Manager\RoomPrice\OutdatedRoomPriceException;
@@ -12,6 +13,7 @@ use App\Repository\ComponentRepository;
 use App\Repository\RoomPriceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class RoomPriceManager
 {
@@ -20,17 +22,20 @@ class RoomPriceManager
     protected ComponentRepository $componentRepository;
     private EntityManagerInterface $entityManager;
     private LoggerInterface $logger;
+    private MessageBusInterface $messageBus;
 
     public function __construct(
         RoomPriceRepository $repository,
         ComponentRepository $componentRepository,
         EntityManagerInterface $entityManager,
+        MessageBusInterface $messageBus,
         LoggerInterface $logger
     ) {
         $this->repository = $repository;
         $this->componentRepository = $componentRepository;
         $this->entityManager = $entityManager;
         $this->logger = $logger;
+        $this->messageBus = $messageBus;
     }
 
     public function replace(RoomPriceRequest $roomPriceRequest): void
@@ -81,5 +86,22 @@ class RoomPriceManager
         \DateTimeInterface $dateTo
     ): array {
         return $this->repository->findByComponentAndDateRange($component, $dateFrom, $dateTo);
+    }
+
+    public function dispatchRoomPricesRequest(RoomPriceRequestList $roomPriceRequestList): void
+    {
+        $componentIds = [];
+        foreach ($roomPriceRequestList->items as $roomPriceRequest) {
+            $componentIds[] = $roomPriceRequest->product->id;
+        }
+
+        $existingComponents = $this->componentRepository->filterManageableComponetsByComponentId($componentIds);
+
+        foreach ($roomPriceRequestList->items as $roomPriceRequest) {
+            if (!isset($existingComponents[$roomPriceRequest->product->id])) {
+                continue;
+            }
+            $this->messageBus->dispatch($roomPriceRequest);
+        }
     }
 }

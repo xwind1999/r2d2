@@ -12,11 +12,11 @@ use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Contract\Request\BroadcastListener\Product\Universe;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
-use App\Contract\Request\BroadcastListener\RoomPriceRequest;
 use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
 use App\Controller\BroadcastListener\BroadcastListenerController;
+use App\Manager\RoomAvailabilityManager;
+use App\Manager\RoomPriceManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -155,37 +155,14 @@ class BroadcastListenerControllerTest extends TestCase
      */
     public function testHandleRoomAvailabilitySuccessfully()
     {
-        $product = new Product();
-        $product->id = '299994';
         $roomAvailabilityRequestList = new RoomAvailabilityRequestList();
-        $roomAvailabilityRequest = new RoomAvailabilityRequest();
-
-        $roomAvailabilityRequest->product = $product;
-        $roomAvailabilityRequest->quantity = 2;
-        $roomAvailabilityRequest->dateFrom = new \DateTime('+5 days');
-        $roomAvailabilityRequest->dateTo = new \DateTime('+8 days');
-        $roomAvailabilityRequest->updatedAt = new \DateTime('now');
-
-        $roomAvailabilityRequest2 = (clone $roomAvailabilityRequest);
-        $roomAvailabilityRequest2->product->id = '218439';
-        $roomAvailabilityRequest2->quantity = 5;
-
-        $roomAvailabilityRequest3 = (clone $roomAvailabilityRequest);
-        $roomAvailabilityRequest3->product->id = '315172';
-        $roomAvailabilityRequest3->quantity = 1;
-
-        $roomAvailabilityRequestList->items = [
-            $roomAvailabilityRequest,
-            $roomAvailabilityRequest2,
-            $roomAvailabilityRequest3,
-        ];
-
-        $this->messageBus->expects($this->atLeast(3))
-            ->method('dispatch')
-            ->willReturn($this->envelope);
+        $manager = $this->prophesize(RoomAvailabilityManager::class);
+        $manager
+            ->dispatchRoomAvailabilitiesRequest($roomAvailabilityRequestList)
+            ->shouldBeCalled();
 
         $controller = new BroadcastListenerController();
-        $response = $controller->roomAvailabilityListener($roomAvailabilityRequestList, $this->messageBus);
+        $response = $controller->roomAvailabilityListener($roomAvailabilityRequestList, $manager->reveal());
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }
@@ -195,34 +172,14 @@ class BroadcastListenerControllerTest extends TestCase
      */
     public function testHandleRoomPriceSuccessfully()
     {
-        $product = new Product();
-        $product->id = '299994';
         $roomPriceRequestList = new RoomPriceRequestList();
-        $roomPriceRequest = new RoomPriceRequest();
-
-        $roomPriceRequest->product = $product;
-        $roomPriceRequest->price = new Price();
-        $roomPriceRequest->price->amount = 123;
-        $roomPriceRequest->price->currencyCode = 'EUR';
-        $roomPriceRequest->dateFrom = new \DateTime('+5 days');
-        $roomPriceRequest->dateTo = new \DateTime('+8 days');
-        $roomPriceRequest->updatedAt = new \DateTime('now');
-
-        $roomPriceRequest2 = (clone $roomPriceRequest);
-        $roomPriceRequest2->product->id = '218439';
-        $roomPriceRequest2->quantity = 5;
-
-        $roomPriceRequestList->items = [
-            $roomPriceRequest,
-            $roomPriceRequest2,
-        ];
-
-        $this->messageBus->expects($this->atLeast(2))
-            ->method('dispatch')
-            ->willReturn($this->envelope);
+        $manager = $this->prophesize(RoomPriceManager::class);
+        $manager
+            ->dispatchRoomPricesRequest($roomPriceRequestList)
+            ->shouldBeCalled();
 
         $controller = new BroadcastListenerController();
-        $response = $controller->roomPriceListener($roomPriceRequestList, $this->messageBus);
+        $response = $controller->roomPriceListener($roomPriceRequestList, $manager->reveal());
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }

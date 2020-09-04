@@ -5,29 +5,38 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
+use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
 use App\Entity\Component;
 use App\Entity\RoomAvailability;
 use App\Exception\Manager\RoomAvailability\InvalidRoomStockTypeException;
 use App\Exception\Manager\RoomAvailability\OutdatedRoomAvailabilityInformationException;
 use App\Repository\ComponentRepository;
 use App\Repository\RoomAvailabilityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class RoomAvailabilityManager
 {
     protected RoomAvailabilityRepository $repository;
 
     protected ComponentRepository $componentRepository;
+    private EntityManagerInterface $entityManager;
     private LoggerInterface $logger;
+    private MessageBusInterface $messageBus;
 
     public function __construct(
         RoomAvailabilityRepository $repository,
         ComponentRepository $componentRepository,
+        EntityManagerInterface $entityManager,
+        MessageBusInterface $messageBus,
         LoggerInterface $logger
     ) {
         $this->repository = $repository;
         $this->componentRepository = $componentRepository;
+        $this->entityManager = $entityManager;
         $this->logger = $logger;
+        $this->messageBus = $messageBus;
     }
 
     public function getRoomAvailabilitiesByMultipleComponentGoldenIds(
@@ -77,38 +86,35 @@ class RoomAvailabilityManager
         $datePeriod = $this->createDatePeriod($roomAvailabilityRequest);
         $component = $this->componentRepository->findOneByGoldenId($roomAvailabilityRequest->product->id);
 
-        try {
-            if (empty($component->roomStockType)) {
-                throw new InvalidRoomStockTypeException();
-            }
-
-            $roomAvailabilityList = $this->repository->findByComponentAndDateRange(
-                $component,
-                $roomAvailabilityRequest->dateFrom,
-                $roomAvailabilityRequest->dateTo
-            );
-
-            foreach ($datePeriod as $date) {
-                $roomAvailability = $roomAvailabilityList[$date->format('Y-m-d')] ?? new RoomAvailability();
-                if ($roomAvailability->externalUpdatedAt &&
-                    $roomAvailabilityRequest->updatedAt < $roomAvailability->externalUpdatedAt) {
-                    $this->logger->warning(OutdatedRoomAvailabilityInformationException::class, $roomAvailabilityRequest->getContext());
-                    continue;
-                }
-
-                $roomAvailability->componentGoldenId = $roomAvailabilityRequest->product->id;
-                $roomAvailability->component = $component;
-                $roomAvailability->stock = $roomAvailabilityRequest->quantity;
-                $roomAvailability->date = $date;
-                $roomAvailability->isStopSale = $roomAvailabilityRequest->isStopSale;
-                $roomAvailability->type = $component->roomStockType;
-                $roomAvailability->externalUpdatedAt = $roomAvailabilityRequest->updatedAt ?? null;
-
-                $this->repository->save($roomAvailability);
-            }
-        } catch (\Exception $exception) {
-            throw $exception;
+        if (empty($component->roomStockType)) {
+            throw new InvalidRoomStockTypeException();
         }
+
+        $roomAvailabilityList = $this->repository->findByComponentAndDateRange(
+            $component,
+            $roomAvailabilityRequest->dateFrom,
+            $roomAvailabilityRequest->dateTo
+        );
+
+        foreach ($datePeriod as $date) {
+            $roomAvailability = $roomAvailabilityList[$date->format('Y-m-d')] ?? new RoomAvailability();
+            if ($roomAvailability->externalUpdatedAt &&
+                $roomAvailabilityRequest->updatedAt < $roomAvailability->externalUpdatedAt) {
+                $this->logger->warning(OutdatedRoomAvailabilityInformationException::class, $roomAvailabilityRequest->getContext());
+                continue;
+            }
+
+            $roomAvailability->componentGoldenId = $roomAvailabilityRequest->product->id;
+            $roomAvailability->component = $component;
+            $roomAvailability->stock = $roomAvailabilityRequest->quantity;
+            $roomAvailability->date = $date;
+            $roomAvailability->isStopSale = $roomAvailabilityRequest->isStopSale;
+            $roomAvailability->type = $component->roomStockType;
+            $roomAvailability->externalUpdatedAt = $roomAvailabilityRequest->updatedAt ?? null;
+
+            $this->entityManager->persist($roomAvailability);
+        }
+        $this->entityManager->flush();
     }
 
     private function createDatePeriod(RoomAvailabilityRequest $roomAvailabilityRequest): \DatePeriod
@@ -119,5 +125,23 @@ class RoomAvailabilityManager
         $interval = new \DateInterval('P1D');
 
         return new \DatePeriod($beginDate, $interval, $endDate);
+    }
+
+    public function dispatchRoomAvailabilitiesRequest(RoomAvailabilityRequestList $roomAvailabilityRequestList): void
+    {
+        $componentIds = [];
+        foreach ($roomAvailabilityRequestList->items as $roomAvailabilityRequest) {
+            $componentIds[] = $roomAvailabilityRequest->product->id;
+        }
+
+        $existingComponents = $this->componentRepository->filterManageableComponetsByComponentId($componentIds);
+
+        foreach ($roomAvailabilityRequestList->items as $roomAvailabilityRequest) {
+            if (!isset($existingComponents[$roomAvailabilityRequest->product->id])) {
+                continue;
+            }
+
+            $this->messageBus->dispatch($roomAvailabilityRequest);
+        }
     }
 }
