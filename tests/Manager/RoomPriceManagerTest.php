@@ -218,6 +218,11 @@ class RoomPriceManagerTest extends TestCase
             ->dispatch(Argument::is($roomPriceRequest2))->willReturn(new Envelope(new \stdClass()))
             ->shouldBeCalled();
 
+        $this
+            ->logger
+            ->warning('Received room price for unknown component', $roomPriceRequest3->getContext())
+            ->shouldBeCalled();
+
         $this->manager->dispatchRoomPricesRequest($roomPriceRequestList);
     }
 }
