@@ -10,6 +10,7 @@ use App\Contract\Response\CMHub\CMHubErrorResponse;
 use App\Contract\Response\CMHub\CMHubResponse;
 use App\Contract\Response\CMHub\GetAvailability\AvailabilityResponse;
 use App\Contract\Response\CMHub\GetAvailabilityResponse;
+use App\Entity\BoxExperience;
 use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
@@ -104,8 +105,9 @@ class AvailabilityProvider
         if (false == $experienceComponent || PartnerStatusConstraint::PARTNER_STATUS_PARTNER !== $partner->status) {
             $roomAvailabilities = [];
             $componentGoldenId = '';
-            $componentSellable = false;
             $roomPrices = [];
+            $componentSellable = false;
+            $box = null;
         } else {
             $roomAvailabilities = $this->getRoomAvailabilitiesAndFilterCeasePartnerByComponent(
                 $experienceComponent->component,
@@ -114,9 +116,17 @@ class AvailabilityProvider
                 $dateTo
             );
 
-            $roomPrices = $this->roomPriceManager->getRoomPricesByComponentAndDateRange($experienceComponent->component, $dateFrom, $dateTo);
+            $roomPrices = $this->roomPriceManager->getRoomPricesByComponentAndDateRange(
+                $experienceComponent->component,
+                $dateFrom,
+                $dateTo
+            );
             $componentGoldenId = $experienceComponent->componentGoldenId;
             $componentSellable = $experienceComponent->component->isSellable;
+
+            /** @var BoxExperience $boxExperience */
+            $boxExperience = $experienceComponent->experience->boxExperience->first();
+            $box = $boxExperience->box;
         }
 
         $roomAvailabilities = AvailabilityHelper::fillMissingAvailabilities(
@@ -131,6 +141,8 @@ class AvailabilityProvider
             'isSellable' => $componentSellable,
             'availabilities' => $roomAvailabilities,
             'prices' => $roomPrices,
+            'box' => $box,
+            'partner' => $partner,
         ];
     }
 

@@ -42,8 +42,11 @@ class LegacyAvailabilityProvider
         try {
             $experience = $this->experienceManager->getOneByGoldenId($experienceId);
             $partner = $experience->partner;
-            $availabilitiesFromDB = $this->availabilityProvider
-                ->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo);
+            $availabilitiesFromDB = $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(
+                $experience,
+                $dateFrom,
+                $dateTo
+            );
 
             $returnArray = [
                 'ListPrestation' => [
@@ -51,7 +54,9 @@ class LegacyAvailabilityProvider
                         AvailabilityHelper::convertToShortType($availabilitiesFromDB['availabilities']),
                         $availabilitiesFromDB['duration'],
                         $partner->goldenId,
-                        $availabilitiesFromDB['isSellable']
+                        $availabilitiesFromDB['isSellable'],
+                        $availabilitiesFromDB['partner']->currency,
+                        $availabilitiesFromDB['box']->currency,
                     ),
                 ],
             ];
@@ -106,11 +111,11 @@ class LegacyAvailabilityProvider
                 $availabilitiesArray['ListPackage'][] = [
                     'PackageCode' => $availability['experienceId'],
                     'ListPrestation' => [
-                        AvailabilityHelper::buildDataForGetPackage(
+                        AvailabilityHelper::buildDataForGetPackageV2(
                             AvailabilityHelper::convertToShortType($availability['availabilities']),
                             $availability['duration'],
                             $availability['partnerId'],
-                            $availability['isSellable']
+                            $availability['isSellable'],
                         ),
                     ],
                 ];
@@ -124,33 +129,46 @@ class LegacyAvailabilityProvider
 
     public function getAvailabilityPriceForExperience(
         string $experienceId,
-        int $prestId,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): QuickDataResponse {
         $experience = $this->experienceManager->getOneByGoldenId($experienceId);
-        $roomAvailabilityAndPrices = $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo);
-
+        $roomAvailabilityAndPrices = $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(
+            $experience,
+            $dateFrom,
+            $dateTo
+        );
         $availabilities = [];
+        $boxCurrency = '';
+        $partnerCurrency = strtoupper($roomAvailabilityAndPrices['partner']->currency);
+        if ($roomAvailabilityAndPrices['box']->currency) {
+            $boxCurrency = strtoupper($roomAvailabilityAndPrices['box']->currency);
+        }
 
-        foreach ($roomAvailabilityAndPrices['availabilities'] as $date => $av) {
+        foreach ($roomAvailabilityAndPrices['availabilities'] as $date => $availability) {
             $availability = [
                 'Date' => (new \DateTime($date))->format('Y-m-d\TH:i:s.u'),
-                'AvailabilityValue' => $av['stock'],
-                'AvailabilityStatus' => AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue($av['type'], $av['stock'], $av['isStopSale']),
+                'AvailabilityValue' => $availability['stock'],
+                'AvailabilityStatus' => AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+                    $availability['type'],
+                    $availability['stock'],
+                    $availability['isStopSale']
+                ),
                 'SellingPrice' => 0,
                 'BuyingPrice' => 0,
             ];
 
-            if (isset($roomAvailabilityAndPrices['prices'][$date])) {
+            if (isset($roomAvailabilityAndPrices['prices'][$date]) && $partnerCurrency === $boxCurrency) {
                 $availability['SellingPrice'] = $roomAvailabilityAndPrices['prices'][$date]->price / 100;
                 $availability['BuyingPrice'] = $roomAvailabilityAndPrices['prices'][$date]->price / 100;
             }
 
             $availabilities[] = $availability;
         }
-        $data = ['DaysAvailabilityPrice' => $availabilities];
 
-        return $this->serializer->fromArray($data, AvailabilityPricePeriodResponse::class);
+        return $this->serializer->fromArray(
+            ['DaysAvailabilityPrice' => $availabilities],
+            AvailabilityPricePeriodResponse::class
+        );
     }
 }
