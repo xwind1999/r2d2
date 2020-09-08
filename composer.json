@@ -5,6 +5,7 @@
         "php": "^7.4.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-igbinary": "*",
         "ext-json": "^7.4",
         "doctrine/annotations": "^1.8",
         "doctrine/collections": "^1.6",

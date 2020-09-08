@@ -31,10 +31,10 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            broadcast-listeners-room-price:
+            listener-room-price:
                 dsn: 'doctrine://default'
                 options:
-                    queue_name: broadcast-listeners-room-price
+                    queue_name: listener-room-price
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
@@ -66,10 +66,24 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            broadcast-listeners-room-availability:
+            listener-room-availability:
                 dsn: 'doctrine://default'
                 options:
-                    queue_name: broadcast-listeners-room-availability
+                    queue_name: listener-room-availability
+                retry_strategy:
+                    service: App\Messenger\RetryCustomStrategy
+
+            listener-room-availability-list:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: listener-room-availability-list
+                retry_strategy:
+                    service: App\Messenger\RetryCustomStrategy
+
+            listener-room-price-list:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: listener-room-price-list
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
@@ -86,8 +100,10 @@ framework:
             'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
             'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
-            'App\Contract\Request\BroadcastListener\RoomAvailabilityRequest': broadcast-listeners-room-availability
-            'App\Contract\Request\BroadcastListener\RoomPriceRequest': broadcast-listeners-room-price
+            'App\Contract\Request\BroadcastListener\RoomAvailabilityRequest': listener-room-availability
+            'App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList': listener-room-availability-list
+            'App\Contract\Request\BroadcastListener\RoomPriceRequest': listener-room-price
+            'App\Contract\Request\BroadcastListener\RoomPriceRequestList': listener-room-price-list
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
             'App\Contract\Request\EAI\RoomRequest': push-room-information
             'App\Contract\Request\EAI\ChannelManagerBookingRequest': push-booking-cmh

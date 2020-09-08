@@ -82,7 +82,8 @@ class RoomAvailabilityBroadcastTest extends IntegrationTestCase
         $response = self::$broadcastListenerHelper->testRoomAvailability($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
-        $this->consume('broadcast-listeners-room-availability', 3);
+        $this->consume('listener-room-availability-list', 3);
+        $this->consume('listener-room-availability', 3);
 
         /** @var RoomAvailabilityRepository $roomAvailabilityRepository */
         $componentRepository = self::$container->get(ComponentRepository::class);

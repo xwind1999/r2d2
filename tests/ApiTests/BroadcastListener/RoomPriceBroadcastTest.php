@@ -62,7 +62,8 @@ class RoomPriceBroadcastTest extends IntegrationTestCase
         $response = self::$broadcastListenerHelper->testRoomPrice($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
-        $this->consume('broadcast-listeners-room-price');
+        $this->consume('listener-room-price-list');
+        $this->consume('listener-room-price');
 
         /** @var RoomPriceRepository $roomPriceRepository */
         $roomPriceRepository = self::$container->get(RoomPriceRepository::class);

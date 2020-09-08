@@ -132,7 +132,6 @@ class ComponentManager
             throw new OutdatedComponentException();
         }
 
-        $currentEntity = clone $component;
         $component->goldenId = $productRequest->id;
         $component->partner = $partner;
         $component->partnerGoldenId = $productRequest->partner ? $productRequest->partner->id : '';

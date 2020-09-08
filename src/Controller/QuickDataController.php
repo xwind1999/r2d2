@@ -202,6 +202,7 @@ class QuickDataController
         return $legacyAvailabilityProvider->getAvailabilityPriceForExperience(
             $availabilityPricePeriodRequest->experienceId,
             $availabilityPricePeriodRequest->dateFrom,
-            $availabilityPricePeriodRequest->dateTo);
+            $availabilityPricePeriodRequest->dateTo
+        );
     }
 }
