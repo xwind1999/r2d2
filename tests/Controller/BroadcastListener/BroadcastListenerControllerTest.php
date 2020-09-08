@@ -15,8 +15,6 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
 use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
 use App\Controller\BroadcastListener\BroadcastListenerController;
-use App\Manager\RoomAvailabilityManager;
-use App\Manager\RoomPriceManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -156,13 +154,11 @@ class BroadcastListenerControllerTest extends TestCase
     public function testHandleRoomAvailabilitySuccessfully()
     {
         $roomAvailabilityRequestList = new RoomAvailabilityRequestList();
-        $manager = $this->prophesize(RoomAvailabilityManager::class);
-        $manager
-            ->dispatchRoomAvailabilitiesRequest($roomAvailabilityRequestList)
-            ->shouldBeCalled();
-
         $controller = new BroadcastListenerController();
-        $response = $controller->roomAvailabilityListener($roomAvailabilityRequestList, $manager->reveal());
+        $this->messageBus->expects($this->once())
+            ->method('dispatch')
+            ->willReturn($this->envelope);
+        $response = $controller->roomAvailabilityListener($roomAvailabilityRequestList, $this->messageBus);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }
@@ -173,13 +169,11 @@ class BroadcastListenerControllerTest extends TestCase
     public function testHandleRoomPriceSuccessfully()
     {
         $roomPriceRequestList = new RoomPriceRequestList();
-        $manager = $this->prophesize(RoomPriceManager::class);
-        $manager
-            ->dispatchRoomPricesRequest($roomPriceRequestList)
-            ->shouldBeCalled();
-
         $controller = new BroadcastListenerController();
-        $response = $controller->roomPriceListener($roomPriceRequestList, $manager->reveal());
+        $this->messageBus->expects($this->once())
+            ->method('dispatch')
+            ->willReturn($this->envelope);
+        $response = $controller->roomPriceListener($roomPriceRequestList, $this->messageBus);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(202, $response->getStatusCode());
     }

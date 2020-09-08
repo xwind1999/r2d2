@@ -12,8 +12,6 @@ use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
 use App\Contract\Request\BroadcastListener\RoomPriceRequest;
 use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
-use App\Manager\RoomAvailabilityManager;
-use App\Manager\RoomPriceManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
@@ -152,9 +150,9 @@ class BroadcastListenerController
      */
     public function roomAvailabilityListener(
         RoomAvailabilityRequestList $roomAvailabilityRequestList,
-        RoomAvailabilityManager $roomAvailabilityManager
+        MessageBusInterface $messageBus
     ): Response {
-        $roomAvailabilityManager->dispatchRoomAvailabilitiesRequest($roomAvailabilityRequestList);
+        $messageBus->dispatch($roomAvailabilityRequestList);
 
         return new Response(null, 202);
     }
@@ -181,9 +179,9 @@ class BroadcastListenerController
      */
     public function roomPriceListener(
         RoomPriceRequestList $roomPriceRequestList,
-        RoomPriceManager $roomPriceManager
+        MessageBusInterface $messageBus
     ): Response {
-        $roomPriceManager->dispatchRoomPricesRequest($roomPriceRequestList);
+        $messageBus->dispatch($roomPriceRequestList);
 
         return new Response(null, 202);
     }

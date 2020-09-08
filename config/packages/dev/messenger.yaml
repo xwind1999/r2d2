@@ -59,17 +59,18 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            broadcast-listeners-room-price:
+            listener-room-price:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        broadcast-listeners-room-price:
-                            binding_keys: [broadcast-listeners-room-price]
+                        listener-room-price:
+                            binding_keys: [listener-room-price]
                             arguments:
                                 x-queue-type: quorum
+                                x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: broadcast-listeners-room-price
+                        default_publish_routing_key: listener-room-price
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
@@ -127,17 +128,48 @@ framework:
                         type: direct
                         default_publish_routing_key: failed-broadcast-listeners
 
-            broadcast-listeners-room-availability:
+            listener-room-availability:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        broadcast-listeners-room-availability:
-                            binding_keys: [broadcast-listeners-room-availability]
+                        listener-room-availability:
+                            binding_keys: [listener-room-availability]
                             arguments:
                                 x-queue-type: quorum
+                                x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: broadcast-listeners-room-availability
+                        default_publish_routing_key: listener-room-availability
+                retry_strategy:
+                    service: App\Messenger\RetryCustomStrategy
+
+            listener-room-availability-list:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        listener-room-availability-list:
+                            binding_keys: [ listener-room-availability-list ]
+                            arguments:
+                                x-queue-type: quorum
+                                x-max-in-memory-length: 100000
+                    exchange:
+                        type: direct
+                        default_publish_routing_key: listener-room-availability-list
+                retry_strategy:
+                    service: App\Messenger\RetryCustomStrategy
+
+            listener-room-price-list:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        listener-room-price-list:
+                            binding_keys: [ listener-room-price-list ]
+                            arguments:
+                                x-queue-type: quorum
+                                x-max-in-memory-length: 100000
+                    exchange:
+                        type: direct
+                        default_publish_routing_key: listener-room-price-list
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
@@ -162,8 +194,10 @@ framework:
             'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
             'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
             'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
-            'App\Contract\Request\BroadcastListener\RoomAvailabilityRequest': broadcast-listeners-room-availability
-            'App\Contract\Request\BroadcastListener\RoomPriceRequest': broadcast-listeners-room-price
+            'App\Contract\Request\BroadcastListener\RoomAvailabilityRequest': listener-room-availability
+            'App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList': listener-room-availability-list
+            'App\Contract\Request\BroadcastListener\RoomPriceRequest': listener-room-price
+            'App\Contract\Request\BroadcastListener\RoomPriceRequestList': listener-room-price-list
             'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
             'App\Contract\Request\EAI\RoomRequest': push-room-information
             'App\Contract\Request\EAI\ChannelManagerBookingRequest': push-booking-cmh
@@ -173,3 +207,6 @@ framework:
             default:
                 middleware:
                     - App\Messenger\NewrelicMessengerMiddleware
+
+        serializer:
+            default_serializer: 'App\Helper\Serializer\IgbinarySerializer'
