@@ -70,6 +70,8 @@ services:
     <<: *worker-template
     environment:
       QUEUES: listener-room-availability
+    deploy:
+      replicas: 10
 
   worker-listener-room-availability-list:
     <<: *worker-template
@@ -80,6 +82,8 @@ services:
     <<: *worker-template
     environment:
       QUEUES: listener-room-price
+    deploy:
+      replicas: 10
 
   worker-listener-room-price-list:
     <<: *worker-template
@@ -92,3 +96,10 @@ services:
       QUEUES: calculate-flat-manageable-component
     deploy:
       replicas: 10
+
+  worker-fallback:
+    <<: *worker-template
+    environment:
+      QUEUES: fallback-queue
+    deploy:
+      replicas: 0
