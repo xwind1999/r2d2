@@ -3,59 +3,63 @@ framework:
 
         transports:
             # https://symfony.com/doc/current/messenger.html#transports
-            broadcast-listeners-partner:
+            listener-partner:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        broadcast-listeners-partner:
-                            binding_keys: [broadcast-listeners-partner]
+                        listener-partner:
+                            binding_keys: [listener-partner]
                             arguments:
                                 x-queue-type: quorum
+                                x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: broadcast-listeners-partner
+                        default_publish_routing_key: listener-partner
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            broadcast-listeners-product:
+            listener-product:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        broadcast-listeners-product:
-                            binding_keys: [broadcast-listeners-product]
+                        listener-product:
+                            binding_keys: [listener-product]
                             arguments:
                                 x-queue-type: quorum
+                                x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: broadcast-listeners-product
+                        default_publish_routing_key: listener-product
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            broadcast-listeners-product-relationship:
+            listener-product-relationship:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        broadcast-listeners-product-relationship:
-                            binding_keys: [broadcast-listeners-product-relationship]
+                        listener-product-relationship:
+                            binding_keys: [listener-product-relationship]
                             arguments:
                                 x-queue-type: quorum
+                                x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: broadcast-listeners-product-relationship
+                        default_publish_routing_key: listener-product-relationship
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            broadcast-listeners-price-information:
+            listener-price-information:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        broadcast-listeners-price-information:
-                            binding_keys: [broadcast-listeners-price-information]
+                        listener-price-information:
+                            binding_keys: [listener-price-information]
                             arguments:
                                 x-queue-type: quorum
+                                x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: broadcast-listeners-price-information
+                        default_publish_routing_key: listener-price-information
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
@@ -82,6 +86,7 @@ framework:
                             binding_keys: [calculate-manageable-flag]
                             arguments:
                                 x-queue-type: quorum
+                                x-max-in-memory-length: 100000
                     exchange:
                         type: direct
                         default_publish_routing_key: calculate-manageable-flag
@@ -96,6 +101,7 @@ framework:
                             binding_keys: [push-room-information]
                             arguments:
                                 x-queue-type: quorum
+                                x-max-in-memory-length: 100000
                     exchange:
                         type: direct
                         default_publish_routing_key: push-room-information
@@ -110,23 +116,25 @@ framework:
                             binding_keys: [push-booking-cmh]
                             arguments:
                                 x-queue-type: quorum
+                                x-max-in-memory-length: 100000
                     exchange:
                         type: direct
                         default_publish_routing_key: push-booking-cmh
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            failed-broadcast-listeners:
+            failed-listener:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        failed-broadcast-listeners:
-                            binding_keys: [failed-broadcast-listeners]
+                        failed-listener:
+                            binding_keys: [failed-listener]
                             arguments:
                                 x-queue-type: quorum
+                                x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: failed-broadcast-listeners
+                        default_publish_routing_key: failed-listener
 
             listener-room-availability:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -206,10 +214,10 @@ framework:
 
         routing:
             # Route your messages to the transports
-            'App\Contract\Request\BroadcastListener\PartnerRequest': broadcast-listeners-partner
-            'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
-            'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
-            'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
+            'App\Contract\Request\BroadcastListener\PartnerRequest': listener-partner
+            'App\Contract\Request\BroadcastListener\ProductRequest': listener-product
+            'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': listener-product-relationship
+            'App\Contract\Request\BroadcastListener\PriceInformationRequest': listener-price-information
             'App\Contract\Request\BroadcastListener\RoomAvailabilityRequest': listener-room-availability
             'App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList': listener-room-availability-list
             'App\Contract\Request\BroadcastListener\RoomPriceRequest': listener-room-price

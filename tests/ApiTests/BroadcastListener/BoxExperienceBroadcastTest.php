@@ -69,7 +69,7 @@ class BoxExperienceBroadcastTest extends IntegrationTestCase
         $response = self::$broadcastListenerHelper->testBoxExperienceRelationship($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
-        $this->consume('broadcast-listeners-product-relationship');
+        $this->consume('listener-product-relationship');
 
         /** @var BoxExperienceRepository $boxExperienceRepository */
         $boxExperienceRepository = self::$container->get(BoxExperienceRepository::class);

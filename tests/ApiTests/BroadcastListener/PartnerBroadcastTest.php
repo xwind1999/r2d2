@@ -20,7 +20,7 @@ class PartnerBroadcastTest extends IntegrationTestCase
         $response = self::$broadcastListenerHelper->testPartners($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
-        $this->consume('broadcast-listeners-partner');
+        $this->consume('listener-partner');
 
         /** @var PartnerRepository $partnerRepository */
         $partnerRepository = self::$container->get(PartnerRepository::class);

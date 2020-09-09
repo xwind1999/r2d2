@@ -10,10 +10,10 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class IntegrationTestCase extends ApiTestCase
 {
-    protected const QUEUE_BROADCAST_PRODUCT = 'broadcast-listeners-product';
-    protected const QUEUE_BROADCAST_RELATIONSHIP = 'broadcast-listeners-product-relationship';
+    protected const QUEUE_BROADCAST_PRODUCT = 'listener-product';
+    protected const QUEUE_BROADCAST_RELATIONSHIP = 'listener-product-relationship';
     protected const QUEUE_CALCULATE_MANAGEABLE_FLAG = 'calculate-manageable-flag';
-    protected const QUEUE_BROADCAST_PARTNER = 'broadcast-listeners-partner';
+    protected const QUEUE_BROADCAST_PARTNER = 'listener-partner';
 
     public static function setUpBeforeClass(): void
     {
