@@ -77,29 +77,6 @@ class AvailabilityHelper
         array $availabilities,
         int $duration,
         string $partnerId,
-        bool $isSellable,
-        string $partnerCurrency,
-        ?string $boxCurrency
-    ): array {
-        $partnerCurrency = strtoupper($partnerCurrency);
-        $boxCurrency = $boxCurrency ? strtoupper($boxCurrency) : '';
-        $isUpsell = (true === $isSellable && $partnerCurrency === $boxCurrency);
-
-        return [
-            'Availabilities' => $availabilities,
-            'PrestId' => 1,
-            'Duration' => $duration,
-            'LiheId' => 1,
-            'PartnerCode' => $partnerId,
-            'ExtraNight' => $isUpsell,
-            'ExtraRoom' => $isUpsell,
-        ];
-    }
-
-    public static function buildDataForGetPackageV2(
-        array $availabilities,
-        int $duration,
-        string $partnerId,
         bool $isSellable
     ): array {
         return [

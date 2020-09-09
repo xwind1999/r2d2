@@ -10,7 +10,6 @@ use App\Contract\Response\CMHub\CMHubErrorResponse;
 use App\Contract\Response\CMHub\CMHubResponse;
 use App\Contract\Response\CMHub\GetAvailability\AvailabilityResponse;
 use App\Contract\Response\CMHub\GetAvailabilityResponse;
-use App\Entity\BoxExperience;
 use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
@@ -107,7 +106,6 @@ class AvailabilityProvider
             $componentGoldenId = '';
             $roomPrices = [];
             $componentSellable = false;
-            $box = null;
         } else {
             $roomAvailabilities = $this->getRoomAvailabilitiesAndFilterCeasePartnerByComponent(
                 $experienceComponent->component,
@@ -123,10 +121,6 @@ class AvailabilityProvider
             );
             $componentGoldenId = $experienceComponent->componentGoldenId;
             $componentSellable = $experienceComponent->component->isSellable;
-
-            /** @var BoxExperience $boxExperience */
-            $boxExperience = $experienceComponent->experience->boxExperience->first();
-            $box = $boxExperience->box;
         }
 
         $roomAvailabilities = AvailabilityHelper::fillMissingAvailabilities(
@@ -141,8 +135,6 @@ class AvailabilityProvider
             'isSellable' => $componentSellable,
             'availabilities' => $roomAvailabilities,
             'prices' => $roomPrices,
-            'box' => $box,
-            'partner' => $partner,
         ];
     }
 

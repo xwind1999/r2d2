@@ -55,8 +55,6 @@ class LegacyAvailabilityProvider
                         $availabilitiesFromDB['duration'],
                         $partner->goldenId,
                         $availabilitiesFromDB['isSellable'],
-                        $availabilitiesFromDB['partner']->currency,
-                        $availabilitiesFromDB['box']->currency,
                     ),
                 ],
             ];
@@ -111,7 +109,7 @@ class LegacyAvailabilityProvider
                 $availabilitiesArray['ListPackage'][] = [
                     'PackageCode' => $availability['experienceId'],
                     'ListPrestation' => [
-                        AvailabilityHelper::buildDataForGetPackageV2(
+                        AvailabilityHelper::buildDataForGetPackage(
                             AvailabilityHelper::convertToShortType($availability['availabilities']),
                             $availability['duration'],
                             $availability['partnerId'],
@@ -138,13 +136,8 @@ class LegacyAvailabilityProvider
             $dateFrom,
             $dateTo
         );
-        $availabilities = [];
-        $boxCurrency = '';
-        $partnerCurrency = strtoupper($roomAvailabilityAndPrices['partner']->currency);
-        if ($roomAvailabilityAndPrices['box']->currency) {
-            $boxCurrency = strtoupper($roomAvailabilityAndPrices['box']->currency);
-        }
 
+        $availabilities = [];
         foreach ($roomAvailabilityAndPrices['availabilities'] as $date => $availability) {
             $availability = [
                 'Date' => (new \DateTime($date))->format('Y-m-d\TH:i:s.u'),
@@ -158,7 +151,7 @@ class LegacyAvailabilityProvider
                 'BuyingPrice' => 0,
             ];
 
-            if (isset($roomAvailabilityAndPrices['prices'][$date]) && $partnerCurrency === $boxCurrency) {
+            if (isset($roomAvailabilityAndPrices['prices'][$date])) {
                 $availability['SellingPrice'] = $roomAvailabilityAndPrices['prices'][$date]->price / 100;
                 $availability['BuyingPrice'] = $roomAvailabilityAndPrices['prices'][$date]->price / 100;
             }

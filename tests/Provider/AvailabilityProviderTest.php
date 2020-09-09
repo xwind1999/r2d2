@@ -313,8 +313,6 @@ class AvailabilityProviderTest extends TestCase
                 '2020-06-22' => $prices['2020-06-22'],
                 '2020-06-23' => $prices['2020-06-23'],
             ],
-            'box' => $box,
-            'partner' => $partner,
         ];
 
         $this->assertEquals(
@@ -350,8 +348,6 @@ class AvailabilityProviderTest extends TestCase
                 '2020-06-25' => ['stock' => 0, 'date' => new \DateTime('2020-06-25'), 'type' => 'stock', 'componentGoldenId' => '', 'isStopSale' => true],
             ],
             'prices' => [],
-            'box' => null,
-            'partner' => $partner,
         ];
         $this->assertEquals($expectedArray, $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo));
     }
