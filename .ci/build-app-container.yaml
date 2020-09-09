@@ -8,6 +8,7 @@ build-base-image:
   image: docker:dind
   only:
     - CI-master
+    - newrelic-upgrade
   script:
     - >
       docker build --pull
@@ -19,6 +20,7 @@ build-validation-image:
   image: docker:dind
   only:
     - CI-master
+    - newrelic-upgrade
   script:
     - >
       docker build --pull
