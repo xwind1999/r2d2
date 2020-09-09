@@ -12,4 +12,7 @@ if [[ ! -z "$NR_APPNAME" ]]; then
     echo "newrelic.daemon.address = /tmp/.newrelic.sock" >> /usr/local/etc/php/conf.d/newrelic.ini
     echo "newrelic.daemon.location = /usr/bin/newrelic-daemon.x64" >> /usr/local/etc/php/conf.d/newrelic.ini
     echo "newrelic.process_host.display_name = \"$NR_HOST-$HOSTNAME\"" >> /usr/local/etc/php/conf.d/newrelic.ini
+    echo "newrelic.transaction_tracer.enabled = true" >> /usr/local/etc/php/conf.d/newrelic.ini
+    echo "newrelic.distributed_tracing_enabled = true" >> /usr/local/etc/php/conf.d/newrelic.ini
+    echo "newrelic.span_events_enabled = true" >> /usr/local/etc/php/conf.d/newrelic.ini
 fi
