@@ -86,3 +86,10 @@ services:
     <<: *worker-template
     environment:
       QUEUES: calculate-flat-manageable-component
+
+  worker-fallback:
+    <<: *worker-template
+    environment:
+      QUEUES: fallback-queue
+    deploy:
+      replicas: 0
