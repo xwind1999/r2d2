@@ -131,22 +131,6 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            failed-listeners:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
-                options:
-                    queues:
-                        failed-listeners:
-                            binding_keys: [failed-listeners]
-                            arguments:
-                                x-queue-type: quorum
-                                x-max-in-memory-length: 100000
-                    exchange:
-                        type: direct
-                        default_publish_routing_key: failed-listeners
-                    auto_setup: false
-                retry_strategy:
-                    service: App\Messenger\RetryCustomStrategy
-
             listener-room-availability:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
