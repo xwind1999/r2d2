@@ -65,15 +65,25 @@ services:
     environment:
       QUEUES: push-room-information
 
-  worker-broadcast-listeners-room-availability:
+  worker-listener-room-availability:
     <<: *worker-template
     environment:
-      QUEUES: broadcast-listeners-room-availability
+      QUEUES: listener-room-availability
 
-  worker-broadcast-listeners-room-price:
+  worker-listener-room-availability-list:
     <<: *worker-template
     environment:
-      QUEUES: broadcast-listeners-room-price
+      QUEUES: listener-room-availability-list
+
+  worker-listener-room-price:
+    <<: *worker-template
+    environment:
+      QUEUES: listener-room-price
+
+  worker-listener-room-price-list:
+    <<: *worker-template
+    environment:
+      QUEUES: listener-room-price-list
 
   calculate-flat-manageable-component:
     <<: *worker-template
