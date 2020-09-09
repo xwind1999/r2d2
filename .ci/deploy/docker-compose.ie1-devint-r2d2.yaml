@@ -2,6 +2,7 @@ version: '3.4'
 
 x-service-template: &service-template
   image: "${APP_IMAGE}"
+  hostname: '{{.Node.Hostname}}'
   env_file:
     - "${ENV_FILE}"
   volumes:
