@@ -3,31 +3,31 @@ framework:
 
         transports:
         # https://symfony.com/doc/current/messenger.html#transports
-            broadcast-listeners-partner:
+            listener-partner:
                 dsn: 'doctrine://default'
                 options:
-                    queue_name: broadcast-listeners-partner
+                    queue_name: listener-partner
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            broadcast-listeners-product:
+            listener-product:
                 dsn: 'doctrine://default'
                 options:
-                    queue_name: broadcast-listeners-product
+                    queue_name: listener-product
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            broadcast-listeners-product-relationship:
+            listener-product-relationship:
                 dsn: 'doctrine://default'
                 options:
-                    queue_name: broadcast-listeners-product-relationship
+                    queue_name: listener-product-relationship
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            broadcast-listeners-price-information:
+            listener-price-information:
                 dsn: 'doctrine://default'
                 options:
-                    queue_name: broadcast-listeners-price-information
+                    queue_name: listener-price-information
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
@@ -59,10 +59,10 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            failed-broadcast-listeners:
+            failed-listener:
                 dsn: 'doctrine://default'
                 options:
-                    queue_name: failed-broadcast-listeners
+                    queue_name: failed-listener
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
@@ -96,10 +96,10 @@ framework:
 
         routing:
         # Route your messages to the transports
-            'App\Contract\Request\BroadcastListener\PartnerRequest': broadcast-listeners-partner
-            'App\Contract\Request\BroadcastListener\ProductRequest': broadcast-listeners-product
-            'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': broadcast-listeners-product-relationship
-            'App\Contract\Request\BroadcastListener\PriceInformationRequest': broadcast-listeners-price-information
+            'App\Contract\Request\BroadcastListener\PartnerRequest': listener-partner
+            'App\Contract\Request\BroadcastListener\ProductRequest': listener-product
+            'App\Contract\Request\BroadcastListener\ProductRelationshipRequest': listener-product-relationship
+            'App\Contract\Request\BroadcastListener\PriceInformationRequest': listener-price-information
             'App\Contract\Request\BroadcastListener\RoomAvailabilityRequest': listener-room-availability
             'App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList': listener-room-availability-list
             'App\Contract\Request\BroadcastListener\RoomPriceRequest': listener-room-price

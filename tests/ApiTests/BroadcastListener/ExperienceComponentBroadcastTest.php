@@ -74,7 +74,7 @@ class ExperienceComponentBroadcastTest extends IntegrationTestCase
         $response = self::$broadcastListenerHelper->testExperienceComponentRelationship($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
-        $this->consume('broadcast-listeners-product-relationship');
+        $this->consume('listener-product-relationship');
 
         /** @var ExperienceComponentRepository $experienceComponentRepository */
         $experienceComponentRepository = self::$container->get(ExperienceComponentRepository::class);

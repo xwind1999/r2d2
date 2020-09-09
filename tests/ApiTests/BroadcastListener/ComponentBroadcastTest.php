@@ -38,7 +38,7 @@ class ComponentBroadcastTest extends IntegrationTestCase
         $response = self::$broadcastListenerHelper->testComponentProduct($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
-        $this->consume('broadcast-listeners-product');
+        $this->consume('listener-product');
 
         /** @var ComponentRepository $componentRepository */
         $componentRepository = self::$container->get(ComponentRepository::class);
@@ -80,7 +80,7 @@ class ComponentBroadcastTest extends IntegrationTestCase
         $response = self::$broadcastListenerHelper->testComponentProduct($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
-        $this->consume('broadcast-listeners-product');
+        $this->consume('listener-product');
 
         /** @var ComponentRepository $componentRepository */
         $componentRepository = self::$container->get(ComponentRepository::class);

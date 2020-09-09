@@ -31,25 +31,25 @@ services:
     <<: *service-template
     command: ['/app/bin/start-crond.sh']
 
-  worker-broadcast-listeners-partner:
+  worker-listener-partner:
     <<: *worker-template
     environment:
-      QUEUES: broadcast-listeners-partner
+      QUEUES: listener-partner
 
-  worker-broadcast-listeners-product:
+  worker-listener-product:
     <<: *worker-template
     environment:
-      QUEUES: broadcast-listeners-product
+      QUEUES: listener-product
 
-  worker-broadcast-listeners-price-information:
+  worker-listener-price-information:
     <<: *worker-template
     environment:
-      QUEUES: broadcast-listeners-price-information
+      QUEUES: listener-price-information
 
-  worker-broadcast-listeners-product-relationship:
+  worker-listener-product-relationship:
     <<: *worker-template
     environment:
-      QUEUES: broadcast-listeners-product-relationship
+      QUEUES: listener-product-relationship
 
   worker-calculate-manageable-flag:
     <<: *worker-template

@@ -31,7 +31,7 @@ class BoxBroadcastTest extends IntegrationTestCase
         $response = self::$broadcastListenerHelper->testBoxProduct($payload);
         $this->assertEquals(202, $response->getStatusCode());
 
-        $this->consume('broadcast-listeners-product');
+        $this->consume('listener-product');
 
         /** @var BoxRepository $boxRepository */
         $boxRepository = self::$container->get(BoxRepository::class);
