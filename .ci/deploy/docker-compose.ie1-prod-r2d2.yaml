@@ -57,14 +57,14 @@ services:
   worker-calculate-manageable-flag:
     <<: *worker-template
     environment:
-      QUEUES: calculate-manageable-flag
+      QUEUES: event-calculate-manageable-flag
     deploy:
       replicas: 10
 
   worker-push-room-information:
     <<: *worker-template
     environment:
-      QUEUES: push-room-information
+      QUEUES: event-push-room-type-information
 
   worker-listener-room-availability:
     <<: *worker-template
@@ -96,6 +96,11 @@ services:
       QUEUES: calculate-flat-manageable-component
     deploy:
       replicas: 10
+
+  calculate-push-booking-information:
+    <<: *worker-template
+    environment:
+      QUEUES: event-push-booking-information
 
   worker-fallback:
     <<: *worker-template

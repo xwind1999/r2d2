@@ -12,7 +12,7 @@ class IntegrationTestCase extends ApiTestCase
 {
     protected const QUEUE_BROADCAST_PRODUCT = 'listener-product';
     protected const QUEUE_BROADCAST_RELATIONSHIP = 'listener-product-relationship';
-    protected const QUEUE_CALCULATE_MANAGEABLE_FLAG = 'calculate-manageable-flag';
+    protected const QUEUE_CALCULATE_MANAGEABLE_FLAG = 'event-calculate-manageable-flag';
     protected const QUEUE_BROADCAST_PARTNER = 'listener-partner';
 
     public static function setUpBeforeClass(): void

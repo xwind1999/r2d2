@@ -78,63 +78,63 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            calculate-manageable-flag:
+            event-calculate-manageable-flag:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        calculate-manageable-flag:
-                            binding_keys: [calculate-manageable-flag]
+                        event-calculate-manageable-flag:
+                            binding_keys: [event-calculate-manageable-flag]
                             arguments:
                                 x-queue-type: quorum
                                 x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: calculate-manageable-flag
+                        default_publish_routing_key: event-calculate-manageable-flag
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            push-room-information:
+            event-push-room-type-information:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        push-room-information:
-                            binding_keys: [push-room-information]
+                        event-push-room-type-information:
+                            binding_keys: [event-push-room-type-information]
                             arguments:
                                 x-queue-type: quorum
                                 x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: push-room-information
+                        default_publish_routing_key: event-push-room-type-information
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            push-booking-cmh:
+            event-push-booking-information:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        push-room-information:
-                            binding_keys: [push-booking-cmh]
+                        event-push-booking-information:
+                            binding_keys: [event-push-booking-information]
                             arguments:
                                 x-queue-type: quorum
                                 x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: push-booking-cmh
+                        default_publish_routing_key: event-push-booking-information
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            failed-listener:
+            failed-listeners:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        failed-listener:
-                            binding_keys: [failed-listener]
+                        failed-listeners:
+                            binding_keys: [failed-listeners]
                             arguments:
                                 x-queue-type: quorum
                                 x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: failed-listener
+                        default_publish_routing_key: failed-listeners
 
             listener-room-availability:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
@@ -181,18 +181,18 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            calculate-flat-manageable-component:
+            event-calculate-flat-manageable-component:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queues:
-                        calculate-flat-manageable-component:
-                            binding_keys: [calculate-flat-manageable-component]
+                        event-calculate-flat-manageable-component:
+                            binding_keys: [event-calculate-flat-manageable-component]
                             arguments:
                                 x-queue-type: quorum
                                 x-max-in-memory-length: 100000
                     exchange:
                         type: direct
-                        default_publish_routing_key: calculate-flat-manageable-component
+                        default_publish_routing_key: event-calculate-flat-manageable-component
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
@@ -208,7 +208,6 @@ framework:
                     exchange:
                         type: direct
                         default_publish_routing_key: fallback-queue
-                    auto_setup: false
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
@@ -222,10 +221,10 @@ framework:
             'App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList': listener-room-availability-list
             'App\Contract\Request\BroadcastListener\RoomPriceRequest': listener-room-price
             'App\Contract\Request\BroadcastListener\RoomPriceRequestList': listener-room-price-list
-            'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
-            'App\Contract\Request\EAI\RoomRequest': push-room-information
-            'App\Contract\Request\EAI\ChannelManagerBookingRequest': push-booking-cmh
-            'App\Contract\Message\CalculateFlatManageableComponent': calculate-flat-manageable-component
+            'App\Contract\Request\Manageable\ManageableProductRequest': event-calculate-manageable-flag
+            'App\Contract\Request\EAI\RoomRequest': event-push-room-type-information
+            'App\Contract\Request\EAI\ChannelManagerBookingRequest': event-push-booking-information
+            'App\Contract\Message\CalculateFlatManageableComponent': event-calculate-flat-manageable-component
 
         buses:
             default:
