@@ -59,13 +59,6 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            failed-listener:
-                dsn: 'doctrine://default'
-                options:
-                    queue_name: failed-listener
-                retry_strategy:
-                    service: App\Messenger\RetryCustomStrategy
-
             listener-room-availability:
                 dsn: 'doctrine://default'
                 options:
