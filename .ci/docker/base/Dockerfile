@@ -14,9 +14,20 @@ RUN sed -i '/xfs/ s/33/82/g' /etc/passwd;\
     chown 33.33 /app -R;\
     chown 33.33 /home/www-data -R;
 
-RUN apk add sudo libxml2-dev icu-dev runit openssh-client curl git bash rabbitmq-c-dev && apk add --virtual purgable-deps $PHPIZE_DEPS
+RUN apk add sudo libxml2-dev icu-dev runit openssh-client curl git bash rabbitmq-c-dev libmemcached libmemcached-dev && apk add --virtual purgable-deps $PHPIZE_DEPS
 
-RUN docker-php-ext-install pcntl soap pdo_mysql sockets intl opcache && pecl install amqp && docker-php-ext-enable amqp && apk del purgable-deps
+RUN docker-php-ext-install pcntl soap pdo_mysql sockets intl opcache \
+    && pecl install amqp igbinary \
+    && docker-php-ext-enable amqp igbinary;
+
+RUN pecl install --nobuild memcached \
+    && cd "$(pecl config-get temp_dir)/memcached" \
+    && phpize \
+    && ./configure --enable-memcached-igbinary \
+    && make -j$(nproc) \
+    && make install \
+    && docker-php-ext-enable memcached \
+    && apk del purgable-deps;
 
 COPY ./newrelic_install.sh /
 RUN /newrelic_install.sh
