@@ -38,24 +38,24 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            calculate-manageable-flag:
+            event-calculate-manageable-flag:
                 dsn: 'doctrine://default'
                 options:
-                    queue_name: calculate-manageable-flag
+                    queue_name: event-calculate-manageable-flag
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            push-room-information:
+            event-push-room-type-information:
                 dsn: 'doctrine://default'
                 options:
-                    queue_name: push-room-information
+                    queue_name: event-push-room-type-information
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            push-booking-cmh:
+            event-push-booking-information:
                 dsn: 'doctrine://default'
                 options:
-                    queue_name: push-booking-cmh
+                    queue_name: event-push-booking-information
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
@@ -87,10 +87,10 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
-            calculate-flat-manageable-component:
+            event-calculate-flat-manageable-component:
                 dsn: 'doctrine://default'
                 options:
-                    queue_name: calculate-flat-manageable-component
+                    queue_name: event-calculate-flat-manageable-component
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
@@ -104,10 +104,10 @@ framework:
             'App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList': listener-room-availability-list
             'App\Contract\Request\BroadcastListener\RoomPriceRequest': listener-room-price
             'App\Contract\Request\BroadcastListener\RoomPriceRequestList': listener-room-price-list
-            'App\Contract\Request\Manageable\ManageableProductRequest': calculate-manageable-flag
-            'App\Contract\Request\EAI\RoomRequest': push-room-information
-            'App\Contract\Request\EAI\ChannelManagerBookingRequest': push-booking-cmh
-            'App\Contract\Message\CalculateFlatManageableComponent': calculate-flat-manageable-component
+            'App\Contract\Request\Manageable\ManageableProductRequest': event-calculate-manageable-flag
+            'App\Contract\Request\EAI\RoomRequest': event-push-room-type-information
+            'App\Contract\Request\EAI\ChannelManagerBookingRequest': event-push-booking-information
+            'App\Contract\Message\CalculateFlatManageableComponent': event-calculate-flat-manageable-component
 
         buses:
             default:
