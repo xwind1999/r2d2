@@ -108,8 +108,6 @@ class AvailabilityHelperTest extends TestCase
         $duration = 1;
         $partnerId = '1234';
         $isSellable = false;
-        $partnerCurrency = 'EUR';
-        $boxCurrency = 'BRL';
 
         $returnArray = [
             'Availabilities' => $availabilities,
@@ -128,39 +126,6 @@ class AvailabilityHelperTest extends TestCase
                 $duration,
                 $partnerId,
                 $isSellable,
-                $partnerCurrency,
-                $boxCurrency
-            )
-        );
-    }
-
-    /**
-     * @covers ::buildDataForGetPackageV2
-     */
-    public function testBuildDataForGetPackageV2(): void
-    {
-        $availabilities = ['1', '1', '1'];
-        $duration = 1;
-        $partnerId = '1234';
-        $isSellable = true;
-
-        $returnArray = [
-            'Availabilities' => $availabilities,
-            'PrestId' => 1,
-            'Duration' => $duration,
-            'LiheId' => 1,
-            'PartnerCode' => $partnerId,
-            'ExtraNight' => $isSellable,
-            'ExtraRoom' => $isSellable,
-        ];
-
-        $this->assertEquals(
-            $returnArray,
-            AvailabilityHelper::buildDataForGetPackageV2(
-                $availabilities,
-                $duration,
-                $partnerId,
-                $isSellable
             )
         );
     }
