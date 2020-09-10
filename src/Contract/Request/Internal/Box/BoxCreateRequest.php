@@ -43,4 +43,11 @@ class BoxCreateRequest implements RequestBodyInterface, ValidatableRequest
      * @JMS\Type("string")
      */
     public string $status;
+
+    /**
+     * @Assert\Currency()
+     *
+     * @JMS\Type("string")
+     */
+    public ?string $currency = null;
 }

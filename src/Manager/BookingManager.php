@@ -14,6 +14,7 @@ use App\Event\BookingStatusEvent;
 use App\Exception\Booking\BadPriceException;
 use App\Exception\Booking\BookingAlreadyInFinalStatusException;
 use App\Exception\Booking\BookingHasExpiredException;
+use App\Exception\Booking\CurrencyMismatchException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
 use App\Exception\Booking\InvalidBookingNewStatus;
@@ -125,6 +126,7 @@ class BookingManager
          * 6. only one room entry can have extra_room=false
          * 7. all rooms should have the same duration
          * 8. cannot have the same date in two entries for a room
+         * 9. do not allow mismatch between box currency and partner currency with upsell
          */
 
         if ($booking->endDate->diff($booking->startDate)->days < $minimumDuration) {
@@ -132,6 +134,10 @@ class BookingManager
         }
 
         $processedIncludedRoom = false;
+
+        // validation #9
+        $boxCurrency = isset($box->currency) ? strtoupper($box->currency) : '';
+        $isDifferentCurrency = strtoupper($partner->currency) !== $boxCurrency;
 
         foreach ($bookingCreateRequest->rooms as $roomIndex => $room) {
             // validating #6
@@ -171,6 +177,12 @@ class BookingManager
                 }
 
                 $day = $date->day->format('Y-m-d');
+
+                // validation #9
+                if ($isDifferentCurrency && (true === $date->extraNight || true === $room->extraRoom)) {
+                    throw new CurrencyMismatchException();
+                }
+
                 $totalPrice += $price;
                 $bookedDates[$day] = isset($bookedDates[$day]) ? $bookedDates[$day] + 1 : 1;
 

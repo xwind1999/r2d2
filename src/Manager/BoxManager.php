@@ -34,6 +34,7 @@ class BoxManager
         $box->brand = $boxCreateRequest->brand;
         $box->country = $boxCreateRequest->country;
         $box->status = $boxCreateRequest->status;
+        $box->currency = $boxCreateRequest->currency;
 
         $this->repository->save($box);
 
@@ -68,6 +69,7 @@ class BoxManager
         $box->brand = $boxUpdateRequest->brand;
         $box->country = $boxUpdateRequest->country;
         $box->status = $boxUpdateRequest->status;
+        $box->currency = $boxUpdateRequest->currency;
 
         $this->repository->save($box);
 
