@@ -96,3 +96,5 @@ services:
     <<: *worker-template
     environment:
       QUEUES: fallback-queue
+    deploy:
+      replicas: 0
