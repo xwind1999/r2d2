@@ -16,11 +16,14 @@ class MemcachedWrapper
 
     private string $dsn;
 
+    private string $environmentName;
+
     private ?\Memcached $client = null;
 
-    public function __construct(string $dsn)
+    public function __construct(string $dsn, string $environmentName)
     {
         $this->dsn = $dsn;
+        $this->environmentName = $environmentName;
     }
 
     private function getClient(): \Memcached
@@ -37,7 +40,7 @@ class MemcachedWrapper
      */
     public function get(string $key)
     {
-        $data = $this->getClient()->get($key);
+        $data = $this->getClient()->get($this->prefixKey($key));
 
         if (!$data && \Memcached::RES_SUCCESS !== $this->getClient()->getResultCode()) {
             throw new ResourceNotCachedException();
@@ -51,16 +54,25 @@ class MemcachedWrapper
      */
     public function set(string $key, $value, int $duration = self::DEFAULT_LIFETIME): bool
     {
-        return $this->getClient()->set($key, $value, $duration);
+        return $this->getClient()->set($this->prefixKey($key), $value, $duration);
     }
 
     public function delete(string $key): void
     {
-        $this->getClient()->delete($key);
+        $this->getClient()->delete($this->prefixKey($key));
     }
 
     public function deleteMulti(array $keys): void
     {
+        foreach ($keys as &$key) {
+            $key = $this->prefixKey($key);
+        }
+
         $this->getClient()->deleteMulti($keys);
+    }
+
+    private function prefixKey(string $key): string
+    {
+        return $this->environmentName.$key;
     }
 }
