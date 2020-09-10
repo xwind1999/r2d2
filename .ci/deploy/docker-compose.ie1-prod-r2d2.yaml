@@ -93,7 +93,7 @@ services:
   calculate-flat-manageable-component:
     <<: *worker-template
     environment:
-      QUEUES: calculate-flat-manageable-component
+      QUEUES: event-calculate-flat-manageable-component
     deploy:
       replicas: 10
 

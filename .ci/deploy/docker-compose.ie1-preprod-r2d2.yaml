@@ -85,7 +85,7 @@ services:
   calculate-flat-manageable-component:
     <<: *worker-template
     environment:
-      QUEUES: calculate-flat-manageable-component
+      QUEUES: event-calculate-flat-manageable-component
 
   calculate-push-booking-information:
     <<: *worker-template
