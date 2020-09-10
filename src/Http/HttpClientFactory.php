@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http;
 
 use App\Http\CorrelationId\CorrelationId;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\HttpClient as SymfonyHttpClient;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class HttpClientFactory
 {

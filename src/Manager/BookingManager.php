@@ -32,7 +32,7 @@ use App\Repository\ComponentRepository;
 use App\Repository\ExperienceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class BookingManager
 {

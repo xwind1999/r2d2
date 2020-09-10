@@ -132,11 +132,16 @@ class MessengerEventsListenerTest extends TestCase
             {
                 return 'named event';
             }
+
+            public function getContext(): array
+            {
+                return ['z' => 'd'];
+            }
         };
 
         yield [
             $message,
-            ['message' => get_class($message), 'event_name' => 'named event', 'message_parsed' => $message],
+            ['message' => get_class($message), 'event_name' => 'named event', 'message_parsed' => ['z' => 'd']],
         ];
     }
 }

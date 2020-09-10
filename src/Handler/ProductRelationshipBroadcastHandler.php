@@ -8,8 +8,8 @@ use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Exception\Resolver\UnprocessableProductRelationshipTypeException;
 use App\Resolver\ProductRelationshipTypeResolver;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class ProductRelationshipBroadcastHandler implements MessageHandlerInterface
 {

@@ -13,7 +13,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ManageableProductRequest extends Event implements ContextualInterface, NamedEventInterface
 {
-    private const EVENT_NAME = 'Calculate Manageable Product';
+    protected const EVENT_NAME = 'Calculate Manageable Product';
 
     public string $boxGoldenId = '';
     public string $componentGoldenId = '';

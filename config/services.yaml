@@ -141,3 +141,12 @@ services:
             - '@cache.messenger.restart_workers_signal'
 
     App\Messenger\RetryCustomStrategy: ~
+
+    App\Cache\MemcachedWrapper:
+        arguments:
+            - '%env(MEMCACHED_DSN)%'
+
+    App\Helper\NamedEventDispatcher:
+        decorates: Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+        arguments:
+            - '@.inner'

@@ -7,8 +7,8 @@ namespace App\Handler;
 use App\Contract\Request\Manageable\ManageableProductRequest;
 use App\Resolver\ManageableProductResolver;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class ManageableProductHandler implements MessageHandlerInterface
 {
