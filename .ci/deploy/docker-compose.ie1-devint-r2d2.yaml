@@ -82,12 +82,12 @@ services:
     environment:
       QUEUES: listener-room-price-list
 
-  calculate-flat-manageable-component:
+  worker-flat-manageable-component:
     <<: *worker-template
     environment:
       QUEUES: event-calculate-flat-manageable-component
 
-  calculate-push-booking-information:
+  worker-push-booking-information:
     <<: *worker-template
     environment:
       QUEUES: event-push-booking-information
