@@ -11,7 +11,7 @@ x-service-template: &service-template
 x-worker-template: &worker-template
   <<: *service-template
   deploy:
-    replicas: 2
+    replicas: 1
   command: ['/app/bin/start-command.sh']
 
 services:
