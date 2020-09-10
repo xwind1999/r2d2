@@ -8,7 +8,7 @@ use App\Event\Http\BadResponseReceivedEvent;
 use App\Event\Http\ExternalServiceRequestMadeEvent;
 use App\Event\Http\WellFormedResponseReceivedEvent;
 use App\Exception\HttpClient\ConnectException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;

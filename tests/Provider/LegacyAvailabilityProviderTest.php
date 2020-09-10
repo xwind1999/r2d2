@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Provider;
 
+use App\Cache\QuickDataCache;
 use App\Contract\Response\QuickData\AvailabilityPricePeriodResponse;
 use App\Contract\Response\QuickData\GetPackageResponse;
 use App\Contract\Response\QuickData\GetPackageV2Response;
@@ -13,6 +14,10 @@ use App\Entity\Box;
 use App\Entity\Experience;
 use App\Entity\Partner;
 use App\Entity\RoomPrice;
+use App\Event\QuickData\BoxCacheErrorEvent;
+use App\Event\QuickData\BoxCacheHitEvent;
+use App\Event\QuickData\BoxCacheMissEvent;
+use App\Exception\Cache\ResourceNotCachedException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceManager;
 use App\Provider\AvailabilityProvider;
@@ -21,6 +26,7 @@ use JMS\Serializer\ArrayTransformerInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @coversDefaultClass \App\Provider\LegacyAvailabilityProvider
@@ -42,11 +48,33 @@ class LegacyAvailabilityProviderTest extends TestCase
      */
     protected $availabilityProvider;
 
+    /**
+     * @var ObjectProphecy|QuickDataCache
+     */
+    protected $quickDataCache;
+
+    /**
+     * @var EventDispatcherInterface|ObjectProphecy
+     */
+    protected $eventDispatcher;
+
+    protected LegacyAvailabilityProvider $legacyAvailabilityProvider;
+
     public function setUp(): void
     {
         $this->serializer = $this->prophesize(ArrayTransformerInterface::class);
         $this->experienceManager = $this->prophesize(ExperienceManager::class);
         $this->availabilityProvider = $this->prophesize(AvailabilityProvider::class);
+        $this->quickDataCache = $this->prophesize(QuickDataCache::class);
+        $this->eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
+
+        $this->legacyAvailabilityProvider = new LegacyAvailabilityProvider(
+            $this->serializer->reveal(),
+            $this->experienceManager->reveal(),
+            $this->availabilityProvider->reveal(),
+            $this->quickDataCache->reveal(),
+            $this->eventDispatcher->reveal()
+        );
     }
 
     /**
@@ -71,12 +99,6 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
 
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
-
         $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
         $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(Argument::any(), Argument::any(), Argument::any())
             ->willReturn([
@@ -92,7 +114,7 @@ class LegacyAvailabilityProviderTest extends TestCase
                 'partner' => $partner,
             ]);
 
-        $response = $legacyAvailabilityProvider->getAvailabilityForExperience('1234', $dateFrom, $dateTo);
+        $response = $this->legacyAvailabilityProvider->getAvailabilityForExperience('1234', $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageResponse::class, $response);
     }
@@ -134,13 +156,7 @@ class LegacyAvailabilityProviderTest extends TestCase
                 'partner' => $partner,
             ]);
 
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
-
-        $response = $legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
+        $response = $this->legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageResponse::class, $response);
     }
@@ -190,13 +206,7 @@ class LegacyAvailabilityProviderTest extends TestCase
                 'partner' => $partner,
             ]);
 
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
-
-        $response = $legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
+        $response = $this->legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageResponse::class, $response);
     }
@@ -237,12 +247,7 @@ class LegacyAvailabilityProviderTest extends TestCase
                 'partner' => $partner,
             ]);
 
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
-        $response = $legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
+        $response = $this->legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageResponse::class, $response);
     }
@@ -264,13 +269,8 @@ class LegacyAvailabilityProviderTest extends TestCase
         $this->experienceManager->getOneByGoldenId(Argument::any())
             ->shouldBeCalledOnce()
             ->willThrow(ExperienceNotFoundException::class);
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
 
-        $legacyAvailabilityProvider->getAvailabilityForExperience('31209470194830912', $dateFrom, $dateTo);
+        $this->legacyAvailabilityProvider->getAvailabilityForExperience('31209470194830912', $dateFrom, $dateTo);
     }
 
     /**
@@ -280,14 +280,7 @@ class LegacyAvailabilityProviderTest extends TestCase
     public function testGetAvailabilitiesForBox()
     {
         $boxId = '1234';
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-05');
-
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
+        $startDate = new \DateTime('2020-01-01');
 
         $returnArray = [
             [
@@ -315,27 +308,54 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $expected['PackagesList'] = $returnArray;
 
-        $this->assertInstanceOf(
-            GetRangeResponse::class,
-            $legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $dateFrom, $dateTo)
-        );
+        $this->quickDataCache->getBoxDate($boxId, $startDate->format('Y-m-d'))->willThrow(new ResourceNotCachedException());
+        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), Argument::type(GetRangeResponse::class))->shouldBeCalled();
+
+        $this
+            ->eventDispatcher
+            ->dispatch(new BoxCacheMissEvent($boxId, $startDate->format('Y-m-d')))
+            ->willReturn(new \stdClass())
+            ->shouldBeCalled();
+
+        $result = $this->legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $startDate);
+
+        $this->assertInstanceOf(GetRangeResponse::class, $result);
+        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), $result)->shouldHaveBeenCalled();
     }
 
     /**
      * @covers ::__construct
      * @covers ::getAvailabilitiesForBoxAndStartDate
      */
-    public function testGetAvailabilitiesForBoxWillFail()
+    public function testGetAvailabilityForBoxFromCache()
     {
         $boxId = '1234';
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-05');
+        $startDate = new \DateTime('2020-01-01');
 
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
+        $cacheResult = new GetRangeResponse();
+        $cacheResult->packagesList = ['1234'];
+
+        $this->quickDataCache->getBoxDate($boxId, $startDate->format('Y-m-d'))->willReturn($cacheResult);
+
+        $this
+            ->eventDispatcher
+            ->dispatch(new BoxCacheHitEvent($boxId, $startDate->format('Y-m-d')))
+            ->shouldBeCalled();
+
+        $result = $this->legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $startDate);
+
+        $this->assertSame($cacheResult, $result);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getAvailabilitiesForBoxAndStartDate
+     */
+    public function testGetAvailabilitiesForBoxFromCacheWillFailDueToResourceBeingCached()
+    {
+        $boxId = '1234';
+        $startDate = new \DateTime('2020-01-01');
+
         $returnArray = [];
 
         $result = $this->prophesize(GetRangeResponse::class);
@@ -348,11 +368,44 @@ class LegacyAvailabilityProviderTest extends TestCase
         )->willReturn($returnArray);
 
         $expected['PackagesList'] = [];
+        $this->quickDataCache->getBoxDate($boxId, $startDate->format('Y-m-d'))->willThrow(new ResourceNotCachedException());
+        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), Argument::type(GetRangeResponse::class))->shouldBeCalled();
+        $this->eventDispatcher->dispatch(new BoxCacheMissEvent($boxId, $startDate->format('Y-m-d')))->shouldBeCalled();
 
-        $this->assertInstanceOf(
-            GetRangeResponse::class,
-            $legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $dateFrom, $dateTo)
-        );
+        $result = $this->legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $startDate);
+        $this->assertInstanceOf(GetRangeResponse::class, $result);
+        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), $result)->shouldHaveBeenCalled();
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getAvailabilitiesForBoxAndStartDate
+     */
+    public function testGetAvailabilitiesForBoxFromCacheWillFailDueToError()
+    {
+        $boxId = '1234';
+        $startDate = new \DateTime('2020-01-01');
+
+        $returnArray = [];
+
+        $result = $this->prophesize(GetRangeResponse::class);
+        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+
+        $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate(
+            Argument::any(),
+            Argument::any(),
+            Argument::any()
+        )->willReturn($returnArray);
+
+        $expected['PackagesList'] = [];
+        $exception = new \Exception();
+        $this->quickDataCache->getBoxDate($boxId, $startDate->format('Y-m-d'))->willThrow($exception);
+        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), Argument::type(GetRangeResponse::class))->shouldBeCalled();
+        $this->eventDispatcher->dispatch(new BoxCacheErrorEvent($boxId, $startDate->format('Y-m-d'), $exception))->shouldBeCalled();
+
+        $result = $this->legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $startDate);
+        $this->assertInstanceOf(GetRangeResponse::class, $result);
+        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), $result)->shouldHaveBeenCalled();
     }
 
     /**
@@ -367,12 +420,6 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $result = $this->prophesize(GetPackageV2Response::class);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
-
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
 
         $returnArray = [
             '4444' => [
@@ -412,7 +459,7 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList($experienceIds, $dateFrom, $dateTo)
             ->willReturn($returnArray);
-        $response = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
+        $response = $this->legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageV2Response::class, $response);
     }
@@ -432,13 +479,7 @@ class LegacyAvailabilityProviderTest extends TestCase
         $result = $this->prophesize(GetPackageV2Response::class);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
 
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
-
-        $response = $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
+        $response = $this->legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(GetPackageV2Response::class, $response);
     }
@@ -478,11 +519,6 @@ class LegacyAvailabilityProviderTest extends TestCase
                 ],
             ],
         ];
-        $legacyAvailabilityProvider = new LegacyAvailabilityProvider(
-            $this->serializer->reveal(),
-            $this->experienceManager->reveal(),
-            $this->availabilityProvider->reveal()
-        );
 
         $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
         $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
@@ -523,7 +559,7 @@ class LegacyAvailabilityProviderTest extends TestCase
                 ],
             ]);
 
-        $response = $legacyAvailabilityProvider->getAvailabilityPriceForExperience($experienceId, $dateFrom, $dateTo);
+        $response = $this->legacyAvailabilityProvider->getAvailabilityPriceForExperience($experienceId, $dateFrom, $dateTo);
 
         $this->assertInstanceOf(AvailabilityPricePeriodResponse::class, $response);
     }

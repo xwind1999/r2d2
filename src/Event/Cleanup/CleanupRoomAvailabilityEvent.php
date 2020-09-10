@@ -15,4 +15,9 @@ class CleanupRoomAvailabilityEvent extends Event implements NamedEventInterface
     {
         return static::EVENT_NAME;
     }
+
+    public function getContext(): array
+    {
+        return [];
+    }
 }

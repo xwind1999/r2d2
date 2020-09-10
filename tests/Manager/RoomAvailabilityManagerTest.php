@@ -9,6 +9,7 @@ use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
 use App\Entity\Component;
 use App\Entity\RoomAvailability;
+use App\Event\Product\AvailabilityUpdatedEvent;
 use App\Exception\Manager\RoomAvailability\InvalidRoomStockTypeException;
 use App\Exception\Manager\RoomAvailability\OutdatedRoomAvailabilityInformationException;
 use App\Exception\Repository\ComponentNotFoundException;
@@ -21,6 +22,7 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -54,6 +56,11 @@ class RoomAvailabilityManagerTest extends TestCase
      */
     private $messageBus;
 
+    /**
+     * @var EventDispatcherInterface|ObjectProphecy
+     */
+    private $eventDispatcher;
+
     private RoomAvailabilityManager $manager;
 
     public function setUp(): void
@@ -63,12 +70,14 @@ class RoomAvailabilityManagerTest extends TestCase
         $this->em = $this->prophesize(EntityManagerInterface::class);
         $this->logger = $this->prophesize(LoggerInterface::class);
         $this->messageBus = $this->prophesize(MessageBusInterface::class);
+        $this->eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
 
         $this->manager = new RoomAvailabilityManager(
             $this->repository->reveal(),
             $this->componentRepository->reveal(),
             $this->em->reveal(),
             $this->messageBus->reveal(),
+            $this->eventDispatcher->reveal(),
             $this->logger->reveal()
         );
     }
@@ -232,6 +241,7 @@ class RoomAvailabilityManagerTest extends TestCase
      * @dataProvider roomAvailabilityRequestProvider
      * @covers ::replace
      * @covers ::createDatePeriod
+     * @covers ::hasAvailabilityChangedForBoxCache
      * @group replace-room-availability
      *
      * @throws \Exception
@@ -248,6 +258,11 @@ class RoomAvailabilityManagerTest extends TestCase
         if ($exceptionClass) {
             $this->expectException($exceptionClass);
         }
+
+        $this
+            ->eventDispatcher
+            ->dispatch(Argument::type(AvailabilityUpdatedEvent::class))
+            ->willReturn(new \stdClass());
 
         $this->assertNull($this->manager->replace($roomAvailabilityRequest));
     }
@@ -280,14 +295,17 @@ class RoomAvailabilityManagerTest extends TestCase
         $date2 = (clone $date)->modify('+1 day');
         $roomAvailabilityExistent2 = clone $roomAvailabilityExistent;
         $roomAvailabilityExistent2->date = $date2;
+        $roomAvailabilityExistent2->externalUpdatedAt = clone $roomAvailabilityExistent->externalUpdatedAt;
 
         $date3 = (clone $date)->modify('+2 days');
         $roomAvailabilityExistent3 = clone $roomAvailabilityExistent;
         $roomAvailabilityExistent3->date = $date3;
+        $roomAvailabilityExistent3->externalUpdatedAt = clone $roomAvailabilityExistent->externalUpdatedAt;
 
         $date4 = (clone $date)->modify('+3 days');
         $roomAvailabilityExistent4 = clone $roomAvailabilityExistent;
         $roomAvailabilityExistent4->date = $date4;
+        $roomAvailabilityExistent4->externalUpdatedAt = clone $roomAvailabilityExistent->externalUpdatedAt;
 
         $roomAvailabilityList = [
             $date->format('Y-m-d') => $roomAvailabilityExistent,
@@ -296,7 +314,7 @@ class RoomAvailabilityManagerTest extends TestCase
             $date4->format('Y-m-d') => $roomAvailabilityExistent4,
         ];
 
-        yield 'room-availability-update-request' => [
+        yield 'room-availability-update-with-no-meaningful-change' => [
             $component,
             (function ($test, $roomAvailabilityList, $component) {
                 $test->repository->findByComponentAndDateRange(Argument::cetera())->willReturn($roomAvailabilityList);
@@ -307,6 +325,30 @@ class RoomAvailabilityManagerTest extends TestCase
             }),
             (function ($roomAvailabilityRequest) {
                 $roomAvailabilityRequest->quantity = random_int(0, 9) < 2 ? 0 : 1;
+                $roomAvailabilityRequest->updatedAt->modify('now');
+
+                return $roomAvailabilityRequest;
+            })(clone $roomAvailabilityRequest),
+            (function ($roomAvailabilityList) {
+                foreach ($roomAvailabilityList as $roomAvailability) {
+                    $roomAvailability->externalUpdatedAt->modify('-1 week');
+                }
+
+                return $roomAvailabilityList;
+            })($roomAvailabilityList),
+        ];
+
+        yield 'room-availability-update-request-with-meaningful-changes' => [
+            $component,
+            (function ($test, $roomAvailabilityList, $component) {
+                $test->repository->findByComponentAndDateRange(Argument::cetera())->willReturn($roomAvailabilityList);
+                $test->em->flush()->shouldBeCalledTimes(1);
+                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(4);
+                $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
+            }),
+            (function ($roomAvailabilityRequest) {
+                //zeroing the stock, so we may need to recalculate some stuff
+                $roomAvailabilityRequest->quantity = 0;
                 $roomAvailabilityRequest->updatedAt->modify('now');
 
                 return $roomAvailabilityRequest;
@@ -414,7 +456,7 @@ class RoomAvailabilityManagerTest extends TestCase
             })(clone $roomAvailabilityRequest),
             (function ($roomAvailabilityList) {
                 foreach ($roomAvailabilityList as $roomAvailability) {
-                    $roomAvailability->externalUpdatedAt->modify('-1 week');
+                    $roomAvailability->externalUpdatedAt = (clone $roomAvailability->externalUpdatedAt)->modify('-1 week');
                 }
 
                 return $roomAvailabilityList;

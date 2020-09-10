@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository\Flat;
 
-use App\Entity\FlatManageableComponent;
+use App\Entity\Flat\FlatManageableComponent;
 use App\Repository\ComponentRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -53,5 +53,16 @@ SQL;
             $statement->bindValue('componentGoldenId', $componentGoldenId);
             $statement->execute();
         });
+    }
+
+    public function getBoxesByComponentId(string $componentGoldenId): array
+    {
+        $sql = 'SELECT DISTINCT box_golden_id FROM flat_manageable_component WHERE component_golden_id = :componentGoldenId';
+
+        $statement = $this->getEntityManager()->getConnection()->prepare($sql);
+        $statement->bindValue('componentGoldenId', $componentGoldenId);
+        $statement->execute();
+
+        return array_column($statement->fetchAll(), 'box_golden_id');
     }
 }

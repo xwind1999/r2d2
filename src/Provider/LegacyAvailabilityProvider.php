@@ -4,34 +4,45 @@ declare(strict_types=1);
 
 namespace App\Provider;
 
+use App\Cache\QuickDataCache;
 use App\Contract\Response\QuickData\AvailabilityPricePeriodResponse;
 use App\Contract\Response\QuickData\GetPackageResponse;
 use App\Contract\Response\QuickData\GetPackageV2Response;
 use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataErrorResponse;
 use App\Contract\Response\QuickData\QuickDataResponse;
+use App\Event\QuickData\BoxCacheErrorEvent;
+use App\Event\QuickData\BoxCacheHitEvent;
+use App\Event\QuickData\BoxCacheMissEvent;
+use App\Exception\Cache\ResourceNotCachedException;
 use App\Exception\Repository\EntityNotFoundException;
 use App\Helper\AvailabilityHelper;
 use App\Manager\ExperienceManager;
 use JMS\Serializer\ArrayTransformerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class LegacyAvailabilityProvider
 {
     protected ArrayTransformerInterface $serializer;
-
     protected ExperienceManager $experienceManager;
-
     protected AvailabilityProvider $availabilityProvider;
+
+    private QuickDataCache $quickDataCache;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         ArrayTransformerInterface $serializer,
         ExperienceManager $experienceManager,
-        AvailabilityProvider $availabilityProvider
+        AvailabilityProvider $availabilityProvider,
+        QuickDataCache $quickDataCache,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->serializer = $serializer;
         $this->experienceManager = $experienceManager;
         $this->availabilityProvider = $availabilityProvider;
+        $this->quickDataCache = $quickDataCache;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function getAvailabilityForExperience(
@@ -82,6 +93,17 @@ class LegacyAvailabilityProvider
         string $boxId,
         \DateTimeInterface $startDate
     ): GetRangeResponse {
+        try {
+            $data = $this->quickDataCache->getBoxDate($boxId, $startDate->format('Y-m-d'));
+            $this->eventDispatcher->dispatch(new BoxCacheHitEvent($boxId, $startDate->format('Y-m-d')));
+
+            return $data;
+        } catch (ResourceNotCachedException $exception) {
+            $this->eventDispatcher->dispatch(new BoxCacheMissEvent($boxId, $startDate->format('Y-m-d')));
+        } catch (\Exception $exception) {
+            $this->eventDispatcher->dispatch(new BoxCacheErrorEvent($boxId, $startDate->format('Y-m-d'), $exception));
+        }
+
         $roomAvailabilities = AvailabilityHelper::buildDataForGetRange(
             $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate(
                 $boxId,
@@ -89,7 +111,11 @@ class LegacyAvailabilityProvider
         );
         $roomAvailabilities['PackagesList'] = $roomAvailabilities;
 
-        return $this->serializer->fromArray($roomAvailabilities, GetRangeResponse::class);
+        $data = $this->serializer->fromArray($roomAvailabilities, GetRangeResponse::class);
+
+        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), $data);
+
+        return $data;
     }
 
     public function getAvailabilityForMultipleExperiences(

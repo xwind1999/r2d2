@@ -7,7 +7,6 @@ namespace App\EventSubscriber;
 use App\Event\NamedEventInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 class NamedEventSubscriber implements EventSubscriberInterface
 {
@@ -21,14 +20,12 @@ class NamedEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            Event::class => ['handleMessage'],
+            NamedEventInterface::class => ['handleMessage'],
         ];
     }
 
-    public function handleMessage(Event $event): void
+    public function handleMessage(NamedEventInterface $event): void
     {
-        if ($event instanceof NamedEventInterface) {
-            $this->logger->info($event->getEventName());
-        }
+        $this->logger->info($event->getEventName(), $event->getContext());
     }
 }

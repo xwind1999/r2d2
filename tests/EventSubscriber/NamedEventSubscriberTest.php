@@ -7,7 +7,6 @@ namespace App\Tests\EventSubscriber;
 use App\Event\NamedEventInterface;
 use App\EventSubscriber\NamedEventSubscriber;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -30,7 +29,7 @@ class NamedEventSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
-            [Event::class => ['handleMessage']],
+            [NamedEventInterface::class => ['handleMessage']],
             NamedEventSubscriber::getSubscribedEvents()
         );
     }
@@ -42,15 +41,13 @@ class NamedEventSubscriberTest extends TestCase
             {
                 return 'event_name';
             }
-        };
-        $this->logger->info('event_name')->shouldBeCalled();
-        $this->eventSubscriber->handleMessage($event);
-    }
 
-    public function testHandleMessageWithoutNamedEvent()
-    {
-        $event = new Event();
-        $this->logger->info(Argument::any())->shouldNotBeCalled();
+            public function getContext(): array
+            {
+                return [];
+            }
+        };
+        $this->logger->info('event_name', [])->shouldBeCalled();
         $this->eventSubscriber->handleMessage($event);
     }
 }
