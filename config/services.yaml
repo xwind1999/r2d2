@@ -145,6 +145,7 @@ services:
     App\Cache\MemcachedWrapper:
         arguments:
             - '%env(MEMCACHED_DSN)%'
+            - '%env(ENVIRONMENT_NAME)%'
 
     App\Helper\NamedEventDispatcher:
         decorates: Symfony\Contracts\EventDispatcher\EventDispatcherInterface
