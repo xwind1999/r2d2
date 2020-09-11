@@ -134,7 +134,8 @@ class QuickDataController
      *     name="dateTo",
      *     in="query",
      *     type="string",
-     *     format="date"
+     *     format="date",
+     *     description="Ignored"
      * )
      * @SWG\Tag(name="quickdata")
      * @SWG\Response(
@@ -148,8 +149,7 @@ class QuickDataController
     ): QuickDataResponse {
         return $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences(
             $getPackageV2Request->listPackageCode,
-            $getPackageV2Request->dateFrom,
-            $getPackageV2Request->dateTo
+            $getPackageV2Request->dateFrom
         );
     }
 

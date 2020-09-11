@@ -65,46 +65,25 @@ class QuickDataIntegrationTest extends IntegrationTestCase
     {
         static::cleanUp();
 
+        $this->consume('event-calculate-flat-manageable-component', 100);
+
         $experienceIds = ['2611', '7307'];
         $dateFrom = new \DateTime(date('Y-m-d', strtotime('first day of next month')));
-        $dateTo = (clone $dateFrom)->modify('+5 day');
 
         $expectedResults = [];
-        foreach ($experienceIds as $experienceId) {
-            /** @var Experience $experience */
-            $experience = self::$container->get(ExperienceRepository::class)->findOneByGoldenId($experienceId);
-
-            /** @var ExperienceComponent $experienceComponent */
-            $experienceComponent = $experience->experienceComponent->filter(
-                static function ($experienceComponent) {
-                    return $experienceComponent->component->isReservable && $experienceComponent->isEnabled;
-                }
-            )->first();
-
-            /** @var RoomAvailability[] $roomAvailabilities */
-            $roomAvailabilities = self::$container->get(RoomAvailabilityRepository::class)->findByComponentAndDateRange($experienceComponent->component, $dateFrom, $dateTo);
-            $resultArray = [];
-
-            foreach ($roomAvailabilities as $availability) {
-                if ('stock' === $availability->type && $availability->stock > 0 && false === $availability->isStopSale) {
-                    $resultArray[] = '1';
-                } elseif ('on_request' === $availability->type && false === $availability->isStopSale) {
-                    $resultArray[] = 'r';
-                } else {
-                    $resultArray[] = '0';
-                }
-            }
-
+        /** @var RoomAvailability[] $roomAvailabilities */
+        $roomAvailabilities = self::$container->get(RoomAvailabilityRepository::class)->findAvailableRoomsByMultipleExperienceIds($experienceIds, $dateFrom);
+        foreach ($roomAvailabilities as $availability) {
             $expectedResults[] = [
-                'PackageCode' => (int) $experienceId,
+                'PackageCode' => (int) $availability['experience_golden_id'],
                 'ListPrestation' => [[
-                    'Availabilities' => $resultArray,
+                    'Availabilities' => ['1'],
                     'PrestId' => 1,
-                    'Duration' => $experienceComponent->component->duration,
+                    'Duration' => $availability['duration'],
                     'LiheId' => 1,
-                    'PartnerCode' => $experienceComponent->component->partnerGoldenId,
-                    'ExtraNight' => false,
-                    'ExtraRoom' => false,
+                    'PartnerCode' => $availability['partner_golden_id'],
+                    'ExtraNight' => boolval($availability['is_sellable']),
+                    'ExtraRoom' => boolval($availability['is_sellable']),
                 ]],
             ];
         }
@@ -113,7 +92,16 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             'ListPackage' => $expectedResults,
         ];
 
-        $response = json_decode(self::$quickDataHelper->getPackageV2(implode(',', $experienceIds), $dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d'))->getContent(), true);
+        $response = json_decode(
+            self::$quickDataHelper->getPackageV2(
+                implode(',', $experienceIds),
+                $dateFrom->format('Y-m-d'),
+                $dateFrom->format('Y-m-d')
+            )->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
         usort($response['ListPackage'], function ($current, $next) {
             return $current['PackageCode'] > $next['PackageCode'];
         });

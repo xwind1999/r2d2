@@ -61,6 +61,13 @@ class RoomAvailabilityManager
         return $this->repository->findAvailableRoomsByBoxId($boxId, $startDate);
     }
 
+    public function getRoomAvailabilitiesByMultipleExperienceGoldenIds(
+        array $experienceGoldenIds,
+        \DateTimeInterface $startDate
+    ): array {
+        return $this->repository->findAvailableRoomsByMultipleExperienceIds($experienceGoldenIds, $startDate);
+    }
+
     public function getRoomAvailabilitiesByComponent(
         Component $component,
         \DateTimeInterface $dateFrom,
@@ -68,18 +75,6 @@ class RoomAvailabilityManager
     ): array {
         return $this->repository->findRoomAvailabilitiesByComponent(
             $component,
-            $dateFrom,
-            $dateTo
-        );
-    }
-
-    public function getRoomAvailabilitiesByComponentGoldenIdAndDates(
-        string $componentGoldenId,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
-    ): array {
-        return $this->repository->findRoomAvailabilitiesByComponentGoldenIdAndDates(
-            $componentGoldenId,
             $dateFrom,
             $dateTo
         );

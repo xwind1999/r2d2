@@ -84,6 +84,53 @@ SQL;
         return $statement->fetchAll();
     }
 
+    public function findAvailableRoomsByMultipleExperienceIds(
+        array $experienceGoldenIds,
+        \DateTimeInterface $startDate
+    ): array {
+        $sql = <<<SQL
+SELECT fmc.experience_golden_id, fmc.partner_golden_id, fmc.is_sellable, fmc.duration
+FROM room_availability ra
+JOIN (
+    SELECT
+        distinct component_uuid,
+        component_golden_id,
+        experience_golden_id,
+        partner_golden_id,
+        last_bookable_date,
+        duration,
+        room_stock_type,
+        is_sellable
+    FROM
+        flat_manageable_component fmc
+    WHERE
+        fmc.experience_golden_id in (:experienceGoldenIds)) fmc
+    ON ra.component_uuid = fmc.component_uuid
+WHERE
+    ra.is_stop_sale = false AND
+    (fmc.last_bookable_date IS NULL OR ra.date <= (fmc.last_bookable_date - INTERVAL fmc.duration DAY)) AND
+    ((ra.type in (:stockType,:allotmentType)) and ra.stock > 0) AND
+     ra.date BETWEEN :startDate AND DATE_ADD(:startDate, interval fmc.duration - 1 day)
+GROUP BY fmc.experience_golden_id, fmc.partner_golden_id, fmc.is_sellable, ra.date, fmc.duration, fmc.room_stock_type  HAVING count(ra.date) = fmc.duration;
+SQL;
+        $values = [
+            'experienceGoldenIds' => $experienceGoldenIds,
+            'startDate' => $startDate->format('Y-m-d'),
+            'stockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK,
+            'allotmentType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT,
+        ];
+        $types = [
+            'experienceGoldenIds' => Connection::PARAM_STR_ARRAY,
+            'startDate' => \PDO::PARAM_STR,
+            'stockType' => \PDO::PARAM_STR,
+            'allotmentType' => \PDO::PARAM_STR,
+        ];
+
+        $query = $this->getEntityManager()->getConnection()->executeQuery($sql, $values, $types);
+
+        return $query->fetchAll();
+    }
+
     public function findRoomAvailabilitiesByMultipleComponentGoldenIds(
         array $componentIds,
         \DateTimeInterface $dateFrom,
@@ -128,29 +175,6 @@ SQL;
             ->andWhere('r.date BETWEEN :dateFrom AND :dateTo')
             ->orderBy('r.date', 'ASC')
             ->setParameter('component', $component->uuid->getBytes())
-            ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
-            ->setParameter('dateTo', $dateTo->format('Y-m-d'))
-            ->indexBy('r', 'r.date')
-        ;
-
-        return $qb->getQuery()->getArrayResult();
-    }
-
-    /**
-     * @throws QueryException
-     */
-    public function findRoomAvailabilitiesByComponentGoldenIdAndDates(
-        string $componentGoldendId,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
-    ): array {
-        $qb = $this->createQueryBuilder('r');
-        $qb
-            ->select('r.stock, r.date, r.type, r.componentGoldenId, r.isStopSale')
-            ->where('r.componentGoldenId = :component')
-            ->andWhere('r.date BETWEEN :dateFrom AND :dateTo')
-            ->orderBy('r.date', 'ASC')
-            ->setParameter('component', $componentGoldendId)
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d'))
             ->indexBy('r', 'r.date')

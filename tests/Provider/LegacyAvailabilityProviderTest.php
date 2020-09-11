@@ -415,8 +415,7 @@ class LegacyAvailabilityProviderTest extends TestCase
     public function testGetAvailabilityForMultipleExperiences()
     {
         $experienceIds = [1234, 5678];
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-05');
+        $startDate = new \DateTime('2020-01-01');
 
         $result = $this->prophesize(GetPackageV2Response::class);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
@@ -457,9 +456,9 @@ class LegacyAvailabilityProviderTest extends TestCase
             ],
         ];
 
-        $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList($experienceIds, $dateFrom, $dateTo)
+        $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList($experienceIds, $startDate)
             ->willReturn($returnArray);
-        $response = $this->legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
+        $response = $this->legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $startDate);
 
         $this->assertInstanceOf(GetPackageV2Response::class, $response);
     }
