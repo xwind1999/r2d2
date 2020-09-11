@@ -162,7 +162,6 @@ class AvailabilityProviderTest extends TestCase
     {
         $boxId = '1234';
         $dateFrom = new \DateTime('2020-06-20');
-        $dateTo = new \DateTime('2020-06-25');
 
         $expectedArray = [
             [
@@ -185,12 +184,11 @@ class AvailabilityProviderTest extends TestCase
         $this->roomAvailabilityManager->getRoomAvailabilitiesByBoxId(
             $boxId,
             Argument::any(),
-            Argument::any()
         )->willReturn($expectedArray);
 
         $this->assertEquals(
             $expectedArray,
-            $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate($boxId, $dateFrom, $dateTo)
+            $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate($boxId, $dateFrom)
         );
     }
 
@@ -203,7 +201,7 @@ class AvailabilityProviderTest extends TestCase
     public function testGetRoomAvailabilitiesListByExperience()
     {
         $dateFrom = new \DateTime('2020-06-20');
-        $dateTo = new \DateTime('2020-06-25');
+        $dateTo = new \DateTime('2020-06-26');
 
         $component = new Component();
         $component->duration = 1;
@@ -226,6 +224,7 @@ class AvailabilityProviderTest extends TestCase
         $experience->experienceComponent = $collection;
         $partner = new Partner();
         $partner->status = 'partner';
+        $partner->ceaseDate = new \DateTime('2020-06-26');
         $experience->partner = $partner;
 
         $this->roomAvailabilityManager->getRoomAvailabilitiesByComponent(
@@ -257,6 +256,13 @@ class AvailabilityProviderTest extends TestCase
                     '2020-06-24' => [
                         'stock' => 10,
                         'date' => new \DateTime('2020-06-24'),
+                        'type' => 'on_request',
+                        'componentGoldenId' => '1234',
+                        'isStopSale' => false,
+                    ],
+                    '2020-06-26' => [
+                        'stock' => 10,
+                        'date' => new \DateTime('2020-06-26'),
                         'type' => 'on_request',
                         'componentGoldenId' => '1234',
                         'isStopSale' => false,
@@ -306,6 +312,7 @@ class AvailabilityProviderTest extends TestCase
                 '2020-06-23' => ['stock' => 0, 'date' => new \DateTime('2020-06-23'), 'type' => 'stock', 'componentGoldenId' => '1234', 'isStopSale' => false],
                 '2020-06-24' => ['stock' => 10, 'date' => new \DateTime('2020-06-24'), 'type' => 'on_request', 'componentGoldenId' => '1234', 'isStopSale' => false],
                 '2020-06-25' => ['stock' => 0, 'date' => new \DateTime('2020-06-25'), 'type' => 'stock', 'componentGoldenId' => '1234', 'isStopSale' => true],
+                '2020-06-26' => ['stock' => 0, 'date' => new \DateTime('2020-06-26'), 'type' => 'on_request', 'componentGoldenId' => '1234', 'isStopSale' => false],
             ],
             'prices' => [
                 '2020-06-20' => $prices['2020-06-20'],
@@ -355,91 +362,35 @@ class AvailabilityProviderTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::getRoomAvailabilitiesByExperienceIdsList
-     * @covers ::prepareRoomAvailabilitiesFromComponentsExperiencesAndDates
-     * @covers ::getRoomAvailabilitiesAndFilterCeasePartner
-     * @covers ::validatePartnerCeaseDate
      */
     public function testGetRoomAvailabilitiesByExperienceIdList()
     {
-        $dateFrom = new \DateTime('2020-06-20');
-        $dateTo = new \DateTime('2020-06-25');
+        $startDate = new \DateTime('2020-06-20');
 
         $experienceIds = ['1234', '4321'];
-        $this->experienceManager
-            ->filterIdsListWithExperienceIds($experienceIds)
-            ->willReturn(
-                [
-                    '1234' => [
-                        'goldenId' => '1234',
-                        'ceaseDate' => new \DateTime('2020-06-25'),
-                        'status' => 'partner',
-                    ],
-                    '4321' => [
-                        'goldenId' => '4321',
-                        'ceaseDate' => null,
-                        'status' => 'partner',
-                    ],
-                ]
-            )
-        ;
-        $this->componentManager->getRoomsByExperienceGoldenIdsList(Argument::any())->willReturn(
-            [
-                '1111' => [
-                    'goldenId' => '1111',
-                    'duration' => 1,
-                    'partnerGoldenId' => '1234',
-                    'isSellable' => true,
-                    'experienceGoldenId' => '1234',
-                ],
-            ]
-        );
-        $this->roomAvailabilityManager->getRoomAvailabilitiesByComponentGoldenIdAndDates(
-            Argument::any(),
-            Argument::any(),
-            Argument::any()
+        $this->roomAvailabilityManager->getRoomAvailabilitiesByMultipleExperienceGoldenIds(
+            $experienceIds,
+            $startDate
         )->willReturn(
             [
-                '2020-06-20' => [
-                    'stock' => 10,
-                    'date' => new \DateTime('2020-06-20'),
-                    'type' => 'stock',
-                    'componentGoldenId' => '1111',
-                    'isStopSale' => false,
-                ],
-                '2020-06-22' => [
-                    'stock' => 0,
-                    'date' => new \DateTime('2020-06-22'),
-                    'type' => 'stock',
-                    'componentGoldenId' => '1111',
-                    'isStopSale' => true,
-                ],
-                '2020-06-24' => [
-                    'stock' => 10,
-                    'date' => new \DateTime('2020-06-24'),
-                    'type' => 'on_request',
-                    'componentGoldenId' => '1111',
-                    'isStopSale' => false,
+                [
+                    'experience_golden_id' => '1234',
+                    'duration' => '1',
+                    'partner_golden_id' => '00112233',
+                    'is_sellable' => '1',
                 ],
             ]
         );
 
         $expectedArray = [
-            '1111' => [
-                'duration' => 1,
-                'isSellable' => true,
-                'partnerId' => '1234',
+            '1234' => [
+                'duration' => '1',
+                'isSellable' => '1',
+                'partnerId' => '00112233',
                 'experienceId' => '1234',
-                'availabilities' => [
-                    '2020-06-20' => ['stock' => 10, 'type' => 'stock', 'date' => new \DateTime('2020-06-20'), 'componentGoldenId' => '1111', 'isStopSale' => false],
-                    '2020-06-21' => ['stock' => 0, 'type' => 'stock', 'date' => new \DateTime('2020-06-21'), 'componentGoldenId' => '1111', 'isStopSale' => true],
-                    '2020-06-22' => ['stock' => 0, 'type' => 'stock', 'date' => new \DateTime('2020-06-22'), 'componentGoldenId' => '1111', 'isStopSale' => true],
-                    '2020-06-23' => ['stock' => 0, 'type' => 'stock', 'date' => new \DateTime('2020-06-23'), 'componentGoldenId' => '1111', 'isStopSale' => true],
-                    '2020-06-24' => ['stock' => 0, 'type' => 'on_request', 'date' => new \DateTime('2020-06-24'), 'componentGoldenId' => '1111', 'isStopSale' => false],
-                    '2020-06-25' => ['stock' => 0, 'type' => 'stock', 'date' => new \DateTime('2020-06-25'), 'componentGoldenId' => '1111', 'isStopSale' => true],
-                ],
             ],
         ];
 
-        $this->assertEquals($expectedArray, $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList($experienceIds, $dateFrom, $dateTo));
+        $this->assertEquals($expectedArray, $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList($experienceIds, $startDate));
     }
 }

@@ -120,26 +120,24 @@ class LegacyAvailabilityProvider
 
     public function getAvailabilityForMultipleExperiences(
         array $packageCodes,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
+        \DateTimeInterface $startDate
     ): QuickDataResponse {
         try {
             $availabilitiesArray = [];
             $availabilities = $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList(
                 $packageCodes,
-                $dateFrom,
-                $dateTo
+                $startDate
             );
 
-            foreach ($availabilities as $componentId => $availability) {
+            foreach ($availabilities as $experienceGoldenId => $availability) {
                 $availabilitiesArray['ListPackage'][] = [
                     'PackageCode' => $availability['experienceId'],
                     'ListPrestation' => [
                         AvailabilityHelper::buildDataForGetPackage(
-                            AvailabilityHelper::convertToShortType($availability['availabilities']),
-                            $availability['duration'],
+                            ['1'],
+                            (int) $availability['duration'],
                             $availability['partnerId'],
-                            $availability['isSellable'],
+                            (bool) $availability['isSellable'],
                         ),
                     ],
                 ];

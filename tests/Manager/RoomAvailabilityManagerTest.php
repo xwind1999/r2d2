@@ -121,38 +121,6 @@ class RoomAvailabilityManagerTest extends TestCase
     }
 
     /**
-     * @covers ::__construct
-     * @covers ::getRoomAvailabilitiesByComponentGoldenIdAndDates
-     */
-    public function testGetRoomAvailabilitiesByComponentGoldenIdAndDates()
-    {
-        $component = new Component();
-        $component->goldenId = '12345';
-        $dateFrom = new \DateTime('2020-06-20');
-        $dateTo = new \DateTime('2020-06-30');
-
-        $this->repository->findRoomAvailabilitiesByComponentGoldenIdAndDates(
-                $component->goldenId,
-                Argument::any(),
-                Argument::any()
-            )->willReturn(
-                [
-                    0 => [
-                        'stock' => 10,
-                        'date' => '2020-07-20',
-                        'type' => 'instant',
-                    ],
-                ]
-            )
-        ;
-        $this->repository
-            ->findRoomAvailabilitiesByComponentGoldenIdAndDates($component->goldenId, $dateFrom, $dateTo)
-            ->shouldBeCalledOnce();
-
-        $this->manager->getRoomAvailabilitiesByComponentGoldenIdAndDates($component->goldenId, $dateFrom, $dateTo);
-    }
-
-    /**
      * @covers ::dispatchRoomAvailabilitiesRequest
      */
     public function testDispatchRoomAvailabilitiesRequest(): void
@@ -205,6 +173,26 @@ class RoomAvailabilityManagerTest extends TestCase
             ->shouldBeCalled();
 
         $this->manager->dispatchRoomAvailabilitiesRequest($roomAvailabilityRequestList);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getRoomAvailabilitiesByMultipleExperienceGoldenIds
+     */
+    public function testGetRoomAvailabilitiesByMultipleExperienceGoldenIds()
+    {
+        $experienceGoldenIds = ['1234', '5678'];
+        $startDate = new \DateTime('2020-10-01');
+        $this
+            ->repository
+            ->findAvailableRoomsByMultipleExperienceIds($experienceGoldenIds, $startDate)
+            ->shouldBeCalled()
+            ->willReturn(['results']);
+
+        $this->assertEquals(
+            ['results'],
+            $this->manager->getRoomAvailabilitiesByMultipleExperienceGoldenIds($experienceGoldenIds, $startDate)
+        );
     }
 
     /**

@@ -72,7 +72,10 @@ class QuickDataControllerTest extends TestCase
         $controller = new QuickDataController();
 
         $qdResponse = $this->prophesize(QuickDataResponse::class);
-        $legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo)->willReturn($qdResponse->reveal());
+        $legacyAvailabilityProvider
+            ->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom)
+            ->willReturn($qdResponse->reveal())
+        ;
         $response = $controller->getPackageV2($getPackageV2Request, $legacyAvailabilityProvider->reveal());
 
         $this->assertInstanceOf(QuickDataResponse::class, $response);

@@ -140,75 +140,23 @@ class AvailabilityProvider
 
     public function getRoomAvailabilitiesByExperienceIdsList(
         array $experienceIds,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
+        \DateTimeInterface $startDate
     ): array {
         $returnArray = [];
-        $activeExperiences = $this->experienceManager->filterIdsListWithExperienceIds($experienceIds);
-        $componentList = $this->componentManager->getRoomsByExperienceGoldenIdsList(
-            array_keys($activeExperiences)
+        $availabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesByMultipleExperienceGoldenIds(
+            $experienceIds,
+            $startDate
         );
-        $roomAvailabilities = $this->prepareRoomAvailabilitiesFromComponentsExperiencesAndDates(
-            $componentList,
-            $activeExperiences,
-            $dateFrom,
-            $dateTo
-        );
-
-        foreach ($roomAvailabilities as $componentGoldenId => $availability) {
-            $item = AvailabilityHelper::fillMissingAvailabilities($availability, (string) $componentGoldenId, $dateFrom, $dateTo);
-            $duration = $componentList[$componentGoldenId]['duration'] ?: self::DEFAULT_COMPONENT_DURATION;
-
-            $returnArray[$componentGoldenId] = [
-                'duration' => $duration,
-                'isSellable' => $componentList[$componentGoldenId]['isSellable'],
-                'partnerId' => $componentList[$componentGoldenId]['partnerGoldenId'],
-                'experienceId' => $componentList[$componentGoldenId]['experienceGoldenId'],
-                'availabilities' => $item,
+        foreach ($availabilities as $availability) {
+            $returnArray[$availability['experience_golden_id']] = [
+                'duration' => $availability['duration'],
+                'isSellable' => $availability['is_sellable'],
+                'partnerId' => $availability['partner_golden_id'],
+                'experienceId' => $availability['experience_golden_id'],
             ];
         }
 
         return $returnArray;
-    }
-
-    private function prepareRoomAvailabilitiesFromComponentsExperiencesAndDates(
-        array $componentList,
-        array $activeExperiences,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
-    ): array {
-        $roomAvailabilities = [];
-        foreach ($componentList as $component) {
-            $partner = new Partner();
-            $partner->ceaseDate = $activeExperiences[$component['experienceGoldenId']]['ceaseDate'];
-            $partner->status = $activeExperiences[$component['experienceGoldenId']]['status'];
-            $roomAvailabilities[$component['goldenId']] = $this->getRoomAvailabilitiesAndFilterCeasePartner(
-                $component['goldenId'],
-                $component['duration'],
-                $partner,
-                $dateFrom,
-                $dateTo
-            );
-            unset($partner);
-        }
-
-        return $roomAvailabilities;
-    }
-
-    private function getRoomAvailabilitiesAndFilterCeasePartner(
-        string $componentGoldenId,
-        int $componentDuration,
-        Partner $partner,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
-    ): array {
-        $roomAvailabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesByComponentGoldenIdAndDates(
-            $componentGoldenId,
-            $dateFrom,
-            $dateTo
-        );
-
-        return $this->validatePartnerCeaseDate($roomAvailabilities, $partner, $componentDuration);
     }
 
     private function getRoomAvailabilitiesAndFilterCeasePartnerByComponent(
