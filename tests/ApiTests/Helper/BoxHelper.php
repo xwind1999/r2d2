@@ -29,6 +29,7 @@ class BoxHelper
             'brand' => 'sbx',
             'country' => 'fr',
             'status' => 'live',
+            'currency' => 'EUR',
         ];
 
         return $overrides + $payload;

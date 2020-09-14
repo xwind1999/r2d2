@@ -63,6 +63,7 @@ class BoxManagerTest extends TestCase
         $boxUpdateRequest->brand = 'sbx';
         $boxUpdateRequest->country = 'fr';
         $boxUpdateRequest->status = 'integrated2';
+        $boxUpdateRequest->currency = 'EUR';
 
         $uuidInterface = $this->prophesize(UuidInterface::class);
         $uuidInterface->toString()->willReturn($uuid);
@@ -73,6 +74,7 @@ class BoxManagerTest extends TestCase
         $box->brand = 'bon';
         $box->country = 'be';
         $box->status = 'integrated';
+        $box->currency = 'EUR';
         $this->repository->findOne($uuid)->willReturn($box->reveal());
         $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
 
@@ -82,6 +84,7 @@ class BoxManagerTest extends TestCase
         $this->assertEquals('sbx', $box->brand);
         $this->assertEquals('fr', $box->country);
         $this->assertEquals('5678', $box->goldenId);
+        $this->assertEquals('EUR', $box->currency);
     }
 
     /**
@@ -122,6 +125,7 @@ class BoxManagerTest extends TestCase
         $boxCreateRequest->brand = 'sbx';
         $boxCreateRequest->country = 'fr';
         $boxCreateRequest->status = 'integrated2';
+        $boxCreateRequest->currency = 'EUR';
 
         $this->repository->save(Argument::type(Box::class))->shouldBeCalled();
         $box = $manager->create($boxCreateRequest->reveal());
@@ -130,6 +134,7 @@ class BoxManagerTest extends TestCase
         $this->assertEquals($boxCreateRequest->brand, $box->brand);
         $this->assertEquals($boxCreateRequest->country, $box->country);
         $this->assertEquals($boxCreateRequest->status, $box->status);
+        $this->assertEquals($boxCreateRequest->currency, $box->currency);
     }
 
     /**

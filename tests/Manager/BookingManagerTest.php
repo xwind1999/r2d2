@@ -19,6 +19,7 @@ use App\Event\BookingStatusEvent;
 use App\Exception\Booking\BadPriceException;
 use App\Exception\Booking\BookingAlreadyInFinalStatusException;
 use App\Exception\Booking\BookingHasExpiredException;
+use App\Exception\Booking\CurrencyMismatchException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
 use App\Exception\Booking\InvalidBookingNewStatus;
@@ -254,6 +255,7 @@ class BookingManagerTest extends TestCase
     ) {
         $partner = new Partner();
         $partner->goldenId = '5678';
+        $partner->currency = $extraParams['partnerCurrency'] ?? 'EUR';
 
         $experience = new Experience();
         $experience->goldenId = $bookingCreateRequest->experience->id;
@@ -265,6 +267,7 @@ class BookingManagerTest extends TestCase
         $box->goldenId = $bookingCreateRequest->box;
         $box->brand = 'SBX';
         $box->country = 'FR';
+        $box->currency = 'EUR';
         $this->boxRepository->findOneByGoldenId($bookingCreateRequest->box)->willReturn($box);
 
         $boxExperience = new BoxExperience();
@@ -812,6 +815,53 @@ class BookingManagerTest extends TestCase
                 $test->entityManager->rollback()->shouldHaveBeenCalledTimes(1);
             },
             ['price' => 0],
+        ];
+
+        yield 'booking with upsell and different box and partner currency' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 300;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $roomDate3 = new RoomDate();
+                $roomDate3->day = new \DateTime('2020-01-01');
+                $roomDate3->price = 300;
+                $roomDate3->extraNight = false;
+                $roomDate4 = new RoomDate();
+                $roomDate4->day = new \DateTime('2020-01-02');
+                $roomDate4->price = 300;
+                $roomDate4->extraNight = true;
+                $room2 = new Room();
+                $room2->extraRoom = true;
+                $room2->dates = [$roomDate3, $roomDate4];
+                $bookingCreateRequest->rooms = [$room, $room2, $room2];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            CurrencyMismatchException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(2000, $booking->totalPrice);
+                $test->assertCount(6, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
+            },
+            [
+                'partnerCurrency' => 'BRL',
+            ],
         ];
     }
 }
