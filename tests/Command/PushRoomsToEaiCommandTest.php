@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Command;
 
 use App\Command\PushRoomsToEaiCommand;
-use App\Contract\Request\Manageable\ManageableProductRequest;
 use App\Entity\Component;
 use App\Entity\Partner;
 use App\Exception\Repository\ComponentNotFoundException;
@@ -46,11 +45,6 @@ class PushRoomsToEaiCommandTest extends KernelTestCase
      */
     private $componentRepository;
 
-    /**
-     * @var ManageableProductRequest|ObjectProphecy
-     */
-    private $manageableProductRequest;
-
     private Application $application;
     private Command $command;
     private CommandTester $commandTester;
@@ -81,22 +75,22 @@ class PushRoomsToEaiCommandTest extends KernelTestCase
     public function testExecuteSuccessfully(\Iterator $goldenIds, array $components): void
     {
         $this->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
-        $this->componentRepository->findListByGoldenId(Argument::any())->shouldBeCalledOnce()->willReturn($components);
+        $this->componentRepository->findListByGoldenId(Argument::any())->shouldBeCalledTimes(2)->willReturn($components);
         $this->logger->error(Argument::any())->shouldNotBeCalled();
         $this->messageBus
             ->dispatch(Argument::any())
-            ->shouldBeCalledOnce()
+            ->shouldBeCalledTimes(2)
             ->willReturn(new Envelope(new \stdClass()))
         ;
         $this->commandTester->execute([
             'command' => $this->command->getName(),
             'file' => 'Import_Command.csv',
-            'batchSize' => '1',
+            'batchSize' => '2',
         ]);
         $this->commandTester->getDisplay();
         $this->assertEquals(0, $this->commandTester->getStatusCode());
-        $this->assertStringContainsString('Total CSV IDs received: 1', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Total Collection IDs read: 1', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Total CSV IDs received: 2', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Total Collection IDs read: 2', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Command executed', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Starting at: ', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Finishing at : ', $this->commandTester->getDisplay());
@@ -137,17 +131,17 @@ class PushRoomsToEaiCommandTest extends KernelTestCase
     public function testExecuteCatchesException(\Iterator $goldenIds, array $components): void
     {
         $this->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
-        $this->componentRepository->findListByGoldenId(Argument::any())->shouldBeCalledOnce()->willReturn($components);
-        $this->logger->error(Argument::any())->shouldBeCalledOnce();
+        $this->componentRepository->findListByGoldenId(Argument::any())->shouldBeCalledTimes(2)->willReturn($components);
+        $this->logger->error(Argument::any())->shouldBeCalledTimes(2);
         $this->messageBus
             ->dispatch(Argument::any())
-            ->shouldBeCalledOnce()
+            ->shouldBeCalledTimes(2)
             ->willThrow(\Exception::class)
         ;
         $this->commandTester->execute([
             'command' => $this->command->getName(),
             'file' => 'Import_Command.csv',
-            'batchSize' => '1',
+            'batchSize' => '2',
         ]);
         $this->commandTester->getDisplay();
         $this->assertEquals(0, $this->commandTester->getStatusCode());
@@ -179,11 +173,12 @@ class PushRoomsToEaiCommandTest extends KernelTestCase
         $goldenIds = new \ArrayIterator(
             [
                 [
-                    'golden_id' => [
-                        '561060698188',
-                    ],
+                    'golden_id' => '561060698188',
                 ],
-            ]
+                [
+                    'golden_id' => '111111111',
+                ],
+            ],
         );
         $component = new Component();
         $component->goldenId = '561060698188';
@@ -194,7 +189,9 @@ class PushRoomsToEaiCommandTest extends KernelTestCase
         $partner = new Partner();
         $partner->goldenId = '123';
         $component->partner = $partner;
-        $components = [$component];
+        $components = [
+            1 => $component,
+        ];
 
         yield [
             $goldenIds,
