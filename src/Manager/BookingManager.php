@@ -107,7 +107,8 @@ class BookingManager
         $booking->expiresAt = (new \DateTime('now'))->add(new \DateInterval(self::EXPIRATION_TIME));
         /** @var ArrayCollection<int, BookingDate> */
         $bookingDatesCollection = new ArrayCollection();
-        $money = $this->moneyHelper->create($experience->price, $bookingCreateRequest->currency);
+        $bookingCurrency = strtoupper($bookingCreateRequest->currency);
+        $money = $this->moneyHelper->create($experience->price, $bookingCurrency);
         $period = new \DatePeriod($booking->startDate, new \DateInterval('P1D'), $booking->endDate);
         $minimumDuration = $component->duration ?? 1;
         $perDay = $money->allocateTo($minimumDuration);
@@ -137,7 +138,12 @@ class BookingManager
 
         // validation #9
         $boxCurrency = isset($box->currency) ? strtoupper($box->currency) : '';
-        $isDifferentCurrency = strtoupper($partner->currency) !== $boxCurrency;
+        $partnerCurrency = strtoupper($partner->currency);
+        $isDifferentCurrency =
+            $partnerCurrency !== $boxCurrency
+            || $bookingCurrency !== $boxCurrency
+            || $partnerCurrency !== $bookingCurrency
+        ;
 
         foreach ($bookingCreateRequest->rooms as $roomIndex => $room) {
             // validating #6
