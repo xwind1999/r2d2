@@ -8,33 +8,37 @@ use App\Constraint\RoomStockTypeConstraint;
 
 class AvailabilityHelper
 {
-    public const AVAILABILITY_TYPE_ON_REQUEST = 'on_request';
-    public const AVAILABILITY_SHORTEN_INSTANT = '1';
-    public const AVAILABILITY_SHORTEN_ON_REQUEST = 'r';
-    public const AVAILABILITY_SHORTEN_NOT_AVAILABLE = '0';
-
+    private const AVAILABILITY_SHORTEN_INSTANT = '1';
+    private const AVAILABILITY_SHORTEN_ON_REQUEST = 'r';
+    private const AVAILABILITY_SHORTEN_NOT_AVAILABLE = '0';
     private const DEFAULT_DATE_TIME_FORMAT = 'Y-m-d';
     private const DEFAULT_DATE_DIFF_VALUE = 0;
     private const AVAILABILITY_PRICE_PERIOD_AVAILABLE = 'Available';
     private const AVAILABILITY_PRICE_PERIOD_REQUEST = 'Request';
     private const AVAILABILITY_PRICE_PERIOD_UNAVAILABLE = 'Unavailable';
-    private const AVAILABILITIES_DELIMITER = ',';
 
-    public static function convertToShortType(array $availabilities): array
+    public static function convertToShortType(array $stocksList, string $roomStockType): array
     {
-        $shortenArray = [];
-
-        foreach ($availabilities as $date => $availability) {
-            if (0 === $availability['stock']) {
-                $shortenArray[$date] = self::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
-            } elseif (self::AVAILABILITY_TYPE_ON_REQUEST === $availability['type']) {
-                $shortenArray[$date] = self::AVAILABILITY_SHORTEN_ON_REQUEST;
-            } else {
-                $shortenArray[$date] = self::AVAILABILITY_SHORTEN_INSTANT;
-            }
+        $availabilityValues = [];
+        foreach ($stocksList as $stock) {
+            $availabilityValues[] = (0 < (int) $stock) ? $roomStockType : self::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
         }
 
-        return array_values($shortenArray);
+        return $availabilityValues;
+    }
+
+    public static function getRoomStockShortType(string $roomStockType): string
+    {
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT === $roomStockType ||
+            RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK === $roomStockType) {
+            return self::AVAILABILITY_SHORTEN_INSTANT;
+        }
+
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType) {
+            return self::AVAILABILITY_SHORTEN_ON_REQUEST;
+        }
+
+        return self::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
     }
 
     public static function fillMissingAvailabilities(

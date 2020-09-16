@@ -194,6 +194,67 @@ class AvailabilityProviderTest extends TestCase
 
     /**
      * @covers ::__construct
+     * @covers ::getRoomAvailabilitiesByExperienceIdAndDates
+     */
+    public function testGetRoomAvailabilitiesByExperienceIdAndDates()
+    {
+        $expId = '1234';
+        $dateFrom = new \DateTime('2020-06-20');
+        $dateTo = new \DateTime('2020-06-23');
+
+        $expectedArray = [
+            [
+                'stock' => '1',
+                'experienceGoldenId' => '1234',
+                'duration' => '1',
+                'date' => '2020-06-20',
+                'partnerGoldenId' => '4321',
+                'isSellable' => '1',
+                'roomStockType' => 'stock',
+            ],
+            [
+                'stock' => '1',
+                'experienceGoldenId' => '1234',
+                'duration' => '1',
+                'date' => '2020-06-21',
+                'partnerGoldenId' => '4321',
+                'isSellable' => '1',
+                'roomStockType' => 'stock',
+            ],
+            [
+                'stock' => '1',
+                'experienceGoldenId' => '1234',
+                'duration' => '1',
+                'date' => '2020-06-22',
+                'partnerGoldenId' => '4321',
+                'isSellable' => '1',
+                'roomStockType' => 'stock',
+            ],
+            [
+                'stock' => '1',
+                'experienceGoldenId' => '1234',
+                'duration' => '1',
+                'date' => '2020-06-23',
+                'partnerGoldenId' => '4321',
+                'isSellable' => '1',
+                'roomStockType' => 'stock',
+            ],
+        ];
+
+        $this->roomAvailabilityManager->getRoomAvailabilitiesByExperienceId(
+            $expId,
+            Argument::any(),
+            Argument::any(),
+            )->willReturn($expectedArray);
+
+        $this->assertEquals(
+            $expectedArray,
+            $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdAndDates($expId, $dateFrom, $dateTo)
+        );
+    }
+
+    /**
+     * @covers ::__construct
      * @covers ::getRoomAvailabilitiesByExperienceAndDates
      * @covers ::validatePartnerCeaseDate
      * @covers ::getRoomAvailabilitiesAndFilterCeasePartnerByComponent

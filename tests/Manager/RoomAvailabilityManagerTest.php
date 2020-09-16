@@ -99,6 +99,33 @@ class RoomAvailabilityManagerTest extends TestCase
 
     /**
      * @covers ::__construct
+     * @covers ::getRoomAvailabilitiesByExperienceId
+     */
+    public function testGetRoomAvailabilitiesByExperienceId()
+    {
+        $roomAvais = [
+            '1234', '4321', '1111',
+        ];
+        $this->repository->findAvailableRoomsByExperienceId(
+            Argument::any(),
+            Argument::any(),
+            Argument::any()
+        )->willReturn($roomAvais);
+        $this->manager->getRoomAvailabilitiesByExperienceId(
+            '1234',
+            new \DateTime('2020-06-20'),
+            new \DateTime('2020-06-30')
+        );
+
+        $this->repository->findAvailableRoomsByExperienceId(
+            '1234',
+            new \DateTime('2020-06-20'),
+            new \DateTime('2020-06-30')
+        )->shouldBeCalledOnce();
+    }
+
+    /**
+     * @covers ::__construct
      * @covers ::getRoomAvailabilitiesByComponent
      */
     public function testGetRoomAvailabilitiesListByComponentGoldenId()

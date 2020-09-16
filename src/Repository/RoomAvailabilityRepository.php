@@ -84,6 +84,32 @@ SQL;
         return $statement->fetchAll();
     }
 
+    public function findAvailableRoomsByExperienceId(
+        string $experienceId,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        $sql = <<<SQL
+SELECT
+   ra.stock as stock, fmc.experience_golden_id as experienceGoldenId, fmc.duration, ra.date,
+   fmc.partner_golden_id as partnerGoldenId, fmc.is_sellable as isSellable, fmc.room_stock_type as roomStockType
+FROM room_availability ra
+JOIN flat_manageable_component fmc on fmc.component_uuid = ra.component_uuid
+WHERE (fmc.experience_golden_id = :experienceId) AND
+      (ra.is_stop_sale = false) AND
+      (fmc.last_bookable_date IS NULL OR fmc.last_bookable_date >= :endDate) AND 
+      (ra.date BETWEEN :startDate AND :endDate);
+SQL;
+
+        $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
+        $statement->bindValue('experienceId', $experienceId);
+        $statement->bindValue('startDate', $startDate->format('Y-m-d'));
+        $statement->bindValue('endDate', $endDate->format('Y-m-d'));
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
     public function findAvailableRoomsByMultipleExperienceIds(
         array $experienceGoldenIds,
         \DateTimeInterface $startDate
