@@ -100,6 +100,16 @@ class AvailabilityHelperTest extends TestCase
     }
 
     /**
+     * @covers ::getRoomStockShortType
+     *
+     * @dataProvider roomStockType
+     */
+    public function testGetRoomStockShortType(string $inputString, string $expectedString): void
+    {
+        $this->assertEquals($expectedString, AvailabilityHelper::getRoomStockShortType($inputString));
+    }
+
+    /**
      * @covers ::buildDataForGetPackage
      */
     public function testBuildDataForGetPackage(): void
@@ -177,32 +187,35 @@ class AvailabilityHelperTest extends TestCase
     /**
      * @covers ::convertToShortType
      */
-    public function testConvertToShortType(): void
+    public function testConvertToShortTypeInstant(): void
     {
-        $availabilities = [
-            0 => [
-                'stock' => 10,
-                'date' => new \DateTime('2020-06-20'),
-                'type' => 'stock',
-                'componentGoldenId' => '1111',
-            ],
-            1 => [
-                'stock' => 0,
-                'date' => new \DateTime('2020-06-21'),
-                'type' => 'stock',
-                'componentGoldenId' => '1111',
-            ],
-            2 => [
-                'stock' => 10,
-                'date' => new \DateTime('2020-06-22'),
-                'type' => 'on_request',
-                'componentGoldenId' => '1111',
-            ],
-        ];
+        $stockList = ['1', '2', '3', '0', '1', '0', '5', '1'];
+        $returnArray = ['1', '1', '1', '0', '1', '0', '1', '1'];
 
-        $returnArray = ['1', '0', 'r'];
+        $this->assertEquals(
+            $returnArray,
+            AvailabilityHelper::convertToShortType(
+                $stockList,
+                '1'
+            )
+        );
+    }
 
-        $this->assertEquals($returnArray, AvailabilityHelper::convertToShortType($availabilities));
+    /**
+     * @covers ::convertToShortType
+     */
+    public function testConvertToShortTypeOnRequest(): void
+    {
+        $stockList = ['1', '2', '3', '0', '1', '0', '5', '1'];
+        $returnArray = ['r', 'r', 'r', '0', 'r', '0', 'r', 'r'];
+
+        $this->assertEquals(
+            $returnArray,
+            AvailabilityHelper::convertToShortType(
+                $stockList,
+                'r'
+            )
+        );
     }
 
     /**
@@ -323,5 +336,27 @@ class AvailabilityHelperTest extends TestCase
             $availabilities,
             AvailabilityHelper::fillMissingAvailabilities($availabilities, $componentId, $dateFrom, $dateTo)
         );
+    }
+
+    public function roomStockType(): array
+    {
+        return [
+            [
+                'inputString' => 'allotment',
+                'expectedString' => '1',
+            ],
+            [
+                'inputString' => 'stock',
+                'expectedString' => '1',
+            ],
+            [
+                'inputString' => 'on_request',
+                'expectedString' => 'r',
+            ],
+            [
+                'inputString' => 'any-thing-else',
+                'expectedString' => '0',
+            ],
+        ];
     }
 }

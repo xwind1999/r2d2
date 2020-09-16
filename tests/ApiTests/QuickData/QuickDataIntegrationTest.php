@@ -22,24 +22,14 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $dateFrom = new \DateTime(date('Y-m-d', strtotime('first day of next month')));
         $dateTo = (clone $dateFrom)->modify('+5 day');
 
-        /** @var Experience $experience */
-        $experience = self::$container->get(ExperienceRepository::class)->findOneByGoldenId($experienceId);
-
-        /** @var ExperienceComponent $experienceComponent */
-        $experienceComponent = $experience->experienceComponent->filter(
-            static function ($experienceComponent) {
-                return $experienceComponent->component->isReservable && $experienceComponent->isEnabled;
-            }
-        )->first();
-
-        /** @var RoomAvailability[] $roomAvailabilities */
-        $roomAvailabilities = self::$container->get(RoomAvailabilityRepository::class)->findByComponentAndDateRange($experienceComponent->component, $dateFrom, $dateTo);
+        $roomAvailabilities = self::$container->get(RoomAvailabilityRepository::class)
+            ->findAvailableRoomsByExperienceId($experienceId, $dateFrom, $dateTo);
         $resultArray = [];
 
         foreach ($roomAvailabilities as $availability) {
-            if ('stock' === $availability->type && $availability->stock > 0 && false === $availability->isStopSale) {
+            if ('stock' === $availability['roomStockType'] && $availability['stock'] > 0) {
                 $resultArray[] = '1';
-            } elseif ('on_request' === $availability->type && false === $availability->isStopSale) {
+            } elseif ('on_request' === $availability['roomStockType']) {
                 $resultArray[] = 'r';
             } else {
                 $resultArray[] = '0';
@@ -49,7 +39,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             'ListPrestation' => [[
                 'Availabilities' => $resultArray,
                 'PrestId' => 1,
-                'Duration' => $experienceComponent->component->duration,
+                'Duration' => $roomAvailabilities[0]['duration'],
                 'LiheId' => 1,
                 'PartnerCode' => '00037411',
                 'ExtraNight' => false,

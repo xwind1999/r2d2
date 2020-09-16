@@ -15,7 +15,6 @@ use App\Event\QuickData\BoxCacheErrorEvent;
 use App\Event\QuickData\BoxCacheHitEvent;
 use App\Event\QuickData\BoxCacheMissEvent;
 use App\Exception\Cache\ResourceNotCachedException;
-use App\Exception\Repository\EntityNotFoundException;
 use App\Helper\AvailabilityHelper;
 use App\Manager\ExperienceManager;
 use JMS\Serializer\ArrayTransformerInterface;
@@ -50,26 +49,13 @@ class LegacyAvailabilityProvider
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): QuickDataResponse {
-        try {
-            $experience = $this->experienceManager->getOneByGoldenId($experienceId);
-            $partner = $experience->partner;
-            $availabilitiesFromDB = $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(
-                $experience,
-                $dateFrom,
-                $dateTo
-            );
+        $roomAvailabilities = $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdAndDates(
+            $experienceId,
+            $dateFrom,
+            $dateTo
+        );
 
-            $returnArray = [
-                'ListPrestation' => [
-                    AvailabilityHelper::buildDataForGetPackage(
-                        AvailabilityHelper::convertToShortType($availabilitiesFromDB['availabilities']),
-                        $availabilitiesFromDB['duration'],
-                        $partner->goldenId,
-                        $availabilitiesFromDB['isSellable'],
-                    ),
-                ],
-            ];
-        } catch (EntityNotFoundException $exception) {
+        if (empty($roomAvailabilities)) {
             $response = $this->serializer->fromArray(
                 [
                     'ResponseStatus' => [
@@ -85,6 +71,20 @@ class LegacyAvailabilityProvider
 
             return $response;
         }
+
+        $returnArray = [
+            'ListPrestation' => [
+                AvailabilityHelper::buildDataForGetPackage(
+                    AvailabilityHelper::convertToShortType(
+                        array_column($roomAvailabilities, 'stock'),
+                        AvailabilityHelper::getRoomStockShortType($roomAvailabilities[0]['roomStockType'])
+                    ),
+                    (int) $roomAvailabilities[0]['duration'],
+                    $roomAvailabilities[0]['partnerGoldenId'],
+                    (bool) $roomAvailabilities[0]['isSellable']
+                ),
+            ],
+        ];
 
         return $this->serializer->fromArray($returnArray, GetPackageResponse::class);
     }

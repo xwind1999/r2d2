@@ -61,6 +61,14 @@ class RoomAvailabilityManager
         return $this->repository->findAvailableRoomsByBoxId($boxId, $startDate);
     }
 
+    public function getRoomAvailabilitiesByExperienceId(
+        string $experienceId,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        return $this->repository->findAvailableRoomsByExperienceId($experienceId, $startDate, $endDate);
+    }
+
     public function getRoomAvailabilitiesByMultipleExperienceGoldenIds(
         array $experienceGoldenIds,
         \DateTimeInterface $startDate

@@ -39,6 +39,7 @@ api-tests:
     - php -dmemory_limit=-1 bin/console doctrine:fixtures:load --append
     - bin/console -e test messenger:setup-transports
     - bin/console -e test r2d2:flatten:manageable-components
+    - bin/console -e test messenger:consume event-calculate-flat-manageable-component --time-limit=3 -vvv
   script:
     - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
   artifacts:

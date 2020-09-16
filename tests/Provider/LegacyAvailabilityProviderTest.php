@@ -18,7 +18,6 @@ use App\Event\QuickData\BoxCacheErrorEvent;
 use App\Event\QuickData\BoxCacheHitEvent;
 use App\Event\QuickData\BoxCacheMissEvent;
 use App\Exception\Cache\ResourceNotCachedException;
-use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceManager;
 use App\Provider\AvailabilityProvider;
 use App\Provider\LegacyAvailabilityProvider;
@@ -85,33 +84,31 @@ class LegacyAvailabilityProviderTest extends TestCase
     {
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
-        $experience = new Experience();
-        $experience->goldenId = '1234';
-        $partner = new Partner();
-        $partner->goldenId = '4321';
-        $partner->status = 'partner';
-        $partner->currency = 'EUR';
-        $experience->partner = $partner;
-        $box = new Box();
-        $box->currency = 'EUR';
 
         $result = $this->prophesize(GetPackageResponse::class);
 
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
 
-        $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
-        $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(Argument::any(), Argument::any(), Argument::any())
+        $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdAndDates(Argument::any(), Argument::any(), Argument::any())
             ->willReturn([
-                'duration' => 1,
-                'isSellable' => true,
-                'experienceId' => '1234',
-                'availabilities' => [
-                    '2020-01-01' => ['stock' => 1, 'type' => 'stock'],
-                    '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
-                    '2020-01-03' => ['stock' => 1, 'type' => 'stock'],
+                [
+                    'stock' => '1',
+                    'experienceGoldenId' => '1',
+                    'date' => '2020-10-01',
+                    'partnerGoldenId' => '1',
+                    'isSellable' => '1',
+                    'roomStockType' => 'stock',
+                    'duration' => 1,
                 ],
-                'box' => $box,
-                'partner' => $partner,
+                [
+                    'stock' => '1',
+                    'experienceGoldenId' => '1',
+                    'date' => '2020-10-02',
+                    'partnerGoldenId' => '1',
+                    'isSellable' => '1',
+                    'roomStockType' => 'stock',
+                    'duration' => 1,
+                ],
             ]);
 
         $response = $this->legacyAvailabilityProvider->getAvailabilityForExperience('1234', $dateFrom, $dateTo);
@@ -123,154 +120,24 @@ class LegacyAvailabilityProviderTest extends TestCase
      * @covers ::__construct
      * @covers ::getAvailabilityForExperience
      */
-    public function testGetAvailabilityForExperienceForOtherPartnerType()
-    {
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
-        $experience = new Experience();
-        $experience->goldenId = '1234';
-        $partner = new Partner();
-        $partner->goldenId = '4321';
-        $partner->status = 'not_partner';
-        $partner->currency = 'EUR';
-        $experience->partner = $partner;
-        $box = new Box();
-        $box->currency = 'EUR';
-
-        $result = $this->prophesize(GetPackageResponse::class);
-
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
-
-        $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
-        $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(Argument::any(), Argument::any(), Argument::any())
-            ->willReturn([
-                'duration' => 1,
-                'isSellable' => true,
-                'experienceId' => '1234',
-                'availabilities' => [
-                    '2020-01-01' => ['stock' => 1, 'type' => 'stock'],
-                    '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
-                    '2020-01-03' => ['stock' => 1, 'type' => 'stock'],
-                ],
-                'box' => $box,
-                'partner' => $partner,
-            ]);
-
-        $response = $this->legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
-
-        $this->assertInstanceOf(GetPackageResponse::class, $response);
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getAvailabilityForExperience
-     */
-    public function testGetAvailabilityForExperienceWithConverter()
-    {
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-03');
-        $experience = new Experience();
-        $experience->goldenId = '1234';
-        $partner = new Partner();
-        $partner->goldenId = '4321';
-        $partner->status = 'partner';
-        $partner->currency = 'EUR';
-        $experience->partner = $partner;
-        $box = new Box();
-        $box->currency = 'EUR';
-
-        $result = $this->prophesize(GetPackageResponse::class);
-
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
-        $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
-        $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(Argument::any(), Argument::any(), Argument::any())
-            ->willReturn([
-                'duration' => 1,
-                'isSellable' => true,
-                'experienceId' => '4321',
-                'availabilities' => [
-                    '2020-01-01' => [
-                        'stock' => 1,
-                        'type' => 'stock',
-                    ],
-                    '2020-01-02' => [
-                        'stock' => 1,
-                        'type' => 'on_request',
-                    ],
-                    '2020-01-03' => [
-                        'stock' => 1,
-                        'type' => 'stock',
-                    ],
-                ],
-                'box' => $box,
-                'partner' => $partner,
-            ]);
-
-        $response = $this->legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
-
-        $this->assertInstanceOf(GetPackageResponse::class, $response);
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getAvailabilityForExperience
-     */
-    public function testGetAvailabilityForExperienceWithConverterWrongFormat()
-    {
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
-        $experience = new Experience();
-        $experience->goldenId = '1234';
-        $partner = new Partner();
-        $partner->goldenId = '4321';
-        $partner->status = 'partner';
-        $partner->currency = 'EUR';
-        $experience->partner = $partner;
-        $box = new Box();
-        $box->currency = 'EUR';
-
-        $result = $this->prophesize(GetPackageResponse::class);
-
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
-        $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
-        $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(Argument::any(), Argument::any(), Argument::any())
-            ->willReturn([
-                'duration' => 1,
-                'isSellable' => true,
-                'experienceId' => '4321',
-                'availabilities' => [
-                    '2020-01-01' => ['stock' => 1, 'type' => 'stock'],
-                    '2020-01-02' => ['stock' => 1, 'type' => 'on_request'],
-                    '2020-01-03' => ['stock' => 1, 'type' => 'stock'],
-                ],
-                'box' => $box,
-                'partner' => $partner,
-            ]);
-
-        $response = $this->legacyAvailabilityProvider->getAvailabilityForExperience($experience->goldenId, $dateFrom, $dateTo);
-
-        $this->assertInstanceOf(GetPackageResponse::class, $response);
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getAvailabilityForExperience
-     */
-    public function testGetAvailabilityForExperienceWithNoExperienceExist()
+    public function testGetAvailabilityForExperienceWithNoAvailabilities()
     {
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
         $result = $this->prophesize(QuickDataErrorResponse::class);
-        $result->httpCode = 400;
-
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
 
-        $this->experienceManager->getOneByGoldenId(Argument::any())
-            ->shouldBeCalledOnce()
-            ->willThrow(ExperienceNotFoundException::class);
+        $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdAndDates(
+            Argument::any(),
+            Argument::any(),
+            Argument::any()
+        )->willReturn([]);
 
-        $this->legacyAvailabilityProvider->getAvailabilityForExperience('31209470194830912', $dateFrom, $dateTo);
+        $this->assertInstanceOf(
+            QuickDataErrorResponse::class,
+            $this->legacyAvailabilityProvider->getAvailabilityForExperience('31209470194830912', $dateFrom, $dateTo)
+        );
     }
 
     /**
