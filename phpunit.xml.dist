@@ -26,6 +26,10 @@
         </testsuite>
         <testsuite name="ApiTests">
             <directory>tests/ApiTests</directory>
+            <exclude>tests/ApiTests/DBValidationTests</exclude>
+        </testsuite>
+         <testsuite name="IntegrationTests">
+            <directory>tests/ApiTests/DBValidationTests</directory>
         </testsuite>
     </testsuites>
 

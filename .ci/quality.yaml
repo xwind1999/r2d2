@@ -18,7 +18,7 @@ unit-tests:
   except:
     - tags
 
-api-tests:
+.api-tests-template: &apiTests
   stage: Test
   image: ${VALIDATION_IMAGE}
   needs:
@@ -40,8 +40,6 @@ api-tests:
     - bin/console -e test messenger:setup-transports
     - bin/console -e test r2d2:flatten:manageable-components
     - bin/console -e test messenger:consume event-calculate-flat-manageable-component --time-limit=3 -vvv
-  script:
-    - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
   artifacts:
     expire_in: 1 day
     paths:
@@ -52,6 +50,16 @@ api-tests:
     - branches
   except:
     - tags
+
+api-tests:
+  <<: *apiTests
+  script:
+    - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
+
+DB-validation-tests:
+  <<: *apiTests
+  script:
+    - phpdbg -qrr vendor/bin/phpunit --testsuite=IntegrationTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
 
 api-tests-DEV-INT:
   stage: Deploy Validation
