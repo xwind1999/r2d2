@@ -99,6 +99,9 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $this->assertEquals($expected, $response);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testAvailabilityPricePeriod()
     {
         static::cleanUp();
@@ -130,8 +133,8 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $result = [
                 'Date' => $availability->date->format('Y-m-d\TH:i:s.u'),
                 'AvailabilityValue' => $availability->stock,
-                'SellingPrice' => null !== $roomPrice ? $roomPrice->price / 100 : 0,
-                'BuyingPrice' => null !== $roomPrice ? $roomPrice->price / 100 : 0,
+                'SellingPrice' => null !== $roomPrice && $availability->stock > 0 ? $roomPrice->price / 100 : 0,
+                'BuyingPrice' => null !== $roomPrice && $availability->stock > 0 ? $roomPrice->price / 100 : 0,
             ];
 
             if ('stock' === $availability->type && $availability->stock > 0 && false === $availability->isStopSale) {

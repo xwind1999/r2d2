@@ -7,7 +7,15 @@ namespace App\Tests\Manager;
 use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
+use App\Entity\Booking;
+use App\Entity\BookingDate;
+use App\Entity\Box;
+use App\Entity\BoxExperience;
 use App\Entity\Component;
+use App\Entity\Experience;
+use App\Entity\ExperienceComponent;
+use App\Entity\Guest;
+use App\Entity\Partner;
 use App\Entity\RoomAvailability;
 use App\Event\Product\AvailabilityUpdatedEvent;
 use App\Exception\Manager\RoomAvailability\InvalidRoomStockTypeException;
@@ -16,6 +24,7 @@ use App\Exception\Repository\ComponentNotFoundException;
 use App\Manager\RoomAvailabilityManager;
 use App\Repository\ComponentRepository;
 use App\Repository\RoomAvailabilityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -477,6 +486,115 @@ class RoomAvailabilityManagerTest extends TestCase
                 return $roomAvailabilityList;
             })($roomAvailabilityList),
             null,
+        ];
+    }
+
+    /**
+     * @dataProvider bookingProvider
+     */
+    public function testUpdateStockBookingConfirmation(Booking $booking, array $availability, callable $prophecies)
+    {
+        $prophecies($this, $availability);
+
+        $response = $this->manager->updateStockBookingConfirmation($booking);
+        $this->assertNull($response);
+    }
+
+    public function bookingProvider()
+    {
+        $booking = new Booking();
+        $booking->voucher = '198257918';
+        $booking->goldenId = '12345';
+        $dateTime = new \DateTime('2020-10-01');
+        $booking->startDate = $dateTime;
+        $booking->endDate = (new $dateTime())->modify('+1 day');
+        $booking->createdAt = $dateTime;
+        $booking->updatedAt = $dateTime;
+        $booking->expiredAt = (new $dateTime())->modify('+15 minutes');
+        $booking->voucher = '1234154';
+        $booking->partnerGoldenId = '1234154';
+        $booking->experienceGoldenId = '1234154';
+        $booking->components = [
+            'name' => 'name',
+        ];
+
+        $experienceComponent = $this->prophesize(ExperienceComponent::class);
+        $component = $this->prophesize(Component::class);
+        $component->goldenId = '5464';
+        $component->name = 'component name';
+        $experienceComponent->component = $component->reveal();
+
+        $boxExperience = $this->prophesize(BoxExperience::class);
+        $box = $this->prophesize(Box::class);
+        $box->country = 'FR';
+        $boxExperience->box = $box->reveal();
+
+        $experience = $this->prophesize(Experience::class);
+        $experience->price = 125;
+        $experience->experienceComponent = new ArrayCollection([$experienceComponent->reveal()]);
+        $experience->boxExperience = new ArrayCollection([$boxExperience->reveal()]);
+        $booking->experience = $experience->reveal();
+
+        $partner = $this->prophesize(Partner::class);
+        $partner->currency = 'EUR';
+        $booking->partner = $partner->reveal();
+
+        $bookingDate = $this->prophesize(BookingDate::class);
+        $bookingDate->componentGoldenId = '5464';
+        $bookingDate->date = $dateTime;
+        $bookingDate->price = 1212;
+        $booking->bookingDate = new ArrayCollection([$bookingDate->reveal()]);
+
+        $guest = $this->prophesize(Guest::class);
+        $guest->firstName = 'First Name';
+        $guest->lastName = 'Last Name';
+        $guest->phone = '089 585 5555';
+        $guest->email = 'teste@teste.com';
+        $booking->guest = new ArrayCollection([$guest->reveal()]);
+
+        $availability = [
+            [
+                'componentGoldenId' => '11111',
+                'date' => $dateTime->format('Y-m-d'),
+                'stock' => 10,
+            ],
+        ];
+
+        yield 'update-booking-with-success' => [
+            $booking,
+            $availability,
+            (function ($test, $availability) {
+                $availability[0]['stock'] = 7;
+                $test->repository
+                    ->getAvailabilityByBookingAndDates(Argument::type(Booking::class))
+                    ->willReturn($availability);
+                $test->repository
+                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
+                    ->shouldBeCalledOnce();
+                $test->repository
+                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
+                    ->willReturn(1);
+            }),
+        ];
+
+        yield 'update-bookings-big-range' => [
+            (function ($booking) {
+                $booking->endDate = (new $booking->startDate())->modify('+10 day');
+
+                return $booking;
+            })(clone $booking),
+            $availability,
+            (function ($test, $availability) {
+                $test->repository
+                    ->getAvailabilityByBookingAndDates(Argument::type(Booking::class))
+                    ->willReturn($availability);
+                $test->repository
+                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
+                    ->shouldBeCalledOnce();
+                $test->repository
+                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
+                    ->willReturn(1);
+            }),
         ];
     }
 }

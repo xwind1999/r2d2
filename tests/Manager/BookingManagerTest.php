@@ -149,7 +149,7 @@ class BookingManagerTest extends TestCase
         $booking = new Booking();
         $booking->status = 'created';
         $booking->createdAt = new \DateTime('now');
-        $booking->expiresAt = (clone $booking->createdAt)->add(new \DateInterval('PT15M'));
+        $booking->expiredAt = (clone $booking->createdAt)->add(new \DateInterval('PT15M'));
 
         yield 'happy path' => [
             $bookingUpdateRequest,
@@ -228,7 +228,7 @@ class BookingManagerTest extends TestCase
             })(clone $bookingUpdateRequest),
             (function ($booking) {
                 $booking->status = 'created';
-                $booking->expiresAt = clone $booking->createdAt;
+                $booking->expiredAt = clone $booking->createdAt;
 
                 return $booking;
             })(clone $booking),

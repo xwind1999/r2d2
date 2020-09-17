@@ -175,7 +175,9 @@ class LegacyAvailabilityProvider
                 'BuyingPrice' => 0,
             ];
 
-            if (isset($roomAvailabilityAndPrices['prices'][$date])) {
+            if (isset($roomAvailabilityAndPrices['prices'][$date]) &&
+                AvailabilityHelper::AVAILABILITY_PRICE_PERIOD_AVAILABLE === $availability['AvailabilityStatus']
+            ) {
                 $availability['SellingPrice'] = $roomAvailabilityAndPrices['prices'][$date]->price / 100;
                 $availability['BuyingPrice'] = $roomAvailabilityAndPrices['prices'][$date]->price / 100;
             }

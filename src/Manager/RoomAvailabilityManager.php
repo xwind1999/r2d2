@@ -6,6 +6,7 @@ namespace App\Manager;
 
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
+use App\Entity\Booking;
 use App\Entity\Component;
 use App\Entity\RoomAvailability;
 use App\Event\Product\AvailabilityUpdatedEvent;
@@ -154,7 +155,10 @@ class RoomAvailabilityManager
 
         foreach ($roomAvailabilityRequestList->items as $roomAvailabilityRequest) {
             if (!isset($existingComponents[$roomAvailabilityRequest->product->id])) {
-                $this->logger->warning(static::LOG_MESSAGE_AVAILABILITY_UNKNOWN_COMPONENT, $roomAvailabilityRequest->getContext());
+                $this->logger->warning(
+                    static::LOG_MESSAGE_AVAILABILITY_UNKNOWN_COMPONENT,
+                    $roomAvailabilityRequest->getContext()
+                );
                 continue;
             }
 
@@ -183,5 +187,13 @@ class RoomAvailabilityManager
             );
 
         return $hasStopSaleChanged || $hasAvailabilityChanged;
+    }
+
+    public function updateStockBookingConfirmation(Booking $booking): void
+    {
+        $bookingDate = $booking->bookingDate->first();
+        if ($bookingDate) {
+            $this->repository->updateStockByComponentAndDates($bookingDate->componentGoldenId, $bookingDate->date);
+        }
     }
 }

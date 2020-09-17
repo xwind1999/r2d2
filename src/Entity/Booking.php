@@ -122,7 +122,7 @@ class Booking
     /**
      * @ORM\Column(name="expired_at", type="datetime", nullable=true)
      */
-    public \DateTime $expiresAt;
+    public \DateTime $expiredAt;
 
     public function __construct()
     {

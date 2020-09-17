@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Constraint\RoomStockTypeConstraint;
+use App\Entity\Booking;
 use App\Entity\Component;
 use App\Entity\RoomAvailability;
 use App\Exception\Repository\RoomAvailabilityNotFoundException;
@@ -23,7 +24,6 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
 {
     private const CLEANUP_AVAILABILITY_OLDER_THAN = '7 days ago';
     private const AVAILABILITY_READ_DATABASE = 'availability_read';
-    private const ROOM_AVAILABILITY_MINIMAL_STOCK = 0;
 
     private ManagerRegistry $registry;
 
@@ -65,7 +65,7 @@ SELECT
    ar.experience_golden_id as experienceGoldenId, ar.room_stock_type as roomStockType
 FROM flat_manageable_component ar
 JOIN room_availability ra on ar.component_uuid = ra.component_uuid
-where ar.box_golden_id = :boxId AND
+WHERE ar.box_golden_id = :boxId AND
       ra.is_stop_sale = false AND
       (ar.last_bookable_date IS NULL OR ra.date <= (ar.last_bookable_date - INTERVAL ar.duration DAY)) AND 
       (((ra.type in (:stockType,:allotmentType)) and ra.stock > 0) OR (ra.type = :onRequestType)) AND
@@ -115,7 +115,7 @@ SQL;
         \DateTimeInterface $startDate
     ): array {
         $sql = <<<SQL
-SELECT fmc.experience_golden_id, fmc.partner_golden_id, fmc.is_sellable, fmc.duration
+SELECT fmc.experience_golden_id, fmc.partner_golden_id, fmc.is_sellable, fmc.duration, ra.date, ra.stock
 FROM room_availability ra
 JOIN (
     SELECT
@@ -137,7 +137,15 @@ WHERE
     (fmc.last_bookable_date IS NULL OR ra.date <= (fmc.last_bookable_date - INTERVAL fmc.duration DAY)) AND
     ((ra.type in (:stockType,:allotmentType)) and ra.stock > 0) AND
      ra.date BETWEEN :startDate AND DATE_ADD(:startDate, interval fmc.duration - 1 day)
-GROUP BY fmc.experience_golden_id, fmc.partner_golden_id, fmc.is_sellable, ra.date, fmc.duration, fmc.room_stock_type  HAVING count(ra.date) = fmc.duration;
+GROUP BY 
+    fmc.experience_golden_id,
+    fmc.partner_golden_id,
+    fmc.is_sellable,
+    ra.date,
+    fmc.duration,
+    fmc.room_stock_type,
+    ra.stock  
+HAVING count(ra.date) = fmc.duration;
 SQL;
         $values = [
             'experienceGoldenIds' => $experienceGoldenIds,
@@ -255,5 +263,54 @@ SQL;
         }
 
         return $this->getEntityManager()->getConnection();
+    }
+
+    public function getAvailabilityByBookingAndDates(Booking $booking): array
+    {
+        $sql = <<<SQL
+SELECT r.component_golden_id as componentGoldenId,
+        sub.date,
+        sum(r.stock) - coalesce(sub.usedStock, sub.usedStock, 0) as stock 
+    FROM r2d2.room_availability r
+        JOIN (
+            SELECT bd.component_uuid, bd.date, count(*) as usedStock
+                FROM r2d2.booking_date bd
+                JOIN r2d2.booking b
+                    ON  b.uuid = bd.booking_uuid
+                WHERE b.status = :status
+                    AND bd.date BETWEEN :dateFrom AND :dateTo
+                    AND b.golden_id = :bookingGoldenId
+                GROUP BY b.golden_id, bd.component_uuid, bd.date
+        ) sub ON sub.component_uuid = r.component_uuid AND sub.date = r.date
+    GROUP BY r.component_golden_id, sub.date, sub.usedStock;
+SQL;
+        $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
+        $statement->bindValue('status', $booking->status);
+        $statement->bindValue('bookingGoldenId', $booking->goldenId);
+        $statement->bindValue('dateFrom', $booking->startDate->format('Y-m-d'));
+        $statement->bindValue('dateTo', $booking->endDate->format('Y-m-d'));
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
+    public function updateStockByComponentAndDates(
+        string $componentGoldenId,
+        \DateTime $date
+    ): int {
+        $sql = <<<SQL
+    UPDATE 
+        room_availability 
+    SET
+        stock = IF(stock > 0, stock - 1, 0),
+        updated_at = now() 
+    WHERE component_golden_id = :componentGoldenId AND date = :date
+SQL;
+        $params = [
+            'componentGoldenId' => $componentGoldenId,
+            'date' => $date->format('Y-m-d'),
+        ];
+
+        return $this->_em->getConnection()->executeUpdate($sql, $params);
     }
 }

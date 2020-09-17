@@ -8,12 +8,13 @@ use App\Constraint\RoomStockTypeConstraint;
 
 class AvailabilityHelper
 {
+    public const AVAILABILITY_PRICE_PERIOD_AVAILABLE = 'Available';
+
     private const AVAILABILITY_SHORTEN_INSTANT = '1';
     private const AVAILABILITY_SHORTEN_ON_REQUEST = 'r';
     private const AVAILABILITY_SHORTEN_NOT_AVAILABLE = '0';
     private const DEFAULT_DATE_TIME_FORMAT = 'Y-m-d';
     private const DEFAULT_DATE_DIFF_VALUE = 0;
-    private const AVAILABILITY_PRICE_PERIOD_AVAILABLE = 'Available';
     private const AVAILABILITY_PRICE_PERIOD_REQUEST = 'Request';
     private const AVAILABILITY_PRICE_PERIOD_UNAVAILABLE = 'Unavailable';
 
@@ -157,5 +158,42 @@ class AvailabilityHelper
         }
 
         return $returnArray;
+    }
+
+    public static function getRealStockByDate(
+        array $roomAvailabilities,
+        array $bookingDateStock
+    ): array {
+        foreach ($bookingDateStock as $booking) {
+            $bookedDate = $booking['date'] instanceof \DateTime ?
+                $booking['date']->format('Y-m-d') : $booking['date'];
+            if (isset($roomAvailabilities[$bookedDate])) {
+                $roomAvailabilities[$bookedDate]['stock'] =
+                    $booking['usedStock'] > $roomAvailabilities[$bookedDate]['stock'] ?
+                        self::AVAILABILITY_SHORTEN_NOT_AVAILABLE :
+                        $roomAvailabilities[$bookedDate]['stock'] - $booking['usedStock'];
+            }
+        }
+
+        return $roomAvailabilities;
+    }
+
+    public static function getRealStock(array $roomAvailabilities, array $bookingStockDates): array
+    {
+        foreach ($bookingStockDates as $booking) {
+            $bookingDate = $booking['date'] instanceof \DateTime ?
+                $booking['date']->format('Y-m-d') : $booking['date'];
+            foreach ($roomAvailabilities as $key => $availability) {
+                $availabilityDate = $availability['date'] instanceof \DateTime ?
+                    $availability['date']->format('Y-m-d') : $availability['date'];
+                if ($bookingDate === $availabilityDate) {
+                    $roomAvailabilities[$key]['stock'] = $booking['usedStock'] > $availability['stock'] ?
+                        self::AVAILABILITY_SHORTEN_NOT_AVAILABLE :
+                        $availability['stock'] - $booking['usedStock'];
+                }
+            }
+        }
+
+        return $roomAvailabilities;
     }
 }

@@ -179,7 +179,7 @@ class BookingStatusSubscriberTest extends TestCase
     public function testHandleMessageByExpiredAt(): void
     {
         $this->booking->status = 'created';
-        $this->booking->expiresAt = new \DateTime('yesterday');
+        $this->booking->expiredAt = new \DateTime('yesterday');
 
         $this->logger->info(
             BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_EXPIRED,
