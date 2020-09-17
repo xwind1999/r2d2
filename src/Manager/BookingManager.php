@@ -104,7 +104,7 @@ class BookingManager
         $booking->customerComment = $bookingCreateRequest->customerComment;
         $booking->components = $bookingCreateRequest->experience->components;
         $booking->cancelledAt = null;
-        $booking->expiresAt = (new \DateTime('now'))->add(new \DateInterval(self::EXPIRATION_TIME));
+        $booking->expiredAt = (new \DateTime('now'))->add(new \DateInterval(self::EXPIRATION_TIME));
         /** @var ArrayCollection<int, BookingDate> */
         $bookingDatesCollection = new ArrayCollection();
         $bookingCurrency = strtoupper($bookingCreateRequest->currency);
@@ -272,7 +272,7 @@ class BookingManager
         $dateNow = new \DateTime('now');
 
         // @TODO: Check the availability before send the exception
-        if ($booking->expiresAt < $dateNow) {
+        if ($booking->expiredAt < $dateNow) {
             throw new BookingHasExpiredException();
         }
     }

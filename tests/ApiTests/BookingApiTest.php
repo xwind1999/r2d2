@@ -15,7 +15,7 @@ class BookingApiTest extends ApiTestCase
         $boxId = json_decode(ApiTestCase::$boxHelper->create()->getContent())->goldenId;
         $partnerId = json_decode(ApiTestCase::$partnerHelper->create()->getContent())->goldenId;
         $experienceId = json_decode(ApiTestCase::$experienceHelper->create()->getContent())->goldenId;
-        $boxExperience = ApiTestCase::$boxExperienceHelper->create(ApiTestCase::$boxExperienceHelper->getDefault([
+        ApiTestCase::$boxExperienceHelper->create(ApiTestCase::$boxExperienceHelper->getDefault([
             'boxGoldenId' => $boxId,
             'experienceGoldenId' => $experienceId,
         ]));
@@ -23,7 +23,7 @@ class BookingApiTest extends ApiTestCase
             'partnerGoldenId' => $partnerId,
             'duration' => 1,
         ]))->getContent())->goldenId;
-        $experienceComponent = ApiTestCase::$experienceComponentHelper->create(ApiTestCase::$experienceComponentHelper->getDefault([
+        ApiTestCase::$experienceComponentHelper->create(ApiTestCase::$experienceComponentHelper->getDefault([
             'componentGoldenId' => $component,
             'experienceGoldenId' => $experienceId,
         ]));

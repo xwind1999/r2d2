@@ -19,6 +19,7 @@ use App\Manager\ComponentManager;
 use App\Manager\ExperienceManager;
 use App\Manager\RoomAvailabilityManager;
 use App\Manager\RoomPriceManager;
+use App\Repository\BookingDateRepository;
 use JMS\Serializer\ArrayTransformerInterface;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
@@ -26,7 +27,6 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 class AvailabilityProvider
 {
     private const DEFAULT_COMPONENT_DURATION = 1;
-    private const DEFAULT_DATE_DIFF_VALUE = 0;
 
     protected CMHub $cmHub;
     protected SerializerInterface $serializer;
@@ -35,6 +35,7 @@ class AvailabilityProvider
     protected ComponentManager $componentManager;
     protected RoomAvailabilityManager $roomAvailabilityManager;
     private RoomPriceManager $roomPriceManager;
+    private BookingDateRepository $bookingDateRepository;
 
     public function __construct(
         CMHub $cmHub,
@@ -43,7 +44,8 @@ class AvailabilityProvider
         ExperienceManager $experienceManager,
         ComponentManager $componentManager,
         RoomAvailabilityManager $roomAvailabilityManager,
-        RoomPriceManager $roomPriceManager
+        RoomPriceManager $roomPriceManager,
+        BookingDateRepository $bookingDateRepository
     ) {
         $this->cmHub = $cmHub;
         $this->serializer = $serializer;
@@ -52,6 +54,7 @@ class AvailabilityProvider
         $this->componentManager = $componentManager;
         $this->roomAvailabilityManager = $roomAvailabilityManager;
         $this->roomPriceManager = $roomPriceManager;
+        $this->bookingDateRepository = $bookingDateRepository;
     }
 
     public function getAvailability(
@@ -132,7 +135,14 @@ class AvailabilityProvider
         }
 
         $roomAvailabilities = AvailabilityHelper::fillMissingAvailabilities(
-            $roomAvailabilities,
+            AvailabilityHelper::getRealStockByDate(
+                $roomAvailabilities,
+                $this->bookingDateRepository->findBookingDatesByComponentAndDate(
+                    $componentGoldenId,
+                    $dateFrom,
+                    $dateTo
+                )
+            ),
             $componentGoldenId,
             $dateFrom,
             $dateTo
@@ -155,6 +165,15 @@ class AvailabilityProvider
             $experienceIds,
             $startDate
         );
+
+        $availabilities = AvailabilityHelper::getRealStock(
+            $availabilities,
+            $this->bookingDateRepository->findBookingDatesByExperiencesAndDate(
+                $experienceIds,
+                $startDate
+            )
+        );
+
         foreach ($availabilities as $availability) {
             $returnArray[$availability['experience_golden_id']] = [
                 'duration' => $availability['duration'],
