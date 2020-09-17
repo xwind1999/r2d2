@@ -12,8 +12,7 @@ use App\Exception\Repository\RoomAvailabilityNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
-use Doctrine\DBAL\Types\Types;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Query\QueryException;
 
 /**
@@ -106,7 +105,7 @@ fmc.room_stock_type;
 SQL;
 
         $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
-        $statement->bindValue('experienceId', $experienceId, Types::STRING);
+        $statement->bindValue('experienceId', $experienceId, ParameterType::STRING);
         $statement->bindValue('startDate', $startDate->format('Y-m-d'));
         $statement->bindValue('endDate', $endDate->format('Y-m-d'));
         $statement->execute();
