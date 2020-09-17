@@ -91,10 +91,22 @@ class RoomAvailabilityManagerTest extends TestCase
         $compIds = [
             '1234', '4321', '1111',
         ];
-        $this->repository->findRoomAvailabilitiesByMultipleComponentGoldenIds(Argument::any(), Argument::any(), Argument::any())->willReturn($compIds);
-        $this->manager->getRoomAvailabilitiesByMultipleComponentGoldenIds($compIds, new \DateTime('2020-06-20'), new \DateTime('2020-06-30'));
+        $this->repository->findRoomAvailabilitiesByMultipleComponentGoldenIds(
+            Argument::any(),
+            new \DateTime('2020-06-20'),
+            new \DateTime('2020-06-30')
+        )->willReturn($compIds);
+        $this->manager->getRoomAvailabilitiesByMultipleComponentGoldenIds(
+            $compIds,
+            new \DateTime('2020-06-20'),
+            new \DateTime('2020-06-30')
+        );
 
-        $this->repository->findRoomAvailabilitiesByMultipleComponentGoldenIds($compIds, new \DateTime('2020-06-20'), new \DateTime('2020-06-30'))->shouldBeCalledOnce();
+        $this->repository->findRoomAvailabilitiesByMultipleComponentGoldenIds(
+            $compIds,
+            new \DateTime('2020-06-20'),
+            new \DateTime('2020-06-30')
+        )->shouldBeCalledOnce();
     }
 
     /**
@@ -107,9 +119,9 @@ class RoomAvailabilityManagerTest extends TestCase
             '1234', '4321', '1111',
         ];
         $this->repository->findAvailableRoomsByExperienceId(
-            Argument::any(),
-            Argument::any(),
-            Argument::any()
+            '1234',
+            new \DateTime('2020-06-20'),
+            new \DateTime('2020-06-30')
         )->willReturn($roomAvais);
         $this->manager->getRoomAvailabilitiesByExperienceId(
             '1234',

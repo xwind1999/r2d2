@@ -98,7 +98,9 @@ JOIN flat_manageable_component fmc on fmc.component_uuid = ra.component_uuid
 WHERE (fmc.experience_golden_id = :experienceId) AND
       (ra.is_stop_sale = false) AND
       (fmc.last_bookable_date IS NULL OR fmc.last_bookable_date >= :endDate) AND 
-      (ra.date BETWEEN :startDate AND :endDate);
+      (ra.date BETWEEN :startDate AND :endDate)
+GROUP BY ra.stock, fmc.experience_golden_id, fmc.duration, ra.date, fmc.partner_golden_id, fmc.is_sellable, 
+fmc.room_stock_type;
 SQL;
 
         $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
