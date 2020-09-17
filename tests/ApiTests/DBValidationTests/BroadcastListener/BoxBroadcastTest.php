@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\ApiTests\BroadcastListener;
+namespace App\Tests\ApiTests\DBValidationTests;
 
 use App\Repository\BoxRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
