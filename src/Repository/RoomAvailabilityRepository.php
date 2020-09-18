@@ -95,13 +95,14 @@ SELECT
    ra.stock as stock, fmc.experience_golden_id as experienceGoldenId, fmc.duration, ra.date,
    fmc.partner_golden_id as partnerGoldenId, fmc.is_sellable as isSellable, fmc.room_stock_type as roomStockType
 FROM room_availability ra
-JOIN flat_manageable_component fmc on fmc.component_uuid = ra.component_uuid
-WHERE (fmc.experience_golden_id = :experienceId) AND
-      (ra.is_stop_sale = false) AND
-      (fmc.last_bookable_date IS NULL OR fmc.last_bookable_date >= :endDate) AND 
+JOIN
+    (SELECT experience_golden_id, partner_golden_id, duration,
+    is_sellable, room_stock_type, last_bookable_date, component_uuid FROM flat_manageable_component
+    WHERE experience_golden_id = :experienceId LIMIT 1) fmc
+on fmc.component_uuid = ra.component_uuid
+WHERE (ra.is_stop_sale = false) AND
+      (fmc.last_bookable_date IS NULL OR fmc.last_bookable_date >= ra.date) AND
       (ra.date BETWEEN :startDate AND :endDate)
-GROUP BY ra.stock, fmc.experience_golden_id, fmc.duration, ra.date, fmc.partner_golden_id, fmc.is_sellable, 
-fmc.room_stock_type;
 SQL;
 
         $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
