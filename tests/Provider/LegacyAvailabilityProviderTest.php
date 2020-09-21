@@ -10,10 +10,6 @@ use App\Contract\Response\QuickData\GetPackageResponse;
 use App\Contract\Response\QuickData\GetPackageV2Response;
 use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataErrorResponse;
-use App\Entity\Box;
-use App\Entity\Experience;
-use App\Entity\Partner;
-use App\Entity\RoomPrice;
 use App\Event\QuickData\BoxCacheErrorEvent;
 use App\Event\QuickData\BoxCacheHitEvent;
 use App\Event\QuickData\BoxCacheMissEvent;
@@ -89,8 +85,12 @@ class LegacyAvailabilityProviderTest extends TestCase
 
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
 
-        $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdAndDates(Argument::any(), Argument::any(), Argument::any())
-            ->willReturn([
+        $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
+            Argument::any(),
+            Argument::any(),
+            Argument::any()
+        )->willReturn(
+            [
                 [
                     'stock' => '1',
                     'experienceGoldenId' => '1',
@@ -109,11 +109,13 @@ class LegacyAvailabilityProviderTest extends TestCase
                     'roomStockType' => 'stock',
                     'duration' => 1,
                 ],
-            ]);
+            ]
+        );
 
-        $response = $this->legacyAvailabilityProvider->getAvailabilityForExperience('1234', $dateFrom, $dateTo);
-
-        $this->assertInstanceOf(GetPackageResponse::class, $response);
+        $this->assertInstanceOf(
+            GetPackageResponse::class,
+            $this->legacyAvailabilityProvider->getAvailabilityForExperience('1234', $dateFrom, $dateTo)
+        );
     }
 
     /**
@@ -128,7 +130,7 @@ class LegacyAvailabilityProviderTest extends TestCase
         $result = $this->prophesize(QuickDataErrorResponse::class);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
 
-        $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdAndDates(
+        $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
             Argument::any(),
             Argument::any(),
             Argument::any()
@@ -353,80 +355,46 @@ class LegacyAvailabilityProviderTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::getAvailabilityPriceForExperience
+     * @covers ::isCeasedPartnerDate
      */
     public function testGetAvailabilityPriceForExperience()
     {
-        $experienceId = '4321';
-        $experience = new Experience();
-        $experience->goldenId = '4321';
-        $partner = new Partner();
-        $partner->goldenId = '1111';
-        $partner->currency = 'EUR';
-        $experience->partner = $partner;
-        $box = new Box();
-        $box->currency = 'EUR';
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-02');
-        $formattedResponse = [
-            'DaysAvailabilityPrice' => [
-                [
-                    'Date' => '2020-01-01T00:00:00.000000',
-                    'AvailabilityValue' => 1,
-                    'AvailabilityStatus' => 'Available',
-                    'BuyingPrice' => 0.05,
-                    'SellingPrice' => 0.05,
-                ],
-                [
-                    'Date' => '2020-01-02T00:00:00.000000',
-                    'AvailabilityValue' => 1,
-                    'AvailabilityStatus' => 'Available',
-                    'BuyingPrice' => 0.1,
-                    'SellingPrice' => 0.1,
-                ],
-            ],
-        ];
-
         $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
-        $this->experienceManager->getOneByGoldenId(Argument::any())->willReturn($experience);
-        $this->serializer->fromArray($formattedResponse, Argument::any())->willReturn($result->reveal());
+        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
 
         $this->availabilityProvider
-            ->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo)
-            ->willReturn([
-                'duration' => 1,
-                'isSellable' => 1,
-                'availabilities' => [
-                    '2020-01-01' => [
+            ->getRoomAndPricesAvailabilitiesByExperienceIdAndDates('1234', $dateFrom, $dateTo)
+            ->willReturn(
+                [
+                    0 => [
+                        'date' => '2020-06-20T00:00:00.000000',
                         'stock' => 1,
                         'type' => 'stock',
-                        'isStopSale' => false,
+                        'isStopSale' => '0',
+                        'duration' => '1',
+                        'SellingPrice' => 86.45,
+                        'BuyingPrice' => 86.45,
+                        'lastBookableDate' => null,
                     ],
-                    '2020-01-02' => [
+                    1 => [
+                        'date' => '2020-06-21T00:00:00.000000',
                         'stock' => 1,
                         'type' => 'stock',
-                        'isStopSale' => false,
+                        'isStopSale' => '0',
+                        'duration' => '1',
+                        'SellingPrice' => 86.45,
+                        'BuyingPrice' => 86.45,
+                        'lastBookableDate' => '2020-06-20T00:00:00.000000',
                     ],
-                ],
-                'box' => $box,
-                'partner' => $partner,
-                'prices' => [
-                    '2020-01-01' => (function () {
-                        $roomPrice = new RoomPrice();
-                        $roomPrice->price = 5;
+                ]
+            )
+        ;
 
-                        return $roomPrice;
-                    })(),
-                    '2020-01-02' => (function () {
-                        $roomPrice = new RoomPrice();
-                        $roomPrice->price = 10;
-
-                        return $roomPrice;
-                    })(),
-                ],
-            ]);
-
-        $response = $this->legacyAvailabilityProvider->getAvailabilityPriceForExperience($experienceId, $dateFrom, $dateTo);
-
-        $this->assertInstanceOf(AvailabilityPricePeriodResponse::class, $response);
+        $this->assertInstanceOf(
+            AvailabilityPricePeriodResponse::class,
+            $this->legacyAvailabilityProvider->getAvailabilityPriceForExperience('1234', $dateFrom, $dateTo)
+        );
     }
 }

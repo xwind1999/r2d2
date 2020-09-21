@@ -120,29 +120,25 @@ class RoomAvailabilityManagerTest extends TestCase
 
     /**
      * @covers ::__construct
-     * @covers ::getRoomAvailabilitiesByExperienceId
+     * @covers ::getRoomAndPriceAvailabilitiesByExperienceIdAndDates
      */
-    public function testGetRoomAvailabilitiesByExperienceId()
+    public function testGetRoomandPriceAvailabilitiesByExperienceId()
     {
         $roomAvais = [
             '1234', '4321', '1111',
         ];
-        $this->repository->findAvailableRoomsByExperienceId(
+        $this->repository->findAvailableRoomsAndPricesByExperienceIdAndDates(
             '1234',
             new \DateTime('2020-06-20'),
             new \DateTime('2020-06-30')
-        )->willReturn($roomAvais);
-        $this->manager->getRoomAvailabilitiesByExperienceId(
+            )->willReturn($roomAvais)
+            ->shouldBeCalled()
+        ;
+        $this->manager->getRoomAndPriceAvailabilitiesByExperienceIdAndDates(
             '1234',
             new \DateTime('2020-06-20'),
             new \DateTime('2020-06-30')
         );
-
-        $this->repository->findAvailableRoomsByExperienceId(
-            '1234',
-            new \DateTime('2020-06-20'),
-            new \DateTime('2020-06-30')
-        )->shouldBeCalledOnce();
     }
 
     /**
@@ -608,5 +604,40 @@ class RoomAvailabilityManagerTest extends TestCase
                     ->willReturn(1);
             }),
         ];
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getRoomAndPriceAvailabilitiesByExperienceIdAndDates
+     */
+    public function testGetRoomAndPriceAvailabilitiesByExperienceIdAndDates(): void
+    {
+        $roomAndPriceAvailabilities = [
+            0 => [
+                'Date' => '2020-10-01T00:00:00.000000',
+                'AvailabilityValue' => '1',
+                'type' => 'stock',
+                'isStopSale' => '0',
+                'duration' => '1',
+                'SellingPrice' => '86.45',
+                'BuyingPrice' => '86.45',
+                'lastBookableDate' => null,
+            ],
+        ];
+        $this->repository->findAvailableRoomsAndPricesByExperienceIdAndDates(
+            '1234',
+            new \DateTime('2020-10-01'),
+            new \DateTime('2020-10-03')
+        )
+            ->shouldBeCalledOnce()
+            ->willReturn($roomAndPriceAvailabilities)
+        ;
+        $this->assertCount(
+            1,
+            $this->manager->getRoomAndPriceAvailabilitiesByExperienceIdAndDates(
+                '1234',
+                new \DateTime('2020-10-01'),
+                new \DateTime('2020-10-03')
+            ));
     }
 }

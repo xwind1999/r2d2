@@ -12,7 +12,6 @@ use App\Exception\Repository\RoomAvailabilityNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Query\QueryException;
 
 /**
@@ -80,35 +79,6 @@ SQL;
         $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
         $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
         $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
-        $statement->execute();
-
-        return $statement->fetchAll();
-    }
-
-    public function findAvailableRoomsByExperienceId(
-        string $experienceId,
-        \DateTimeInterface $startDate,
-        \DateTimeInterface $endDate
-    ): array {
-        $sql = <<<SQL
-SELECT
-   ra.stock as stock, fmc.experience_golden_id as experienceGoldenId, fmc.duration, ra.date,
-   fmc.partner_golden_id as partnerGoldenId, fmc.is_sellable as isSellable, fmc.room_stock_type as roomStockType
-FROM room_availability ra
-JOIN
-    (SELECT experience_golden_id, partner_golden_id, duration,
-    is_sellable, room_stock_type, last_bookable_date, component_uuid FROM flat_manageable_component
-    WHERE experience_golden_id = :experienceId LIMIT 1) fmc
-on fmc.component_uuid = ra.component_uuid
-WHERE (ra.is_stop_sale = false) AND
-      (fmc.last_bookable_date IS NULL OR fmc.last_bookable_date >= ra.date) AND
-      (ra.date BETWEEN :startDate AND :endDate)
-SQL;
-
-        $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
-        $statement->bindValue('experienceId', $experienceId, ParameterType::STRING);
-        $statement->bindValue('startDate', $startDate->format('Y-m-d'));
-        $statement->bindValue('endDate', $endDate->format('Y-m-d'));
         $statement->execute();
 
         return $statement->fetchAll();
@@ -316,5 +286,59 @@ SQL;
         ];
 
         return $this->_em->getConnection()->executeUpdate($sql, $params);
+    }
+
+    public function findAvailableRoomsAndPricesByExperienceIdAndDates(
+        string $experienceId,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        $sql =
+        <<<SQL
+            SELECT 
+                ra.date,
+                ra.type,
+                ra.stock,
+                ra.component_golden_id AS componentGoldenId,
+                ra.is_stop_sale AS isStopSale,
+                fmc.duration,
+                ROUND((rp.price / 100), 2) AS SellingPrice,
+                ROUND((rp.price / 100), 2) AS BuyingPrice,
+                last_bookable_date AS lastBookableDate,
+                fmc.experience_golden_id AS experienceGoldenId,
+                fmc.partner_golden_id AS partnerGoldenId,
+                fmc.is_sellable AS isSellable,
+                fmc.room_stock_type AS roomStockType
+            FROM
+                room_availability ra
+            JOIN 
+                (SELECT
+                    experience_golden_id,
+                    partner_golden_id,
+                    duration,
+                    is_sellable,
+                    room_stock_type,
+                    last_bookable_date,
+                    component_uuid
+                FROM
+                    flat_manageable_component
+                WHERE
+                    experience_golden_id = :experienceId LIMIT 1) fmc ON fmc.component_uuid = ra.component_uuid
+            LEFT JOIN room_price rp ON rp.component_uuid = ra.component_uuid AND rp.date = ra.date
+            WHERE
+                (ra.is_stop_sale = FALSE)
+                AND (fmc.last_bookable_date IS NULL
+                OR fmc.last_bookable_date >= ra.date)
+                AND (ra.date BETWEEN :startDate AND :endDate)
+            ;
+        SQL;
+
+        $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
+        $statement->bindValue('experienceId', $experienceId);
+        $statement->bindValue('startDate', $startDate->format('Y-m-d'));
+        $statement->bindValue('endDate', $endDate->format('Y-m-d'));
+        $statement->execute();
+
+        return $statement->fetchAll();
     }
 }

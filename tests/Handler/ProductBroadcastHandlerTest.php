@@ -102,6 +102,32 @@ class ProductBroadcastHandlerTest extends TestCase
         $logger->warning(Argument::any(), $productRequest->getContext())->shouldBeCalled()->willReturn(Void_::class);
 
         $this->assertEquals(null, $productBroadcastHandler->__invoke($productRequest));
+        $this->assertEquals(
+            [
+                'id' => '1234',
+                'name' => 'box name',
+                'description' => 'description',
+                'universe' => 'universe',
+                'is_sellable' => true,
+                'is_reservable' => true,
+                'partner' => '4321',
+                'sellable_brand' => 'SBX',
+                'sellable_country' => 'FR',
+                'status' => 'active',
+                'type' => 'MEV',
+                'product_people_number' => null,
+                'product_duration' => null,
+                'product_duration_unit' => null,
+                'room_stock_type' => null,
+                'stock_allotment' => null,
+                'list_price' => [
+                    'amount' => 11,
+                    'currency_code' => 'EUR',
+                ],
+                'updated_at' => null,
+            ],
+            $productRequest->getContext()
+        );
     }
 
     /**

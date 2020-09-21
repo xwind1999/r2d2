@@ -8,20 +8,12 @@ use App\CMHub\CMHub;
 use App\Contract\Response\CMHub\CMHubErrorResponse;
 use App\Contract\Response\CMHub\CMHubResponse;
 use App\Contract\Response\CMHub\GetAvailabilityResponse;
-use App\Entity\Box;
-use App\Entity\BoxExperience;
-use App\Entity\Component;
-use App\Entity\Experience;
-use App\Entity\ExperienceComponent;
-use App\Entity\Partner;
-use App\Entity\RoomPrice;
 use App\Manager\ComponentManager;
 use App\Manager\ExperienceManager;
 use App\Manager\RoomAvailabilityManager;
 use App\Manager\RoomPriceManager;
 use App\Provider\AvailabilityProvider;
 use App\Repository\BookingDateRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\ArrayTransformerInterface;
 use JMS\Serializer\SerializerInterface;
 use PHPUnit\Framework\TestCase;
@@ -203,9 +195,9 @@ class AvailabilityProviderTest extends TestCase
 
     /**
      * @covers ::__construct
-     * @covers ::getRoomAvailabilitiesByExperienceIdAndDates
+     * @covers ::getRoomAndPricesAvailabilitiesByExperienceIdAndDates
      */
-    public function testGetRoomAvailabilitiesByExperienceIdAndDates()
+    public function testGetRoomAndPriceAvailabilitiesByExperienceIdAndDates()
     {
         $expId = '1234';
         $dateFrom = new \DateTime('2020-06-20');
@@ -250,7 +242,7 @@ class AvailabilityProviderTest extends TestCase
             ],
         ];
 
-        $this->roomAvailabilityManager->getRoomAvailabilitiesByExperienceId(
+        $this->roomAvailabilityManager->getRoomAndPriceAvailabilitiesByExperienceIdAndDates(
             $expId,
             Argument::any(),
             Argument::any(),
@@ -258,203 +250,62 @@ class AvailabilityProviderTest extends TestCase
 
         $this->assertEquals(
             $expectedArray,
-            $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdAndDates($expId, $dateFrom, $dateTo)
+            $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates($expId, $dateFrom, $dateTo)
         );
     }
 
     /**
      * @covers ::__construct
-     * @covers ::getRoomAvailabilitiesByExperienceAndDates
-     * @covers ::validatePartnerCeaseDate
-     * @covers ::getRoomAvailabilitiesAndFilterCeasePartnerByComponent
+     * @covers ::getRoomAndPricesAvailabilitiesByExperienceIdAndDates
      */
-    public function testGetRoomAvailabilitiesListByExperience()
+    public function testGetRoomAndPriceAvailabilitiesListByExperienceIdAndDates()
     {
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-26');
 
-        $component = new Component();
-        $component->duration = 1;
-        $component->isSellable = true;
-        $component->isReservable = true;
-        $component->goldenId = '1234';
-        $box = new Box();
-        $boxExperience = new BoxExperience();
-        $boxExperience->box = $box;
-        $experience = new Experience();
-        $experience->boxExperience = new ArrayCollection([$boxExperience]);
-        $experienceComponent = new ExperienceComponent();
-        $experienceComponent->component = $component;
-        $experienceComponent->isEnabled = true;
-        $experienceComponent->componentGoldenId = '1234';
-        $experienceComponent->experience = $experience;
-        $collection = new ArrayCollection();
-        $collection->add($experienceComponent);
-        $experience = new Experience();
-        $experience->experienceComponent = $collection;
-        $partner = new Partner();
-        $partner->status = 'partner';
-        $partner->ceaseDate = new \DateTime('2020-06-26');
-        $experience->partner = $partner;
-
-        $this->roomAvailabilityManager->getRoomAvailabilitiesByComponent(
-            Argument::any(), Argument::any(), Argument::any()
-        )
+        $this->roomAvailabilityManager->getRoomAndPriceAvailabilitiesByExperienceIdAndDates(
+            Argument::any(),
+            Argument::any(),
+            Argument::any()
+            )->shouldBeCalledOnce()
             ->willReturn(
                 [
-                    '2020-06-21' => [
-                        'stock' => 10,
-                        'date' => new \DateTime('2020-06-21'),
-                        'type' => 'stock',
-                        'componentGoldenId' => '1234',
-                        'isStopSale' => false,
+                    0 => [
+                        'Date' => '2020-06-20T00:00:00.000000',
+                        'AvailabilityValue' => 1,
+                        'AvailabilityStatus' => 'Available',
+                        'SellingPrice' => 86.45,
+                        'BuyingPrice' => 86.45,
                     ],
-                    '2020-06-22' => [
-                        'stock' => 10,
-                        'date' => new \DateTime('2020-06-22'),
-                        'type' => 'stock',
-                        'componentGoldenId' => '1234',
-                        'isStopSale' => false,
+                    1 => [
+                        'Date' => '2020-06-21T00:00:00.000000',
+                        'AvailabilityValue' => 1,
+                        'AvailabilityStatus' => 'Available',
+                        'SellingPrice' => 86.45,
+                        'BuyingPrice' => 86.45,
                     ],
-                    '2020-06-23' => [
-                        'stock' => 0,
-                        'date' => new \DateTime('2020-06-23'),
-                        'type' => 'stock',
-                        'componentGoldenId' => '1234',
-                        'isStopSale' => false,
+                    2 => [
+                       'Date' => '2020-06-22T00:00:00.000000',
+                       'AvailabilityValue' => 1,
+                       'AvailabilityStatus' => 'Available',
+                       'SellingPrice' => 86.45,
+                       'BuyingPrice' => 86.45,
                     ],
-                    '2020-06-24' => [
-                        'stock' => 10,
-                        'date' => new \DateTime('2020-06-24'),
-                        'type' => 'on_request',
-                        'componentGoldenId' => '1234',
-                        'isStopSale' => false,
-                    ],
-                    '2020-06-26' => [
-                        'stock' => 10,
-                        'date' => new \DateTime('2020-06-26'),
-                        'type' => 'on_request',
-                        'componentGoldenId' => '1234',
-                        'isStopSale' => false,
+                    3 => [
+                        'Date' => '2020-06-23T00:00:00.000000',
+                        'AvailabilityValue' => 1,
+                        'AvailabilityStatus' => 'Available',
+                        'SellingPrice' => 86.45,
+                        'BuyingPrice' => 86.45,
                     ],
                 ]
             );
 
-        $this->bookingDateRepository->findBookingDatesByComponentAndDate(
-            Argument::type('string'),
-            Argument::type(\DateTime::class),
-            Argument::type(\DateTime::class)
-        )->willReturn([
-                [
-                    'componentGoldenId' => '1234',
-                    'date' => new \DateTime('2020-06-21'),
-                    'usedStock' => 1,
-                ],
-                [
-                    'componentGoldenId' => '1234',
-                    'date' => new \DateTime('2020-06-22'),
-                    'usedStock' => 5,
-                ],
-                [
-                    'componentGoldenId' => '1234',
-                    'date' => new \DateTime('2020-06-24'),
-                    'usedStock' => 3,
-                ],
-            ]);
-
-        $prices = [
-            '2020-06-20' => (function () {
-                $roomPrice = new RoomPrice();
-                $roomPrice->price = 1000;
-
-                return $roomPrice;
-            })(),
-            '2020-06-21' => (function () {
-                $roomPrice = new RoomPrice();
-                $roomPrice->price = 1000;
-
-                return $roomPrice;
-            })(),
-            '2020-06-22' => (function () {
-                $roomPrice = new RoomPrice();
-                $roomPrice->price = 1000;
-
-                return $roomPrice;
-            })(),
-            '2020-06-23' => (function () {
-                $roomPrice = new RoomPrice();
-                $roomPrice->price = 1000;
-
-                return $roomPrice;
-            })(),
-        ];
-
-        $this
-            ->roomPriceManager
-            ->getRoomPricesByComponentAndDateRange($component, $dateFrom, $dateTo)
-            ->willReturn($prices);
-
-        $expectedArray = [
-            'duration' => 1,
-            'isSellable' => true,
-            'availabilities' => [
-                '2020-06-20' => ['stock' => 0, 'date' => new \DateTime('2020-06-20'), 'type' => 'stock', 'componentGoldenId' => '1234', 'isStopSale' => true],
-                '2020-06-21' => ['stock' => 9, 'date' => new \DateTime('2020-06-21'), 'type' => 'stock', 'componentGoldenId' => '1234', 'isStopSale' => false],
-                '2020-06-22' => ['stock' => 5, 'date' => new \DateTime('2020-06-22'), 'type' => 'stock', 'componentGoldenId' => '1234', 'isStopSale' => false],
-                '2020-06-23' => ['stock' => 0, 'date' => new \DateTime('2020-06-23'), 'type' => 'stock', 'componentGoldenId' => '1234', 'isStopSale' => false],
-                '2020-06-24' => ['stock' => 7, 'date' => new \DateTime('2020-06-24'), 'type' => 'on_request', 'componentGoldenId' => '1234', 'isStopSale' => false],
-                '2020-06-25' => ['stock' => 0, 'date' => new \DateTime('2020-06-25'), 'type' => 'stock', 'componentGoldenId' => '1234', 'isStopSale' => true],
-                '2020-06-26' => ['stock' => 0, 'date' => new \DateTime('2020-06-26'), 'type' => 'on_request', 'componentGoldenId' => '1234', 'isStopSale' => false],
-            ],
-            'prices' => [
-                '2020-06-20' => $prices['2020-06-20'],
-                '2020-06-21' => $prices['2020-06-21'],
-                '2020-06-22' => $prices['2020-06-22'],
-                '2020-06-23' => $prices['2020-06-23'],
-            ],
-        ];
-
-        $this->assertEquals(
-            $expectedArray,
-            $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo)
+        $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
+            '1234',
+            $dateFrom,
+            $dateTo
         );
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getRoomAvailabilitiesByExperienceAndDates
-     * @covers ::validatePartnerCeaseDate
-     * @covers ::getRoomAvailabilitiesAndFilterCeasePartnerByComponent
-     */
-    public function testGetRoomAvailabilitiesListByExperienceWithNoData()
-    {
-        $dateFrom = new \DateTime('2020-06-20');
-        $dateTo = new \DateTime('2020-06-25');
-        $experience = new Experience();
-        $partner = new Partner();
-        $partner->status = 'partner';
-        $experience->partner = $partner;
-
-        $this->bookingDateRepository->findBookingDatesByComponentAndDate(
-            Argument::type('string'),
-            Argument::type(\DateTime::class),
-            Argument::type(\DateTime::class)
-        )->shouldBeCalled();
-
-        $expectedArray = [
-            'duration' => 1,
-            'isSellable' => false,
-            'availabilities' => [
-                '2020-06-20' => ['stock' => 0, 'date' => new \DateTime('2020-06-20'), 'type' => 'stock', 'componentGoldenId' => '', 'isStopSale' => true],
-                '2020-06-21' => ['stock' => 0, 'date' => new \DateTime('2020-06-21'), 'type' => 'stock', 'componentGoldenId' => '', 'isStopSale' => true],
-                '2020-06-22' => ['stock' => 0, 'date' => new \DateTime('2020-06-22'), 'type' => 'stock', 'componentGoldenId' => '', 'isStopSale' => true],
-                '2020-06-23' => ['stock' => 0, 'date' => new \DateTime('2020-06-23'), 'type' => 'stock', 'componentGoldenId' => '', 'isStopSale' => true],
-                '2020-06-24' => ['stock' => 0, 'date' => new \DateTime('2020-06-24'), 'type' => 'stock', 'componentGoldenId' => '', 'isStopSale' => true],
-                '2020-06-25' => ['stock' => 0, 'date' => new \DateTime('2020-06-25'), 'type' => 'stock', 'componentGoldenId' => '', 'isStopSale' => true],
-            ],
-            'prices' => [],
-        ];
-        $this->assertEquals($expectedArray, $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates($experience, $dateFrom, $dateTo));
     }
 
     /**
