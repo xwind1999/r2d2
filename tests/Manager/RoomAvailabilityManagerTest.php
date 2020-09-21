@@ -547,11 +547,11 @@ class RoomAvailabilityManagerTest extends TestCase
         $partner->currency = 'EUR';
         $booking->partner = $partner->reveal();
 
-        $bookingDate = $this->prophesize(BookingDate::class);
+        $bookingDate = new BookingDate();
         $bookingDate->componentGoldenId = '5464';
         $bookingDate->date = $dateTime;
         $bookingDate->price = 1212;
-        $booking->bookingDate = new ArrayCollection([$bookingDate->reveal()]);
+        $booking->bookingDate = new ArrayCollection([$bookingDate]);
 
         $guest = $this->prophesize(Guest::class);
         $guest->firstName = 'First Name';
@@ -599,6 +599,39 @@ class RoomAvailabilityManagerTest extends TestCase
                 $test->repository
                     ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
                     ->shouldBeCalledOnce();
+                $test->repository
+                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
+                    ->willReturn(1);
+            }),
+        ];
+
+        yield 'update-bookings-with-extra-room' => [
+            (function ($booking, $dateTime) {
+                $booking->endDate = (new $booking->startDate())->modify('+10 day');
+                $bookingDate = new BookingDate();
+                $bookingDate->componentGoldenId = '5464';
+                $bookingDate->date = $dateTime;
+                $bookingDate->price = 1212;
+                $bookingDate2 = clone $bookingDate;
+                $bookingDate2->price = 500;
+                $bookingDate3 = clone $bookingDate;
+                $bookingDate3->price = 500;
+                $booking->bookingDate = new ArrayCollection([
+                    $bookingDate,
+                    $bookingDate2,
+                    $bookingDate3,
+                ]);
+
+                return $booking;
+            })(clone $booking, $dateTime),
+            $availability,
+            (function ($test, $availability) {
+                $test->repository
+                    ->getAvailabilityByBookingAndDates(Argument::type(Booking::class))
+                    ->willReturn($availability);
+                $test->repository
+                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
+                    ->shouldBeCalled(3);
                 $test->repository
                     ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
                     ->willReturn(1);
