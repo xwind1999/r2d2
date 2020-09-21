@@ -49,7 +49,7 @@ class LegacyAvailabilityProvider
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): QuickDataResponse {
-        $roomAvailabilities = $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdAndDates(
+        $roomAvailabilities = $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
             $experienceId,
             $dateFrom,
             $dateTo
@@ -154,40 +154,45 @@ class LegacyAvailabilityProvider
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): QuickDataResponse {
-        $experience = $this->experienceManager->getOneByGoldenId($experienceId);
-        $roomAvailabilityAndPrices = $this->availabilityProvider->getRoomAvailabilitiesByExperienceAndDates(
-            $experience,
+        $roomAndPriceAvailability = $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
+            $experienceId,
             $dateFrom,
             $dateTo
         );
 
         $availabilities = [];
-        foreach ($roomAvailabilityAndPrices['availabilities'] as $date => $availability) {
-            $availability = [
-                'Date' => (new \DateTime($date))->format('Y-m-d\TH:i:s.u'),
-                'AvailabilityValue' => $availability['stock'],
-                'AvailabilityStatus' => AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
-                    $availability['type'],
-                    $availability['stock'],
-                    $availability['isStopSale']
-                ),
-                'SellingPrice' => 0,
-                'BuyingPrice' => 0,
-            ];
-
-            if (isset($roomAvailabilityAndPrices['prices'][$date]) &&
-                AvailabilityHelper::AVAILABILITY_PRICE_PERIOD_AVAILABLE === $availability['AvailabilityStatus']
-            ) {
-                $availability['SellingPrice'] = $roomAvailabilityAndPrices['prices'][$date]->price / 100;
-                $availability['BuyingPrice'] = $roomAvailabilityAndPrices['prices'][$date]->price / 100;
+        foreach ($roomAndPriceAvailability as $index => $availability) {
+            if ($this->isCeasedPartnerDate($availability['lastBookableDate'], $availability['date'])) {
+                $availability['stock'] = 0;
             }
 
-            $availabilities[] = $availability;
+            $availability['AvailabilityValue'] = (int) $availability['stock'];
+            $availability['Date'] = (new \DateTime($availability['date']))->format(AvailabilityHelper::PRICE_PERIOD_DATE_TIME_FORMAT);
+            $availability += [
+                'AvailabilityStatus' => AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+                    $availability['type'],
+                    $availability['AvailabilityValue'],
+                    $availability['isStopSale']
+                ),
+            ];
+            $availabilities[$availability['date']] = $availability;
+            unset($roomAndPriceAvailability[$index]);
         }
 
         return $this->serializer->fromArray(
-            ['DaysAvailabilityPrice' => $availabilities],
+            [
+                'DaysAvailabilityPrice' => AvailabilityHelper::fillMissingAvailabilities(
+                    $availabilities,
+                    $dateFrom,
+                    $dateTo
+                ),
+            ],
             AvailabilityPricePeriodResponse::class
         );
+    }
+
+    private function isCeasedPartnerDate(?string $lastBookableDate, string $currentDate): bool
+    {
+        return (null !== $lastBookableDate) && $lastBookableDate <= $currentDate;
     }
 }

@@ -15,87 +15,71 @@ class AvailabilityHelperTest extends TestCase
     /**
      * @covers ::convertAvailabilityTypeToExplicitQuickdataValue
      */
-    public function testconvertAvailableValueToRequest(): void
+    public function testConvertAvailableValueToRequest(): void
     {
-        $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('stock', 0, false));
-        $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('stock', 0, true));
-        $this->assertEquals('Available', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('stock', 1, false));
-        $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('stock', 1, true));
-        $this->assertEquals('Request', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('on_request', 0, false));
-        $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('on_request', 0, true));
-        $this->assertEquals('Request', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('on_request', 1, false));
-        $this->assertEquals('Unavailable', AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue('on_request', 1, true));
-    }
-
-    /**
-     * @covers ::mapRoomAvailabilitiesToExperience
-     */
-    public function testMapRoomAvailabilitiesToExperience(): void
-    {
-        $comps = [
-            '1234' => [
-                'duration' => 0,
-                'goldenId' => '1234',
-                'experienceGoldenId' => '1111',
-            ],
-            '4321' => [
-                'duration' => 0,
-                'goldenId' => '4321',
-                'experienceGoldenId' => '2222',
-            ],
-            '4323' => [
-                'duration' => 0,
-                'goldenId' => '4323',
-                'experienceGoldenId' => '3333',
-            ],
-            '4324' => [
-                'duration' => 0,
-                'goldenId' => '4324',
-                'experienceGoldenId' => '4444',
-            ],
-        ];
-
-        $roomAvailabilities = [
-            '1234' => [
-                'stock' => 10,
-                'componentGoldenId' => '1234',
-            ],
-            '4321' => [
-                'stock' => 5,
-                'componentGoldenId' => '4321',
-            ],
-            '4322' => [
-                'stock' => 6,
-                'componentGoldenId' => '4322',
-            ],
-        ];
-
-        $returnArray = [
-            [
-                'Package' => '1111',
-                'Request' => 0,
-                'Stock' => 5,
-            ],
-            [
-                'Package' => '2222',
-                'Request' => 0,
-                'Stock' => 5,
-            ],
-            [
-                'Package' => '3333',
-                'Request' => 5,
-                'Stock' => 0,
-            ],
-            [
-                'Package' => '4444',
-                'Request' => 5,
-                'Stock' => 0,
-            ],
-        ];
-
         $this->assertEquals(
-            $returnArray,
-            AvailabilityHelper::mapRoomAvailabilitiesToExperience($comps, $roomAvailabilities, 5)
+            'Unavailable',
+            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+                'stock',
+                0,
+                '0'
+            )
+        );
+        $this->assertEquals(
+            'Unavailable',
+            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+                'stock',
+                0,
+                '1'
+            )
+        );
+        $this->assertEquals(
+            'Available',
+            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+                'stock',
+                1,
+                '0'
+            )
+        );
+        $this->assertEquals(
+            'Unavailable',
+            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+                'stock',
+                1,
+                '1'
+            )
+        );
+        $this->assertEquals(
+            'Request',
+            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+                'on_request',
+                0,
+                '0'
+            )
+        );
+        $this->assertEquals(
+            'Unavailable',
+            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+                'on_request',
+                0,
+                '1'
+            )
+        );
+        $this->assertEquals(
+            'Request',
+            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+                'on_request',
+                1,
+                '0'
+            )
+        );
+        $this->assertEquals(
+            'Unavailable',
+            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+                'on_request',
+                1,
+                '1'
+            )
         );
     }
 
@@ -224,81 +208,80 @@ class AvailabilityHelperTest extends TestCase
     public function testFillMissingAvailabilities(): void
     {
         $availabilities = [
-            '2020-06-20' => [
-                'stock' => 10,
-                'date' => new \DateTime('2020-06-20'),
-                'type' => 'stock',
-                'componentGoldenId' => '1111',
-                'isStopSale' => true,
+            '2020-06-20T00:00:00.000000' => [
+                'Date' => '2020-06-20T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
             ],
-            '2020-06-21' => [
-                'stock' => 0,
-                'date' => new \DateTime('2020-06-21'),
-                'type' => 'stock',
-                'componentGoldenId' => '1111',
-                'isStopSale' => true,
+            '2020-06-21T00:00:00.000000' => [
+                'Date' => '2020-06-21T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
             ],
-            '2020-06-23' => [
-                'stock' => 10,
-                'date' => new \DateTime('2020-06-23'),
-                'type' => 'on_request',
-                'componentGoldenId' => '1111',
-                'isStopSale' => false,
+            '2020-06-23T00:00:00.000000' => [
+                'Date' => '2020-06-23T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
             ],
         ];
 
-        $componentId = '1111';
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-25');
 
         $returnArray = [
-            '2020-06-20' => [
-                'stock' => 10,
-                'date' => new \DateTime('2020-06-20'),
-                'type' => 'stock',
-                'componentGoldenId' => '1111',
-                'isStopSale' => true,
+            '2020-06-20T00:00:00.000000' => [
+                'Date' => '2020-06-20T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
             ],
-            '2020-06-21' => [
-                'stock' => 0,
-                'date' => new \DateTime('2020-06-21'),
-                'type' => 'stock',
-                'componentGoldenId' => '1111',
-                'isStopSale' => true,
+            '2020-06-21T00:00:00.000000' => [
+                'Date' => '2020-06-21T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
             ],
-            '2020-06-22' => [
-                'stock' => 0,
-                'date' => new \DateTime('2020-06-22'),
-                'type' => 'stock',
-                'componentGoldenId' => '1111',
-                'isStopSale' => true,
+            '2020-06-22T00:00:00.000000' => [
+                'Date' => '2020-06-22T00:00:00.000000',
+                'AvailabilityValue' => 0,
+                'AvailabilityStatus' => 'Unavailable',
+                'SellingPrice' => 0,
+                'BuyingPrice' => 0,
             ],
-            '2020-06-23' => [
-                'stock' => 10,
-                'date' => new \DateTime('2020-06-23'),
-                'type' => 'on_request',
-                'componentGoldenId' => '1111',
-                'isStopSale' => false,
+            '2020-06-23T00:00:00.000000' => [
+                'Date' => '2020-06-23T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
             ],
-            '2020-06-24' => [
-                'stock' => 0,
-                'date' => new \DateTime('2020-06-24'),
-                'type' => 'stock',
-                'componentGoldenId' => '1111',
-                'isStopSale' => true,
+            '2020-06-24T00:00:00.000000' => [
+                'Date' => '2020-06-24T00:00:00.000000',
+                'AvailabilityValue' => 0,
+                'AvailabilityStatus' => 'Unavailable',
+                'SellingPrice' => 0,
+                'BuyingPrice' => 0,
             ],
-            '2020-06-25' => [
-                'stock' => 0,
-                'date' => new \DateTime('2020-06-25'),
-                'type' => 'stock',
-                'componentGoldenId' => '1111',
-                'isStopSale' => true,
+            '2020-06-25T00:00:00.000000' => [
+                'Date' => '2020-06-25T00:00:00.000000',
+                'AvailabilityValue' => 0,
+                'AvailabilityStatus' => 'Unavailable',
+                'SellingPrice' => 0,
+                'BuyingPrice' => 0,
             ],
         ];
 
         $this->assertEquals(
             $returnArray,
-            AvailabilityHelper::fillMissingAvailabilities($availabilities, $componentId, $dateFrom, $dateTo)
+            AvailabilityHelper::fillMissingAvailabilities($availabilities, $dateFrom, $dateTo)
         );
     }
 
@@ -308,33 +291,35 @@ class AvailabilityHelperTest extends TestCase
     public function testFillMissingAvailabilitiesWithEnoughDate(): void
     {
         $availabilities = [
-            '2020-06-20' => [
-                'stock' => 10,
-                'date' => new \DateTime('2020-06-20'),
-                'type' => 'stock',
-                'componentGoldenId' => '1111',
+            '2020-06-20T00:00:00.000000' => [
+                'Date' => '2020-06-20T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
             ],
-            '2020-06-21' => [
-                'stock' => 0,
-                'date' => new \DateTime('2020-06-21'),
-                'type' => 'stock',
-                'componentGoldenId' => '1111',
+            '2020-06-21T00:00:00.000000' => [
+                'Date' => '2020-06-21T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
             ],
-            '2020-06-22' => [
-                'stock' => 10,
-                'date' => new \DateTime('2020-06-22'),
-                'type' => 'on_request',
-                'componentGoldenId' => '1111',
+            '2020-06-22T00:00:00.000000' => [
+                'Date' => '2020-06-22T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
             ],
         ];
 
-        $componentId = '1111';
         $dateFrom = new \DateTime('2020-06-20');
         $dateTo = new \DateTime('2020-06-22');
 
         $this->assertEquals(
             $availabilities,
-            AvailabilityHelper::fillMissingAvailabilities($availabilities, $componentId, $dateFrom, $dateTo)
+            AvailabilityHelper::fillMissingAvailabilities($availabilities, $dateFrom, $dateTo)
         );
     }
 

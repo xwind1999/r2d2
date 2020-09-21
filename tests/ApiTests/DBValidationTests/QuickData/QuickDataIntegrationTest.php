@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests\QuickData;
 
-use App\Entity\Experience;
-use App\Entity\ExperienceComponent;
 use App\Entity\RoomAvailability;
-use App\Repository\ExperienceRepository;
 use App\Repository\RoomAvailabilityRepository;
-use App\Repository\RoomPriceRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
 
 class QuickDataIntegrationTest extends IntegrationTestCase
@@ -23,7 +19,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $dateTo = (clone $dateFrom)->modify('+5 day');
 
         $roomAvailabilities = self::$container->get(RoomAvailabilityRepository::class)
-            ->findAvailableRoomsByExperienceId($experienceId, $dateFrom, $dateTo);
+            ->findAvailableRoomsAndPricesByExperienceIdAndDates($experienceId, $dateFrom, $dateTo);
         $resultArray = [];
 
         foreach ($roomAvailabilities as $availability) {
@@ -102,7 +98,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
     /**
      * @throws \Exception
      */
-    public function testAvailabilityPricePeriod()
+    public function testAvailabilityPricePeriod(): void
     {
         static::cleanUp();
 
@@ -110,38 +106,30 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $dateFrom = new \DateTime(date('Y-m-d', strtotime('first day of next month')));
         $dateTo = (clone $dateFrom)->modify('+5 day');
 
-        /** @var Experience $experience */
-        $experience = self::$container->get(ExperienceRepository::class)->findOneByGoldenId($experienceId);
-
-        /** @var ExperienceComponent $experienceComponent */
-        $experienceComponent = $experience->experienceComponent->filter(
-            static function ($experienceComponent) {
-                return $experienceComponent->component->isReservable && $experienceComponent->isEnabled;
-            }
-        )->first();
-
         /** @var RoomAvailability[] $roomAvailabilities */
-        $roomAvailabilities = self::$container->get(RoomAvailabilityRepository::class)->findByComponentAndDateRange($experienceComponent->component, $dateFrom, $dateTo);
-        $resultArray = [];
+        $roomAvailabilities = self::$container
+            ->get(RoomAvailabilityRepository::class)
+            ->findAvailableRoomsAndPricesByExperienceIdAndDates($experienceId, $dateFrom, $dateTo)
+        ;
 
+        $resultArray = [];
         foreach ($roomAvailabilities as $date => $availability) {
-            try {
-                $roomPrice = self::$container->get(RoomPriceRepository::class)->findByComponentAndDateRange($experienceComponent->component, $dateFrom, $dateTo)[$date];
-            } catch (\Throwable $exc) {
-                $roomPrice = null;
-            }
             $result = [
-                'Date' => $availability->date->format('Y-m-d\TH:i:s.u'),
-                'AvailabilityValue' => $availability->stock,
-                'SellingPrice' => null !== $roomPrice && $availability->stock > 0 ? $roomPrice->price / 100 : 0,
-                'BuyingPrice' => null !== $roomPrice && $availability->stock > 0 ? $roomPrice->price / 100 : 0,
+                'Date' => (new \DateTime($availability['date']))->format('Y-m-d\TH:i:s.u'),
+                'AvailabilityValue' => $availability['stock'],
+                'SellingPrice' => $availability['SellingPrice'],
+                'BuyingPrice' => $availability['BuyingPrice'],
             ];
 
-            if ('stock' === $availability->type && $availability->stock > 0 && false === $availability->isStopSale) {
+            if ('1' === $availability['isStopSale']) {
+                $result += [
+                    'AvailabilityStatus' => 'Unavailable',
+                ];
+            } elseif ('stock' === $availability['type'] && $availability['stock'] > 0) {
                 $result += [
                     'AvailabilityStatus' => 'Available',
                 ];
-            } elseif ('on_request' === $availability->type && false === $availability->isStopSale) {
+            } elseif ('on_request' === $availability['type']) {
                 $result += [
                     'AvailabilityStatus' => 'Request',
                 ];
@@ -151,13 +139,18 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                     'AvailabilityValue' => 0,
                 ];
             }
+
             $resultArray[] = $result;
         }
         $expectedResult = [
             'DaysAvailabilityPrice' => $resultArray,
         ];
 
-        $response = self::$quickDataHelper->availabilityPricePeriod($experienceId, $dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d'));
+        $response = self::$quickDataHelper->availabilityPricePeriod(
+            $experienceId,
+            $dateFrom->format('Y-m-d'),
+            $dateTo->format('Y-m-d')
+        );
 
         $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
     }

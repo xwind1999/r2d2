@@ -62,14 +62,6 @@ class RoomAvailabilityManager
         return $this->repository->findAvailableRoomsByBoxId($boxId, $startDate);
     }
 
-    public function getRoomAvailabilitiesByExperienceId(
-        string $experienceId,
-        \DateTimeInterface $startDate,
-        \DateTimeInterface $endDate
-    ): array {
-        return $this->repository->findAvailableRoomsByExperienceId($experienceId, $startDate, $endDate);
-    }
-
     public function getRoomAvailabilitiesByMultipleExperienceGoldenIds(
         array $experienceGoldenIds,
         \DateTimeInterface $startDate
@@ -195,5 +187,17 @@ class RoomAvailabilityManager
         if ($bookingDate) {
             $this->repository->updateStockByComponentAndDates($bookingDate->componentGoldenId, $bookingDate->date);
         }
+    }
+
+    public function getRoomAndPriceAvailabilitiesByExperienceIdAndDates(
+        string $experienceId,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        return $this->repository->findAvailableRoomsAndPricesByExperienceIdAndDates(
+            $experienceId,
+            $startDate,
+            $endDate
+        );
     }
 }

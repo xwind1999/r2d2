@@ -55,6 +55,9 @@ class FlattenManageableComponentsCommandTest extends KernelTestCase
             ->willReturn(new Envelope(new \stdClass()));
 
         $this->commandTester->execute(['command' => 'r2d2:flatten:manageable-components']);
+        $this->commandTester->getDisplay();
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+        $this->assertStringContainsString('', $this->commandTester->getDisplay());
     }
 
     /**

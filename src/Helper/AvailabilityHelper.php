@@ -9,6 +9,7 @@ use App\Constraint\RoomStockTypeConstraint;
 class AvailabilityHelper
 {
     public const AVAILABILITY_PRICE_PERIOD_AVAILABLE = 'Available';
+    public const PRICE_PERIOD_DATE_TIME_FORMAT = 'Y-m-d\TH:i:s.u';
 
     private const AVAILABILITY_SHORTEN_INSTANT = '1';
     private const AVAILABILITY_SHORTEN_ON_REQUEST = 'r';
@@ -44,7 +45,6 @@ class AvailabilityHelper
 
     public static function fillMissingAvailabilities(
         array $availabilities,
-        string $componentId,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): array {
@@ -58,17 +58,16 @@ class AvailabilityHelper
         }
 
         $returnAvailabilities = [];
-
         $datePeriod = new \DatePeriod($dateFrom, new \DateInterval('P1D'), (clone $dateTo)->modify('+1 day'));
         foreach ($datePeriod as $date) {
-            $date = $date->format('Y-m-d');
+            $date = $date->format(self::PRICE_PERIOD_DATE_TIME_FORMAT);
             if (!isset($availabilities[$date])) {
                 $returnAvailabilities[$date] = [
-                    'stock' => 0,
-                    'date' => new \DateTime($date),
-                    'type' => 'stock',
-                    'isStopSale' => true,
-                    'componentGoldenId' => $componentId,
+                    'Date' => $date,
+                    'AvailabilityValue' => 0,
+                    'AvailabilityStatus' => self::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
+                    'SellingPrice' => 0,
+                    'BuyingPrice' => 0,
                 ];
             } else {
                 $returnAvailabilities[$date] = $availabilities[$date];
@@ -116,9 +115,12 @@ class AvailabilityHelper
         return $returnArray;
     }
 
-    public static function convertAvailabilityTypeToExplicitQuickdataValue(string $type, int $stock, bool $isStopSale): string
-    {
-        if (true === $isStopSale) {
+    public static function convertAvailabilityTypeToExplicitQuickdataValue(
+        string $type,
+        int $stock,
+        string $isStopSale
+    ): string {
+        if ('1' === $isStopSale) {
             return self::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE;
         }
 
@@ -131,33 +133,6 @@ class AvailabilityHelper
         }
 
         return self::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE;
-    }
-
-    public static function mapRoomAvailabilitiesToExperience(
-        array $components,
-        array $roomAvailabilities,
-        int $numberOfNights
-    ): array {
-        $returnArray = [];
-
-        foreach ($components as $component) {
-            $duration = $component['duration'] ?: 0;
-            if (!empty($roomAvailabilities[$component['goldenId']]) && $duration <= $numberOfNights) {
-                $returnArray[] = [
-                    'Package' => $component['experienceGoldenId'],
-                    'Request' => 0,
-                    'Stock' => $numberOfNights,
-                ];
-            } else {
-                $returnArray[] = [
-                    'Package' => $component['experienceGoldenId'],
-                    'Request' => $numberOfNights,
-                    'Stock' => 0,
-                ];
-            }
-        }
-
-        return $returnArray;
     }
 
     public static function getRealStockByDate(
