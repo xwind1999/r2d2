@@ -253,8 +253,8 @@ class AvailabilityHelperTest extends TestCase
                 'Date' => '2020-06-22T00:00:00.000000',
                 'AvailabilityValue' => 0,
                 'AvailabilityStatus' => 'Unavailable',
-                'SellingPrice' => 0,
-                'BuyingPrice' => 0,
+                'SellingPrice' => 0.00,
+                'BuyingPrice' => 0.00,
             ],
             '2020-06-23T00:00:00.000000' => [
                 'Date' => '2020-06-23T00:00:00.000000',
@@ -267,15 +267,15 @@ class AvailabilityHelperTest extends TestCase
                 'Date' => '2020-06-24T00:00:00.000000',
                 'AvailabilityValue' => 0,
                 'AvailabilityStatus' => 'Unavailable',
-                'SellingPrice' => 0,
-                'BuyingPrice' => 0,
+                'SellingPrice' => 0.00,
+                'BuyingPrice' => 0.00,
             ],
             '2020-06-25T00:00:00.000000' => [
                 'Date' => '2020-06-25T00:00:00.000000',
                 'AvailabilityValue' => 0,
                 'AvailabilityStatus' => 'Unavailable',
-                'SellingPrice' => 0,
-                'BuyingPrice' => 0,
+                'SellingPrice' => 0.00,
+                'BuyingPrice' => 0.00,
             ],
         ];
 
