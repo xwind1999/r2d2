@@ -191,9 +191,11 @@ class RoomAvailabilityManager
 
     public function updateStockBookingConfirmation(Booking $booking): void
     {
-        $bookingDate = $booking->bookingDate->first();
-        if ($bookingDate) {
-            $this->repository->updateStockByComponentAndDates($bookingDate->componentGoldenId, $bookingDate->date);
+        $bookingDates = $booking->bookingDate->getValues();
+        foreach ($bookingDates as $bookingDate) {
+            $this->repository->updateStockByComponentAndDates(
+                $bookingDate->componentGoldenId,
+                $bookingDate->date);
         }
     }
 }
