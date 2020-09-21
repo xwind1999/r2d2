@@ -66,8 +66,8 @@ class AvailabilityHelper
                     'Date' => $date,
                     'AvailabilityValue' => 0,
                     'AvailabilityStatus' => self::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
-                    'SellingPrice' => 0,
-                    'BuyingPrice' => 0,
+                    'SellingPrice' => 0.00,
+                    'BuyingPrice' => 0.00,
                 ];
             } else {
                 $returnAvailabilities[$date] = $availabilities[$date];
