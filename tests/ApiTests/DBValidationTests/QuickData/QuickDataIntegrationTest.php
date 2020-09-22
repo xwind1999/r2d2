@@ -114,11 +114,12 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
         $resultArray = [];
         foreach ($roomAvailabilities as $date => $availability) {
+            $availability['price'] = !empty($availability['price']) ? (int) $availability['price'] / 100 : 0;
             $result = [
                 'Date' => (new \DateTime($availability['date']))->format('Y-m-d\TH:i:s.u'),
                 'AvailabilityValue' => $availability['stock'],
-                'SellingPrice' => $availability['SellingPrice'],
-                'BuyingPrice' => $availability['BuyingPrice'],
+                'SellingPrice' => $availability['price'],
+                'BuyingPrice' => $availability['price'],
             ];
 
             if ('1' === $availability['isStopSale']) {
