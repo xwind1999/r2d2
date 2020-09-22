@@ -166,15 +166,19 @@ class LegacyAvailabilityProvider
                 $availability['stock'] = 0;
             }
 
+            $availability['price'] = !empty($availability['price']) ? (int) $availability['price'] / 100 : 0;
             $availability['AvailabilityValue'] = (int) $availability['stock'];
-            $availability['Date'] = (new \DateTime($availability['date']))->format(AvailabilityHelper::PRICE_PERIOD_DATE_TIME_FORMAT);
             $availability += [
+                'Date' => (new \DateTime($availability['date']))->format(AvailabilityHelper::PRICE_PERIOD_DATE_TIME_FORMAT),
                 'AvailabilityStatus' => AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
                     $availability['type'],
                     $availability['AvailabilityValue'],
                     $availability['isStopSale']
                 ),
+                'SellingPrice' => $availability['price'],
+                'BuyingPrice' => $availability['price'],
             ];
+
             $availabilities[$availability['date']] = $availability;
             unset($roomAndPriceAvailability[$index]);
         }
