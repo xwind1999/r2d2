@@ -9,7 +9,6 @@ use App\Contract\Response\CMHub\CMHubErrorResponse;
 use App\Contract\Response\CMHub\CMHubResponse;
 use App\Contract\Response\CMHub\GetAvailability\AvailabilityResponse;
 use App\Contract\Response\CMHub\GetAvailabilityResponse;
-use App\Helper\AvailabilityHelper;
 use App\Manager\ComponentManager;
 use App\Manager\ExperienceManager;
 use App\Manager\RoomAvailabilityManager;
@@ -21,8 +20,6 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 
 class AvailabilityProvider
 {
-    private const DEFAULT_COMPONENT_DURATION = 1;
-
     protected CMHub $cmHub;
     protected SerializerInterface $serializer;
     private ArrayTransformerInterface $arraySerializer;
@@ -104,14 +101,6 @@ class AvailabilityProvider
         $availabilities = $this->roomAvailabilityManager->getRoomAvailabilitiesByMultipleExperienceGoldenIds(
             $experienceIds,
             $startDate
-        );
-
-        $availabilities = AvailabilityHelper::getRealStock(
-            $availabilities,
-            $this->bookingDateRepository->findBookingDatesByExperiencesAndDate(
-                $experienceIds,
-                $startDate
-            )
         );
 
         foreach ($availabilities as $availability) {

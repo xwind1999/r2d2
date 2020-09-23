@@ -333,18 +333,6 @@ class AvailabilityProviderTest extends TestCase
             ]
         );
 
-        $this->bookingDateRepository->findBookingDatesByExperiencesAndDate(
-            Argument::type('array'),
-            Argument::type(\DateTime::class)
-            )->willReturn([
-                [
-                    'experience_golden_id' => '1234',
-                    'componentGoldenId' => '1111',
-                    'date' => new \DateTime('2020-06-20'),
-                    'usedStock' => 1,
-                ],
-            ]);
-
         $expectedArray = [
             '1234' => [
                 'duration' => '1',

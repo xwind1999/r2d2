@@ -152,23 +152,4 @@ class AvailabilityHelper
 
         return $roomAvailabilities;
     }
-
-    public static function getRealStock(array $roomAvailabilities, array $bookingStockDates): array
-    {
-        foreach ($bookingStockDates as $booking) {
-            $bookingDate = $booking['date'] instanceof \DateTime ?
-                $booking['date']->format('Y-m-d') : $booking['date'];
-            foreach ($roomAvailabilities as $key => $availability) {
-                $availabilityDate = $availability['date'] instanceof \DateTime ?
-                    $availability['date']->format('Y-m-d') : $availability['date'];
-                if ($bookingDate === $availabilityDate) {
-                    $roomAvailabilities[$key]['stock'] = $booking['usedStock'] > $availability['stock'] ?
-                        self::AVAILABILITY_SHORTEN_NOT_AVAILABLE :
-                        $availability['stock'] - $booking['usedStock'];
-                }
-            }
-        }
-
-        return $roomAvailabilities;
-    }
 }

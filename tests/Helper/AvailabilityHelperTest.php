@@ -355,16 +355,6 @@ class AvailabilityHelperTest extends TestCase
         $asserts($this, $usedAvailabilities, $bookingStockDate, $availabilities);
     }
 
-    /**
-     * @dataProvider bookingAvailabilityRealStockProvider
-     */
-    public function testGetRealStock(array $availabilities, array $bookingStockDate, callable $asserts)
-    {
-        $usedAvailabilities = AvailabilityHelper::getRealStock($availabilities, $bookingStockDate);
-
-        $asserts($this, $usedAvailabilities, $bookingStockDate, $availabilities);
-    }
-
     public function bookingAvailabilityProvider()
     {
         $componentGoldenId = '12345';
@@ -406,9 +396,11 @@ class AvailabilityHelperTest extends TestCase
                 foreach ($usedAvailabilities as $date => $usedStock) {
                     foreach ($bookingStock as $booking) {
                         if ($booking['date']->format('Y-m-d') === $date) {
+                            $realStock = $booking['usedStock'] > $roomAvailabilities[$date]['stock'] ? 0 :
+                                $roomAvailabilities[$date]['stock'] - $booking['usedStock'];
                             $test->assertEquals(
                                 $usedStock['stock'],
-                                ($roomAvailabilities[$date]['stock'] - $booking['usedStock'])
+                                $realStock
                             );
                         }
                     }
@@ -447,79 +439,6 @@ class AvailabilityHelperTest extends TestCase
                                 $roomAvailabilities[$date]['stock'] - $booking['usedStock'];
                             $test->assertEquals(
                                 $usedStock['stock'],
-                                $realStock
-                            );
-                        }
-                    }
-                }
-            }),
-        ];
-    }
-
-    public function bookingAvailabilityRealStockProvider()
-    {
-        $datetime = new \DateTime('2020-10-01');
-
-        $availabilities = [
-            [
-                'experience_golden_id' => '59593',
-                'partner_golden_id' => '00030786',
-                'is_sellable' => '0',
-                'duration' => 1,
-                'date' => $datetime->format('Y-m-d'),
-                'stock' => 1,
-            ],
-            [
-                'experience_golden_id' => '59593',
-                'partner_golden_id' => '00030786',
-                'is_sellable' => '0',
-                'duration' => 1,
-                'date' => (clone $datetime)->modify('+1 day')->format('Y-m-d'),
-                'stock' => 10,
-            ],         [
-                'experience_golden_id' => '59593',
-                'partner_golden_id' => '00030786',
-                'is_sellable' => '0',
-                'duration' => 1,
-                'date' => (clone $datetime)->modify('+2 days')->format('Y-m-d'),
-                'stock' => 5,
-            ],
-            [
-                'experience_golden_id' => '59593',
-                'partner_golden_id' => '00030786',
-                'is_sellable' => '0',
-                'duration' => 1,
-                'date' => (clone $datetime)->modify('+3 days')->format('Y-m-d'),
-                'stock' => 3,
-            ],
-        ];
-
-        $bookingStockDate = [
-            [
-                'experienceGoldenId' => '59593',
-                'componentGoldenId' => '213072',
-                'date' => $datetime,
-                'usedStock' => 1,
-            ],
-            [
-                'experienceGoldenId' => '59593',
-                'componentGoldenId' => '213072',
-                'date' => (clone $datetime)->modify('+3 days'),
-                'usedStock' => 5,
-            ],
-        ];
-
-        yield 'booking-availability-calculate' => [
-            $availabilities,
-            $bookingStockDate,
-            (function ($test, $usedAvailabilities, $bookingStock, $roomAvailabilities) {
-                foreach ($usedAvailabilities as $key => $usedAvailability) {
-                    foreach ($bookingStock as $booking) {
-                        if ($booking['date']->format('Y-m-d') === $usedAvailability['date']) {
-                            $realStock = $booking['usedStock'] > $roomAvailabilities[$key]['stock'] ? 0 :
-                                $roomAvailabilities[$key]['stock'] - $booking['usedStock'];
-                            $test->assertEquals(
-                                $usedAvailability['stock'],
                                 $realStock
                             );
                         }
