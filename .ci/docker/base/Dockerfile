@@ -2,7 +2,7 @@ FROM php:7.4-fpm-alpine
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_HOME /composer
-ENV COMPOSER_VERSION 1.10.5
+ENV COMPOSER_VERSION 1.10.13
 
 RUN apk add nginx; mkdir -p /run/nginx
 
