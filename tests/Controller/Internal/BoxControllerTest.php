@@ -154,6 +154,7 @@ class BoxControllerTest extends TestCase
     {
         $boxCreateRequest = new BoxCreateRequest();
         $boxManager = $this->prophesize(BoxManager::class);
+        //TODO: DriverException is deprecated, but this cannot be fixed at the moment
         $exception = new UniqueConstraintViolationException('', $this->prophesize(DriverException::class)->reveal());
         $boxManager->create($boxCreateRequest)->willThrow($exception);
         $controller = new BoxController();

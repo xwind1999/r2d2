@@ -156,6 +156,7 @@ class ExperienceControllerTest extends TestCase
     {
         $experienceCreateRequest = new ExperienceCreateRequest();
         $experienceManager = $this->prophesize(ExperienceManager::class);
+        //TODO: DriverException is deprecated, but this cannot be fixed at the moment
         $exception = new UniqueConstraintViolationException('', $this->prophesize(DriverException::class)->reveal());
         $experienceManager->create($experienceCreateRequest)->willThrow($exception);
         $controller = new ExperienceController();

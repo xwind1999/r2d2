@@ -21,10 +21,6 @@ namespace Doctrine\ORM;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\NotifyPropertyChanged;
-use Doctrine\Common\Persistence\Mapping\RuntimeReflectionService;
-use Doctrine\Common\Persistence\ObjectManagerAware;
-use Doctrine\Common\PropertyChangedListener;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\Cache\Persister\CachedPersister;
 use Doctrine\ORM\Event\LifecycleEventArgs;
@@ -43,6 +39,10 @@ use Doctrine\ORM\Persisters\Entity\JoinedSubclassPersister;
 use Doctrine\ORM\Persisters\Entity\SingleTablePersister;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\Utility\IdentifierFlattener;
+use Doctrine\Persistence\Mapping\RuntimeReflectionService;
+use Doctrine\Persistence\NotifyPropertyChanged;
+use Doctrine\Persistence\ObjectManagerAware;
+use Doctrine\Persistence\PropertyChangedListener;
 use InvalidArgumentException;
 use Throwable;
 use UnexpectedValueException;
@@ -349,11 +349,11 @@ class UnitOfWork implements PropertyChangedListener
         }
 
         if ( ! ($this->entityInsertions ||
-                $this->entityDeletions ||
-                $this->entityUpdates ||
-                $this->collectionUpdates ||
-                $this->collectionDeletions ||
-                $this->orphanRemovals)) {
+            $this->entityDeletions ||
+            $this->entityUpdates ||
+            $this->collectionUpdates ||
+            $this->collectionDeletions ||
+            $this->orphanRemovals)) {
             $this->dispatchOnFlushEvent();
             $this->dispatchPostFlushEvent();
 
@@ -1901,7 +1901,7 @@ class UnitOfWork implements PropertyChangedListener
      * @param object      $entity
      * @param array       $visited
      * @param object|null $prevManagedCopy
-     * @param array|null  $assoc
+     * @param string[]    $assoc
      *
      * @return object The managed copy of the entity.
      *
@@ -2205,7 +2205,7 @@ class UnitOfWork implements PropertyChangedListener
                 case ($relatedEntities instanceof PersistentCollection):
                     // Unwrap so that foreach() does not initialize
                     $relatedEntities = $relatedEntities->unwrap();
-                    // break; is commented intentionally!
+                // break; is commented intentionally!
 
                 case ($relatedEntities instanceof Collection):
                 case (is_array($relatedEntities)):
@@ -2248,7 +2248,7 @@ class UnitOfWork implements PropertyChangedListener
                 case ($relatedEntities instanceof PersistentCollection):
                     // Unwrap so that foreach() does not initialize
                     $relatedEntities = $relatedEntities->unwrap();
-                    // break; is commented intentionally!
+                // break; is commented intentionally!
 
                 case ($relatedEntities instanceof Collection):
                 case (is_array($relatedEntities)):
@@ -2331,7 +2331,7 @@ class UnitOfWork implements PropertyChangedListener
                 case ($relatedEntities instanceof PersistentCollection):
                     // Unwrap so that foreach() does not initialize
                     $relatedEntities = $relatedEntities->unwrap();
-                    // break; is commented intentionally!
+                // break; is commented intentionally!
 
                 case ($relatedEntities instanceof Collection):
                 case (is_array($relatedEntities)):
@@ -2596,13 +2596,13 @@ class UnitOfWork implements PropertyChangedListener
     /**
      * @param ClassMetadata $class
      *
-     * @return \Doctrine\Common\Persistence\ObjectManagerAware|object
+     * @return ObjectManagerAware|object
      */
     private function newInstance($class)
     {
         $entity = $class->newInstance();
 
-        if ($entity instanceof \Doctrine\Common\Persistence\ObjectManagerAware) {
+        if ($entity instanceof ObjectManagerAware) {
             $entity->injectObjectManager($this->em, $class);
         }
 

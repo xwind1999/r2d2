@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests\Helper;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
@@ -29,7 +27,7 @@ class DisposableWorker
     {
         $this->receivers = $receivers;
         $this->bus = $bus;
-        $this->eventDispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($eventDispatcher) : $eventDispatcher;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function run(int $count = 1): void
