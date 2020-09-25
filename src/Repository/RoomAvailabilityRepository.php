@@ -90,7 +90,7 @@ SQL;
         \DateTimeInterface $startDate
     ): array {
         $sql = <<<SQL
-SELECT fmc.experience_golden_id, fmc.partner_golden_id, fmc.is_sellable, fmc.duration, ra.date, ra.stock
+SELECT fmc.experience_golden_id, fmc.partner_golden_id, fmc.is_sellable, fmc.duration
 FROM room_availability ra
 JOIN (
     SELECT
@@ -111,16 +111,7 @@ WHERE
     ra.is_stop_sale = false AND
     (fmc.last_bookable_date IS NULL OR ra.date <= (fmc.last_bookable_date - INTERVAL fmc.duration DAY)) AND
     ((ra.type in (:stockType,:allotmentType)) and ra.stock > 0) AND
-     ra.date BETWEEN :startDate AND DATE_ADD(:startDate, interval fmc.duration - 1 day)
-GROUP BY 
-    fmc.experience_golden_id,
-    fmc.partner_golden_id,
-    fmc.is_sellable,
-    ra.date,
-    fmc.duration,
-    fmc.room_stock_type,
-    ra.stock  
-HAVING count(ra.date) = fmc.duration;
+     ra.date BETWEEN :startDate AND DATE_ADD(:startDate, interval fmc.duration - 1 day);
 SQL;
         $values = [
             'experienceGoldenIds' => $experienceGoldenIds,
@@ -136,7 +127,7 @@ SQL;
         ];
 
         /** @var Statement $query */
-        $query = $this->getEntityManager()->getConnection()->executeQuery($sql, $values, $types);
+        $query = $this->getAvailabilityReadOnlyConnection()->executeQuery($sql, $values, $types);
 
         return $query->fetchAllAssociative();
     }
