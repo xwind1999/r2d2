@@ -111,7 +111,8 @@ WHERE
     ra.is_stop_sale = false AND
     (fmc.last_bookable_date IS NULL OR ra.date <= (fmc.last_bookable_date - INTERVAL fmc.duration DAY)) AND
     ((ra.type in (:stockType,:allotmentType)) and ra.stock > 0) AND
-     ra.date BETWEEN :startDate AND DATE_ADD(:startDate, interval fmc.duration - 1 day);
+     ra.date BETWEEN :startDate AND DATE_ADD(:startDate, interval fmc.duration - 1 day)
+GROUP BY experience_golden_id HAVING count(ra.date) = fmc.duration;
 SQL;
         $values = [
             'experienceGoldenIds' => $experienceGoldenIds,

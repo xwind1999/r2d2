@@ -24,8 +24,11 @@ unit-tests:
   needs:
     - composer
   services:
-    - name: mysql:8.0
+    - name: percona:8.0
       alias: mysql
+      command:
+        - mysqld
+        - --sql-mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION
   variables:
     MYSQL_DATABASE: r2d2
     MYSQL_ROOT_PASSWORD: admin123
