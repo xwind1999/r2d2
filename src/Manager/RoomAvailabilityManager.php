@@ -12,6 +12,7 @@ use App\Entity\RoomAvailability;
 use App\Event\Product\AvailabilityUpdatedEvent;
 use App\Exception\Manager\RoomAvailability\InvalidRoomStockTypeException;
 use App\Exception\Manager\RoomAvailability\OutdatedRoomAvailabilityInformationException;
+use App\Helper\AvailabilityHelper;
 use App\Repository\ComponentRepository;
 use App\Repository\RoomAvailabilityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -86,7 +87,11 @@ class RoomAvailabilityManager
      */
     public function replace(RoomAvailabilityRequest $roomAvailabilityRequest): void
     {
-        $datePeriod = $this->createDatePeriod($roomAvailabilityRequest);
+        $datePeriod = AvailabilityHelper::createDatePeriod(
+            $roomAvailabilityRequest->dateFrom,
+            $roomAvailabilityRequest->dateTo
+        );
+
         $component = $this->componentRepository->findOneByGoldenId($roomAvailabilityRequest->product->id);
 
         if (empty($component->roomStockType)) {
@@ -124,16 +129,6 @@ class RoomAvailabilityManager
             $this->eventDispatcher->dispatch(new AvailabilityUpdatedEvent($component, $changedDates));
         }
         $this->entityManager->flush();
-    }
-
-    private function createDatePeriod(RoomAvailabilityRequest $roomAvailabilityRequest): \DatePeriod
-    {
-        $beginDate = new \DateTime($roomAvailabilityRequest->dateFrom->format('Y-m-d'));
-        $endDate = new \DateTime($roomAvailabilityRequest->dateTo->format('Y-m-d'));
-        $endDate->modify('+1 day');
-        $interval = new \DateInterval('P1D');
-
-        return new \DatePeriod($beginDate, $interval, $endDate);
     }
 
     public function dispatchRoomAvailabilitiesRequest(RoomAvailabilityRequestList $roomAvailabilityRequestList): void
