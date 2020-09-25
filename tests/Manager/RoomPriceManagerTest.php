@@ -80,7 +80,7 @@ class RoomPriceManagerTest extends TestCase
         $roomPriceRequest->product = new Product();
         $roomPriceRequest->product->id = '1234';
         $roomPriceRequest->dateFrom = new \DateTime('2020-01-01');
-        $roomPriceRequest->dateTo = new \DateTime('2020-01-02');
+        $roomPriceRequest->dateTo = new \DateTime('2020-01-03');
         $roomPriceRequest->price = new Price();
         $roomPriceRequest->price->amount = 123;
         $roomPriceRequest->price->currencyCode = 'EUR';
@@ -121,15 +121,16 @@ class RoomPriceManagerTest extends TestCase
         $roomPriceRequest->price = new Price();
         $roomPriceRequest->price->amount = 123;
         $roomPriceRequest->price->currencyCode = 'EUR';
-        $roomPriceRequest->updatedAt = null;
+        $roomPriceRequest->updatedAt = new \DateTime('2019-12-01');
 
         $roomPriceList = [];
         $roomPrice = new RoomPrice();
         $roomPrice->component = new Component();
         $roomPrice->component->id = '1234';
         $roomPriceList['2020-01-01'] = $roomPrice;
+        $roomPriceList['2020-01-01']->externalUpdatedAt = new \DateTime('now');
         $roomPriceList['2020-01-02'] = clone $roomPrice;
-        $roomPriceList['2020-01-02']->externalUpdatedAt = new \DateTime();
+        $roomPriceList['2020-01-02']->externalUpdatedAt = new \DateTime('now');
 
         $component = new Component();
 
@@ -143,7 +144,7 @@ class RoomPriceManagerTest extends TestCase
 
         $this->em->flush()->shouldBeCalled();
 
-        $this->em->persist($roomPrice)->shouldBeCalledTimes(1);
+        $this->em->persist($roomPrice)->shouldNotBeCalled();
         $this->logger->warning('Outdated room price received', $roomPriceRequest->getContext())->shouldBeCalledTimes(1);
 
         $this->manager->replace($roomPriceRequest);

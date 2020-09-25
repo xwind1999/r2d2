@@ -48,6 +48,8 @@ class RoomAvailabilityBroadcastTest extends IntegrationTestCase
         $date2 = new \DateTime('+2 week 2 days');
         $date3 = new \DateTime('+2 week 3 days');
         $date4 = new \DateTime('+2 week 4 days');
+        $date5 = new \DateTime('+2 week 5 days');
+        $date6 = new \DateTime('+3 weeks');
         $payload = [[
                 'product' => [
                     'id' => $component['id'],
@@ -62,7 +64,7 @@ class RoomAvailabilityBroadcastTest extends IntegrationTestCase
                     'id' => $component['id'],
                 ],
                 'dateFrom' => $date3->format('Y-m-d\TH:i:s.uP'),
-                'dateTo' => $date3->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => $date4->format('Y-m-d\TH:i:s.uP'),
                 'isStopSale' => false,
                 'updatedAt' => $date->format('Y-m-d\TH:i:s.uP'),
                 'quantity' => '50',
@@ -71,8 +73,8 @@ class RoomAvailabilityBroadcastTest extends IntegrationTestCase
                 'product' => [
                     'id' => $component['id'],
                 ],
-                'dateFrom' => $date4->format('Y-m-d\TH:i:s.uP'),
-                'dateTo' => $date4->format('Y-m-d\TH:i:s.uP'),
+                'dateFrom' => $date5->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => $date6->format('Y-m-d\TH:i:s.uP'),
                 'isStopSale' => true,
                 'updatedAt' => $date->format('Y-m-d\TH:i:s.uP'),
                 'quantity' => '50',
@@ -93,9 +95,6 @@ class RoomAvailabilityBroadcastTest extends IntegrationTestCase
         $this->assertEquals($payload[0]['product']['id'], $roomAvailability[$date1->format('Y-m-d')]->componentGoldenId);
         $this->assertEquals($payload[0]['quantity'], $roomAvailability[$date1->format('Y-m-d')]->stock);
         $this->assertEquals(false, $roomAvailability[$date1->format('Y-m-d')]->isStopSale);
-        $this->assertEquals($payload[0]['product']['id'], $roomAvailability[$date2->format('Y-m-d')]->componentGoldenId);
-        $this->assertEquals($payload[0]['quantity'], $roomAvailability[$date2->format('Y-m-d')]->stock);
-        $this->assertEquals(false, $roomAvailability[$date1->format('Y-m-d')]->isStopSale);
 
         $component2 = $componentRepository->findOneByGoldenId($payload[1]['product']['id']);
         $roomAvailability = $roomAvailabilityRepository->findByComponentAndDateRange($component2, new \DateTime($payload[1]['dateFrom']), new \DateTime($payload[1]['dateTo']));
@@ -105,8 +104,8 @@ class RoomAvailabilityBroadcastTest extends IntegrationTestCase
 
         $component3 = $componentRepository->findOneByGoldenId($payload[2]['product']['id']);
         $roomAvailability = $roomAvailabilityRepository->findByComponentAndDateRange($component3, new \DateTime($payload[2]['dateFrom']), new \DateTime($payload[2]['dateTo']));
-        $this->assertEquals($payload[2]['product']['id'], $roomAvailability[$date4->format('Y-m-d')]->componentGoldenId);
-        $this->assertEquals($payload[2]['quantity'], $roomAvailability[$date4->format('Y-m-d')]->stock);
-        $this->assertEquals($payload[2]['isStopSale'], $roomAvailability[$date4->format('Y-m-d')]->isStopSale);
+        $this->assertEquals($payload[2]['product']['id'], $roomAvailability[$date5->format('Y-m-d')]->componentGoldenId);
+        $this->assertEquals($payload[2]['quantity'], $roomAvailability[$date5->format('Y-m-d')]->stock);
+        $this->assertEquals($payload[2]['isStopSale'], $roomAvailability[$date5->format('Y-m-d')]->isStopSale);
     }
 }

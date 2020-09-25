@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Helper;
 
+use App\Exception\Helper\InvalidDatesForPeriod;
 use App\Helper\AvailabilityHelper;
 use PHPUnit\Framework\TestCase;
 
@@ -347,6 +348,7 @@ class AvailabilityHelperTest extends TestCase
 
     /**
      * @dataProvider bookingAvailabilityProvider
+     * @covers ::getRealStockByDate
      */
     public function testGetRoomAvailabilityRealStock(array $availabilities, array $bookingStockDate, callable $asserts)
     {
@@ -445,6 +447,58 @@ class AvailabilityHelperTest extends TestCase
                     }
                 }
             }),
+        ];
+    }
+
+    /**
+     * @dataProvider periodProvider
+     * @covers ::createDatePeriod
+     */
+    public function testCreateDatePeriod($beginDate, $endDate, callable $asserts, string $exception = null)
+    {
+        if ($exception) {
+            $this->expectException($exception);
+        }
+
+        $datePeriod = AvailabilityHelper::createDatePeriod($beginDate, $endDate);
+
+        $asserts($this, $datePeriod);
+    }
+
+    public function periodProvider()
+    {
+        yield 'three-days-difference-dates' => [
+            new \DateTime('today'),
+            new \DateTime('+3 days'),
+            (function ($test, $period) {
+                $test->assertEquals((new \DateTime('today'))->format('Y-m-d'), $period->start->format('Y-m-d'));
+                $test->assertEquals((new \DateTime('+3 days'))->format('Y-m-d'), $period->end->format('Y-m-d'));
+            }),
+        ];
+        yield 'two-days-difference-dates' => [
+            new \DateTime('today'),
+            new \DateTime('+2 days'),
+            (function ($test, $period) {
+                $test->assertEquals((new \DateTime('today'))->format('Y-m-d'), $period->start->format('Y-m-d'));
+                $test->assertEquals((new \DateTime('+2 days'))->format('Y-m-d'), $period->end->format('Y-m-d'));
+            }),
+        ];
+        yield 'one-days-difference-dates' => [
+            new \DateTime('today'),
+            new \DateTime('+1 day'),
+            (function ($test, $period) {
+                $test->assertEquals((new \DateTime('today'))->format('Y-m-d'), $period->start->format('Y-m-d'));
+                $test->assertEquals((new \DateTime('+1 day'))->format('Y-m-d'), $period->end->format('Y-m-d'));
+            }),
+        ];
+        yield 'same-days-difference-dates' => [
+            new \DateTime('today'),
+            new \DateTime('today'),
+            (function ($test, $period) {
+                $test->assertEquals((new \DateTime('today'))->format('Y-m-d'), $period->start->format('Y-m-d'));
+                $test->assertEquals((new \DateTime('+1 day'))->format('Y-m-d'), $period->end->format('Y-m-d'));
+            }),
+            InvalidDatesForPeriod::class,
         ];
     }
 }

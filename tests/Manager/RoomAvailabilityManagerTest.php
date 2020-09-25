@@ -272,7 +272,6 @@ class RoomAvailabilityManagerTest extends TestCase
     /**
      * @dataProvider roomAvailabilityRequestProvider
      * @covers ::replace
-     * @covers ::createDatePeriod
      * @covers ::hasAvailabilityChangedForBoxCache
      * @group replace-room-availability
      *
@@ -352,7 +351,7 @@ class RoomAvailabilityManagerTest extends TestCase
                 $test->repository->findByComponentAndDateRange(Argument::cetera())->willReturn($roomAvailabilityList);
 
                 $test->em->flush()->shouldBeCalledTimes(1);
-                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(4);
+                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(3);
                 $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
             }),
             (function ($roomAvailabilityRequest) {
@@ -375,7 +374,7 @@ class RoomAvailabilityManagerTest extends TestCase
             (function ($test, $roomAvailabilityList, $component) {
                 $test->repository->findByComponentAndDateRange(Argument::cetera())->willReturn($roomAvailabilityList);
                 $test->em->flush()->shouldBeCalledTimes(1);
-                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(4);
+                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(3);
                 $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
             }),
             (function ($roomAvailabilityRequest) {
@@ -399,7 +398,7 @@ class RoomAvailabilityManagerTest extends TestCase
             (function ($test, $roomAvailabilityList, $component) {
                 $test->repository->findByComponentAndDateRange(Argument::cetera())->willReturn($roomAvailabilityList);
                 $test->em->flush()->shouldBeCalledTimes(1);
-                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(4);
+                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(3);
                 $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
             }),
             (function ($roomAvailabilityRequest, $roomAvailabilityExistent) {

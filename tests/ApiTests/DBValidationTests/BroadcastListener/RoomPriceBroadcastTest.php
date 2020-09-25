@@ -68,8 +68,6 @@ class RoomPriceBroadcastTest extends IntegrationTestCase
         /** @var RoomPriceRepository $roomPriceRepository */
         $roomPriceRepository = self::$container->get(RoomPriceRepository::class);
         $roomPrice = $roomPriceRepository->findByComponentAndDateRange($componentEntity, new \DateTime($payload[0]['dateFrom']), new \DateTime($payload[0]['dateTo']));
-        $this->assertEquals($payload[0]['product']['id'], $roomPrice[$date2->format('Y-m-d')]->componentGoldenId);
-        $this->assertEquals($payload[0]['price']['amount'], ($roomPrice[$date2->format('Y-m-d')]->price) / 100);
         $this->assertEquals($payload[0]['product']['id'], $roomPrice[$date1->format('Y-m-d')]->componentGoldenId);
         $this->assertEquals($payload[0]['price']['amount'], ($roomPrice[$date1->format('Y-m-d')]->price) / 100);
     }
