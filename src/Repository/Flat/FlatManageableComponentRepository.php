@@ -63,6 +63,6 @@ SQL;
         $statement->bindValue('componentGoldenId', $componentGoldenId);
         $statement->execute();
 
-        return array_column($statement->fetchAll(), 'box_golden_id');
+        return array_column($statement->fetchAllAssociative(), 'box_golden_id');
     }
 }

@@ -12,6 +12,7 @@ use App\Exception\Repository\RoomAvailabilityNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\PDO\Statement;
 use Doctrine\ORM\Query\QueryException;
 
 /**
@@ -81,7 +82,7 @@ SQL;
         $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
         $statement->execute();
 
-        return $statement->fetchAll();
+        return $statement->fetchAllAssociative();
     }
 
     public function findAvailableRoomsByMultipleExperienceIds(
@@ -134,9 +135,10 @@ SQL;
             'allotmentType' => \PDO::PARAM_STR,
         ];
 
+        /** @var Statement $query */
         $query = $this->getEntityManager()->getConnection()->executeQuery($sql, $values, $types);
 
-        return $query->fetchAll();
+        return $query->fetchAllAssociative();
     }
 
     public function findRoomAvailabilitiesByMultipleComponentGoldenIds(
@@ -265,7 +267,7 @@ SQL;
         $statement->bindValue('dateTo', $booking->endDate->format('Y-m-d'));
         $statement->execute();
 
-        return $statement->fetchAll();
+        return $statement->fetchAllAssociative();
     }
 
     public function updateStockByComponentAndDates(
@@ -285,7 +287,7 @@ SQL;
             'date' => $date->format('Y-m-d'),
         ];
 
-        return $this->_em->getConnection()->executeUpdate($sql, $params);
+        return $this->_em->getConnection()->executeStatement($sql, $params);
     }
 
     public function findAvailableRoomsAndPricesByExperienceIdAndDates(
@@ -338,6 +340,6 @@ SQL;
         $statement->bindValue('endDate', $endDate->format('Y-m-d'));
         $statement->execute();
 
-        return $statement->fetchAll();
+        return $statement->fetchAllAssociative();
     }
 }
