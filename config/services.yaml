@@ -9,11 +9,6 @@ parameters:
     newrelic.api_key: '%env(NR_APIKEY)%'
     clients.quickdata:
         base_uri: '%env(QUICKDATA_URL)%'
-    clients.cmhub:
-        base_uri: '%env(CMHUB_URL)%'
-        auth_basic:
-            user: '%env(CMHUB_USER)%'
-            password: '%env(CMHUB_PASSWORD)%'
 
 services:
     # default configuration for services in *this* file
@@ -99,11 +94,6 @@ services:
     App\Http\HttpClientFactory: ~
 
     Ramsey\Uuid\UuidFactory: ~
-
-    App\CMHub\CMHub:
-        arguments:
-            - '%clients.cmhub%'
-            - '@App\Http\HttpClientFactory'
 
     App\Logger\Processor\:
         resource: '../src/Logger/Processor'
