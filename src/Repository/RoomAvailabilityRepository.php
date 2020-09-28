@@ -241,7 +241,6 @@ SQL;
         <<<SQL
             SELECT 
                 ra.date,
-                fmc.room_stock_type AS type,
                 ra.stock,
                 ra.component_golden_id AS componentGoldenId,
                 ra.is_stop_sale AS isStopSale,
@@ -260,9 +259,9 @@ SQL;
                     partner_golden_id,
                     duration,
                     is_sellable,
-                    room_stock_type,
                     last_bookable_date,
-                    component_uuid
+                    component_uuid,
+                    room_stock_type
                 FROM
                     flat_manageable_component
                 WHERE

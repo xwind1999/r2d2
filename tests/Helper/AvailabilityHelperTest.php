@@ -97,7 +97,7 @@ class AvailabilityHelperTest extends TestCase
     /**
      * @covers ::buildDataForGetPackage
      */
-    public function testBuildDataForGetPackage(): void
+    public function testBuildDataForGetPackageV2(): void
     {
         $availabilities = ['1', '1', '1'];
         $duration = 1;
@@ -121,6 +121,115 @@ class AvailabilityHelperTest extends TestCase
                 $duration,
                 $partnerId,
                 $isSellable,
+            )
+        );
+    }
+
+    /**
+     * @covers ::fillMissingAvailabilityForGetPackage
+     * @covers ::getRoomStockShortType
+     * @covers ::validateStockType
+     * @covers ::validateMissingAvailability
+     */
+    public function testBuildDataForGetPackage(): void
+    {
+        $dateFrom = new \DateTime('2020-10-01');
+        $dateTo = new \DateTime('2020-10-02');
+        $roomStockType = '1';
+        $duration = 1;
+        $partnerCode = '1234';
+        $isSellable = false;
+        $availabilities = [
+            '2020-10-01' => [
+                'date' => '2020-10-01',
+                'roomStockType' => 'stock',
+                'stock' => '1',
+                'isStopSale' => 0,
+                'duration' => '1',
+                'isSellable' => '0',
+                'partnerGoldenId' => '1234',
+            ],
+            '2020-10-02' => [
+                'date' => '2020-10-02',
+                'roomStockType' => 'stock',
+                'stock' => '1',
+                'isStopSale' => 0,
+                'duration' => '1',
+                'isSellable' => '0',
+                'partnerGoldenId' => '1234',
+            ],
+        ];
+
+        $returnArray = [
+            'Availabilities' => ['1', '1'],
+            'PrestId' => 1,
+            'Duration' => 1,
+            'LiheId' => 1,
+            'PartnerCode' => '1234',
+            'ExtraNight' => false,
+            'ExtraRoom' => false,
+        ];
+
+        $this->assertEquals(
+            $returnArray,
+            AvailabilityHelper::fillMissingAvailabilityForGetPackage(
+                $availabilities,
+                $roomStockType,
+                $duration,
+                $partnerCode,
+                $isSellable,
+                $dateFrom,
+                $dateTo
+            )
+        );
+    }
+
+    /**
+     * @covers ::fillMissingAvailabilityForGetPackage
+     * @covers ::getRoomStockShortType
+     * @covers ::validateStockType
+     * @covers ::validateMissingAvailability
+     */
+    public function testBuildDataForGetPackageWithMissingAvailabilities(): void
+    {
+        $dateFrom = new \DateTime('2020-10-01');
+        $dateTo = new \DateTime('2020-10-02');
+        $roomStockType = '1';
+        $duration = 1;
+        $partnerCode = '1234';
+        $isSellable = false;
+        $availabilities = [
+            '2020-10-01' => [
+                'date' => '2020-10-01',
+                'type' => 'stock',
+                'stock' => '1',
+                'isStopSale' => 0,
+                'duration' => '1',
+                'isSellable' => '0',
+                'partnerGoldenId' => '1234',
+            ],
+        ];
+
+        $returnArray = [
+            'Availabilities' => ['1', '0'],
+            'PrestId' => 1,
+            'Duration' => 1,
+            'LiheId' => 1,
+            'PartnerCode' => '1234',
+            'ExtraNight' => false,
+            'ExtraRoom' => false,
+        ];
+
+        $this->assertEquals(
+            $returnArray,
+            AvailabilityHelper::fillMissingAvailabilityForGetPackage(
+                $availabilities,
+                $roomStockType,
+                $duration,
+                $partnerCode,
+                $isSellable,
+                $dateFrom,
+                $dateTo
             )
         );
     }
@@ -204,7 +313,7 @@ class AvailabilityHelperTest extends TestCase
     }
 
     /**
-     * @covers ::fillMissingAvailabilities
+     * @covers ::fillMissingAvailabilitiesForAvailabilityPrice
      */
     public function testFillMissingAvailabilities(): void
     {
@@ -282,12 +391,12 @@ class AvailabilityHelperTest extends TestCase
 
         $this->assertEquals(
             $returnArray,
-            AvailabilityHelper::fillMissingAvailabilities($availabilities, $dateFrom, $dateTo)
+            AvailabilityHelper::fillMissingAvailabilitiesForAvailabilityPrice($availabilities, $dateFrom, $dateTo)
         );
     }
 
     /**
-     * @covers ::fillMissingAvailabilities
+     * @covers ::fillMissingAvailabilitiesForAvailabilityPrice
      */
     public function testFillMissingAvailabilitiesWithEnoughDate(): void
     {
@@ -320,7 +429,7 @@ class AvailabilityHelperTest extends TestCase
 
         $this->assertEquals(
             $availabilities,
-            AvailabilityHelper::fillMissingAvailabilities($availabilities, $dateFrom, $dateTo)
+            AvailabilityHelper::fillMissingAvailabilitiesForAvailabilityPrice($availabilities, $dateFrom, $dateTo)
         );
     }
 

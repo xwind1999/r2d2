@@ -355,7 +355,6 @@ class LegacyAvailabilityProviderTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::getAvailabilityPriceForExperience
-     * @covers ::isCeasedPartnerDate
      */
     public function testGetAvailabilityPriceForExperience()
     {
@@ -371,7 +370,7 @@ class LegacyAvailabilityProviderTest extends TestCase
                     0 => [
                         'date' => '2020-06-20T00:00:00.000000',
                         'stock' => '1',
-                        'type' => 'stock',
+                        'roomStockType' => 'stock',
                         'isStopSale' => '0',
                         'duration' => '1',
                         'price' => '86.45',
@@ -380,7 +379,7 @@ class LegacyAvailabilityProviderTest extends TestCase
                     1 => [
                         'date' => '2020-06-21T00:00:00.000000',
                         'stock' => '1',
-                        'type' => 'stock',
+                        'roomStockType' => 'stock',
                         'isStopSale' => '0',
                         'duration' => '1',
                         'price' => '86.45',
@@ -389,7 +388,7 @@ class LegacyAvailabilityProviderTest extends TestCase
                     1 => [
                         'date' => '2020-06-21T00:00:00.000000',
                         'stock' => '1',
-                        'type' => 'stock',
+                        'roomStockType' => 'stock',
                         'isStopSale' => '0',
                         'duration' => '1',
                         'price' => '0',
