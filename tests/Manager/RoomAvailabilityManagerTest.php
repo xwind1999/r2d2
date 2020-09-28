@@ -18,7 +18,6 @@ use App\Entity\Guest;
 use App\Entity\Partner;
 use App\Entity\RoomAvailability;
 use App\Event\Product\AvailabilityUpdatedEvent;
-use App\Exception\Manager\RoomAvailability\InvalidRoomStockTypeException;
 use App\Exception\Manager\RoomAvailability\OutdatedRoomAvailabilityInformationException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Manager\RoomAvailabilityManager;
@@ -93,33 +92,6 @@ class RoomAvailabilityManagerTest extends TestCase
 
     /**
      * @covers ::__construct
-     * @covers ::getRoomAvailabilitiesByMultipleComponentGoldenIds
-     */
-    public function testGetRoomAvailabilitiesByComponentGoldenIds()
-    {
-        $compIds = [
-            '1234', '4321', '1111',
-        ];
-        $this->repository->findRoomAvailabilitiesByMultipleComponentGoldenIds(
-            Argument::any(),
-            new \DateTime('2020-06-20'),
-            new \DateTime('2020-06-30')
-        )->willReturn($compIds);
-        $this->manager->getRoomAvailabilitiesByMultipleComponentGoldenIds(
-            $compIds,
-            new \DateTime('2020-06-20'),
-            new \DateTime('2020-06-30')
-        );
-
-        $this->repository->findRoomAvailabilitiesByMultipleComponentGoldenIds(
-            $compIds,
-            new \DateTime('2020-06-20'),
-            new \DateTime('2020-06-30')
-        )->shouldBeCalledOnce();
-    }
-
-    /**
-     * @covers ::__construct
      * @covers ::getRoomAndPriceAvailabilitiesByExperienceIdAndDates
      */
     public function testGetRoomandPriceAvailabilitiesByExperienceId()
@@ -139,29 +111,6 @@ class RoomAvailabilityManagerTest extends TestCase
             new \DateTime('2020-06-20'),
             new \DateTime('2020-06-30')
         );
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getRoomAvailabilitiesByComponent
-     */
-    public function testGetRoomAvailabilitiesListByComponentGoldenId()
-    {
-        $component = new Component();
-        $this->repository->findRoomAvailabilitiesByComponent($component, Argument::any(), Argument::any())
-            ->willReturn(
-                [
-                    0 => [
-                        'stock' => 10,
-                        'date' => '2020-07-20',
-                        'type' => 'instant',
-                    ],
-                ]
-            );
-        $this->manager->getRoomAvailabilitiesByComponent($component, new \DateTime('2020-06-20'), new \DateTime('2020-06-30'));
-
-        $this->repository->findRoomAvailabilitiesByComponent($component, new \DateTime('2020-06-20'), new \DateTime('2020-06-30'))
-            ->shouldBeCalledOnce();
     }
 
     /**
@@ -316,7 +265,6 @@ class RoomAvailabilityManagerTest extends TestCase
         $roomAvailabilityExistent->uuid = Uuid::uuid4();
         $roomAvailabilityExistent->component = $component;
         $roomAvailabilityExistent->componentGoldenId = $component->goldenId;
-        $roomAvailabilityExistent->type = $component->roomStockType ?? '';
         $roomAvailabilityExistent->date = $roomAvailabilityRequest->dateFrom;
         $roomAvailabilityExistent->stock = 2;
         $roomAvailabilityExistent->externalUpdatedAt = new \DateTime('-2 days');
@@ -426,27 +374,6 @@ class RoomAvailabilityManagerTest extends TestCase
             })(clone $roomAvailabilityRequest),
             null,
             ComponentNotFoundException::class,
-        ];
-
-        yield 'room-stock-type-not-valid-exception' => [
-            (function ($component) {
-                $component->roomStockType = null;
-
-                return $component;
-            })(clone $component),
-            (function ($test, $roomAvailabilityList, $component) {
-                $test->repository->findByComponentAndDateRange(Argument::any())->shouldNotBeCalled();
-                $test->em->flush()->shouldNotBeCalled();
-                $test->em->persist()->shouldNotBeCalled();
-                $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
-            }),
-            (function ($roomAvailabilityRequest) {
-                $roomAvailabilityRequest->product->id = '998877665';
-
-                return $roomAvailabilityRequest;
-            })(clone $roomAvailabilityRequest),
-            null,
-            InvalidRoomStockTypeException::class,
         ];
 
         yield 'room-availability-create-request' => [

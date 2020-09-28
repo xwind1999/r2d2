@@ -69,7 +69,7 @@ JOIN room_availability ra on ar.component_uuid = ra.component_uuid
 WHERE ar.box_golden_id = :boxId AND
       ra.is_stop_sale = false AND
       (ar.last_bookable_date IS NULL OR ra.date <= (ar.last_bookable_date - INTERVAL ar.duration DAY)) AND 
-      (((ra.type in (:stockType,:allotmentType)) and ra.stock > 0) OR (ra.type = :onRequestType)) AND
+      (((ar.room_stock_type in (:stockType,:allotmentType)) and ra.stock > 0) OR (ar.room_stock_type = :onRequestType)) AND
       ra.date BETWEEN :dateFrom AND DATE_ADD(:dateFrom, interval ar.duration - 1 day)
 GROUP BY ar.experience_golden_id, ar.duration, ar.room_stock_type HAVING count(ra.date) = ar.duration;
 SQL;
@@ -105,13 +105,15 @@ JOIN (
     FROM
         flat_manageable_component fmc
     WHERE
-        fmc.experience_golden_id in (:experienceGoldenIds)) fmc
+        fmc.experience_golden_id in (:experienceGoldenIds) AND
+        fmc.room_stock_type IN (:stockType,:allotmentType)
+    ) fmc
     ON ra.component_uuid = fmc.component_uuid
 WHERE
     ra.is_stop_sale = false AND
     (fmc.last_bookable_date IS NULL OR ra.date <= (fmc.last_bookable_date - INTERVAL fmc.duration DAY)) AND
-    ((ra.type in (:stockType,:allotmentType)) and ra.stock > 0) AND
-     ra.date BETWEEN :startDate AND DATE_ADD(:startDate, interval fmc.duration - 1 day)
+    ra.stock > 0 AND
+    ra.date BETWEEN :startDate AND DATE_ADD(:startDate, interval fmc.duration - 1 day)
 GROUP BY experience_golden_id HAVING count(ra.date) = fmc.duration;
 SQL;
         $values = [
@@ -131,58 +133,6 @@ SQL;
         $query = $this->getAvailabilityReadOnlyConnection()->executeQuery($sql, $values, $types);
 
         return $query->fetchAllAssociative();
-    }
-
-    public function findRoomAvailabilitiesByMultipleComponentGoldenIds(
-        array $componentIds,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
-    ): array {
-        $qb = $this->createQueryBuilder('r');
-        $result = $qb
-            ->select('r.stock, r.date, r.type, r.componentGoldenId')
-            ->where($qb->expr()->in('r.componentGoldenId', $componentIds))
-            ->andWhere('r.date BETWEEN :dateFrom AND :dateTo')
-            ->orderBy('r.date', 'ASC')
-            ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
-            ->setParameter('dateTo', $dateTo->format('Y-m-d'))
-            ->getQuery()
-            ->getArrayResult()
-        ;
-
-        $resultSet = [];
-        foreach ($result as $item) {
-            $date = $item['date']->format('Y-m-d');
-            if (!isset($resultSet[$item['componentGoldenId']])) {
-                $resultSet[$item['componentGoldenId']] = [];
-            }
-            $resultSet[$item['componentGoldenId']][$date] = $item;
-        }
-
-        return $resultSet;
-    }
-
-    /**
-     * @throws QueryException
-     */
-    public function findRoomAvailabilitiesByComponent(
-        Component $component,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
-    ): array {
-        $qb = $this->createQueryBuilder('r');
-        $qb
-            ->select('r.stock, r.date, r.type, r.componentGoldenId, r.isStopSale')
-            ->where('r.component = :component')
-            ->andWhere('r.date BETWEEN :dateFrom AND :dateTo')
-            ->orderBy('r.date', 'ASC')
-            ->setParameter('component', $component->uuid->getBytes())
-            ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
-            ->setParameter('dateTo', $dateTo->format('Y-m-d'))
-            ->indexBy('r', 'r.date')
-        ;
-
-        return $qb->getQuery()->getArrayResult();
     }
 
     /**
@@ -291,7 +241,7 @@ SQL;
         <<<SQL
             SELECT 
                 ra.date,
-                ra.type,
+                fmc.room_stock_type AS type,
                 ra.stock,
                 ra.component_golden_id AS componentGoldenId,
                 ra.is_stop_sale AS isStopSale,
@@ -316,7 +266,9 @@ SQL;
                 FROM
                     flat_manageable_component
                 WHERE
-                    experience_golden_id = :experienceId LIMIT 1) fmc ON fmc.component_uuid = ra.component_uuid
+                    experience_golden_id = :experienceId AND
+                    room_stock_type in (:stockType,:allotmentType,:onRequestType)
+                LIMIT 1) fmc ON fmc.component_uuid = ra.component_uuid
             LEFT JOIN room_price rp ON rp.component_uuid = ra.component_uuid AND rp.date = ra.date
             WHERE
                 (ra.is_stop_sale = FALSE)
@@ -330,6 +282,9 @@ SQL;
         $statement->bindValue('experienceId', $experienceId);
         $statement->bindValue('startDate', $startDate->format('Y-m-d'));
         $statement->bindValue('endDate', $endDate->format('Y-m-d'));
+        $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
+        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
+        $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
         $statement->execute();
 
         return $statement->fetchAllAssociative();
