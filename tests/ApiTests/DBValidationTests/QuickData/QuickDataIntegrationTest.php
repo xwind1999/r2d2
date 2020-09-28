@@ -126,11 +126,11 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                 $result += [
                     'AvailabilityStatus' => 'Unavailable',
                 ];
-            } elseif ('stock' === $availability['type'] && $availability['stock'] > 0) {
+            } elseif ('stock' === $availability['roomStockType'] && $availability['stock'] > 0) {
                 $result += [
                     'AvailabilityStatus' => 'Available',
                 ];
-            } elseif ('on_request' === $availability['type']) {
+            } elseif ('on_request' === $availability['roomStockType']) {
                 $result += [
                     'AvailabilityStatus' => 'Request',
                 ];

@@ -72,16 +72,26 @@ class LegacyAvailabilityProvider
             return $response;
         }
 
+        $roomStockType = AvailabilityHelper::getRoomStockShortType($roomAvailabilities[0]['roomStockType']);
+        $duration = (int) $roomAvailabilities[0]['duration'];
+        $partnerCode = (string) $roomAvailabilities[0]['partnerGoldenId'];
+        $isSellable = (bool) $roomAvailabilities[0]['isSellable'];
+
+        $sortedRoomAvailabilities = [];
+        foreach ($roomAvailabilities as $availability) {
+            $sortedRoomAvailabilities[$availability['date']] = $availability;
+        }
+
         $returnArray = [
             'ListPrestation' => [
-                AvailabilityHelper::buildDataForGetPackage(
-                    AvailabilityHelper::convertToShortType(
-                        array_column($roomAvailabilities, 'stock'),
-                        AvailabilityHelper::getRoomStockShortType($roomAvailabilities[0]['roomStockType'])
-                    ),
-                    (int) $roomAvailabilities[0]['duration'],
-                    $roomAvailabilities[0]['partnerGoldenId'],
-                    (bool) $roomAvailabilities[0]['isSellable']
+                AvailabilityHelper::fillMissingAvailabilityForGetPackage(
+                    $sortedRoomAvailabilities,
+                    $roomStockType,
+                    $duration,
+                    $partnerCode,
+                    $isSellable,
+                    $dateFrom,
+                    $dateTo
                 ),
             ],
         ];
@@ -162,16 +172,14 @@ class LegacyAvailabilityProvider
 
         $availabilities = [];
         foreach ($roomAndPriceAvailability as $index => $availability) {
-            if ($this->isCeasedPartnerDate($availability['lastBookableDate'], $availability['date'])) {
-                $availability['stock'] = 0;
-            }
-
-            $availability['price'] = !empty($availability['price']) ? (int) $availability['price'] / 100 : 0;
+            $availability['price'] = !empty($availability['price']) ? ((int) $availability['price']) / 100 : 0;
             $availability['AvailabilityValue'] = (int) $availability['stock'];
             $availability += [
-                'Date' => (new \DateTime($availability['date']))->format(AvailabilityHelper::PRICE_PERIOD_DATE_TIME_FORMAT),
+                'Date' => (new \DateTime($availability['date']))->format(
+                    AvailabilityHelper::PRICE_PERIOD_DATE_TIME_FORMAT
+                ),
                 'AvailabilityStatus' => AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
-                    $availability['type'],
+                    $availability['roomStockType'],
                     $availability['AvailabilityValue'],
                     $availability['isStopSale']
                 ),
@@ -179,13 +187,12 @@ class LegacyAvailabilityProvider
                 'BuyingPrice' => $availability['price'],
             ];
 
-            $availabilities[$availability['date']] = $availability;
-            unset($roomAndPriceAvailability[$index]);
+            $availabilities[$availability['Date']] = $availability;
         }
 
         return $this->serializer->fromArray(
             [
-                'DaysAvailabilityPrice' => AvailabilityHelper::fillMissingAvailabilities(
+                'DaysAvailabilityPrice' => AvailabilityHelper::fillMissingAvailabilitiesForAvailabilityPrice(
                     $availabilities,
                     $dateFrom,
                     $dateTo
@@ -193,10 +200,5 @@ class LegacyAvailabilityProvider
             ],
             AvailabilityPricePeriodResponse::class
         );
-    }
-
-    private function isCeasedPartnerDate(?string $lastBookableDate, string $currentDate): bool
-    {
-        return (null !== $lastBookableDate) && $lastBookableDate <= $currentDate;
     }
 }
