@@ -53,11 +53,6 @@ class RoomAvailability
     public int $stock;
 
     /**
-     * @ORM\Column(type="string", length=10)
-     */
-    public string $type;
-
-    /**
      * @ORM\Column(type="boolean", options={"default": false})
      */
     public bool $isStopSale = false;

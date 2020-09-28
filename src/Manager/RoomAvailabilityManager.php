@@ -7,10 +7,8 @@ namespace App\Manager;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
 use App\Entity\Booking;
-use App\Entity\Component;
 use App\Entity\RoomAvailability;
 use App\Event\Product\AvailabilityUpdatedEvent;
-use App\Exception\Manager\RoomAvailability\InvalidRoomStockTypeException;
 use App\Exception\Manager\RoomAvailability\OutdatedRoomAvailabilityInformationException;
 use App\Helper\AvailabilityHelper;
 use App\Repository\ComponentRepository;
@@ -48,14 +46,6 @@ class RoomAvailabilityManager
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function getRoomAvailabilitiesByMultipleComponentGoldenIds(
-        array $componentGoldenIds,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
-    ): array {
-        return $this->repository->findRoomAvailabilitiesByMultipleComponentGoldenIds($componentGoldenIds, $dateFrom, $dateTo);
-    }
-
     public function getRoomAvailabilitiesByBoxId(
         string $boxId,
         \DateTimeInterface $startDate
@@ -70,18 +60,6 @@ class RoomAvailabilityManager
         return $this->repository->findAvailableRoomsByMultipleExperienceIds($experienceGoldenIds, $startDate);
     }
 
-    public function getRoomAvailabilitiesByComponent(
-        Component $component,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
-    ): array {
-        return $this->repository->findRoomAvailabilitiesByComponent(
-            $component,
-            $dateFrom,
-            $dateTo
-        );
-    }
-
     /**
      * @throws \Exception
      */
@@ -93,10 +71,6 @@ class RoomAvailabilityManager
         );
 
         $component = $this->componentRepository->findOneByGoldenId($roomAvailabilityRequest->product->id);
-
-        if (empty($component->roomStockType)) {
-            throw new InvalidRoomStockTypeException();
-        }
 
         $roomAvailabilityList = $this->repository->findByComponentAndDateRange(
             $component,
@@ -122,7 +96,6 @@ class RoomAvailabilityManager
             $roomAvailability->stock = $roomAvailabilityRequest->quantity;
             $roomAvailability->date = $date;
             $roomAvailability->isStopSale = $roomAvailabilityRequest->isStopSale;
-            $roomAvailability->type = $component->roomStockType;
             $roomAvailability->externalUpdatedAt = $roomAvailabilityRequest->updatedAt ?? null;
 
             $this->entityManager->persist($roomAvailability);
