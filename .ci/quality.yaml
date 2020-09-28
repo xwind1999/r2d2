@@ -109,7 +109,7 @@ locust-PREPROD:
   needs: ['deploy-PREPROD']
   when: on_success
   only:
-    - tags
+    - master
   variables:
     LOCUST_ENV: "preprod"
     LOCUST_HOST: "https://r2-d2-api-preprod.sbxtest.net"
@@ -135,11 +135,11 @@ locust-PRODUCTION:
   needs: ['deploy-PROD']
   when: on_success
   only:
-    - tags
+    - master
   variables:
     LOCUST_ENV: "prod"
     LOCUST_HOST: "https://r2-d2-api.production.smartbox.com"
-    LOCUST_OPTS: "--headless -u 150 -r 5 --run-time 3m"
+    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
     LOCUST_FILE: "end2EndTests.py"
     EXTRA_PARAMETERS: "QuickData"
 
@@ -148,8 +148,6 @@ locust-PRODUCTION:
   image: ${BASE_IMAGE}
   script:
     - curl -f ${CHECK_ENVIRONMENT}
-  only:
-    - tags
 
 'pre-health-smoke-test-DEV-INT':
   extends: .health-smoke-test
@@ -173,6 +171,8 @@ locust-PRODUCTION:
   stage: Preprod Check
   variables:
     CHECK_ENVIRONMENT: https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
+  only:
+    - master
 
 'post-health-smoke-test-PREPROD':
   extends: .health-smoke-test
@@ -182,6 +182,8 @@ locust-PRODUCTION:
   when: on_success
   variables:
     CHECK_ENVIRONMENT: https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
+  only:
+    - master
 
 'pre-health-smoke-test-PROD':
   extends: .health-smoke-test
@@ -190,6 +192,8 @@ locust-PRODUCTION:
   when: on_success
   variables:
     CHECK_ENVIRONMENT: https://r2-d2-api.production.smartbox.com/_monitor/health/run
+  only:
+    - master
 
 'post-health-smoke-test-PROD':
   extends: .health-smoke-test
@@ -199,6 +203,8 @@ locust-PRODUCTION:
   when: on_success
   variables:
     CHECK_ENVIRONMENT: https://r2-d2-api.production.smartbox.com/_monitor/health/run
+  only:
+    - master
 
 .running-r2d2:
   variables:
