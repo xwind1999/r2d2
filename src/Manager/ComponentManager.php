@@ -164,20 +164,25 @@ class ComponentManager
             $component = $this->repository->findComponentWithManageableCriteria(
                 $this->createComponentRequiredCriteria($componentGoldenId, $this->createManageableCriteria())
             );
+
             if (false === $component->isManageable) {
                 $component->isManageable = true;
                 $this->repository->save($component);
             }
+
+            $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
         } catch (ManageableProductNotFoundException $exception) {
             $component = $this->repository->findComponentWithManageableRelationships(
                 $this->createComponentRequiredCriteria($componentGoldenId, Criteria::create())
             );
+
             if (true === $component->isManageable) {
                 $component->isManageable = false;
                 $this->repository->save($component);
+                $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
             }
         }
-        $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
+
         $this->messageBus->dispatch(new CalculateFlatManageableComponent($componentGoldenId));
     }
 

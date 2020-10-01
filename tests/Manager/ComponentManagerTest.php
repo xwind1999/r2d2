@@ -448,7 +448,7 @@ class ComponentManagerTest extends TestCase
             ->willReturn($component->reveal())
         ;
         $this->repository->save(Argument::type(Component::class))->shouldNotBeCalled();
-        $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldBeCalled()->willReturn(new Envelope(new \stdClass()));
+        $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldNotBeCalled();
         (function ($test, $goldenId) {
             $this->messageBus->dispatch(Argument::type(CalculateFlatManageableComponent::class))->will(function ($args) use ($test, $goldenId) {
                 $test->assertEquals($goldenId, $args[0]->componentGoldenId);
