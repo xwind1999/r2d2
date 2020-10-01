@@ -42,13 +42,6 @@ class Partner
     public string $currency;
 
     /**
-     * @ORM\Column(type="boolean")
-     *
-     * @deprecated remove this attribute soon
-     */
-    public bool $isChannelManagerActive = true;
-
-    /**
      * @ORM\Column(type="date", nullable=true)
      */
     public ?\DateTime $ceaseDate = null;

@@ -15,7 +15,6 @@ class PartnerImportCommand extends AbstractImportCommand
         'type',
         'currencyCode',
         'partnerCeaseDate',
-        'isChannelManagerEnabled',
         'updatedAt',
     ];
 
@@ -32,7 +31,6 @@ class PartnerImportCommand extends AbstractImportCommand
             $partnerRequest->id = $record['id'];
             $partnerRequest->status = $record['type'];
             $partnerRequest->currencyCode = $record['currencyCode'];
-            $partnerRequest->isChannelManagerEnabled = (bool) ($record['isChannelManagerEnabled']);
 
             if (!empty($record['partnerCeaseDate'])) {
                 $partnerRequest->partnerCeaseDate = new \DateTime($record['partnerCeaseDate']);
