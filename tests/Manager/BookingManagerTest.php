@@ -116,6 +116,7 @@ class BookingManagerTest extends TestCase
     }
 
     /**
+     * @covers ::update
      * @dataProvider dataForUpdate
      * @group update-booking
      */
@@ -141,6 +142,9 @@ class BookingManagerTest extends TestCase
         }
     }
 
+    /**
+     * @see testUpdate
+     */
     public function dataForUpdate(): iterable
     {
         $bookingUpdateRequest = new BookingUpdateRequest();
@@ -222,7 +226,7 @@ class BookingManagerTest extends TestCase
 
         yield 'booking with date expired' => [
             (function ($bookingUpdateRequest) {
-                $bookingUpdateRequest->status = 'created';
+                $bookingUpdateRequest->status = 'complete';
 
                 return $bookingUpdateRequest;
             })(clone $bookingUpdateRequest),
@@ -235,6 +239,36 @@ class BookingManagerTest extends TestCase
             BookingHasExpiredException::class,
             null,
             null,
+        ];
+
+        yield 'cancelling a completed booking with expired date' => [
+            (static function ($bookingUpdateRequest) {
+                $bookingUpdateRequest->status = 'cancelled';
+
+                return $bookingUpdateRequest;
+            })(clone $bookingUpdateRequest),
+            (static function ($booking) {
+                $booking->status = 'complete';
+                $booking->expiredAt = clone $booking->createdAt;
+
+                return $booking;
+            })(clone $booking),
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist($booking)->shouldHaveBeenCalled();
+                $test->entityManager->flush()->shouldHaveBeenCalled();
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+                $test->assertEquals('cancelled', $booking->status);
+            },
+            function (BookingManagerTest $test) {
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+            },
         ];
     }
 

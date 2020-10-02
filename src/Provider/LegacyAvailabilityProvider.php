@@ -23,6 +23,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class LegacyAvailabilityProvider
 {
+    private const DEFAULT_AVAILABILITY_PRICE = 0;
+    private const DEFAULT_AVAILABILITY_DIVISOR = 100;
+
     protected ArrayTransformerInterface $serializer;
     protected ExperienceManager $experienceManager;
     protected AvailabilityProvider $availabilityProvider;
@@ -172,7 +175,8 @@ class LegacyAvailabilityProvider
 
         $availabilities = [];
         foreach ($roomAndPriceAvailability as $index => $availability) {
-            $availability['price'] = !empty($availability['price']) ? ((int) $availability['price']) / 100 : 0;
+            $availability['price'] = !empty($availability['price']) ?
+                ((int) $availability['price']) / self::DEFAULT_AVAILABILITY_DIVISOR : self::DEFAULT_AVAILABILITY_PRICE;
             $availability['AvailabilityValue'] = (int) $availability['stock'];
             $availability += [
                 'Date' => (new \DateTime($availability['date']))->format(

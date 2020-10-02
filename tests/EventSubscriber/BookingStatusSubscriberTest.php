@@ -144,6 +144,9 @@ class BookingStatusSubscriberTest extends TestCase
     public function testHandleCompletedMessage(): void
     {
         $this->booking->status = BookingStatusConstraint::BOOKING_STATUS_COMPLETE;
+        $this->booking->goldenId = '12345';
+        $this->booking->startDate = new \DateTime();
+        $this->booking->endDate = new \DateTime();
         $this->booking->createdAt = new \DateTime();
         $this->logger->info(
             BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_COMPLETED,

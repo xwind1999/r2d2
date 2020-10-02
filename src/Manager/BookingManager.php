@@ -248,13 +248,35 @@ class BookingManager
 
     /**
      * @throws BookingAlreadyInFinalStatusException
+     * @throws BookingHasExpiredException
      * @throws BookingNotFoundException
      * @throws InvalidBookingNewStatus
      */
     public function update(BookingUpdateRequest $bookingUpdateRequest): void
     {
         $booking = $this->repository->findOneByGoldenId($bookingUpdateRequest->bookingId);
-        $this->validateBookingStatus($bookingUpdateRequest, $booking);
+
+        if (
+            BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status ||
+            (
+                BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $booking->status &&
+                BookingStatusConstraint::BOOKING_STATUS_CANCELLED !== $bookingUpdateRequest->status
+            )
+        ) {
+            throw new BookingAlreadyInFinalStatusException();
+        }
+
+        if ($booking->status === $bookingUpdateRequest->status) {
+            throw new InvalidBookingNewStatus();
+        }
+
+        // @TODO: Check the availability before send the exception
+        if (
+            BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $bookingUpdateRequest->status &&
+            $booking->expiredAt < new \DateTime('now')
+        ) {
+            throw new BookingHasExpiredException();
+        }
 
         $booking->status = $bookingUpdateRequest->status;
 
@@ -265,31 +287,5 @@ class BookingManager
         $this->em->persist($booking);
         $this->em->flush();
         $this->eventDispatcher->dispatch(new BookingStatusEvent($booking));
-    }
-
-    private function validateBookingExpirationTime(Booking $booking): void
-    {
-        $dateNow = new \DateTime('now');
-
-        // @TODO: Check the availability before send the exception
-        if ($booking->expiredAt < $dateNow) {
-            throw new BookingHasExpiredException();
-        }
-    }
-
-    private function validateBookingStatus(BookingUpdateRequest $bookingUpdateRequest, Booking $booking): void
-    {
-        $this->validateBookingExpirationTime($booking);
-
-        if (
-            BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $booking->status
-            || BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status
-        ) {
-            throw new BookingAlreadyInFinalStatusException();
-        }
-
-        if ($booking->status === $bookingUpdateRequest->status) {
-            throw new InvalidBookingNewStatus();
-        }
     }
 }
