@@ -167,15 +167,6 @@ class RoomPriceManagerTest extends TestCase
         $this->manager->replace($roomPriceRequest);
     }
 
-    public function testGetRoomPricesByComponentAndDateRange(): void
-    {
-        $component = new Component();
-        $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-05');
-        $this->repository->findByComponentAndDateRange($component, $dateFrom, $dateTo)->willReturn([])->shouldBeCalled();
-        $this->manager->getRoomPricesByComponentAndDateRange($component, $dateFrom, $dateTo);
-    }
-
     /**
      * @covers ::dispatchRoomPricesRequest
      */

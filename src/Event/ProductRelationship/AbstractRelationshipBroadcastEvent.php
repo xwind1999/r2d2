@@ -10,8 +10,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class AbstractRelationshipBroadcastEvent extends Event implements ProductRelationshipEventInterface, ContextualInterface
 {
-    protected const LOG_MESSAGE = 'Product Relationship Broadcast Event';
-
     private ProductRelationshipRequest $relationshipRequest;
 
     public function __construct(ProductRelationshipRequest $relationshipRequest)
