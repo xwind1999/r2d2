@@ -150,11 +150,6 @@ class ComponentManager
         $this->manageableProductService->dispatchForProduct($productRequest);
     }
 
-    public function getRoomsByExperienceGoldenIdsList(array $experienceIds): array
-    {
-        return $this->repository->findRoomsByExperienceGoldenIdsList($experienceIds);
-    }
-
     /**
      * @throws NonUniqueResultException
      */
@@ -186,6 +181,9 @@ class ComponentManager
         $this->messageBus->dispatch(new CalculateFlatManageableComponent($componentGoldenId));
     }
 
+    /**
+     * @throws \Exception
+     */
     private function createManageableCriteria(): Criteria
     {
         $criteria = Criteria::create();
@@ -214,7 +212,10 @@ class ComponentManager
         $criteria->andWhere(Criteria::expr()->eq('experienceComponent.isEnabled', true));
         $criteria->andWhere(Criteria::expr()->eq('partner.status', PartnerStatusConstraint::PARTNER_STATUS_PARTNER));
 
-        /** @psalm-suppress TooManyArguments */
+        /**
+         * @var Criteria $c
+         * @psalm-suppress TooManyArguments
+         */
         $c = $criteria->andWhere(
             Criteria::expr()->orX(
                     Criteria::expr()->isNull('partner.ceaseDate'),

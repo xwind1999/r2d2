@@ -8,12 +8,8 @@ class CalendarFixtureHelper
 {
     private const AVAILABILITY_DATES_RANGE = '+14 days';
 
-    public static function getAvailabilityCalendar(int $days = 0): array
+    public static function getAvailabilityCalendar(): array
     {
-        if (0 === $days) {
-            $days = static::AVAILABILITY_DATES_RANGE;
-        }
-
         $beginDate = new \DateTime(date('Y-m-d', strtotime('first day of next month')));
         $endDate = (clone $beginDate)->modify(self::AVAILABILITY_DATES_RANGE);
         $endDate = $endDate->modify('+1 day');

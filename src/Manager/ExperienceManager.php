@@ -157,9 +157,4 @@ class ExperienceManager
 
         $this->repository->save($experience);
     }
-
-    public function filterIdsListWithExperienceIds(array $experienceIds): array
-    {
-        return $this->repository->filterListExperienceIds($experienceIds);
-    }
 }

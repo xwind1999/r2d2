@@ -325,21 +325,6 @@ class ExperienceManagerTest extends TestCase
 
     /**
      * @covers ::__construct
-     * @covers ::filterIdsListWithExperienceIds
-     */
-    public function testFilterIdsListWithPartnerStatus()
-    {
-        $expIds = [
-            '1234', '4321', '1111',
-        ];
-        $this->repository->filterListExperienceIds(Argument::any())->willReturn($expIds);
-        $this->manager->filterIdsListWithExperienceIds($expIds);
-
-        $this->repository->filterListExperienceIds($expIds)->shouldBeCalledOnce();
-    }
-
-    /**
-     * @covers ::__construct
      * @covers ::getOneByGoldenId
      */
     public function testGetOneByGoldenId()

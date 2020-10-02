@@ -462,25 +462,4 @@ class ComponentManagerTest extends TestCase
 
         $this->assertFalse($component->isManageable);
     }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getRoomsByExperienceGoldenIdsList
-     */
-    public function testGetRoomsByExperienceGoldenIdsList(): void
-    {
-        $compIds = [
-            '1234', '4321', '1111',
-        ];
-        $this->repository->findRoomsByExperienceGoldenIdsList(Argument::any())->willReturn($compIds);
-        $manager = new ComponentManager(
-            $this->repository->reveal(),
-            $this->partnerRepository->reveal(),
-            $this->manageableProductService->reveal(),
-            $this->partnerManager->reveal(),
-            $this->messageBus->reveal()
-        );
-        $manager->getRoomsByExperienceGoldenIdsList($compIds);
-        $this->repository->findRoomsByExperienceGoldenIdsList($compIds)->shouldBeCalledOnce();
-    }
 }

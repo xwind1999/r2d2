@@ -6,7 +6,6 @@ namespace App\Manager;
 
 use App\Contract\Request\BroadcastListener\RoomPriceRequest;
 use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
-use App\Entity\Component;
 use App\Entity\RoomPrice;
 use App\Exception\Manager\RoomPrice\OutdatedRoomPriceException;
 use App\Helper\AvailabilityHelper;
@@ -81,14 +80,6 @@ class RoomPriceManager
         }
 
         $this->entityManager->flush();
-    }
-
-    public function getRoomPricesByComponentAndDateRange(
-        Component $component,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
-    ): array {
-        return $this->repository->findByComponentAndDateRange($component, $dateFrom, $dateTo);
     }
 
     public function dispatchRoomPricesRequest(RoomPriceRequestList $roomPriceRequestList): void
