@@ -22,7 +22,8 @@ class ProductBoxImportCommandTest extends AbstractProductImportCommandTest
             $this->logger->reveal(),
             $this->messageBus->reveal(),
             $this->helper->reveal(),
-            $this->validator->reveal()
+            $this->validator->reveal(),
+            $this->serializer->reveal()
         );
     }
 

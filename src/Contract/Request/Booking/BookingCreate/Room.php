@@ -27,7 +27,7 @@ class Room
      *
      * @JMS\Type("array<App\Contract\Request\Booking\BookingCreate\RoomDate>")
      *
-     * @var \App\Contract\Request\Booking\BookingCreate\RoomDate[]
+     * @var RoomDate[]
      */
     public array $dates;
 }

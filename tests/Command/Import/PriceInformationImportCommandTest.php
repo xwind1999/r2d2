@@ -33,7 +33,8 @@ class PriceInformationImportCommandTest extends AbstractImportCommandTest
             $this->logger->reveal(),
             $this->messageBus->reveal(),
             $this->helper->reveal(),
-            $this->validator->reveal()
+            $this->validator->reveal(),
+            $this->serializer->reveal()
         );
         $application->add($this->command);
         $this->commandTester = new CommandTester($this->command);
