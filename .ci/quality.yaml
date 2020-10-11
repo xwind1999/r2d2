@@ -102,6 +102,19 @@ api-tests-DEV-INT:
   except:
     - schedules
 
+locust-DEV-INT:
+  <<: *locust
+  stage: Deploy Validation
+  allow_failure: true
+  needs: [ 'deploy-DEV-INT' ]
+  only:
+    - master
+  variables:
+    LOCUST_ENV: "staging"
+    LOCUST_HOST: "http://r2-d2-api-devint.sbxtest.net"
+    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
+    LOCUST_FILE: "end2EndTests.py"
+
 locust-PREPROD:
   <<: *locust
   stage: Preprod Validation
@@ -116,19 +129,7 @@ locust-PREPROD:
     LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
     LOCUST_FILE: "end2EndTests.py"
 
-locust-DEV-INT:
-  <<: *locust
-  stage: Deploy Validation
-  allow_failure: true
-  only:
-    - master
-  variables:
-    LOCUST_ENV: "staging"
-    LOCUST_HOST: "http://r2-d2-api-devint.sbxtest.net"
-    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
-    LOCUST_FILE: "end2EndTests.py"
-
-locust-PRODUCTION:
+locust-PROD:
   <<: *locust
   stage: Production Validation
   allow_failure: true
