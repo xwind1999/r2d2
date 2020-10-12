@@ -11,7 +11,7 @@ use App\Exception\Repository\BookingNotFoundException;
 use App\Manager\BookingManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -20,29 +20,29 @@ class BookingController
     /**
      * @Route("/booking", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="booking")
-     * @SWG\Parameter(
+     * @OA\Tag(name="booking")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=BookingCreateRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=201,
      *     description="Booking created"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=422,
      *     description="Unprocessable entity"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=500,
      *     description="Internal server error"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=409,
      *     description="Booking already exists"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=400,
      *     description="Bad request"
      * )
@@ -59,29 +59,29 @@ class BookingController
     /**
      * @Route("/booking", methods={"PATCH"}, format="json")
      *
-     * @SWG\Tag(name="booking")
-     * @SWG\Parameter(
+     * @OA\Tag(name="booking")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=BookingUpdateRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=204,
      *     description="Booking updated"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=422,
      *     description="Unprocessable entity"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=404,
      *     description="Booking not found"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=409,
      *     description="Booking already exists"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=400,
      *     description="Bad request"
      * )

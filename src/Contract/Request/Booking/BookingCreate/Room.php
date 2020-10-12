@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Contract\Request\Booking\BookingCreate;
 
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class Room
@@ -16,7 +16,7 @@ class Room
      *
      * @JMS\Type("strict_boolean")
      *
-     * @SWG\Property(type="boolean", example=false)
+     * @OA\Property(type="boolean", example=false)
      */
     public bool $extraRoom;
 

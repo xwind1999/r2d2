@@ -10,7 +10,7 @@ use App\Contract\Request\QuickData\GetPackageV2Request;
 use App\Contract\Request\QuickData\GetRangeRequest;
 use App\Contract\Response\QuickData\QuickDataResponse;
 use App\Provider\LegacyAvailabilityProvider;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Routing\Annotation\Route;
 
 class QuickDataController
@@ -18,34 +18,41 @@ class QuickDataController
     /**
      * @Route("/quickdata/GetPackage/1/{engineId}", methods={"GET"}, format="json")
      *
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="engineId",
      *     in="path",
-     *     type="string",
-     *     format="string",
-     *     description="Ignored"
+     *     description="Ignored",
+     *     @OA\Schema(
+     *         type="string"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="PackageCode",
      *     in="query",
-     *     type="integer",
-     *     format="integer",
-     *     description="Experience ID (example: 88826)"
+     *     description="Experience ID (example: 88826)",
+     *     @OA\Schema(
+     *         type="integer",
+     *         format="int64"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="dateFrom",
      *     in="query",
-     *     type="string",
-     *     format="date"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="date"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="dateTo",
      *     in="query",
-     *     type="string",
-     *     format="date"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="date"
+     *     )
      * )
-     * @SWG\Tag(name="quickdata")
-     * @SWG\Response(
+     * @OA\Tag(name="quickdata")
+     * @OA\Response(
      *     description="Quickdata handled",
      *     response="200"
      * )
@@ -64,35 +71,42 @@ class QuickDataController
     /**
      * @Route("/quickdata/GetRangeV2/1/{engineId}", methods={"GET"}, format="json")
      *
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="engineId",
      *     in="path",
-     *     type="string",
-     *     format="string",
-     *     description="Ignored"
+     *     description="Ignored",
+     *     @OA\Schema(
+     *         type="string"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="boxVersion",
      *     in="query",
-     *     type="integer",
-     *     format="integer",
-     *     description="Box ID (example: 523950)"
+     *     description="Box ID (example: 523950)",
+     *     @OA\Schema(
+     *         type="integer",
+     *         format="int64"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="dateFrom",
      *     in="query",
-     *     type="string",
-     *     format="date"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="date"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="dateTo",
      *     in="query",
-     *     type="string",
-     *     format="date",
-     *     description="Ignored"
+     *     description="Ignored",
+     *     @OA\Schema(
+     *         type="string",
+     *         format="date"
+     *     )
      * )
-     * @SWG\Tag(name="quickdata")
-     * @SWG\Response(
+     * @OA\Tag(name="quickdata")
+     * @OA\Response(
      *     description="Quickdata handled",
      *     response="200"
      * )
@@ -110,35 +124,41 @@ class QuickDataController
     /**
      * @Route("/quickdata/GetPackageV2/1/{engineId}", methods={"GET"}, format="json")
      *
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="engineId",
      *     in="path",
-     *     type="string",
-     *     format="string",
-     *     description="Ignored"
+     *     description="Ignored",
+     *     @OA\Schema(
+     *         type="string"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="ListPackageCode",
      *     in="query",
-     *     type="string",
-     *     format="string",
-     *     description="Experience IDs, comma separated (example: 88826,677507)"
+     *     description="Experience IDs, comma separated (example: 88826,677507)",
+     *     @OA\Schema(
+     *         type="string"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="dateFrom",
      *     in="query",
-     *     type="string",
-     *     format="date"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="date"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="dateTo",
      *     in="query",
-     *     type="string",
-     *     format="date",
-     *     description="Ignored"
+     *     description="Ignored",
+     *     @OA\Schema(
+     *         type="string",
+     *         format="date"
+     *     )
      * )
-     * @SWG\Tag(name="quickdata")
-     * @SWG\Response(
+     * @OA\Tag(name="quickdata")
+     * @OA\Response(
      *     description="Quickdata handled",
      *     response="200"
      * )
@@ -156,41 +176,50 @@ class QuickDataController
     /**
      * @Route("/quickdata/availabilitypriceperiod/1/{engineId}", methods={"GET"}, format="json")
      *
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="engineId",
      *     in="path",
-     *     type="string",
-     *     format="string",
-     *     description="Ignored"
+     *     description="Ignored",
+     *     @OA\Schema(
+     *         type="string"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="ExperienceId",
      *     in="query",
-     *     type="integer",
-     *     format="integer",
-     *     description="Experience ID (example: 88826)"
+     *     description="Experience ID (example: 88826)",
+     *     @OA\Schema(
+     *         type="integer",
+     *         format="int64"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="prestid",
      *     in="query",
-     *     type="integer",
-     *     format="integer",
-     *     description="Prest ID (example: 2878007)"
+     *     description="Prest ID (example: 2878007)",
+     *     @OA\Schema(
+     *         type="integer",
+     *         format="int64"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="datefrom",
      *     in="query",
-     *     type="string",
-     *     format="date"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="date"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *     name="dateto",
      *     in="query",
-     *     type="string",
-     *     format="date"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="date"
+     *     )
      * )
-     * @SWG\Tag(name="quickdata")
-     * @SWG\Response(
+     * @OA\Tag(name="quickdata")
+     * @OA\Response(
      *     description="Quickdata handled",
      *     response="200"
      * )

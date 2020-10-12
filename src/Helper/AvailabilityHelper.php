@@ -102,7 +102,7 @@ class AvailabilityHelper
     ): bool {
         $dateFrom = new \DateTime($dateFrom->format(self::DEFAULT_DATE_FORMAT));
         $dateTo = new \DateTime($dateTo->format(self::DEFAULT_DATE_FORMAT));
-        $numberOfNights = ($dateTo->diff($dateFrom)->days ?? self::DEFAULT_DATE_DIFF_VALUE) + 1;
+        $numberOfNights = ($dateTo->diff($dateFrom)->days ?: self::DEFAULT_DATE_DIFF_VALUE) + 1;
 
         return $numberOfNights !== count($availabilities);
     }

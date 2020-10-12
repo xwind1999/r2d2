@@ -17,9 +17,9 @@ use App\Manager\BoxManager;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -28,13 +28,13 @@ class BoxController
     /**
      * @Route("/internal/box", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="box")
-     * @SWG\Parameter(
+     * @OA\Tag(name="box")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=BoxCreateRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=201,
      *     description="Box created",
      *     @Model(type=BoxCreateResponse::class)
@@ -55,14 +55,16 @@ class BoxController
     /**
      * @Route("/internal/box/{uuid}", methods={"GET"}, format="json")
      *
-     * @SWG\Tag(name="box")
-     * @SWG\Parameter(
+     * @OA\Tag(name="box")
+     * @OA\Parameter(
      *     name="uuid",
      *     in="path",
-     *     type="string",
-     *     format="uuid"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="uuid"
+     *     )
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=200,
      *     description="Box successfully retrieved",
      *     @Model(type=BoxGetResponse::class)
@@ -86,14 +88,16 @@ class BoxController
     /**
      * @Route("/internal/box/{uuid}", methods={"DELETE"}, format="json")
      *
-     * @SWG\Tag(name="box")
-     * @SWG\Parameter(
+     * @OA\Tag(name="box")
+     * @OA\Parameter(
      *     name="uuid",
      *     in="path",
-     *     type="string",
-     *     format="uuid"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="uuid"
+     *     )
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=200,
      *     description="Box deleted"
      * )
@@ -116,19 +120,21 @@ class BoxController
     /**
      * @Route("/internal/box/{uuid}", methods={"PUT"}, format="json")
      *
-     * @SWG\Tag(name="box")
-     * @SWG\Parameter(
+     * @OA\Tag(name="box")
+     * @OA\Parameter(
      *     name="uuid",
      *     in="path",
-     *     type="string",
-     *     format="uuid"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="uuid"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=BoxUpdateRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=200,
      *     description="Box successfully updated",
      *     @Model(type=BoxUpdateResponse::class)

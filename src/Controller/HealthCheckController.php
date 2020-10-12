@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -12,8 +12,8 @@ class HealthCheckController
 {
     /**
      * @Route("/ping", methods={"GET"}, format="json")
-     * @SWG\Tag(name="healthcheck")
-     * @SWG\Response(
+     * @OA\Tag(name="healthcheck")
+     * @OA\Response(
      *     description="Pong",
      *     response="204"
      * )

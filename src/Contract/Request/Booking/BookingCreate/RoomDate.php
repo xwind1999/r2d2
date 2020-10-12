@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Contract\Request\Booking\BookingCreate;
 
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class RoomDate
@@ -16,7 +16,7 @@ class RoomDate
      *
      * @JMS\Type("DateTime<'Y-m-d'>")
      *
-     * @SWG\Property(example="2020-01-01")
+     * @OA\Property(example="2020-01-01")
      */
     public \DateTime $day;
 
@@ -27,7 +27,7 @@ class RoomDate
      *
      * @JMS\Type("strict_integer")
      *
-     * @SWG\Property(type="integer", example=5500)
+     * @OA\Property(type="integer", example=5500)
      */
     public int $price;
 
@@ -37,7 +37,7 @@ class RoomDate
      *
      * @JMS\Type("strict_boolean")
      *
-     * @SWG\Property(type="boolean", example=false)
+     * @OA\Property(type="boolean", example=false)
      */
     public bool $extraNight;
 }

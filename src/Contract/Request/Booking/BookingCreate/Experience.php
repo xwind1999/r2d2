@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Contract\Request\Booking\BookingCreate;
 
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class Experience
@@ -17,7 +17,7 @@ class Experience
      *
      * @JMS\Type("string")
      *
-     * @SWG\Property(example="3216334")
+     * @OA\Property(example="3216334")
      */
     public string $id;
 
@@ -31,7 +31,7 @@ class Experience
      *
      * @JMS\Type("array<string>")
      *
-     * @SWG\Property(example={"Cup of tea", "Una noche muy buena"})
+     * @OA\Property(example={"Cup of tea", "Una noche muy buena"})
      */
     public array $components;
 }

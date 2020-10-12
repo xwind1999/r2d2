@@ -34,18 +34,15 @@ class ApiDumpCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $spec = $this->generatorLocator->generate()->toArray();
-
-        $json = json_encode(
-            $spec,
+        $spec = $this->generatorLocator->generate()->toJson(
             $input->hasParameterOption(['--no-pretty']) ? static::JSON_NO_OPTION : JSON_PRETTY_PRINT
         );
 
-        if (!$json) {
+        if (!$spec) {
             return 1;
         }
 
-        $output->writeln($json);
+        $output->writeln($spec);
 
         return 0;
     }

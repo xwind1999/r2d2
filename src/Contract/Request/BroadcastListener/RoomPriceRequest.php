@@ -9,7 +9,7 @@ use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Event\NamedEventInterface;
 use Clogger\ContextualInterface;
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class RoomPriceRequest implements ContextualInterface, NamedEventInterface
@@ -26,7 +26,7 @@ class RoomPriceRequest implements ContextualInterface, NamedEventInterface
 
     /**
      * @Assert\Type(type="DateTime")
-     * @SWG\Property(example="2020-07-16T20:00:00.000000+0000")
+     * @OA\Property(example="2020-07-16T20:00:00.000000+0000")
      * @Assert\NotBlank
      * @JMS\Type("DateTime<'Y-m-d\TH:i:s.uP'>")
      */
@@ -34,7 +34,7 @@ class RoomPriceRequest implements ContextualInterface, NamedEventInterface
 
     /**
      * @Assert\Type(type="DateTime")
-     * @SWG\Property(example="2020-07-20T20:00:00.000000+0000")
+     * @OA\Property(example="2020-07-20T20:00:00.000000+0000")
      * @Assert\NotBlank
      * @JMS\Type("DateTime<'Y-m-d\TH:i:s.uP'>")
      */
@@ -42,7 +42,7 @@ class RoomPriceRequest implements ContextualInterface, NamedEventInterface
 
     /**
      * @Assert\Type(type="DateTime")
-     * @SWG\Property(example="2020-07-20T17:58:32.000000+0000")
+     * @OA\Property(example="2020-07-20T17:58:32.000000+0000")
      * @JMS\Type("DateTime<'Y-m-d\TH:i:s.uP'>")
      */
     public ?\DateTime $updatedAt = null;

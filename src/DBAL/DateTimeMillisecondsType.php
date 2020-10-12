@@ -23,7 +23,7 @@ class DateTimeMillisecondsType extends DateTimeType
     /**
      * {@inheritdoc}
      */
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform)
     {
         return 'DATETIME(3)';
     }

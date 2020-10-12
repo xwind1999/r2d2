@@ -7,7 +7,7 @@ namespace App\Contract\Request\Internal\Component;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class ComponentCreateRequest implements RequestBodyInterface, ValidatableRequest
@@ -54,7 +54,7 @@ class ComponentCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("strict_integer")
      *
-     * @SWG\Property(type="integer", example=10)
+     * @OA\Property(type="integer", example=10)
      */
     public int $inventory;
 
@@ -64,7 +64,7 @@ class ComponentCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("strict_integer")
      *
-     * @SWG\Property(type="integer", example=10)
+     * @OA\Property(type="integer", example=10)
      */
     public ?int $duration = null;
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Contract\Request\Booking\BookingCreate;
 
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class Guest
@@ -17,7 +17,7 @@ class Guest
      *
      * @JMS\Type("string")
      *
-     * @SWG\Property(example="Hermano")
+     * @OA\Property(example="Hermano")
      */
     public string $firstName;
 
@@ -28,7 +28,7 @@ class Guest
      *
      * @JMS\Type("string")
      *
-     * @SWG\Property(example="Guido")
+     * @OA\Property(example="Guido")
      */
     public string $lastName;
 
@@ -39,7 +39,7 @@ class Guest
      *
      * @JMS\Type("string")
      *
-     * @SWG\Property(example="maradona@worldcup.ar")
+     * @OA\Property(example="maradona@worldcup.ar")
      */
     public ?string $email = null;
 
@@ -49,7 +49,7 @@ class Guest
      *
      * @JMS\Type("string")
      *
-     * @SWG\Property(example="123 123 123")
+     * @OA\Property(example="123 123 123")
      */
     public ?string $phone = null;
 }

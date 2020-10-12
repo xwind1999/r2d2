@@ -10,7 +10,7 @@ use App\Contract\Request\Booking\BookingCreate\Room;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
@@ -22,7 +22,7 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("string")
      *
-     * @SWG\Property(example="SBXFRJBO200101123123")
+     * @OA\Property(example="SBXFRJBO200101123123")
      */
     public string $bookingId;
 
@@ -33,7 +33,7 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("string")
      *
-     * @SWG\Property(example="2406")
+     * @OA\Property(example="2406")
      */
     public string $box;
 
@@ -52,7 +52,7 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("string")
      *
-     * @SWG\Property(example="EUR")
+     * @OA\Property(example="EUR")
      */
     public string $currency;
 
@@ -63,7 +63,7 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("string")
      *
-     * @SWG\Property(example="198257918")
+     * @OA\Property(example="198257918")
      */
     public string $voucher;
 
@@ -73,7 +73,7 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("DateTime<'Y-m-d'>")
      *
-     * @SWG\Property(example="2020-01-01")
+     * @OA\Property(example="2020-01-01")
      */
     public \DateTime $startDate;
 
@@ -83,7 +83,7 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("DateTime<'Y-m-d'>")
      *
-     * @SWG\Property(example="2020-01-02")
+     * @OA\Property(example="2020-01-02")
      */
     public \DateTime $endDate;
 
@@ -93,7 +93,7 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
      *
      * @JMS\Type("string")
      *
-     * @SWG\Property(example="Clean sheets please")
+     * @OA\Property(example="Clean sheets please")
      */
     public ?string $customerComment = null;
 
