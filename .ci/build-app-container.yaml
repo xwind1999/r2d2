@@ -8,10 +8,10 @@ build-base-image:
   image: docker:dind
   only:
     - CI-master
+    - R2D2-360
   script:
-    - >
-      docker build --pull
-      --tag ${BASE_IMAGE} .ci/docker/base
+    - docker pull ${BASE_IMAGE}
+    - docker build --tag ${BASE_IMAGE} .ci/docker/base
     - docker push ${BASE_IMAGE}
 
 build-validation-image:
@@ -20,9 +20,9 @@ build-validation-image:
   only:
     - CI-master
   script:
-    - >
-      docker build --pull
-      --tag ${VALIDATION_IMAGE} .ci/docker/validation
+    - docker pull ${BASE_IMAGE}
+    - docker pull ${VALIDATION_IMAGE}
+    - docker build --tag ${VALIDATION_IMAGE} .ci/docker/validation
     - docker push ${VALIDATION_IMAGE}
 
 build-app-container:
@@ -34,7 +34,6 @@ build-app-container:
     - master
     - tags
   script:
-    - >
-      docker build --pull -f .ci/docker/app/Dockerfile
-      --tag "$APP_IMAGE" .
+    - docker pull ${BASE_IMAGE}
+    - docker build -f .ci/docker/app/Dockerfile --tag "$APP_IMAGE" .
     - docker push $APP_IMAGE

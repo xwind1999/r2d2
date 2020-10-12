@@ -280,6 +280,7 @@ class ExperienceManagerTest extends TestCase
         $productDTO->id = '1264';
         $priceDTO = new Price();
         $priceDTO->amount = 12;
+        $priceDTO->currencyCode = 'EUR';
         $priceInformationRequest = new PriceInformationRequest();
         $priceInformationRequest->product = $productDTO;
         $priceInformationRequest->averageValue = $priceDTO;

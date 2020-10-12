@@ -78,6 +78,11 @@ class Experience
     public ?int $price = null;
 
     /**
+     * @ORM\Column(type="string", length=3, nullable=true)
+     */
+    public ?string $currency = null;
+
+    /**
      * @ORM\Column(type="price_commission_type", length=10, nullable=true)
      */
     public ?string $commissionType = null;
