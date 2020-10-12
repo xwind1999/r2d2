@@ -22,8 +22,8 @@ use App\Exception\Booking\BookingHasExpiredException;
 use App\Exception\Booking\CurrencyMismatchException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
-use App\Exception\Booking\ExperienceCurrencyMismatchException;
 use App\Exception\Booking\InvalidBookingNewStatus;
+use App\Exception\Booking\InvalidBoxCurrencyException;
 use App\Exception\Booking\InvalidExtraNightException;
 use App\Exception\Booking\MisconfiguredExperiencePriceException;
 use App\Exception\Booking\NoIncludedRoomFoundException;
@@ -303,7 +303,7 @@ class BookingManagerTest extends TestCase
         $box->goldenId = $bookingCreateRequest->box;
         $box->brand = 'SBX';
         $box->country = 'FR';
-        $box->currency = 'EUR';
+        $box->currency = $extraParams['boxCurrency'] ?? 'EUR';
         $this->boxRepository->findOneByGoldenId($bookingCreateRequest->box)->willReturn($box);
 
         $boxExperience = new BoxExperience();
@@ -883,7 +883,7 @@ class BookingManagerTest extends TestCase
             ['currency' => '0'],
         ];
 
-        yield 'experience with different currency' => [
+        yield 'box with missing currency' => [
             (function ($bookingCreateRequest) {
                 $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
                 $roomDate = new RoomDate();
@@ -906,11 +906,11 @@ class BookingManagerTest extends TestCase
             function (BookingManagerTest $test) {
                 $test->repository->findOneByGoldenId(Argument::type('string'))->willThrow(new BookingNotFoundException());
             },
-            ExperienceCurrencyMismatchException::class,
+            InvalidBoxCurrencyException::class,
             function ($test) {
                 $test->entityManager->rollback()->shouldHaveBeenCalledTimes(1);
             },
-            ['currency' => 'USD'],
+            ['boxCurrency' => '0'],
         ];
 
         yield 'booking with upsell and different box and partner currency' => [

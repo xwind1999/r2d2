@@ -17,8 +17,8 @@ use App\Exception\Booking\BookingHasExpiredException;
 use App\Exception\Booking\CurrencyMismatchException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
-use App\Exception\Booking\ExperienceCurrencyMismatchException;
 use App\Exception\Booking\InvalidBookingNewStatus;
+use App\Exception\Booking\InvalidBoxCurrencyException;
 use App\Exception\Booking\InvalidExtraNightException;
 use App\Exception\Booking\MisconfiguredExperiencePriceException;
 use App\Exception\Booking\NoIncludedRoomFoundException;
@@ -80,11 +80,16 @@ class BookingManager
 
         $experience = $this->experienceRepository->findOneByGoldenId($bookingCreateRequest->experience->id);
 
-        if (!$experience->price || !$experience->currency) {
+        if (empty($experience->price) || empty($experience->currency)) {
             throw new MisconfiguredExperiencePriceException();
         }
 
         $box = $this->boxRepository->findOneByGoldenId($bookingCreateRequest->box);
+
+        if (empty($box->currency)) {
+            throw new InvalidBoxCurrencyException();
+        }
+
         $this->boxExperienceRepository->findOneEnabledByBoxExperience($box, $experience);
         $component = $this->componentRepository->findDefaultRoomByExperience($experience);
 
@@ -108,6 +113,7 @@ class BookingManager
         $booking->expiredAt = (new \DateTime('now'))->add(new \DateInterval(self::EXPIRATION_TIME));
         /** @var ArrayCollection<int, BookingDate> */
         $bookingDatesCollection = new ArrayCollection();
+        $booking->currency = $experience->currency;
         $bookingCurrency = strtoupper($bookingCreateRequest->currency);
         $money = $this->moneyHelper->create($experience->price, $experience->currency);
         $period = new \DatePeriod($booking->startDate, new \DateInterval('P1D'), $booking->endDate);
@@ -138,18 +144,13 @@ class BookingManager
         $processedIncludedRoom = false;
 
         // validation #9
-        $boxCurrency = isset($box->currency) ? strtoupper($box->currency) : '';
-        $experienceCurrency = $experience->currency;
+        $boxCurrency = strtoupper($box->currency);
         $partnerCurrency = strtoupper($partner->currency);
         $isDifferentCurrency =
             $partnerCurrency !== $boxCurrency
             || $bookingCurrency !== $boxCurrency
             || $partnerCurrency !== $bookingCurrency
         ;
-
-        if ($bookingCurrency !== $experienceCurrency) {
-            throw new ExperienceCurrencyMismatchException();
-        }
 
         foreach ($bookingCreateRequest->rooms as $roomIndex => $room) {
             // validating #6

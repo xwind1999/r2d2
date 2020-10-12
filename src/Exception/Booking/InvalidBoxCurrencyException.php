@@ -6,8 +6,8 @@ namespace App\Exception\Booking;
 
 use App\Exception\Http\UnprocessableEntityException;
 
-class ExperienceCurrencyMismatchException extends UnprocessableEntityException
+class InvalidBoxCurrencyException extends UnprocessableEntityException
 {
-    protected const MESSAGE = 'Experience currency mismatch';
+    protected const MESSAGE = 'Invalid box currency';
     protected const CODE = 1300012;
 }
