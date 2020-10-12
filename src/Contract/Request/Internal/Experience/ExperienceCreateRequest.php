@@ -71,4 +71,11 @@ class ExperienceCreateRequest implements RequestBodyInterface, ValidatableReques
      * @OA\Property(type="integer", example=1000)
      */
     public ?int $price = null;
+
+    /**
+     * @Assert\Currency()
+     *
+     * @JMS\Type("string")
+     */
+    public ?string $currency = null;
 }

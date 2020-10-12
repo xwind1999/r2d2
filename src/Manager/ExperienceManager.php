@@ -50,6 +50,7 @@ class ExperienceManager
         $experience->peopleNumber = $experienceCreateRequest->productPeopleNumber;
         $experience->status = $experienceCreateRequest->status;
         $experience->price = $experienceCreateRequest->price;
+        $experience->currency = $experienceCreateRequest->currency;
         $experience->priceUpdatedAt = new \DateTime('now');
 
         $this->repository->save($experience);
@@ -150,7 +151,11 @@ class ExperienceManager
             throw new OutdatedExperiencePriceException();
         }
 
-        $experience->price = $priceInformationRequest->averageValue ? $priceInformationRequest->averageValue->amount : null;
+        if ($priceInformationRequest->averageValue) {
+            $experience->price = $priceInformationRequest->averageValue->amount;
+            $experience->currency = $priceInformationRequest->averageValue->currencyCode;
+        }
+
         $experience->commissionType = $priceInformationRequest->averageCommissionType;
         $experience->commission = $priceInformationRequest->averageCommission;
         $experience->priceUpdatedAt = $priceInformationRequest->updatedAt;

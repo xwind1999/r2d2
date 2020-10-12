@@ -22,6 +22,7 @@ use App\Exception\Booking\BookingHasExpiredException;
 use App\Exception\Booking\CurrencyMismatchException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
+use App\Exception\Booking\ExperienceCurrencyMismatchException;
 use App\Exception\Booking\InvalidBookingNewStatus;
 use App\Exception\Booking\InvalidExtraNightException;
 use App\Exception\Booking\MisconfiguredExperiencePriceException;
@@ -294,6 +295,7 @@ class BookingManagerTest extends TestCase
         $experience = new Experience();
         $experience->goldenId = $bookingCreateRequest->experience->id;
         $experience->partner = $partner;
+        $experience->currency = $extraParams['currency'] ?? 'EUR';
         $experience->price = $extraParams['price'] ?? 500;
         $this->experienceRepository->findOneByGoldenId($bookingCreateRequest->experience->id)->willReturn($experience);
 
@@ -312,8 +314,8 @@ class BookingManagerTest extends TestCase
         $component->duration = $duration;
         $this->componentRepository->findDefaultRoomByExperience($experience)->willReturn($component);
 
-        $money = new Money($experience->price, new Currency($bookingCreateRequest->currency));
-        $this->moneyHelper->create($experience->price, $bookingCreateRequest->currency)->willReturn($money);
+        $money = new Money($experience->price, new Currency($experience->currency));
+        $this->moneyHelper->create($experience->price, $experience->currency)->willReturn($money);
 
         if ($setUp) {
             $setUp($this);
@@ -849,6 +851,66 @@ class BookingManagerTest extends TestCase
                 $test->entityManager->rollback()->shouldHaveBeenCalledTimes(1);
             },
             ['price' => 0],
+        ];
+
+        yield 'experience with missing currency' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 0;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::type('string'))->willThrow(new BookingNotFoundException());
+            },
+            MisconfiguredExperiencePriceException::class,
+            function ($test) {
+                $test->entityManager->rollback()->shouldHaveBeenCalledTimes(1);
+            },
+            ['currency' => '0'],
+        ];
+
+        yield 'experience with different currency' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 0;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::type('string'))->willThrow(new BookingNotFoundException());
+            },
+            ExperienceCurrencyMismatchException::class,
+            function ($test) {
+                $test->entityManager->rollback()->shouldHaveBeenCalledTimes(1);
+            },
+            ['currency' => 'USD'],
         ];
 
         yield 'booking with upsell and different box and partner currency' => [

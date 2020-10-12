@@ -54,6 +54,7 @@ composer:
     paths:
       - vendor/
       - public/bundles
+      - public/version.txt
 
 build-docs:
   stage: Generate Documentation

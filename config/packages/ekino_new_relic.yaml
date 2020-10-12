@@ -1,0 +1,3 @@
+ekino_new_relic:
+  enabled: false
+  deprecations: false
