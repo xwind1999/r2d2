@@ -15,9 +15,9 @@ use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\ComponentManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -26,13 +26,13 @@ class ComponentController
     /**
      * @Route("/internal/component", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="component")
-     * @SWG\Parameter(
+     * @OA\Tag(name="component")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=ComponentCreateRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=201,
      *     description="Component created",
      *     @Model(type=ComponentCreateResponse::class)
@@ -49,14 +49,16 @@ class ComponentController
     /**
      * @Route("/internal/component/{uuid}", methods={"GET"}, format="json")
      *
-     * @SWG\Tag(name="component")
-     * @SWG\Parameter(
+     * @OA\Tag(name="component")
+     * @OA\Parameter(
      *     name="uuid",
      *     in="path",
-     *     type="string",
-     *     format="uuid"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="uuid"
+     *     )
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=200,
      *     description="Component successfully retrieved",
      *     @Model(type=ComponentGetResponse::class)
@@ -80,14 +82,16 @@ class ComponentController
     /**
      * @Route("/internal/component/{uuid}", methods={"DELETE"}, format="json")
      *
-     * @SWG\Tag(name="component")
-     * @SWG\Parameter(
+     * @OA\Tag(name="component")
+     * @OA\Parameter(
      *     name="uuid",
      *     in="path",
-     *     type="string",
-     *     format="uuid"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="uuid"
+     *     )
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=200,
      *     description="Component deleted"
      * )
@@ -110,19 +114,21 @@ class ComponentController
     /**
      * @Route("/internal/component/{uuid}", methods={"PUT"}, format="json")
      *
-     * @SWG\Tag(name="component")
-     * @SWG\Parameter(
+     * @OA\Tag(name="component")
+     * @OA\Parameter(
      *     name="uuid",
      *     in="path",
-     *     type="string",
-     *     format="uuid"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="uuid"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=ComponentUpdateRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=200,
      *     description="Component updated",
      *     @Model(type=ComponentUpdateResponse::class)

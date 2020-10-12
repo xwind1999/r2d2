@@ -14,7 +14,7 @@ use App\Contract\Request\BroadcastListener\RoomPriceRequest;
 use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -28,13 +28,13 @@ class BroadcastListenerController
     /**
      * @Route("/broadcast-listener/product", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="broadcast-listener")
-     * @SWG\Parameter(
+     * @OA\Tag(name="broadcast-listener")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=ProductRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=202,
      *     description="Product handled")
      * )
@@ -52,13 +52,13 @@ class BroadcastListenerController
     /**
      * @Route("/broadcast-listener/partner", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="broadcast-listener")
-     * @SWG\Parameter(
+     * @OA\Tag(name="broadcast-listener")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=PartnerRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=202,
      *     description="Partner handled")
      * )
@@ -76,13 +76,13 @@ class BroadcastListenerController
     /**
      * @Route("/broadcast-listener/product-relationship", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="broadcast-listener")
-     * @SWG\Parameter(
+     * @OA\Tag(name="broadcast-listener")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=ProductRelationshipRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=202,
      *     description="Relationship handled")
      * )
@@ -103,13 +103,13 @@ class BroadcastListenerController
     /**
      * @Route("/broadcast-listener/price-information", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="broadcast-listener")
-     * @SWG\Parameter(
+     * @OA\Tag(name="broadcast-listener")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=PriceInformationRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=202,
      *     description="Price information handled")
      * )
@@ -130,19 +130,19 @@ class BroadcastListenerController
     /**
      * @Route("/broadcast-listener/room-availability", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="broadcast-listener")
-     * @SWG\Parameter(
+     * @OA\Tag(name="broadcast-listener")
+     * @OA\Parameter(
      *    name="body",
-     *    in="body",
-     *    @SWG\Schema(
+     *    in="query",
+     *    @OA\Schema(
      *        type="array",
-     *        @SWG\Items(
+     *        @OA\Items(
      *            ref=@Model(type=RoomAvailabilityRequest::class)
      *        )
      *    )
      * )
      *
-     * @SWG\Response(
+     * @OA\Response(
      *     response=202,
      *     description="Room availability handled")
      * )
@@ -160,18 +160,18 @@ class BroadcastListenerController
     /**
      * @Route("/broadcast-listener/room-price", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="broadcast-listener")
-     * @SWG\Parameter(
+     * @OA\Tag(name="broadcast-listener")
+     * @OA\Parameter(
      *    name="body",
-     *    in="body",
-     *    @SWG\Schema(
+     *    in="query",
+     *    @OA\Schema(
      *        type="array",
-     *        @SWG\Items(
+     *        @OA\Items(
      *            ref=@Model(type=RoomPriceRequest::class)
      *        )
      *    )
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=202,
      *     description="Room price handled")
      * )

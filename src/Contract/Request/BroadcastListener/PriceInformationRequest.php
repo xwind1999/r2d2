@@ -11,7 +11,7 @@ use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\ValidatableRequest;
 use Clogger\ContextualInterface;
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class PriceInformationRequest implements RequestBodyInterface, ValidatableRequest, ContextualInterface, NamedEventInterface
@@ -40,7 +40,7 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
      * @Assert\Choice(choices=\App\Constraint\PriceCommissionTypeConstraint::VALID_VALUES)
      *
      * @JMS\Type("string")
-     * @SWG\Property(example="amount")
+     * @OA\Property(example="amount")
      */
     public ?string $averageCommissionType = null;
 
@@ -48,7 +48,7 @@ class PriceInformationRequest implements RequestBodyInterface, ValidatableReques
      * @Assert\Type(type="string")
      *
      * @JMS\Type("string")
-     * @SWG\Property(example="5.20")
+     * @OA\Property(example="5.20")
      */
     public ?string $averageCommission = null;
 

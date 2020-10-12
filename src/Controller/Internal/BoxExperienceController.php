@@ -14,7 +14,7 @@ use App\Exception\Repository\EntityNotFoundException;
 use App\Manager\BoxExperienceManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -23,22 +23,22 @@ class BoxExperienceController
     /**
      * @Route("/internal/box-experience", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="box-experience")
-     * @SWG\Parameter(
+     * @OA\Tag(name="box-experience")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=BoxExperienceCreateRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=201,
      *     description="Relationship created",
      *     @Model(type=BoxExperienceCreateResponse::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=409,
      *     description="Relationship already exists"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=404,
      *     description="Resource not found"
      * )
@@ -60,17 +60,17 @@ class BoxExperienceController
     /**
      * @Route("/internal/box-experience", methods={"DELETE"}, format="json")
      *
-     * @SWG\Tag(name="box-experience")
-     * @SWG\Parameter(
+     * @OA\Tag(name="box-experience")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=BoxExperienceDeleteRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=204,
      *     description="Relationship deleted"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=404,
      *     description="Resource not found"
      * )

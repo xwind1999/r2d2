@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Command {
     use App\Command\ApiDumpCommand;
-    use EXSyst\Component\Swagger\Swagger;
     use Nelmio\ApiDocBundle\ApiDocGenerator;
+    use OpenApi\Annotations\OpenApi;
+    use Prophecy\Argument;
     use Prophecy\Prophecy\ObjectProphecy;
     use Symfony\Bundle\FrameworkBundle\Console\Application;
     use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -43,10 +44,10 @@ namespace App\Tests\Command {
         {
             $commandTester = new CommandTester($this->command);
 
-            $swagger = $this->prophesize(Swagger::class);
-            $swagger->toArray()->willReturn(['test' => 'bbbb']);
+            $openApi = $this->prophesize(OpenApi::class);
+            $openApi->toJson(0)->willReturn('{"test":"bbbb"}');
 
-            $this->apiDocGenerator->generate()->willReturn($swagger->reveal());
+            $this->apiDocGenerator->generate()->willReturn($openApi->reveal());
 
             $commandTester->execute(['--no-pretty']);
 
@@ -58,15 +59,15 @@ namespace App\Tests\Command {
         {
             $commandTester = new CommandTester($this->command);
 
-            $swagger = $this->prophesize(Swagger::class);
-            $swagger->toArray()->willReturn(['test' => 'bbbb']);
+            $openApi = $this->prophesize(OpenApi::class);
+            $openApi->toJson(128)->willReturn("{\n\"test\": \"bbbb\"\n}");
 
-            $this->apiDocGenerator->generate()->willReturn($swagger->reveal());
+            $this->apiDocGenerator->generate()->willReturn($openApi->reveal());
 
             $commandTester->execute([]);
 
             $output = $commandTester->getDisplay();
-            $this->assertEquals("{\n    \"test\": \"bbbb\"\n}\n", $output);
+            $this->assertEquals("{\n\"test\": \"bbbb\"\n}\n", $output);
             $this->assertEquals(0, $commandTester->getStatusCode());
         }
 
@@ -74,10 +75,10 @@ namespace App\Tests\Command {
         {
             $commandTester = new CommandTester($this->command);
 
-            $swagger = $this->prophesize(Swagger::class);
-            $swagger->toArray()->willReturn(fopen('php://memory', 'r'));
+            $openApi = $this->prophesize(OpenApi::class);
+            $openApi->toJson(Argument::any())->willReturn(false);
 
-            $this->apiDocGenerator->generate()->willReturn($swagger->reveal());
+            $this->apiDocGenerator->generate()->willReturn($openApi->reveal());
 
             $commandTester->execute([]);
 

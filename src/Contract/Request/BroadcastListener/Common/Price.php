@@ -6,7 +6,7 @@ namespace App\Contract\Request\BroadcastListener\Common;
 
 use Clogger\ContextualInterface;
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class Price implements ContextualInterface
@@ -16,7 +16,7 @@ class Price implements ContextualInterface
      * @Assert\NotBlank()
      *
      * @JMS\Type("float_to_integer")
-     * @SWG\Property(example=10.50, type="float")
+     * @OA\Property(example=10.50, type="float")
      */
     public int $amount;
 
@@ -25,7 +25,7 @@ class Price implements ContextualInterface
      * @Assert\NotBlank()
      *
      * @JMS\Type("string")
-     * @SWG\Property(example="EUR")
+     * @OA\Property(example="EUR")
      */
     public string $currencyCode;
 

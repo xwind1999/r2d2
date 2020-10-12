@@ -6,7 +6,7 @@ namespace App\Contract\Request\BroadcastListener\Product;
 
 use Clogger\ContextualInterface;
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class Product implements ContextualInterface
@@ -17,7 +17,7 @@ class Product implements ContextualInterface
      * @Assert\NotBlank
      *
      * @JMS\Type("string")
-     * @SWG\Property(example="481d7e979637c39f6864d709")
+     * @OA\Property(example="481d7e979637c39f6864d709")
      */
     public string $id;
 

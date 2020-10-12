@@ -17,7 +17,7 @@ use App\Exception\Repository\ExperienceComponentNotFoundException;
 use App\Manager\ExperienceComponentManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -26,22 +26,22 @@ class ExperienceComponentController
     /**
      * @Route("/internal/experience-component", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="experience-component")
-     * @SWG\Parameter(
+     * @OA\Tag(name="experience-component")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=ExperienceComponentCreateRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=201,
      *     description="Relationship created",
      *     @Model(type=ExperienceComponentCreateResponse::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=409,
      *     description="Relationship already exists"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=404,
      *     description="Resource not found"
      * )
@@ -65,17 +65,17 @@ class ExperienceComponentController
     /**
      * @Route("/internal/experience-component", methods={"DELETE"}, format="json")
      *
-     * @SWG\Tag(name="experience-component")
-     * @SWG\Parameter(
+     * @OA\Tag(name="experience-component")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=ExperienceComponentDeleteRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=204,
      *     description="Relationship deleted"
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=404,
      *     description="Resource not found"
      * )
@@ -99,13 +99,13 @@ class ExperienceComponentController
     /**
      * @Route("/internal/experience-component/", methods={"PUT"}, format="json")
      *
-     * @SWG\Tag(name="experience-component")
-     * @SWG\Parameter(
+     * @OA\Tag(name="experience-component")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=ExperienceComponentUpdateRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=200,
      *     description="Relationship upated",
      *     @Model(type=ExperienceComponentUpdateResponse::class)

@@ -17,9 +17,9 @@ use App\Manager\ExperienceManager;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -28,13 +28,13 @@ class ExperienceController
     /**
      * @Route("/internal/experience", methods={"POST"}, format="json")
      *
-     * @SWG\Tag(name="experience")
-     * @SWG\Parameter(
+     * @OA\Tag(name="experience")
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=ExperienceCreateRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=201,
      *     description="Experience created",
      *     @Model(type=ExperienceCreateResponse::class)
@@ -57,14 +57,16 @@ class ExperienceController
     /**
      * @Route("/internal/experience/{uuid}", methods={"GET"}, format="json")
      *
-     * @SWG\Tag(name="experience")
-     * @SWG\Parameter(
+     * @OA\Tag(name="experience")
+     * @OA\Parameter(
      *     name="uuid",
      *     in="path",
-     *     type="string",
-     *     format="uuid"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="uuid"
+     *     )
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=200,
      *     description="Experience successfully retrieved",
      *     @Model(type=ExperienceGetResponse::class)
@@ -88,14 +90,16 @@ class ExperienceController
     /**
      * @Route("/internal/experience/{uuid}", methods={"DELETE"}, format="json")
      *
-     * @SWG\Tag(name="experience")
-     * @SWG\Parameter(
+     * @OA\Tag(name="experience")
+     * @OA\Parameter(
      *     name="uuid",
      *     in="path",
-     *     type="string",
-     *     format="uuid"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="uuid"
+     *     )
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=200,
      *     description="Experience deleted"
      * )
@@ -118,19 +122,21 @@ class ExperienceController
     /**
      * @Route("/internal/experience/{uuid}", methods={"PUT"}, format="json")
      *
-     * @SWG\Tag(name="experience")
-     * @SWG\Parameter(
+     * @OA\Tag(name="experience")
+     * @OA\Parameter(
      *     name="uuid",
      *     in="path",
-     *     type="string",
-     *     format="uuid"
+     *     @OA\Schema(
+     *         type="string",
+     *         format="uuid"
+     *     )
      * )
-     * @SWG\Parameter(
+     * @OA\Parameter(
      *         name="body",
-     *         in="body",
+     *         in="query",
      *         @Model(type=ExperienceUpdateRequest::class)
      * )
-     * @SWG\Response(
+     * @OA\Response(
      *     response=200,
      *     description="Experience updated",
      *     @Model(type=ExperienceUpdateResponse::class)
