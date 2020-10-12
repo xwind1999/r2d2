@@ -148,6 +148,7 @@ class BookingStatusSubscriberTest extends TestCase
         $this->booking->startDate = new \DateTime();
         $this->booking->endDate = new \DateTime();
         $this->booking->createdAt = new \DateTime();
+        $this->booking->currency = 'EUR';
         $this->logger->info(
             BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_COMPLETED,
             ['booking' => $this->booking]
@@ -167,6 +168,7 @@ class BookingStatusSubscriberTest extends TestCase
     public function testHandleCancelledMessages(): void
     {
         $this->booking->status = BookingStatusConstraint::BOOKING_STATUS_CANCELLED;
+        $this->booking->currency = 'EUR';
         $this->booking->createdAt = new \DateTime();
         $this->logger->info(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CANCELLED, ['booking' => $this->booking])->shouldBeCalledOnce();
         $this->bookingUpdatedEvent->getBooking()->willReturn($this->booking);

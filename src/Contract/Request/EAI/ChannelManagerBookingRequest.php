@@ -77,7 +77,7 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking
         if (!empty($booking->experience->price)) {
             $price->setAmount($booking->experience->price);
         }
-        $price->setCurrencyCode($booking->partner->currency);
+        $price->setCurrencyCode($booking->currency);
         $bookingRequest->setTotalPrice($price);
 
         $experience = new Experience();
@@ -149,7 +149,7 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking
             $dailyRate->setDate($bookingDate->date);
             $ratePrice = new Price();
             $ratePrice->setAmount($bookingDate->price);
-            $ratePrice->setCurrencyCode($booking->partner->currency);
+            $ratePrice->setCurrencyCode($booking->currency);
             $dailyRate->setRate($price);
             $dailyRateArray[] = $dailyRate;
             $room->setDailyRates($dailyRateArray);

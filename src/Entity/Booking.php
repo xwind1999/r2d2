@@ -81,6 +81,11 @@ class Booking
     public int $totalPrice;
 
     /**
+     * @ORM\Column(type="string", length=3)
+     */
+    public string $currency;
+
+    /**
      * @ORM\Column(type="date")
      */
     public \DateTime $startDate;
