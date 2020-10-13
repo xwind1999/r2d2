@@ -33,7 +33,11 @@ class BookingStatusSubscriber implements EventSubscriberInterface
     public function handleBookingStatus(BookingStatusEvent $event): void
     {
         $booking = $event->getBooking();
-        if (!empty($booking->expiredAt) && $booking->expiredAt < new \DateTime('now')) {
+        if (
+            !empty($booking->expiredAt) &&
+            $booking->expiredAt < new \DateTime('now') &&
+            BookingStatusConstraint::BOOKING_STATUS_CREATED === $booking->status
+        ) {
             $this->processLogMessage(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_EXPIRED, $booking);
         } elseif (BookingStatusConstraint::BOOKING_STATUS_CREATED === $booking->status) {
             $this->processLogMessage(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CREATED, $booking);
