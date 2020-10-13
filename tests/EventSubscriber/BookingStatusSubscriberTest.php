@@ -66,6 +66,8 @@ class BookingStatusSubscriberTest extends TestCase
         $this->booking->updatedAt = $dateTime;
         $this->booking->voucher = '1234154';
         $this->booking->partnerGoldenId = '1234154';
+        $this->booking->country = 'FR';
+        $this->booking->totalPrice = 1212;
         $this->booking->experienceGoldenId = '1234154';
         $this->booking->components = [
             'name' => 'name',
@@ -94,6 +96,7 @@ class BookingStatusSubscriberTest extends TestCase
 
         $bookingDate = $this->prophesize(BookingDate::class);
         $bookingDate->componentGoldenId = '5464';
+        $bookingDate->component = $component;
         $bookingDate->date = $dateTime;
         $bookingDate->price = 1212;
         $this->booking->bookingDate = new ArrayCollection([$bookingDate->reveal()]);

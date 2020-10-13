@@ -23,6 +23,8 @@ use App\Exception\Booking\CurrencyMismatchException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
 use App\Exception\Booking\InvalidBookingNewStatus;
+use App\Exception\Booking\InvalidBoxBrandException;
+use App\Exception\Booking\InvalidBoxCountryException;
 use App\Exception\Booking\InvalidBoxCurrencyException;
 use App\Exception\Booking\InvalidExtraNightException;
 use App\Exception\Booking\MisconfiguredExperiencePriceException;
@@ -301,8 +303,8 @@ class BookingManagerTest extends TestCase
 
         $box = new Box();
         $box->goldenId = $bookingCreateRequest->box;
-        $box->brand = 'SBX';
-        $box->country = 'FR';
+        $box->brand = $extraParams['boxBrand'] ?? 'SBX';
+        $box->country = $extraParams['boxCountry'] ?? 'FR';
         $box->currency = $extraParams['boxCurrency'] ?? 'EUR';
         $this->boxRepository->findOneByGoldenId($bookingCreateRequest->box)->willReturn($box);
 
@@ -958,6 +960,66 @@ class BookingManagerTest extends TestCase
             [
                 'partnerCurrency' => 'BRL',
             ],
+        ];
+
+        yield 'box with missing brand' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 0;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::type('string'))->willThrow(new BookingNotFoundException());
+            },
+            InvalidBoxBrandException::class,
+            function ($test) {
+                $test->entityManager->rollback()->shouldHaveBeenCalledTimes(1);
+            },
+            ['boxBrand' => '0'],
+        ];
+
+        yield 'box with missing country' => [
+            (function ($bookingCreateRequest) {
+                $bookingCreateRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 0;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::type('string'))->willThrow(new BookingNotFoundException());
+            },
+            InvalidBoxCountryException::class,
+            function ($test) {
+                $test->entityManager->rollback()->shouldHaveBeenCalledTimes(1);
+            },
+            ['boxCountry' => '0'],
         ];
     }
 }
