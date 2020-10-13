@@ -6,6 +6,7 @@ namespace App\Contract\Request\EAI;
 
 use App\Constraint\CMHStatusConstraint;
 use App\Entity\Booking;
+use App\Entity\BookingDate;
 use Smartbox\CDM\Entity\Booking\ChannelManagerBooking;
 use Smartbox\CDM\Entity\Booking\Guest;
 use Smartbox\CDM\Entity\Common\Country;
@@ -73,16 +74,19 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking
         $partner->setId($booking->partnerGoldenId);
         $bookingRequest->setPartner($partner);
 
+        $experience = new Experience();
+        $experience->setId($booking->experienceGoldenId);
+
         $price = new Price();
         if (!empty($booking->experience->price)) {
             $price->setAmount($booking->experience->price);
         }
         $price->setCurrencyCode($booking->currency);
+        $experience->setPrice($price);
+
+        $price->setAmount($booking->totalPrice);
         $bookingRequest->setTotalPrice($price);
 
-        $experience = new Experience();
-        $experience->setId($booking->experienceGoldenId);
-        $experience->setPrice($price);
         $componentsArray = [];
         foreach ($booking->components as $component) {
             $componentObject = new Component();
@@ -92,19 +96,8 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking
         $experience->setComponents($componentsArray);
         $bookingRequest->setExperience($experience);
 
-        // Generate array of components with its IDs and names to be used during the next loop
-        $components = [];
-        foreach ($booking->experience->experienceComponent->getIterator() as $experienceComponent) {
-            $components[$experienceComponent->component->goldenId] = $experienceComponent->component->name;
-        }
-
         $country = new Country();
-        foreach ($booking->experience->boxExperience->getIterator() as $boxExperience) {
-            if ($boxExperience->box->country) {
-                $country->setCode($boxExperience->box->country);
-                break;
-            }
-        }
+        $country->setCode($booking->country);
 
         $roomArray = [];
         $dailyRateArray = [];
@@ -112,12 +105,16 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking
         $room = new Room();
         $previousComponentGoldenId = null;
         $previousComponentGoldenIdIndex = 0;
+
+        /**
+         * @var BookingDate $bookingDate
+         */
         foreach ($booking->bookingDate->getIterator() as $index => $bookingDate) {
             if ($previousComponentGoldenId !== $bookingDate->componentGoldenId) {
                 $roomTypeProduct = new RoomTypeProduct();
                 $product = new Product();
                 $product->setId($bookingDate->componentGoldenId);
-                $product->setName($components[$bookingDate->componentGoldenId]);
+                $product->setName($bookingDate->component->name);
                 $roomTypeProduct->setProduct($product);
                 $room->setRoomTypeProduct($roomTypeProduct);
                 $previousComponentGoldenId = $bookingDate->componentGoldenId;
@@ -150,7 +147,7 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking
             $ratePrice = new Price();
             $ratePrice->setAmount($bookingDate->price);
             $ratePrice->setCurrencyCode($booking->currency);
-            $dailyRate->setRate($price);
+            $dailyRate->setRate($ratePrice);
             $dailyRateArray[] = $dailyRate;
             $room->setDailyRates($dailyRateArray);
 

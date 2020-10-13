@@ -18,6 +18,8 @@ use App\Exception\Booking\CurrencyMismatchException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
 use App\Exception\Booking\InvalidBookingNewStatus;
+use App\Exception\Booking\InvalidBoxBrandException;
+use App\Exception\Booking\InvalidBoxCountryException;
 use App\Exception\Booking\InvalidBoxCurrencyException;
 use App\Exception\Booking\InvalidExtraNightException;
 use App\Exception\Booking\MisconfiguredExperiencePriceException;
@@ -90,6 +92,14 @@ class BookingManager
             throw new InvalidBoxCurrencyException();
         }
 
+        if (empty($box->brand)) {
+            throw new InvalidBoxBrandException();
+        }
+
+        if (empty($box->country)) {
+            throw new InvalidBoxCountryException();
+        }
+
         $this->boxExperienceRepository->findOneEnabledByBoxExperience($box, $experience);
         $component = $this->componentRepository->findDefaultRoomByExperience($experience);
 
@@ -113,8 +123,8 @@ class BookingManager
         $booking->expiredAt = (new \DateTime('now'))->add(new \DateInterval(self::EXPIRATION_TIME));
         /** @var ArrayCollection<int, BookingDate> */
         $bookingDatesCollection = new ArrayCollection();
-        $booking->currency = $experience->currency;
         $bookingCurrency = strtoupper($bookingCreateRequest->currency);
+        $booking->currency = $bookingCurrency;
         $money = $this->moneyHelper->create($experience->price, $experience->currency);
         $period = new \DatePeriod($booking->startDate, new \DateInterval('P1D'), $booking->endDate);
         $minimumDuration = $component->duration ?? 1;

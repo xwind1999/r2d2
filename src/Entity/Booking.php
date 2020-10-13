@@ -56,19 +56,19 @@ class Booking
     public string $experienceGoldenId;
 
     /**
-     * @ORM\Column(type="string", length=12, nullable=true)
+     * @ORM\Column(type="string", length=12)
      */
-    public ?string $voucher = null;
+    public string $voucher;
 
     /**
-     * @ORM\Column(type="string", length=3, nullable=true)
+     * @ORM\Column(type="string", length=3)
      */
-    public ?string $brand = null;
+    public string $brand;
 
     /**
-     * @ORM\Column(type="string", length=2, nullable=true)
+     * @ORM\Column(type="string", length=2)
      */
-    public ?string $country = null;
+    public string $country;
 
     /**
      * @ORM\Column(type="booking_status", length=30)
