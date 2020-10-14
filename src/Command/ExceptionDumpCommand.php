@@ -27,7 +27,7 @@ class ExceptionDumpCommand extends Command
     {
         $dir = __DIR__.'/'.self::EXCEPTION_DIR;
         $finder = new Finder();
-        $files = $finder->in($dir)->files()->name('/^.+Exception\.php$/i');
+        $files = $finder->in($dir)->files()->name('/^.+\.php$/i');
         $classes = [];
         $data = [];
         if ($finder->hasResults()) {
@@ -40,10 +40,18 @@ class ExceptionDumpCommand extends Command
         /** @var class-string $classFQDN */
         foreach ($classes as $classFQDN) {
             $ref = new ReflectionClass($classFQDN);
+            if (!$ref->isSubclassOf(\Exception::class)) {
+                continue;
+            }
+
             $message = $ref->getConstant('MESSAGE');
             $code = $ref->getConstant('CODE');
             $data[] = [$code, $message, $ref->getShortName(), $ref->getNamespaceName()];
         }
+
+        usort($data, function ($a, $b) {
+            return $a[0] > $b[0] ? 1 : -1;
+        });
 
         $output->writeln('| Code | Message | Class Name | Namespace |');
         $output->writeln('| :--- | :--- | :--- | :--- |');
