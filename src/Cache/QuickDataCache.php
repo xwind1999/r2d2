@@ -10,7 +10,7 @@ use App\Exception\Cache\ResourceNotCachedException;
 
 class QuickDataCache
 {
-    private const BOX_DATE_CACHE_DURATION = 60 * 60;
+    private const BOX_DATE_CACHE_DURATION = 300; //5 minutes
     private const KEY_SEPARATOR = '.';
     private const BOX_DATE_PREFIX = 'box'.self::KEY_SEPARATOR;
 

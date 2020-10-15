@@ -238,11 +238,11 @@ class RoomAvailabilityManagerTest extends TestCase
         if ($exceptionClass) {
             $this->expectException($exceptionClass);
         }
-
-        $this
-            ->eventDispatcher
-            ->dispatch(Argument::type(AvailabilityUpdatedEvent::class))
-            ->willReturn(new \stdClass());
+//
+//        $this
+//            ->eventDispatcher
+//            ->dispatch(Argument::type(AvailabilityUpdatedEvent::class))
+//            ->willReturn(new \stdClass());
 
         $this->assertNull($this->manager->replace($roomAvailabilityRequest));
     }
