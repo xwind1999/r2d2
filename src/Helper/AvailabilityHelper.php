@@ -4,28 +4,20 @@ declare(strict_types=1);
 
 namespace App\Helper;
 
+use App\Constants\AvailabilityConstants;
+use App\Constants\DateTimeConstants;
 use App\Constraint\RoomStockTypeConstraint;
 use App\Exception\Helper\InvalidDatesForPeriod;
 
 class AvailabilityHelper
 {
-    public const AVAILABILITY_PRICE_PERIOD_AVAILABLE = 'Available';
-    public const PRICE_PERIOD_DATE_TIME_FORMAT = 'Y-m-d\TH:i:s.u';
-
-    private const AVAILABILITY_SHORTEN_INSTANT = '1';
-    private const AVAILABILITY_SHORTEN_ON_REQUEST = 'r';
-    private const AVAILABILITY_SHORTEN_NOT_AVAILABLE = '0';
-    private const DEFAULT_DATE_FORMAT = 'Y-m-d';
     private const DEFAULT_DATE_DIFF_VALUE = 0;
-    private const AVAILABILITY_PRICE_PERIOD_REQUEST = 'Request';
-    private const AVAILABILITY_PRICE_PERIOD_UNAVAILABLE = 'Unavailable';
-    private const DEFAULT_TIME_FORMAT = 'T00:00:00.000000';
 
     public static function convertToShortType(array $stocksList, string $roomStockType): array
     {
         $availabilityValues = [];
         foreach ($stocksList as $stock) {
-            $availabilityValues[] = (0 < (int) $stock) ? $roomStockType : self::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
+            $availabilityValues[] = (0 < (int) $stock) ? $roomStockType : AvailabilityConstants::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
         }
 
         return $availabilityValues;
@@ -35,14 +27,14 @@ class AvailabilityHelper
     {
         if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT === $roomStockType ||
             RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK === $roomStockType) {
-            return self::AVAILABILITY_SHORTEN_INSTANT;
+            return AvailabilityConstants::AVAILABILITY_SHORTEN_INSTANT;
         }
 
         if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType) {
-            return self::AVAILABILITY_SHORTEN_ON_REQUEST;
+            return AvailabilityConstants::AVAILABILITY_SHORTEN_ON_REQUEST;
         }
 
-        return self::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
+        return AvailabilityConstants::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
     }
 
     public static function fillMissingAvailabilitiesForAvailabilityPrice(
@@ -56,17 +48,17 @@ class AvailabilityHelper
         }
         $returnAvailabilities = [];
         $datePeriod = new \DatePeriod(
-            (new \DateTime($dateFrom->format(self::DEFAULT_DATE_FORMAT))),
-            new \DateInterval('P1D'),
-            (new \DateTime($dateTo->format(self::DEFAULT_DATE_FORMAT)))->modify('+1 day')
+            (new \DateTime($dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT))),
+            new \DateInterval(DateTimeConstants::PLUS_ONE_DAY_DATE_INTERVAL),
+            (new \DateTime($dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)))->modify('+1 day')
         );
         foreach ($datePeriod as $date) {
-            $date = $date->format(self::DEFAULT_DATE_FORMAT).self:: DEFAULT_TIME_FORMAT;
+            $date = $date->format(DateTimeConstants::DEFAULT_DATE_FORMAT).DateTimeConstants:: DEFAULT_TIME_FORMAT;
             if (!isset($availabilities[$date])) {
                 $returnAvailabilities[$date] = [
                     'Date' => $date,
                     'AvailabilityValue' => 0,
-                    'AvailabilityStatus' => self::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
+                    'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
                     'SellingPrice' => 0.00,
                     'BuyingPrice' => 0.00,
                 ];
@@ -100,8 +92,8 @@ class AvailabilityHelper
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): bool {
-        $dateFrom = new \DateTime($dateFrom->format(self::DEFAULT_DATE_FORMAT));
-        $dateTo = new \DateTime($dateTo->format(self::DEFAULT_DATE_FORMAT));
+        $dateFrom = new \DateTime($dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        $dateTo = new \DateTime($dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
         $numberOfNights = ($dateTo->diff($dateFrom)->days ?: self::DEFAULT_DATE_DIFF_VALUE) + 1;
 
         return $numberOfNights !== count($availabilities);
@@ -119,13 +111,13 @@ class AvailabilityHelper
         $isAvailabilityMissing = self::validateMissingAvailability($availabilities, $dateFrom, $dateTo);
         if (true === $isAvailabilityMissing) {
             $datePeriod = new \DatePeriod(
-                (new \DateTime($dateFrom->format(self::DEFAULT_DATE_FORMAT))),
-                new \DateInterval('P1D'),
-                (new \DateTime($dateTo->format(self::DEFAULT_DATE_FORMAT)))->modify('+1 day')
+                (new \DateTime($dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT))),
+                new \DateInterval(DateTimeConstants::PLUS_ONE_DAY_DATE_INTERVAL),
+                (new \DateTime($dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)))->modify('+1 day')
             );
 
             foreach ($datePeriod as $date) {
-                $date = $date->format(self::DEFAULT_DATE_FORMAT);
+                $date = $date->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
                 $availabilities['stock'][] = isset($availabilities[$date]) ?
                     self::validateStockType($availabilities[$date]['stock'], $roomStockType) : '0';
             }
@@ -140,7 +132,7 @@ class AvailabilityHelper
 
     private static function validateStockType(string $stock, string $roomStockType): string
     {
-        return 0 < ((int) $stock) ? $roomStockType : self::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
+        return 0 < ((int) $stock) ? $roomStockType : AvailabilityConstants::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
     }
 
     public static function buildDataForGetRange(array $availabilities): array
@@ -170,32 +162,44 @@ class AvailabilityHelper
         string $isStopSale
     ): string {
         if ('1' === $isStopSale) {
-            return self::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE;
+            return AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE;
         }
 
         if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK === $type && $stock > 0) {
-            return self::AVAILABILITY_PRICE_PERIOD_AVAILABLE;
+            return AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_AVAILABLE;
         }
 
         if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $type) {
-            return self::AVAILABILITY_PRICE_PERIOD_REQUEST;
+            return AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST;
         }
 
-        return self::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE;
+        return AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE;
     }
 
-    public static function getRealStockByDate(
+    public static function getRealStock(
         array $roomAvailabilities,
         array $bookingDateStock
     ): array {
         foreach ($bookingDateStock as $booking) {
-            $bookedDate = $booking['date'] instanceof \DateTime ?
-                $booking['date']->format('Y-m-d') : $booking['date'];
-            if (isset($roomAvailabilities[$bookedDate])) {
-                $roomAvailabilities[$bookedDate]['stock'] =
-                    $booking['usedStock'] > $roomAvailabilities[$bookedDate]['stock'] ?
-                        self::AVAILABILITY_SHORTEN_NOT_AVAILABLE :
-                        $roomAvailabilities[$bookedDate]['stock'] - $booking['usedStock'];
+            foreach ($roomAvailabilities as $key => $availability) {
+                if (isset($availability['date'], $availability['stock']) &&
+                    $availability['date'] === $booking['date'] && (
+                        (
+                            isset($availability['componentGoldenId']) &&
+                            $availability['componentGoldenId'] === $booking['componentGoldenId']
+                        )
+                        ||
+                        (
+                            isset($availability['experienceGoldenId']) &&
+                            $availability['experienceGoldenId'] === $booking['experienceGoldenId']
+                        )
+                    )
+                ) {
+                    $roomAvailabilities[$key]['stock'] = (string) max(
+                        $roomAvailabilities[$key]['stock'] - $booking['usedStock'],
+                        AvailabilityConstants::AVAILABILITY_SHORTEN_NOT_AVAILABLE
+                    );
+                }
             }
         }
 
@@ -208,6 +212,6 @@ class AvailabilityHelper
             throw new InvalidDatesForPeriod();
         }
 
-        return new \DatePeriod($beginDate, new \DateInterval('P1D'), $endDate);
+        return new \DatePeriod($beginDate, new \DateInterval(DateTimeConstants::PLUS_ONE_DAY_DATE_INTERVAL), $endDate);
     }
 }

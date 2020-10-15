@@ -129,7 +129,7 @@ class AvailabilityProviderTest extends TestCase
 
         $expectedArray = [
             [
-                'stock' => '1',
+                'stock' => '0',
                 'experienceGoldenId' => '1234',
                 'duration' => '1',
                 'date' => '2020-06-20',
@@ -138,7 +138,7 @@ class AvailabilityProviderTest extends TestCase
                 'roomStockType' => 'stock',
             ],
             [
-                'stock' => '1',
+                'stock' => '0',
                 'experienceGoldenId' => '1234',
                 'duration' => '1',
                 'date' => '2020-06-21',
@@ -172,6 +172,27 @@ class AvailabilityProviderTest extends TestCase
             Argument::any(),
             )->willReturn($expectedArray);
 
+        $expectedBookingDates = [
+            [
+                'experienceGoldenId' => '1234',
+                'componentGoldenId' => '4321',
+                'date' => '2020-06-20',
+                'usedStock' => '1',
+            ],
+            [
+                'experienceGoldenId' => '1234',
+                'componentGoldenId' => '4321',
+                'date' => '2020-06-21',
+                'usedStock' => '1',
+            ],
+        ];
+
+        $this->bookingDateRepository->findBookingDatesByExperiencesAndDates(
+            Argument::type('array'),
+            Argument::type(\DateTimeInterface::class),
+            Argument::type(\DateTimeInterface::class)
+        )->willReturn($expectedBookingDates);
+
         $this->assertEquals(
             $expectedArray,
             $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates($expId, $dateFrom, $dateTo)
@@ -196,14 +217,14 @@ class AvailabilityProviderTest extends TestCase
                 [
                     0 => [
                         'Date' => '2020-06-20T00:00:00.000000',
-                        'AvailabilityValue' => 1,
+                        'AvailabilityValue' => 0,
                         'AvailabilityStatus' => 'Available',
                         'SellingPrice' => 86.45,
                         'BuyingPrice' => 86.45,
                     ],
                     1 => [
                         'Date' => '2020-06-21T00:00:00.000000',
-                        'AvailabilityValue' => 1,
+                        'AvailabilityValue' => 0,
                         'AvailabilityStatus' => 'Available',
                         'SellingPrice' => 86.45,
                         'BuyingPrice' => 86.45,
@@ -224,6 +245,31 @@ class AvailabilityProviderTest extends TestCase
                     ],
                 ]
             );
+
+        $expectedBookingDates = [
+            [
+                'experienceGoldenId' => '1234',
+                'componentGoldenId' => '4321',
+                'date' => '2020-06-20',
+                'realStock' => '0',
+                'usedStock' => '1',
+                'stock' => '1',
+            ],
+            [
+                'experienceGoldenId' => '1234',
+                'componentGoldenId' => '4321',
+                'date' => '2020-06-21',
+                'realStock' => '0',
+                'usedStock' => '1',
+                'stock' => '1',
+            ],
+        ];
+
+        $this->bookingDateRepository->findBookingDatesByExperiencesAndDates(
+            Argument::type('array'),
+            Argument::type(\DateTimeInterface::class),
+            Argument::type(\DateTimeInterface::class)
+        )->willReturn($expectedBookingDates);
 
         $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
             '1234',

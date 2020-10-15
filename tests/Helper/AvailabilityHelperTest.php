@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Helper;
 
+use App\Constants\AvailabilityConstants;
+use App\Constants\DateTimeConstants;
 use App\Exception\Helper\InvalidDatesForPeriod;
 use App\Helper\AvailabilityHelper;
 use PHPUnit\Framework\TestCase;
@@ -35,7 +37,7 @@ class AvailabilityHelperTest extends TestCase
             )
         );
         $this->assertEquals(
-            'Available',
+            AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_AVAILABLE,
             AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
                 'stock',
                 1,
@@ -43,7 +45,7 @@ class AvailabilityHelperTest extends TestCase
             )
         );
         $this->assertEquals(
-            'Unavailable',
+            AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
             AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
                 'stock',
                 1,
@@ -51,7 +53,7 @@ class AvailabilityHelperTest extends TestCase
             )
         );
         $this->assertEquals(
-            'Request',
+            AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST,
             AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
                 'on_request',
                 0,
@@ -457,11 +459,11 @@ class AvailabilityHelperTest extends TestCase
 
     /**
      * @dataProvider bookingAvailabilityProvider
-     * @covers ::getRealStockByDate
+     * @covers ::getRealStock
      */
     public function testGetRoomAvailabilityRealStock(array $availabilities, array $bookingStockDate, callable $asserts)
     {
-        $usedAvailabilities = AvailabilityHelper::getRealStockByDate($availabilities, $bookingStockDate);
+        $usedAvailabilities = AvailabilityHelper::getRealStock($availabilities, $bookingStockDate);
 
         $asserts($this, $usedAvailabilities, $bookingStockDate, $availabilities);
     }
@@ -469,10 +471,11 @@ class AvailabilityHelperTest extends TestCase
     public function bookingAvailabilityProvider()
     {
         $componentGoldenId = '12345';
+        $experienceGoldenId = '54321';
         $datetime = new \DateTime('2020-10-01');
 
         $availabilities = [
-            $datetime->format('Y-m-d') => [
+            $datetime->format(DateTimeConstants::DEFAULT_DATE_FORMAT) => [
                 'stock' => 10,
                 'date' => $datetime,
                 'type' => 'stock',
@@ -495,6 +498,7 @@ class AvailabilityHelperTest extends TestCase
         $bookingStockDate = [
             [
                 'componentGoldenId' => $componentGoldenId,
+                'experienceGoldenId' => $experienceGoldenId,
                 'date' => $datetime,
                 'usedStock' => '4',
             ],
@@ -506,9 +510,8 @@ class AvailabilityHelperTest extends TestCase
             (function ($test, $usedAvailabilities, $bookingStock, $roomAvailabilities) {
                 foreach ($usedAvailabilities as $date => $usedStock) {
                     foreach ($bookingStock as $booking) {
-                        if ($booking['date']->format('Y-m-d') === $date) {
-                            $realStock = $booking['usedStock'] > $roomAvailabilities[$date]['stock'] ? 0 :
-                                $roomAvailabilities[$date]['stock'] - $booking['usedStock'];
+                        if ($booking['date']->format(DateTimeConstants::DEFAULT_DATE_FORMAT) === $date) {
+                            $realStock = max($roomAvailabilities[$date]['stock'] - $booking['usedStock'], 0);
                             $test->assertEquals(
                                 $usedStock['stock'],
                                 $realStock
@@ -545,9 +548,9 @@ class AvailabilityHelperTest extends TestCase
             (function ($test, $usedAvailabilities, $bookingStock, $roomAvailabilities) {
                 foreach ($usedAvailabilities as $date => $usedStock) {
                     foreach ($bookingStock as $booking) {
-                        if ($booking['date']->format('Y-m-d') === $date) {
-                            $realStock = $booking['usedStock'] > $roomAvailabilities[$date]['stock'] ? 0 :
-                                $roomAvailabilities[$date]['stock'] - $booking['usedStock'];
+                        if ($booking['date']->format(DateTimeConstants::DEFAULT_DATE_FORMAT) === $date &&
+                            $usedStock['componentGoldenId'] === $booking['componentGoldenId']) {
+                            $realStock = max($roomAvailabilities[$date]['stock'] - $booking['usedStock'], 0);
                             $test->assertEquals(
                                 $usedStock['stock'],
                                 $realStock
@@ -555,6 +558,86 @@ class AvailabilityHelperTest extends TestCase
                         }
                     }
                 }
+            }),
+        ];
+
+        yield 'multiple-booking-availability-with-experience' => [
+            [
+                $datetime->format(DateTimeConstants::DEFAULT_DATE_FORMAT) => [
+                    'stock' => 10,
+                    'date' => $datetime,
+                    'type' => 'stock',
+                    'experienceGoldenId' => $experienceGoldenId,
+                ],
+                '2020-10-02' => [
+                    'stock' => 0,
+                    'date' => (clone $datetime)->modify('+1 day'),
+                    'type' => 'stock',
+                    'experienceGoldenId' => '1111',
+                ],
+                '2020-10-03' => [
+                    'stock' => 10,
+                    'date' => (clone $datetime)->modify('+2 days'),
+                    'type' => 'on_request',
+                    'experienceGoldenId' => '1111',
+                ],
+            ],
+            (function ($experienceGoldenId, $datetime) {
+                $bookingDates = [
+                    [
+                        'experienceGoldenId' => $experienceGoldenId,
+                        'date' => $datetime,
+                        'usedStock' => '4',
+                    ],
+                    [
+                        'experienceGoldenId' => $experienceGoldenId,
+                        'date' => (clone $datetime)->modify('+1 day'),
+                        'usedStock' => '1',
+                    ],
+                    [
+                        'experienceGoldenId' => $experienceGoldenId,
+                        'date' => (clone $datetime)->modify('+2 days'),
+                        'usedStock' => '2',
+                    ],
+                ];
+
+                return $bookingDates;
+            })($experienceGoldenId, $datetime),
+            (function ($test, $usedAvailabilities, $bookingStock, $roomAvailabilities) {
+                foreach ($usedAvailabilities as $date => $usedStock) {
+                    foreach ($bookingStock as $booking) {
+                        if ($booking['date']->format(DateTimeConstants::DEFAULT_DATE_FORMAT) === $date &&
+                            $usedStock['experienceGoldenId'] === $booking['experienceGoldenId']) {
+                            $realStock = max($roomAvailabilities[$date]['stock'] - $booking['usedStock'], 0);
+                            $test->assertEquals(
+                                $usedStock['stock'],
+                                $realStock
+                            );
+                        }
+                    }
+                }
+            }),
+        ];
+
+        yield 'availability-without-date-stock' => [
+            [
+                $datetime->format(DateTimeConstants::DEFAULT_DATE_FORMAT) => [
+                    'date' => $datetime,
+                    'type' => 'stock',
+                    'componentGoldenId' => $componentGoldenId,
+                ],
+                '2020-10-02' => [
+                    'stock' => 0,
+                    'type' => 'stock',
+                    'componentGoldenId' => '1111',
+                ],
+                '2020-10-03' => [
+                    'type' => 'on_request',
+                    'componentGoldenId' => '1111',
+                ],
+            ], $bookingStockDate,
+            (function ($test, $usedAvailabilities, $bookingStock, $roomAvailabilities) {
+                $test->assertEquals($usedAvailabilities, $roomAvailabilities);
             }),
         ];
     }
@@ -580,32 +663,56 @@ class AvailabilityHelperTest extends TestCase
             new \DateTime('today'),
             new \DateTime('+3 days'),
             (function ($test, $period) {
-                $test->assertEquals((new \DateTime('today'))->format('Y-m-d'), $period->start->format('Y-m-d'));
-                $test->assertEquals((new \DateTime('+3 days'))->format('Y-m-d'), $period->end->format('Y-m-d'));
+                $test->assertEquals(
+                    (new \DateTime('today'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                    $period->start->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+                );
+                $test->assertEquals(
+                    (new \DateTime('+3 days'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                    $period->end->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+                );
             }),
         ];
         yield 'two-days-difference-dates' => [
             new \DateTime('today'),
             new \DateTime('+2 days'),
             (function ($test, $period) {
-                $test->assertEquals((new \DateTime('today'))->format('Y-m-d'), $period->start->format('Y-m-d'));
-                $test->assertEquals((new \DateTime('+2 days'))->format('Y-m-d'), $period->end->format('Y-m-d'));
+                $test->assertEquals(
+                    (new \DateTime('today'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                    $period->start->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+                );
+                $test->assertEquals(
+                    (new \DateTime('+2 days'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                    $period->end->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+                );
             }),
         ];
         yield 'one-days-difference-dates' => [
             new \DateTime('today'),
             new \DateTime('+1 day'),
             (function ($test, $period) {
-                $test->assertEquals((new \DateTime('today'))->format('Y-m-d'), $period->start->format('Y-m-d'));
-                $test->assertEquals((new \DateTime('+1 day'))->format('Y-m-d'), $period->end->format('Y-m-d'));
+                $test->assertEquals(
+                    (new \DateTime('today'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                    $period->start->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+                );
+                $test->assertEquals(
+                    (new \DateTime('+1 day'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                    $period->end->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+                );
             }),
         ];
         yield 'same-days-difference-dates' => [
             new \DateTime('today'),
             new \DateTime('today'),
             (function ($test, $period) {
-                $test->assertEquals((new \DateTime('today'))->format('Y-m-d'), $period->start->format('Y-m-d'));
-                $test->assertEquals((new \DateTime('+1 day'))->format('Y-m-d'), $period->end->format('Y-m-d'));
+                $test->assertEquals(
+                    (new \DateTime('today'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                    $period->start->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+                );
+                $test->assertEquals(
+                    (new \DateTime('+1 day'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                    $period->end->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+                );
             }),
             InvalidDatesForPeriod::class,
         ];

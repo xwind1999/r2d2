@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Provider;
 
 use App\Cache\QuickDataCache;
+use App\Constants\DateTimeConstants;
 use App\Contract\Response\QuickData\AvailabilityPricePeriodResponse;
 use App\Contract\Response\QuickData\GetPackageResponse;
 use App\Contract\Response\QuickData\GetPackageV2Response;
@@ -107,14 +108,14 @@ class LegacyAvailabilityProvider
         \DateTimeInterface $startDate
     ): GetRangeResponse {
         try {
-            $data = $this->quickDataCache->getBoxDate($boxId, $startDate->format('Y-m-d'));
-            $this->eventDispatcher->dispatch(new BoxCacheHitEvent($boxId, $startDate->format('Y-m-d')));
+            $data = $this->quickDataCache->getBoxDate($boxId, $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+            $this->eventDispatcher->dispatch(new BoxCacheHitEvent($boxId, $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT)));
 
             return $data;
         } catch (ResourceNotCachedException $exception) {
-            $this->eventDispatcher->dispatch(new BoxCacheMissEvent($boxId, $startDate->format('Y-m-d')));
+            $this->eventDispatcher->dispatch(new BoxCacheMissEvent($boxId, $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT)));
         } catch (\Exception $exception) {
-            $this->eventDispatcher->dispatch(new BoxCacheErrorEvent($boxId, $startDate->format('Y-m-d'), $exception));
+            $this->eventDispatcher->dispatch(new BoxCacheErrorEvent($boxId, $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT), $exception));
         }
 
         $roomAvailabilities = AvailabilityHelper::buildDataForGetRange(
@@ -126,7 +127,7 @@ class LegacyAvailabilityProvider
 
         $data = $this->serializer->fromArray($roomAvailabilities, GetRangeResponse::class);
 
-        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), $data);
+        $this->quickDataCache->setBoxDate($boxId, $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT), $data);
 
         return $data;
     }
@@ -180,7 +181,7 @@ class LegacyAvailabilityProvider
             $availability['AvailabilityValue'] = (int) $availability['stock'];
             $availability += [
                 'Date' => (new \DateTime($availability['date']))->format(
-                    AvailabilityHelper::PRICE_PERIOD_DATE_TIME_FORMAT
+                    DateTimeConstants::PRICE_PERIOD_DATE_TIME_FORMAT
                 ),
                 'AvailabilityStatus' => AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
                     $availability['roomStockType'],

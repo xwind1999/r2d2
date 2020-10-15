@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Constants\DateTimeConstants;
 use App\Entity\Component;
 use App\Entity\RoomPrice;
 use App\Exception\Repository\RoomPriceNotFoundException;
@@ -56,8 +57,8 @@ class RoomPriceRepository extends ServiceEntityRepository
             ->where('rp.component = :component')
             ->andWhere('rp.date BETWEEN :dateFrom AND :dateTo')
             ->setParameter('component', $component->uuid->getBytes())
-            ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
-            ->setParameter('dateTo', $dateTo->format('Y-m-d'))
+            ->setParameter('dateFrom', $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT))
+            ->setParameter('dateTo', $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT))
             ->indexBy('rp', 'rp.date')
         ;
 

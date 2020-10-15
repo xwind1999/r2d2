@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Constants\DateTimeConstants;
+use App\Constraint\BookingStatusConstraint;
 use App\Constraint\RoomStockTypeConstraint;
 use App\Entity\Booking;
 use App\Entity\Component;
@@ -76,7 +78,7 @@ SQL;
 
         $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
         $statement->bindValue('boxId', $boxId);
-        $statement->bindValue('dateFrom', $startDate->format('Y-m-d'));
+        $statement->bindValue('dateFrom', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
         $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
         $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
         $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
@@ -118,7 +120,7 @@ GROUP BY experience_golden_id HAVING count(ra.date) = fmc.duration;
 SQL;
         $values = [
             'experienceGoldenIds' => $experienceGoldenIds,
-            'startDate' => $startDate->format('Y-m-d'),
+            'startDate' => $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
             'stockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK,
             'allotmentType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT,
         ];
@@ -150,8 +152,8 @@ SQL;
             ->where('ra.component = :component')
             ->andWhere('ra.date BETWEEN :dateFrom AND :dateTo')
             ->setParameter('component', $component->uuid->getBytes())
-            ->setParameter('dateFrom', $dateFrom->format('Y-m-d'))
-            ->setParameter('dateTo', $dateTo->format('Y-m-d'))
+            ->setParameter('dateFrom', $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT))
+            ->setParameter('dateTo', $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT))
             ->indexBy('ra', 'ra.date')
         ;
 
@@ -166,7 +168,7 @@ SQL;
             ->createQueryBuilder()
             ->delete(RoomAvailability::class, 'ra')
             ->where('ra.date < :oldAvailabilityDate')
-            ->setParameter('oldAvailabilityDate', $cleanUpOlderThan->format('Y-m-d'))
+            ->setParameter('oldAvailabilityDate', $cleanUpOlderThan->format(DateTimeConstants::DEFAULT_DATE_FORMAT))
             ->getQuery()
             ->execute()
         ;
@@ -205,8 +207,8 @@ SQL;
         $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
         $statement->bindValue('status', $booking->status);
         $statement->bindValue('bookingGoldenId', $booking->goldenId);
-        $statement->bindValue('dateFrom', $booking->startDate->format('Y-m-d'));
-        $statement->bindValue('dateTo', $booking->endDate->format('Y-m-d'));
+        $statement->bindValue('dateFrom', $booking->startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        $statement->bindValue('dateTo', $booking->endDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
         $statement->execute();
 
         return $statement->fetchAllAssociative();
@@ -226,7 +228,7 @@ SQL;
 SQL;
         $params = [
             'componentGoldenId' => $componentGoldenId,
-            'date' => $date->format('Y-m-d'),
+            'date' => $date->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
         ];
 
         return $this->_em->getConnection()->executeStatement($sql, $params);
@@ -279,13 +281,64 @@ SQL;
 
         $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
         $statement->bindValue('experienceId', $experienceId);
-        $statement->bindValue('startDate', $startDate->format('Y-m-d'));
-        $statement->bindValue('endDate', $endDate->format('Y-m-d'));
+        $statement->bindValue('startDate', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        $statement->bindValue('endDate', $endDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
         $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
         $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
         $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
         $statement->execute();
 
         return $statement->fetchAllAssociative();
+    }
+
+    public function findBookingAvailabilityByExperienceAndDates(
+        string $experienceGoldenId,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        $sql = <<<SQL
+SELECT
+   f.experience_golden_id as experienceGoldenId,
+   r.component_golden_id as componentGoldenId,
+   r.date AS date,
+   coalesce(sub.used_stock, sub.used_stock, 0) as usedStock,
+   IF(r.stock - (coalesce(sub.used_stock, sub.used_stock, 0)) > 0, r.stock - (coalesce(sub.used_stock, sub.used_stock, 0)), 0) AS realStock,
+   r.stock
+FROM
+   room_availability r
+    JOIN
+      flat_manageable_component f 
+      ON  f.component_uuid = r.component_uuid 
+   LEFT JOIN
+   (
+        select
+               bd.component_golden_id, bd.date, b.status, count(*) as used_stock
+        FROM
+            booking_date bd
+            JOIN booking b on b.uuid = bd.booking_uuid
+        WHERE
+            b.expired_at > :dateNow
+            AND bd.date BETWEEN :startDate and :endDate
+        GROUP BY bd.component_golden_id, bd.date
+       ) sub ON sub.component_golden_id = r.component_golden_id and sub.date = r.date AND sub.status = :status
+ WHERE
+   r.date BETWEEN :startDate AND :endDate
+  AND f.experience_golden_id = :experienceGoldenId
+GROUP BY
+   r.stock,
+   r.date,
+   f.experience_golden_id,
+   f.component_golden_id
+HAVING r.stock - usedStock > 0;
+SQL;
+        $query = $this->getEntityManager()->getConnection()->prepare($sql);
+        $query->bindValue('experienceGoldenId', $experienceGoldenId);
+        $query->bindValue('startDate', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        $query->bindValue('endDate', $endDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        $query->bindValue('dateNow', (new \DateTime('now'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        $query->bindValue('status', BookingStatusConstraint::BOOKING_STATUS_CREATED);
+        $query->execute();
+
+        return $query->fetchAllAssociative();
     }
 }
