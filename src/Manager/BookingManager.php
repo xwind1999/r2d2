@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Constants\DateTimeConstants;
 use App\Constraint\BookingStatusConstraint;
 use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
@@ -26,6 +27,7 @@ use App\Exception\Booking\MisconfiguredExperiencePriceException;
 use App\Exception\Booking\NoIncludedRoomFoundException;
 use App\Exception\Booking\RoomsDontHaveSameDurationException;
 use App\Exception\Booking\UnallocatedDateException;
+use App\Exception\Booking\UnavailableDateException;
 use App\Exception\Http\ResourceConflictException;
 use App\Exception\Repository\BookingNotFoundException;
 use App\Helper\MoneyHelper;
@@ -34,6 +36,7 @@ use App\Repository\BoxExperienceRepository;
 use App\Repository\BoxRepository;
 use App\Repository\ComponentRepository;
 use App\Repository\ExperienceRepository;
+use App\Repository\RoomAvailabilityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -50,6 +53,7 @@ class BookingManager
     private MoneyHelper $moneyHelper;
     private BoxRepository $boxRepository;
     private EventDispatcherInterface $eventDispatcher;
+    private RoomAvailabilityRepository $roomAvailabilityRepository;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -59,7 +63,8 @@ class BookingManager
         ComponentRepository $componentRepository,
         MoneyHelper $moneyHelper,
         BoxRepository $boxRepository,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        RoomAvailabilityRepository $roomAvailabilityRepository
     ) {
         $this->em = $em;
         $this->repository = $repository;
@@ -69,6 +74,7 @@ class BookingManager
         $this->moneyHelper = $moneyHelper;
         $this->boxRepository = $boxRepository;
         $this->eventDispatcher = $eventDispatcher;
+        $this->roomAvailabilityRepository = $roomAvailabilityRepository;
     }
 
     public function create(BookingCreateRequest $bookingCreateRequest): Booking
@@ -126,7 +132,11 @@ class BookingManager
         $bookingCurrency = strtoupper($bookingCreateRequest->currency);
         $booking->currency = $bookingCurrency;
         $money = $this->moneyHelper->create($experience->price, $experience->currency);
-        $period = new \DatePeriod($booking->startDate, new \DateInterval('P1D'), $booking->endDate);
+        $period = new \DatePeriod(
+            $booking->startDate,
+            new \DateInterval(DateTimeConstants::PLUS_ONE_DAY_DATE_INTERVAL),
+            $booking->endDate
+        );
         $minimumDuration = $component->duration ?? 1;
         $perDay = $money->allocateTo($minimumDuration);
         $totalPrice = 0;
@@ -145,10 +155,16 @@ class BookingManager
          * 7. all rooms should have the same duration
          * 8. cannot have the same date in two entries for a room
          * 9. do not allow mismatch between box currency and partner currency with upsell
+         * 10. validate the availability for the booking date and component duration
          */
 
         if ($booking->endDate->diff($booking->startDate)->days < $minimumDuration) {
             throw new UnallocatedDateException();
+        }
+
+        // validation #10
+        if (true === $this->isUnavailableForBookings($booking)) {
+            throw new UnavailableDateException();
         }
 
         $processedIncludedRoom = false;
@@ -287,10 +303,10 @@ class BookingManager
             throw new InvalidBookingNewStatus();
         }
 
-        // @TODO: Check the availability before send the exception
         if (
             BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $bookingUpdateRequest->status &&
-            $booking->expiredAt < new \DateTime('now')
+            $booking->expiredAt < new \DateTime('now') &&
+            $this->isUnavailableForBookings($booking)
         ) {
             throw new BookingHasExpiredException();
         }
@@ -304,5 +320,16 @@ class BookingManager
         $this->em->persist($booking);
         $this->em->flush();
         $this->eventDispatcher->dispatch(new BookingStatusEvent($booking));
+    }
+
+    public function isUnavailableForBookings(Booking $booking): bool
+    {
+        $availabilities = $this->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
+            $booking->experienceGoldenId,
+            $booking->startDate,
+            $booking->endDate
+        );
+
+        return count($availabilities) < $booking->startDate->diff($booking->endDate)->days + 1;
     }
 }

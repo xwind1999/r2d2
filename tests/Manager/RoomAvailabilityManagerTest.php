@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Constants\DateTimeConstants;
 use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
@@ -287,10 +288,10 @@ class RoomAvailabilityManagerTest extends TestCase
         $roomAvailabilityExistent4->externalUpdatedAt = clone $roomAvailabilityExistent->externalUpdatedAt;
 
         $roomAvailabilityList = [
-            $date->format('Y-m-d') => $roomAvailabilityExistent,
-            $date2->format('Y-m-d') => $roomAvailabilityExistent2,
-            $date3->format('Y-m-d') => $roomAvailabilityExistent3,
-            $date4->format('Y-m-d') => $roomAvailabilityExistent4,
+            $date->format(DateTimeConstants::DEFAULT_DATE_FORMAT) => $roomAvailabilityExistent,
+            $date2->format(DateTimeConstants::DEFAULT_DATE_FORMAT) => $roomAvailabilityExistent2,
+            $date3->format(DateTimeConstants::DEFAULT_DATE_FORMAT) => $roomAvailabilityExistent3,
+            $date4->format(DateTimeConstants::DEFAULT_DATE_FORMAT) => $roomAvailabilityExistent4,
         ];
 
         yield 'room-availability-update-with-no-meaningful-change' => [
@@ -489,7 +490,7 @@ class RoomAvailabilityManagerTest extends TestCase
         $availability = [
             [
                 'componentGoldenId' => '11111',
-                'date' => $dateTime->format('Y-m-d'),
+                'date' => $dateTime->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
                 'stock' => 10,
             ],
         ];

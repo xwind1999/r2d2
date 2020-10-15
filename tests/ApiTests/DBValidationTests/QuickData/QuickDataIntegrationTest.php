@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests\QuickData;
 
+use App\Constants\AvailabilityConstants;
+use App\Constants\DateTimeConstants;
 use App\Entity\RoomAvailability;
 use App\Repository\RoomAvailabilityRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
 
+/**
+ * Class QuickDataIntegrationTest.
+ *
+ * @group quickdata
+ */
 class QuickDataIntegrationTest extends IntegrationTestCase
 {
     public function testGetPackage()
@@ -15,7 +22,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         static::cleanUp();
 
         $experienceId = '7307';
-        $dateFrom = new \DateTime(date('Y-m-d', strtotime('first day of next month')));
+        $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
         $dateTo = (clone $dateFrom)->modify('+5 day');
 
         $roomAvailabilities = self::$container->get(RoomAvailabilityRepository::class)
@@ -43,7 +50,11 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             ]],
         ];
 
-        $response = self::$quickDataHelper->getPackage($experienceId, $dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d'));
+        $response = self::$quickDataHelper->getPackage(
+            $experienceId,
+            $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        );
         $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
@@ -54,7 +65,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $this->consume('event-calculate-flat-manageable-component', 100);
 
         $experienceIds = ['2611', '7307'];
-        $dateFrom = new \DateTime(date('Y-m-d', strtotime('first day of next month')));
+        $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
 
         $expectedResults = [];
         /** @var RoomAvailability[] $roomAvailabilities */
@@ -81,8 +92,8 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $response = json_decode(
             self::$quickDataHelper->getPackageV2(
                 implode(',', $experienceIds),
-                $dateFrom->format('Y-m-d'),
-                $dateFrom->format('Y-m-d')
+                $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
             )->getContent(),
             true,
             512,
@@ -103,7 +114,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         static::cleanUp();
 
         $experienceId = '7307';
-        $dateFrom = new \DateTime(date('Y-m-d', strtotime('first day of next month')));
+        $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
         $dateTo = (clone $dateFrom)->modify('+5 day');
 
         /** @var RoomAvailability[] $roomAvailabilities */
@@ -116,7 +127,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         foreach ($roomAvailabilities as $date => $availability) {
             $availability['price'] = !empty($availability['price']) ? (int) $availability['price'] / 100 : 0;
             $result = [
-                'Date' => (new \DateTime($availability['date']))->format('Y-m-d\TH:i:s.u'),
+                'Date' => (new \DateTime($availability['date']))->format(DateTimeConstants::PRICE_PERIOD_DATE_TIME_FORMAT),
                 'AvailabilityValue' => $availability['stock'],
                 'SellingPrice' => $availability['price'],
                 'BuyingPrice' => $availability['price'],
@@ -124,19 +135,19 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
             if ('1' === $availability['isStopSale']) {
                 $result += [
-                    'AvailabilityStatus' => 'Unavailable',
+                    'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
                 ];
             } elseif ('stock' === $availability['roomStockType'] && $availability['stock'] > 0) {
                 $result += [
-                    'AvailabilityStatus' => 'Available',
+                    'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_AVAILABLE,
                 ];
             } elseif ('on_request' === $availability['roomStockType']) {
                 $result += [
-                    'AvailabilityStatus' => 'Request',
+                    'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST,
                 ];
             } else {
                 $result += [
-                    'AvailabilityStatus' => 'Unavailable',
+                    'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
                     'AvailabilityValue' => 0,
                 ];
             }
@@ -149,8 +160,8 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
         $response = self::$quickDataHelper->availabilityPricePeriod(
             $experienceId,
-            $dateFrom->format('Y-m-d'),
-            $dateTo->format('Y-m-d')
+            $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
 
         $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
@@ -161,7 +172,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         static::cleanUp();
 
         $boxId = '851518';
-        $dateFrom = new \DateTime(date('Y-m-d', strtotime('first day of next month')));
+        $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
 
         $avs = self::$container->get(RoomAvailabilityRepository::class)
             ->findAvailableRoomsByBoxId($boxId, $dateFrom);
@@ -189,7 +200,12 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             return $current['Package'] > $next['Package'];
         });
 
-        $response = json_decode(self::$quickDataHelper->getRangeV2($boxId, $dateFrom->format('Y-m-d'))->getContent(), true);
+        $response = json_decode(
+            self::$quickDataHelper->getRangeV2(
+                $boxId, $dateFrom->format(
+                    DateTimeConstants::DEFAULT_DATE_FORMAT
+                )
+            )->getContent(), true);
 
         usort($response['PackagesList'], function ($current, $next) {
             return $current['Package'] > $next['Package'];

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Provider;
 
+use App\Helper\AvailabilityHelper;
 use App\Manager\ComponentManager;
 use App\Manager\ExperienceManager;
 use App\Manager\RoomAvailabilityManager;
@@ -52,11 +53,19 @@ class AvailabilityProvider
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo
     ): array {
-        return $this->roomAvailabilityManager->getRoomAndPriceAvailabilitiesByExperienceIdAndDates(
+        $roomAvailabilities = $this->roomAvailabilityManager->getRoomAndPriceAvailabilitiesByExperienceIdAndDates(
             $experienceId,
             $dateFrom,
             $dateTo
         );
+
+        $bookingStockDate = $this->bookingDateRepository->findBookingDatesByExperiencesAndDates(
+            [$experienceId],
+            $dateFrom,
+            $dateTo
+        );
+
+        return AvailabilityHelper::getRealStock($roomAvailabilities, $bookingStockDate);
     }
 
     public function getRoomAvailabilitiesByExperienceIdsList(
