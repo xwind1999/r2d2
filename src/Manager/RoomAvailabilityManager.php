@@ -99,7 +99,7 @@ class RoomAvailabilityManager
             $roomAvailability->externalUpdatedAt = $roomAvailabilityRequest->updatedAt ?? null;
 
             $this->entityManager->persist($roomAvailability);
-            $this->eventDispatcher->dispatch(new AvailabilityUpdatedEvent($component, $changedDates));
+//            $this->eventDispatcher->dispatch(new AvailabilityUpdatedEvent($component, $changedDates));
         }
         $this->entityManager->flush();
     }

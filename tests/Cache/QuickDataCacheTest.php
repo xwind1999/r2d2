@@ -73,7 +73,7 @@ class QuickDataCacheTest extends TestCase
         $boxId = 'box';
         $date = '2020-10-01';
 
-        $this->memcachedWrapper->set('box.'.$boxId.'.'.$date, $data, 3600)->shouldBeCalled()->willReturn(true);
+        $this->memcachedWrapper->set('box.'.$boxId.'.'.$date, $data, 300)->shouldBeCalled()->willReturn(true);
         $this->quickDataCache->setBoxDate($boxId, $date, $data);
     }
 
