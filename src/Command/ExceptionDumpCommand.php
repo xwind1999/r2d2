@@ -50,7 +50,7 @@ class ExceptionDumpCommand extends Command
         }
 
         usort($data, function ($a, $b) {
-            return $a[0] > $b[0] ? 1 : -1;
+            return $a[0] <=> $b[0];
         });
 
         $output->writeln('| Code | Message | Class Name | Namespace |');

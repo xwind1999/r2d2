@@ -79,6 +79,8 @@ class RoomAvailabilityManager
         );
 
         $changedDates = [];
+
+        /** @var \DateTime $date */
         foreach ($datePeriod as $date) {
             $roomAvailability = $roomAvailabilityList[$date->format('Y-m-d')] ?? new RoomAvailability();
             if ($roomAvailability->externalUpdatedAt &&
@@ -88,7 +90,7 @@ class RoomAvailabilityManager
             }
 
             if ($this->hasAvailabilityChangedForBoxCache($roomAvailabilityRequest, $roomAvailability)) {
-                $changedDates[$date->format('Y-m-d')] = true;
+                $changedDates[$date->format('Y-m-d')] = $date;
             }
 
             $roomAvailability->componentGoldenId = $roomAvailabilityRequest->product->id;
