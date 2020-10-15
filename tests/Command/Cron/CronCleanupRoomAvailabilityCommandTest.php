@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Command\CleanupRoomAvailabilityCommand;
-use App\Event\Cleanup\CleanupRoomAvailabilityEvent;
+namespace App\Tests\Command\Cron;
+
+use App\Command\Cron\CronCleanupRoomAvailabilityCommand;
+use App\Event\Cleanup\AvailabilityCleanupEvent;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -11,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CleanupRoomAvailabilityCommandTest extends KernelTestCase
+class CronCleanupRoomAvailabilityCommandTest extends KernelTestCase
 {
     /**
      * @var Application
@@ -19,7 +21,7 @@ class CleanupRoomAvailabilityCommandTest extends KernelTestCase
     protected $application;
 
     /**
-     * @var CleanupRoomAvailabilityCommand
+     * @var CronCleanupRoomAvailabilityCommand
      */
     protected $command;
 
@@ -33,7 +35,7 @@ class CleanupRoomAvailabilityCommandTest extends KernelTestCase
         $kernel = static::createKernel();
         $this->application = new Application($kernel);
         $this->eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $this->command = new CleanupRoomAvailabilityCommand($this->eventDispatcher->reveal());
+        $this->command = new CronCleanupRoomAvailabilityCommand($this->eventDispatcher->reveal());
 
         $this->application->add($this->command);
     }
@@ -42,7 +44,8 @@ class CleanupRoomAvailabilityCommandTest extends KernelTestCase
     {
         $commandTester = new CommandTester($this->command);
 
-        $this->eventDispatcher->dispatch(Argument::type(CleanupRoomAvailabilityEvent::class))->shouldBeCalled();
+        $this->eventDispatcher->dispatch(Argument::type(AvailabilityCleanupEvent::class))->shouldBeCalled();
+
         $commandTester->execute([]);
 
         $this->assertEquals(0, $commandTester->getStatusCode());

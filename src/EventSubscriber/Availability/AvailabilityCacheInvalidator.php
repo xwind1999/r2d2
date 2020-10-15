@@ -5,23 +5,25 @@ declare(strict_types=1);
 namespace App\EventSubscriber\Availability;
 
 use App\Cache\QuickDataCache;
-use App\Entity\Component;
 use App\Event\Product\AvailabilityUpdatedEvent;
+use App\Helper\DateDurationExpander;
 use App\Repository\Flat\FlatManageableComponentRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AvailabilityCacheInvalidator implements EventSubscriberInterface
 {
     private QuickDataCache $quickDataCache;
-
     private FlatManageableComponentRepository $flatManageableComponentRepository;
+    private DateDurationExpander $dateDurationExpander;
 
     public function __construct(
         QuickDataCache $quickDataCache,
-        FlatManageableComponentRepository $flatManageableComponentRepository
+        FlatManageableComponentRepository $flatManageableComponentRepository,
+        DateDurationExpander $dateDurationExpander
     ) {
         $this->quickDataCache = $quickDataCache;
         $this->flatManageableComponentRepository = $flatManageableComponentRepository;
+        $this->dateDurationExpander = $dateDurationExpander;
     }
 
     public static function getSubscribedEvents()
@@ -33,7 +35,7 @@ class AvailabilityCacheInvalidator implements EventSubscriberInterface
 
     public function invalidateCache(AvailabilityUpdatedEvent $event): void
     {
-        $changedDates = $this->expandCacheDates($event->component, $event->dates);
+        $changedDates = $this->dateDurationExpander->expandDatesForComponentDuration($event->component, $event->dates);
         $boxes = $this->flatManageableComponentRepository->getBoxesByComponentId($event->component->goldenId);
         $keys = [];
         foreach ($changedDates as $date => $set) {
@@ -42,24 +44,5 @@ class AvailabilityCacheInvalidator implements EventSubscriberInterface
             }
         }
         $this->quickDataCache->massInvalidate($keys);
-    }
-
-    private function expandCacheDates(Component $component, array $changedDates): array
-    {
-        if ($component->duration > 1) {
-            $extraDates = [];
-            foreach ($changedDates as $date => $set) {
-                $beginDate = (new \DateTime($date))->modify(sprintf('-%s day', $component->duration - 1));
-                $endDate = (new \DateTime($date))->modify(sprintf('+%s day', $component->duration));
-                $interval = new \DateInterval('P1D');
-                $period = new \DatePeriod($beginDate, $interval, $endDate);
-                foreach ($period as $extraDate) {
-                    $extraDates[$extraDate->format('Y-m-d')] = true;
-                }
-            }
-            $changedDates += $extraDates;
-        }
-
-        return $changedDates;
     }
 }

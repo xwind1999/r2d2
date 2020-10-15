@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\EventSubscriber\Cleanup;
 
-use App\Event\Cleanup\CleanupRoomAvailabilityEvent;
+use App\Event\Cleanup\AvailabilityCleanupEvent;
 use App\EventSubscriber\Cleanup\CleanupRoomAvailabilityEventSubscriber;
 use App\Repository\RoomAvailabilityRepository;
 use PHPUnit\Framework\TestCase;
@@ -24,7 +24,7 @@ class CleanupRoomAvailabilityEventSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
-            [CleanupRoomAvailabilityEvent::class => ['handleMessage']],
+            [AvailabilityCleanupEvent::class => ['handleMessage']],
             CleanupRoomAvailabilityEventSubscriber::getSubscribedEvents()
         );
     }
@@ -32,6 +32,6 @@ class CleanupRoomAvailabilityEventSubscriberTest extends TestCase
     public function testHandleMessage(): void
     {
         $this->roomAvailabilityRepository->cleanUp()->shouldBeCalled();
-        $this->eventSubscriber->handleMessage(new CleanupRoomAvailabilityEvent());
+        $this->eventSubscriber->handleMessage(new AvailabilityCleanupEvent());
     }
 }

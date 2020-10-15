@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Command;
+namespace App\Command\Cron;
 
-use App\Event\Cleanup\CleanupRoomAvailabilityEvent;
+use App\Event\Cleanup\AvailabilityCleanupEvent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class CleanupRoomAvailabilityCommand extends Command
+class CronCleanupRoomAvailabilityCommand extends Command implements CronCommandInterface
 {
     protected static $defaultName = 'r2d2:cleanup:room-availability';
 
@@ -32,8 +32,7 @@ class CleanupRoomAvailabilityCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $event = new CleanupRoomAvailabilityEvent();
-        $this->eventDispatcher->dispatch($event);
+        $this->eventDispatcher->dispatch(new AvailabilityCleanupEvent());
 
         return 0;
     }

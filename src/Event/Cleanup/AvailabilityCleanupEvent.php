@@ -7,9 +7,9 @@ namespace App\Event\Cleanup;
 use App\Event\NamedEventInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CleanupRoomAvailabilityEvent extends Event implements NamedEventInterface
+class AvailabilityCleanupEvent extends Event implements NamedEventInterface
 {
-    private const EVENT_NAME = 'Cleanup Room Availability';
+    private const EVENT_NAME = 'Cleanup availability';
 
     public function getEventName(): string
     {

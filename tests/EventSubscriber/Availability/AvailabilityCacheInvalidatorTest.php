@@ -8,6 +8,7 @@ use App\Cache\QuickDataCache;
 use App\Entity\Component;
 use App\Event\Product\AvailabilityUpdatedEvent;
 use App\EventSubscriber\Availability\AvailabilityCacheInvalidator;
+use App\Helper\DateDurationExpander;
 use App\Repository\Flat\FlatManageableComponentRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -21,12 +22,17 @@ class AvailabilityCacheInvalidatorTest extends TestCase
     /**
      * @var ObjectProphecy|QuickDataCache
      */
-    private ObjectProphecy $quickDataCache;
+    private $quickDataCache;
 
     /**
      * @var FlatManageableComponentRepository|ObjectProphecy
      */
     private $flatManageableComponentRepository;
+
+    /**
+     * @var DateDurationExpander|ObjectProphecy
+     */
+    private $dateDurationExpander;
 
     private AvailabilityCacheInvalidator $availabilityCacheInvalidator;
 
@@ -34,10 +40,12 @@ class AvailabilityCacheInvalidatorTest extends TestCase
     {
         $this->quickDataCache = $this->prophesize(QuickDataCache::class);
         $this->flatManageableComponentRepository = $this->prophesize(FlatManageableComponentRepository::class);
+        $this->dateDurationExpander = $this->prophesize(DateDurationExpander::class);
 
         $this->availabilityCacheInvalidator = new AvailabilityCacheInvalidator(
             $this->quickDataCache->reveal(),
-            $this->flatManageableComponentRepository->reveal()
+            $this->flatManageableComponentRepository->reveal(),
+            $this->dateDurationExpander->reveal()
         );
     }
 
@@ -54,7 +62,6 @@ class AvailabilityCacheInvalidatorTest extends TestCase
     }
 
     /**
-     * @covers ::expandCacheDates
      * @covers ::invalidateCache
      * @covers ::__construct
      * @covers \App\Event\Product\AvailabilityUpdatedEvent::__construct
@@ -62,61 +69,9 @@ class AvailabilityCacheInvalidatorTest extends TestCase
     public function testInvalidateCache(): void
     {
         $component = new Component();
-        $component->duration = 1;
         $component->goldenId = '1234';
 
-        $dates = ['2020-04-01' => 1, '2020-04-02' => 1];
-        $event = new AvailabilityUpdatedEvent($component, $dates);
-
-        $boxes = ['1111', '2222'];
-
-        $this
-            ->flatManageableComponentRepository
-            ->getBoxesByComponentId('1234')
-            ->willReturn($boxes)
-            ->shouldBeCalled();
-
-        $expectedDates = ['2020-04-01', '2020-04-02'];
-
-        $keys = [];
-        foreach ($expectedDates as $date) {
-            foreach ($boxes as $box) {
-                $key = $box.'key'.$date;
-                $keys[] = $key;
-                $this
-                    ->quickDataCache
-                    ->boxDateKey($box, $date)
-                    ->willReturn($key)
-                    ->shouldBeCalledTimes(1);
-            }
-        }
-
-        $this->quickDataCache->massInvalidate(Argument::that(function ($v) use ($keys) {
-            sort($keys);
-            sort($v);
-
-            return $keys === $v;
-        }))->shouldBeCalled();
-
-        $this->availabilityCacheInvalidator->invalidateCache($event);
-    }
-
-    /**
-     * @covers ::expandCacheDates
-     * @covers ::invalidateCache
-     * @covers ::__construct
-     * @covers \App\Event\Product\AvailabilityUpdatedEvent::__construct
-     */
-    public function testInvalidateCacheWhenComponentDurationEquals3(): void
-    {
-        $component = new Component();
-        $component->duration = 3;
-        $component->goldenId = '1234';
-
-        $dates = [
-            '2020-04-05' => 1,
-            '2020-04-10' => 1,
-        ];
+        $dates = ['2020-04-01' => new \DateTime('2020-04-01'), '2020-04-02' => new \DateTime('2020-04-02')];
         $event = new AvailabilityUpdatedEvent($component, $dates);
 
         $boxes = ['1111', '2222'];
@@ -128,25 +83,23 @@ class AvailabilityCacheInvalidatorTest extends TestCase
             ->shouldBeCalled();
 
         $expectedDates = [
-            '2020-04-03',
-            '2020-04-04',
-            '2020-04-05',
-            '2020-04-06',
-            '2020-04-07',
-            '2020-04-08',
-            '2020-04-09',
-            '2020-04-10',
-            '2020-04-11',
-            '2020-04-12',
+            '2020-04-01' => new \DateTime('2020-04-01'),
+            '2020-04-02' => new \DateTime('2020-04-02'),
         ];
+
+        $this
+            ->dateDurationExpander
+            ->expandDatesForComponentDuration($component, $dates)
+            ->willReturn($expectedDates);
+
         $keys = [];
         foreach ($expectedDates as $date) {
             foreach ($boxes as $box) {
-                $key = $box.'key'.$date;
+                $key = $box.'key'.$date->format('Y-m-d');
                 $keys[] = $key;
                 $this
                     ->quickDataCache
-                    ->boxDateKey($box, $date)
+                    ->boxDateKey($box, $date->format('Y-m-d'))
                     ->willReturn($key)
                     ->shouldBeCalledTimes(1);
             }

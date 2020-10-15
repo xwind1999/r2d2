@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber\Cleanup;
 
-use App\Event\Cleanup\CleanupRoomAvailabilityEvent;
+use App\Event\Cleanup\AvailabilityCleanupEvent;
 use App\Repository\RoomAvailabilityRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -20,11 +20,11 @@ class CleanupRoomAvailabilityEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CleanupRoomAvailabilityEvent::class => ['handleMessage'],
+            AvailabilityCleanupEvent::class => ['handleMessage'],
         ];
     }
 
-    public function handleMessage(CleanupRoomAvailabilityEvent $event): void
+    public function handleMessage(AvailabilityCleanupEvent $event): void
     {
         $this->roomAvailabilityRepository->cleanUp();
     }

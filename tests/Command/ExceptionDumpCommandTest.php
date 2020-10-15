@@ -36,6 +36,12 @@ namespace App\Exception\Test {
         public const CODE = '0000666';
     }
 
+    class TestException2 extends \Exception
+    {
+        public const MESSAGE = 'Test Message3';
+        public const CODE = '0000669';
+    }
+
     class TestException extends \Exception
     {
         public const MESSAGE = 'Test Message2';
@@ -78,17 +84,22 @@ namespace App\Tests\Command {
             $fileInfo1->getRelativePathname()->willReturn('Test/TestClass.php');
 
             $fileInfo2 = $this->prophesize(SplFileInfo::class);
-            $fileInfo2->getRealPath()->willReturn('/app/src/Exception/Test/TestException.php');
-            $fileInfo2->getRelativePathname()->willReturn('Test/TestException.php');
+            $fileInfo2->getRealPath()->willReturn('/app/src/Exception/Test/TestException2.php');
+            $fileInfo2->getRelativePathname()->willReturn('Test/TestException2.php');
 
-            $generator = [$fileInfo1->reveal(), $fileInfo2->reveal()];
+            $fileInfo3 = $this->prophesize(SplFileInfo::class);
+            $fileInfo3->getRealPath()->willReturn('/app/src/Exception/Test/TestException.php');
+            $fileInfo3->getRelativePathname()->willReturn('Test/TestException.php');
+
+            $generator = [$fileInfo1->reveal(), $fileInfo2->reveal(), $fileInfo3->reveal()];
             \Symfony\Component\Finder\Finder::$generator = $generator;
             $commandTester = new CommandTester($this->command);
 
             $expectedOutput =
                 '| Code | Message | Class Name | Namespace |'.PHP_EOL.
                 '| :--- | :--- | :--- | :--- |'.PHP_EOL.
-                '| 0000667 | Test Message2 | TestException | App\Exception\Test |'.PHP_EOL
+                '| 0000667 | Test Message2 | TestException | App\Exception\Test |'.PHP_EOL.
+                '| 0000669 | Test Message3 | TestException2 | App\Exception\Test |'.PHP_EOL
             ;
 
             $commandTester->execute([]);
