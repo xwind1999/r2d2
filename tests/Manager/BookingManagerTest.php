@@ -26,6 +26,7 @@ use App\Exception\Booking\InvalidBookingNewStatus;
 use App\Exception\Booking\InvalidBoxBrandException;
 use App\Exception\Booking\InvalidBoxCountryException;
 use App\Exception\Booking\InvalidBoxCurrencyException;
+use App\Exception\Booking\InvalidExperienceComponentListException;
 use App\Exception\Booking\InvalidExtraNightException;
 use App\Exception\Booking\MisconfiguredExperiencePriceException;
 use App\Exception\Booking\NoIncludedRoomFoundException;
@@ -1352,5 +1353,21 @@ class BookingManagerTest extends TestCase
                 $test->assertTrue($response);
             }),
         ];
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::create
+     *
+     * @group create
+     */
+    public function testCreateWithoutComponent()
+    {
+        $bookingCreateRequest = new BookingCreateRequest();
+        $bookingCreateRequest->experience = new \App\Contract\Request\Booking\BookingCreate\Experience();
+
+        $this->expectException(InvalidExperienceComponentListException::class);
+
+        $this->bookingManager->create($bookingCreateRequest);
     }
 }
