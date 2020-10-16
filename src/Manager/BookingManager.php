@@ -22,6 +22,7 @@ use App\Exception\Booking\InvalidBookingNewStatus;
 use App\Exception\Booking\InvalidBoxBrandException;
 use App\Exception\Booking\InvalidBoxCountryException;
 use App\Exception\Booking\InvalidBoxCurrencyException;
+use App\Exception\Booking\InvalidExperienceComponentListException;
 use App\Exception\Booking\InvalidExtraNightException;
 use App\Exception\Booking\MisconfiguredExperiencePriceException;
 use App\Exception\Booking\NoIncludedRoomFoundException;
@@ -79,6 +80,10 @@ class BookingManager
 
     public function create(BookingCreateRequest $bookingCreateRequest): Booking
     {
+        if (empty($bookingCreateRequest->experience->components)) {
+            throw new InvalidExperienceComponentListException();
+        }
+
         try {
             $this->repository->findOneByGoldenId($bookingCreateRequest->bookingId);
 
