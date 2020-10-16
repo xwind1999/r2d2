@@ -27,12 +27,11 @@ class CorrelationIdMiddleware implements MiddlewareInterface
             null === $envelope->last(CorrelationIdStamp::class)
         ) {
             $envelope = $envelope->with(new CorrelationIdStamp($this->correlationId->getCorrelationId()));
-        } else {
-            $stamp = $envelope->last(CorrelationIdStamp::class);
+        }
+        $stamp = $envelope->last(CorrelationIdStamp::class);
 
-            if ($stamp instanceof CorrelationIdStamp && null !== $stamp->correlationId) {
-                $this->correlationId->setCorrelationIdOverride($stamp->correlationId);
-            }
+        if ($stamp instanceof CorrelationIdStamp && null !== $stamp->correlationId) {
+            $this->correlationId->setCorrelationIdOverride($stamp->correlationId);
         }
 
         try {

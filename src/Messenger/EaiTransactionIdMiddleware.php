@@ -27,12 +27,12 @@ class EaiTransactionIdMiddleware implements MiddlewareInterface
             null === $envelope->last(EaiTransactionIdStamp::class)
         ) {
             $envelope = $envelope->with(new EaiTransactionIdStamp($this->eaiTransactionId->getTransactionId()));
-        } else {
-            $stamp = $envelope->last(EaiTransactionIdStamp::class);
+        }
 
-            if ($stamp instanceof EaiTransactionIdStamp && null !== $stamp->eaiTransactionId) {
-                $this->eaiTransactionId->setTransactionIdOverride($stamp->eaiTransactionId);
-            }
+        $stamp = $envelope->last(EaiTransactionIdStamp::class);
+
+        if ($stamp instanceof EaiTransactionIdStamp && null !== $stamp->eaiTransactionId) {
+            $this->eaiTransactionId->setTransactionIdOverride($stamp->eaiTransactionId);
         }
 
         try {

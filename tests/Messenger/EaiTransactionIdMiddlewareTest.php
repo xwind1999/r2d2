@@ -57,6 +57,7 @@ class EaiTransactionIdMiddlewareTest extends TestCase
         })($this, $envelope);
 
         $this->stack->next()->willReturn($this->middleware->reveal());
+        $this->eaiTransactionId->setTransactionIdOverride('1234')->shouldBeCalled();
         $this->eaiTransactionId->resetTransactionIdOverride()->shouldBeCalled();
         $this->eaiTransactionIdMiddleware->handle($envelope, $this->stack->reveal());
     }
