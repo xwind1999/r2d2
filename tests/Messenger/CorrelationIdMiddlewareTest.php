@@ -57,6 +57,7 @@ class CorrelationIdMiddlewareTest extends TestCase
         })($this, $envelope);
 
         $this->stack->next()->willReturn($this->middleware->reveal());
+        $this->correlationId->setCorrelationIdOverride('1234')->shouldBeCalled();
         $this->correlationId->resetCorrelationIdOverride();
         $this->correlationIdMiddleware->handle($envelope, $this->stack->reveal());
     }
