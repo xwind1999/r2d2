@@ -4,29 +4,23 @@ declare(strict_types=1);
 
 namespace App\Logger\Processor;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Helper\EaiTransactionId;
 
 class EaiTransactionProcessor
 {
-    protected RequestStack $requestStack;
+    protected EaiTransactionId $eaiTransactionId;
 
-    public function __construct(RequestStack $requestStack)
+    public function __construct(EaiTransactionId $eaiTransactionId)
     {
-        $this->requestStack = $requestStack;
+        $this->eaiTransactionId = $eaiTransactionId;
     }
 
     public function __invoke(array $record): array
     {
-        $request = $this->requestStack->getMasterRequest();
-
-        if (!$request
-            || null === $request->headers
-            || !$transactionId = $request->headers->get('x-transaction-id', null)
-        ) {
-            return $record;
+        if ($this->eaiTransactionId->getTransactionId()) {
+            $record['extra'][EaiTransactionId::LOG_FIELD] = $this->eaiTransactionId->getTransactionId();
+            $record['context'][EaiTransactionId::LOG_FIELD] = $this->eaiTransactionId->getTransactionId();
         }
-
-        $record['extra']['eai_transaction_id'] = $transactionId;
 
         return $record;
     }

@@ -13,9 +13,14 @@ declare(strict_types=1);
 namespace App\Messenger\EventListener;
 
 use App\Event\NamedEventInterface;
+use App\Helper\EaiTransactionId;
+use App\Http\CorrelationId\CorrelationId;
+use App\Messenger\Stamp\CorrelationIdStamp;
+use App\Messenger\Stamp\EaiTransactionIdStamp;
 use Clogger\ContextualInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
@@ -48,10 +53,8 @@ class MessengerEventsListener implements EventSubscriberInterface
     public function onMessageFailed(WorkerMessageFailedEvent $event): void
     {
         $envelope = $event->getEnvelope();
-        $message = $envelope->getMessage();
+        $context = $this->generateContext($envelope);
         $throwable = $event->getThrowable();
-
-        $context = $this->generateContext($message);
 
         $this->logger->error($throwable, $context);
 
@@ -63,33 +66,45 @@ class MessengerEventsListener implements EventSubscriberInterface
     public function onMessageSent(SendMessageToTransportsEvent $event): void
     {
         $envelope = $event->getEnvelope();
-        $message = $envelope->getMessage();
 
-        $this->logger->info(self::MESSAGE_SENT, $this->generateContext($message));
+        $this->logger->info(self::MESSAGE_SENT, $this->generateContext($envelope));
     }
 
     public function onMessageHandled(WorkerMessageHandledEvent $event): void
     {
         $envelope = $event->getEnvelope();
-        $message = $envelope->getMessage();
 
-        $this->logger->info(self::MESSAGE_HANDLED, $this->generateContext($message));
+        $this->logger->info(self::MESSAGE_HANDLED, $this->generateContext($envelope));
     }
 
     public function onMessageReceived(WorkerMessageReceivedEvent $event): void
     {
         $envelope = $event->getEnvelope();
-        $message = $envelope->getMessage();
 
-        $this->logger->info(self::MESSAGE_RECEIVED, $this->generateContext($message));
+        $this->logger->info(self::MESSAGE_RECEIVED, $this->generateContext($envelope));
     }
 
-    private function generateContext(object $message): array
+    private function generateContext(Envelope $envelope): array
     {
-        return [
+        $message = $envelope->getMessage();
+        $context = [
             'message' => get_class($message),
             'event_name' => $message instanceof NamedEventInterface ? $message->getEventName() : null,
             'message_parsed' => $message instanceof ContextualInterface ? $message->getContext() : $message,
         ];
+
+        if (null !== $envelope->last(EaiTransactionIdStamp::class)) {
+            /** @var EaiTransactionIdStamp $eaiTransactionIdStamp */
+            $eaiTransactionIdStamp = $envelope->last(EaiTransactionIdStamp::class);
+            $context[EaiTransactionId::LOG_FIELD] = $eaiTransactionIdStamp->eaiTransactionId;
+        }
+
+        if (null !== $envelope->last(CorrelationIdStamp::class)) {
+            /** @var CorrelationIdStamp $correlationIdStamp */
+            $correlationIdStamp = $envelope->last(CorrelationIdStamp::class);
+            $context[CorrelationId::LOG_FIELD] = $correlationIdStamp->correlationId;
+        }
+
+        return $context;
     }
 }

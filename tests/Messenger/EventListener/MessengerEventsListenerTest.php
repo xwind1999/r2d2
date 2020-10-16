@@ -6,6 +6,8 @@ namespace App\Tests\Messenger\EventListener;
 
 use App\Event\NamedEventInterface;
 use App\Messenger\EventListener\MessengerEventsListener;
+use App\Messenger\Stamp\CorrelationIdStamp;
+use App\Messenger\Stamp\EaiTransactionIdStamp;
 use Clogger\ContextualInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -41,9 +43,9 @@ class MessengerEventsListenerTest extends TestCase
      *
      * @dataProvider dataProvider
      */
-    public function testOnMessageHandled(object $message, array $context)
+    public function testOnMessageHandled(object $message, array $stamps, array $context)
     {
-        $event = new WorkerMessageHandledEvent(new Envelope($message, []), '');
+        $event = new WorkerMessageHandledEvent(new Envelope($message, $stamps), '');
         $this->logger->info('Message handled', $context)->shouldBeCalled();
         $this->messengerEventsListener->onMessageHandled($event);
     }
@@ -55,9 +57,9 @@ class MessengerEventsListenerTest extends TestCase
      *
      * @dataProvider dataProvider
      */
-    public function testOnMessageReceived(object $message, array $context)
+    public function testOnMessageReceived(object $message, array $stamps, array $context)
     {
-        $event = new WorkerMessageReceivedEvent(new Envelope($message, []), '');
+        $event = new WorkerMessageReceivedEvent(new Envelope($message, $stamps), '');
         $this->logger->info('Message received', $context)->shouldBeCalled();
         $this->messengerEventsListener->onMessageReceived($event);
     }
@@ -69,9 +71,9 @@ class MessengerEventsListenerTest extends TestCase
      *
      * @dataProvider dataProvider
      */
-    public function testOnMessageSent(object $message, array $context)
+    public function testOnMessageSent(object $message, array $stamps, array $context)
     {
-        $event = new SendMessageToTransportsEvent(new Envelope($message, []));
+        $event = new SendMessageToTransportsEvent(new Envelope($message, $stamps));
         $this->logger->info('Message sent', $context)->shouldBeCalled();
         $this->messengerEventsListener->onMessageSent($event);
     }
@@ -96,10 +98,10 @@ class MessengerEventsListenerTest extends TestCase
      *
      * @dataProvider dataProvider
      */
-    public function testOnMessageFailed(object $message, array $context)
+    public function testOnMessageFailed(object $message, array $stamps, array $context)
     {
         $exc = new \Exception();
-        $event = new WorkerMessageFailedEvent(new Envelope($message, []), '', $exc);
+        $event = new WorkerMessageFailedEvent(new Envelope($message, $stamps), '', $exc);
         $this->logger->error($exc, $context)->shouldBeCalled();
         $this->logger->info('Error while handling message', $context + ['exception' => $exc])->shouldBeCalled();
 
@@ -110,9 +112,22 @@ class MessengerEventsListenerTest extends TestCase
     {
         $message = new \stdClass();
 
-        yield [
+        yield 'generic message' => [
             $message,
+            [],
             ['message' => 'stdClass', 'event_name' => null, 'message_parsed' => $message],
+        ];
+
+        yield 'generic message with eai transaction id stamp' => [
+            $message,
+            [new EaiTransactionIdStamp('1234')],
+            ['eai_transaction_id' => '1234', 'message' => 'stdClass', 'event_name' => null, 'message_parsed' => $message],
+        ];
+
+        yield 'generic message with correlation id stamp' => [
+            $message,
+            [new CorrelationIdStamp('5678')],
+            ['correlation_id' => '5678', 'message' => 'stdClass', 'event_name' => null, 'message_parsed' => $message],
         ];
 
         $message = new class() implements ContextualInterface {
@@ -122,8 +137,9 @@ class MessengerEventsListenerTest extends TestCase
             }
         };
 
-        yield [
+        yield 'generic message with context' => [
             $message,
+            [],
             ['message' => get_class($message), 'event_name' => null, 'message_parsed' => ['a' => 'b']],
         ];
 
@@ -139,8 +155,9 @@ class MessengerEventsListenerTest extends TestCase
             }
         };
 
-        yield [
+        yield 'NamedEvent message with context' => [
             $message,
+            [],
             ['message' => get_class($message), 'event_name' => 'named event', 'message_parsed' => ['z' => 'd']],
         ];
     }

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class CorrelationId
 {
+    public const LOG_FIELD = 'correlation_id';
     public const HEADER_KEY = 'Correlation-Id';
 
     private string $uuid;
