@@ -22,7 +22,7 @@ class HttpClientFactory
 
     public function buildWithOptions(string $clientId, array $options): HttpClient
     {
-        $options['headers'][CorrelationId::HEADER_KEY] = $this->correlationId->getUuid();
+        $options['headers'][CorrelationId::HEADER_KEY] = $this->correlationId->getCorrelationId();
 
         return new HttpClient($clientId, $this->dispatcher, SymfonyHttpClient::create($options));
     }

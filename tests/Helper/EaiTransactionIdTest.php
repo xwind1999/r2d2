@@ -97,4 +97,28 @@ class EaiTransactionIdTest extends TestCase
             $this->eaiTransactionId->getTransactionId()
         );
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getTransactionId
+     * @covers ::resetTransactionIdOverride
+     * @covers ::setTransactionIdOverride
+     */
+    public function testGetTransactionIdWithOverride(): void
+    {
+        $this->request->headers = $this->headers->reveal();
+        $this->headers->get('x-transaction-id', null)->willReturn('original-eai-transaction-id');
+        $this->requestStack->getMasterRequest()->willReturn($this->request->reveal());
+        $this->eaiTransactionId = new EaiTransactionId($this->requestStack->reveal());
+        $this->eaiTransactionId->setTransactionIdOverride('overrided');
+        $this->assertEquals(
+            'overrided',
+            $this->eaiTransactionId->getTransactionId()
+        );
+        $this->eaiTransactionId->resetTransactionIdOverride();
+        $this->assertEquals(
+            'original-eai-transaction-id',
+            $this->eaiTransactionId->getTransactionId()
+        );
+    }
 }
