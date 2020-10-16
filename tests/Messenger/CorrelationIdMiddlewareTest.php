@@ -42,7 +42,7 @@ class CorrelationIdMiddlewareTest extends TestCase
     public function testHandle(): void
     {
         $envelope = new Envelope(new \stdClass(), [new SentStamp('whatever')]);
-        $this->correlationId->getUuid()->willReturn('1234');
+        $this->correlationId->getCorrelationId()->willReturn('1234');
         (function ($test, $envelope) {
             $this
                 ->middleware
@@ -57,6 +57,7 @@ class CorrelationIdMiddlewareTest extends TestCase
         })($this, $envelope);
 
         $this->stack->next()->willReturn($this->middleware->reveal());
+        $this->correlationId->resetCorrelationIdOverride();
         $this->correlationIdMiddleware->handle($envelope, $this->stack->reveal());
     }
 
@@ -84,6 +85,8 @@ class CorrelationIdMiddlewareTest extends TestCase
         })($this, $envelope);
 
         $this->stack->next()->willReturn($this->middleware->reveal());
+        $this->correlationId->setCorrelationIdOverride('5678')->shouldBeCalled();
+        $this->correlationId->resetCorrelationIdOverride();
         $this->correlationIdMiddleware->handle($envelope, $this->stack->reveal());
     }
 
@@ -94,7 +97,7 @@ class CorrelationIdMiddlewareTest extends TestCase
     public function testHandleWithUnsentMessage(): void
     {
         $envelope = new Envelope(new \stdClass());
-        $this->correlationId->getUuid()->willReturn('1234');
+        $this->correlationId->getCorrelationId()->willReturn('1234');
         (function ($test, $envelope) {
             $this
                 ->middleware
@@ -108,6 +111,7 @@ class CorrelationIdMiddlewareTest extends TestCase
         })($this, $envelope);
 
         $this->stack->next()->willReturn($this->middleware->reveal());
+        $this->correlationId->resetCorrelationIdOverride();
         $this->correlationIdMiddleware->handle($envelope, $this->stack->reveal());
     }
 }

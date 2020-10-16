@@ -24,7 +24,7 @@ class HttpClientFactoryTest extends TestCase
     {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $correlationId = $this->prophesize(CorrelationId::class);
-        $correlationId->getUuid()->willReturn(Uuid::uuid4());
+        $correlationId->getCorrelationId()->willReturn(Uuid::uuid4());
         $factory = new HttpClientFactory($dispatcher->reveal(), $correlationId->reveal());
 
         $httpClient = $factory->buildWithOptions('client', []);

@@ -30,7 +30,7 @@ class CorrelationIdProcessorTest extends TestCase
 
     public function testAddInfo(): void
     {
-        $this->correlationId->getUuid()->willReturn('correlation-id-is-1234567');
+        $this->correlationId->getCorrelationId()->willReturn('correlation-id-is-1234567');
         $this->assertEquals(
             [
                 'test' => 'test2',

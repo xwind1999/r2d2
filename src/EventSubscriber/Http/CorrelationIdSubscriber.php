@@ -30,7 +30,7 @@ class CorrelationIdSubscriber implements EventSubscriberInterface
     public function onKernelResponse(ResponseEvent $responseEvent): void
     {
         if (!$responseEvent->getResponse()->headers->get(CorrelationId::HEADER_KEY)) {
-            $responseEvent->getResponse()->headers->set(CorrelationId::HEADER_KEY, $this->correlationId->getUuid());
+            $responseEvent->getResponse()->headers->set(CorrelationId::HEADER_KEY, $this->correlationId->getCorrelationId());
         }
     }
 }

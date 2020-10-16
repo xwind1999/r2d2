@@ -13,17 +13,19 @@ class CorrelationId
     public const LOG_FIELD = 'correlation_id';
     public const HEADER_KEY = 'Correlation-Id';
 
-    private string $uuid;
+    private string $correlationId;
+
+    private ?string $correlationIdOverride = null;
 
     private RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
-        $this->uuid = $this->generateUuid();
+        $this->correlationId = $this->generateCorrelationId();
     }
 
-    protected function generateUuid(): string
+    protected function generateCorrelationId(): string
     {
         $request = $this->requestStack->getMasterRequest() instanceof Request ? $this->requestStack->getMasterRequest() : null;
 
@@ -32,8 +34,22 @@ class CorrelationId
         return $requestCorrelationId ?? Uuid::uuid4()->toString();
     }
 
-    public function getUuid(): string
+    public function getCorrelationId(): string
     {
-        return $this->uuid;
+        if (null !== $this->correlationIdOverride) {
+            return $this->correlationIdOverride;
+        }
+
+        return $this->correlationId;
+    }
+
+    public function setCorrelationIdOverride(string $correlationIdOverride): void
+    {
+        $this->correlationIdOverride = $correlationIdOverride;
+    }
+
+    public function resetCorrelationIdOverride(): void
+    {
+        $this->correlationIdOverride = null;
     }
 }
