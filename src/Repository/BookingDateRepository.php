@@ -50,26 +50,6 @@ class BookingDateRepository extends ServiceEntityRepository
         return $bookingDate;
     }
 
-    public function findBookingDatesByComponentAndDate(
-        string $componentGoldenId,
-        \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo): array
-    {
-        $qb = $this->createQueryBuilder('bd');
-        $qb->select('bd.componentGoldenId, bd.date, count(bd.componentGoldenId) as usedStock')
-            ->join(Booking::class, 'b', Join::WITH, 'b.uuid = bd.booking')
-            ->where('b.expiredAt > :dateNow')
-            ->andWhere($qb->expr()->between('bd.date', ':dateFrom', ':dateTo'))
-            ->andWhere($qb->expr()->eq('bd.componentGoldenId', ':component'))
-            ->groupBy('bd.componentGoldenId, bd.date')
-            ->setParameter('component', $componentGoldenId)
-            ->setParameter('dateFrom', $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT))
-            ->setParameter('dateTo', $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT))
-            ->setParameter('dateNow', (new \DateTime('now'))->format('Y-m-d H:i:s'));
-
-        return $qb->getQuery()->getResult();
-    }
-
     public function findBookingDatesByExperiencesAndDates(
         array $experienceGoldenIds,
         \DateTimeInterface $startDate,
@@ -91,7 +71,7 @@ class BookingDateRepository extends ServiceEntityRepository
         $qb->setParameter('experienceGoldenIds', $experienceGoldenIds, Connection::PARAM_STR_ARRAY);
         $qb->setParameter('startDate', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT), \PDO::PARAM_STR);
         $qb->setParameter('endDate', $endDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT), \PDO::PARAM_STR);
-        $qb->setParameter('dateNow', (new \DateTime('now'))->format('Y-m-d H:i:s'), \PDO::PARAM_STR);
+        $qb->setParameter('dateNow', (new \DateTime('now'))->format(DateTimeConstants::DEFAULT_DATE_TIME_FORMAT), \PDO::PARAM_STR);
         $qb->setParameter('status', BookingStatusConstraint::BOOKING_STATUS_CREATED, \PDO::PARAM_STR);
 
         return $qb->getQuery()->getArrayResult();
