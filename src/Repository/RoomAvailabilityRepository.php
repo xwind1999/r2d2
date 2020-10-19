@@ -335,7 +335,7 @@ SQL;
         $query->bindValue('experienceGoldenId', $experienceGoldenId);
         $query->bindValue('startDate', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
         $query->bindValue('endDate', $endDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
-        $query->bindValue('dateNow', (new \DateTime('now'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        $query->bindValue('dateNow', (new \DateTime('now'))->format(DateTimeConstants::DEFAULT_DATE_TIME_FORMAT));
         $query->bindValue('status', BookingStatusConstraint::BOOKING_STATUS_CREATED);
         $query->execute();
 
