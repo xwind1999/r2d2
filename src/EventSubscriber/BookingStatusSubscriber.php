@@ -46,7 +46,10 @@ class BookingStatusSubscriber implements EventSubscriberInterface
             $this->messageBus->dispatch(ChannelManagerBookingRequest::fromCompletedBooking($booking));
         } elseif (BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status) {
             $this->processLogMessage(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CANCELLED, $booking);
-            $this->messageBus->dispatch(ChannelManagerBookingRequest::fromCancelledBooking($booking));
+
+            if (BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $event->getPreviousBookingStatus()) {
+                $this->messageBus->dispatch(ChannelManagerBookingRequest::fromCancelledBooking($booking));
+            }
         }
     }
 
