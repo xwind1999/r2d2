@@ -334,7 +334,12 @@ SQL;
         $query = $this->getEntityManager()->getConnection()->prepare($sql);
         $query->bindValue('experienceGoldenId', $experienceGoldenId);
         $query->bindValue('startDate', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
-        $query->bindValue('endDate', $endDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        // Removing the last date as it should not count due to do not have night stay
+        $query->bindValue('endDate', (
+            new \DateTime($endDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT))
+            )->modify('-1 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        );
+
         $query->bindValue('dateNow', (new \DateTime('now'))->format(DateTimeConstants::DEFAULT_DATE_TIME_FORMAT));
         $query->bindValue('status', BookingStatusConstraint::BOOKING_STATUS_CREATED);
         $query->execute();

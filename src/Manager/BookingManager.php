@@ -335,6 +335,6 @@ class BookingManager
             $booking->endDate
         );
 
-        return count($availabilities) < $booking->startDate->diff($booking->endDate)->days + 1;
+        return count($availabilities) < $booking->startDate->diff($booking->endDate)->days;
     }
 }
