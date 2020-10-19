@@ -17,8 +17,12 @@ class CorrelationIdProcessor
 
     public function __invoke(array $record): array
     {
-        $record['context'][CorrelationId::LOG_FIELD] = $this->correlationId->getCorrelationId();
-        $record['extra'][CorrelationId::LOG_FIELD] = $this->correlationId->getCorrelationId();
+        if (isset($record['context'][CorrelationId::LOG_FIELD])) {
+            $record['extra'][CorrelationId::LOG_FIELD] = $record['context'][CorrelationId::LOG_FIELD];
+        } else {
+            $record['extra'][CorrelationId::LOG_FIELD] = $this->correlationId->getCorrelationId();
+            $record['context'][CorrelationId::LOG_FIELD] = $this->correlationId->getCorrelationId();
+        }
 
         return $record;
     }

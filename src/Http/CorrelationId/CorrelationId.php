@@ -22,16 +22,7 @@ class CorrelationId
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
-        $this->correlationId = $this->generateCorrelationId();
-    }
-
-    protected function generateCorrelationId(): string
-    {
-        $request = $this->requestStack->getMasterRequest() instanceof Request ? $this->requestStack->getMasterRequest() : null;
-
-        $requestCorrelationId = $request ? $request->headers->get(self::HEADER_KEY) : null;
-
-        return $requestCorrelationId ?? Uuid::uuid4()->toString();
+        $this->regenerate();
     }
 
     public function getCorrelationId(): string
@@ -51,5 +42,13 @@ class CorrelationId
     public function resetCorrelationIdOverride(): void
     {
         $this->correlationIdOverride = null;
+    }
+
+    public function regenerate(): void
+    {
+        $request = $this->requestStack->getMasterRequest() instanceof Request ? $this->requestStack->getMasterRequest() : null;
+        $requestCorrelationId = $request ? $request->headers->get(self::HEADER_KEY) : null;
+
+        $this->correlationId = $requestCorrelationId ?? Uuid::uuid4()->toString();
     }
 }

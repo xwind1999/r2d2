@@ -9,7 +9,6 @@ use App\Messenger\Stamp\CorrelationIdStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
-use Symfony\Component\Messenger\Stamp\SentStamp;
 
 class CorrelationIdMiddleware implements MiddlewareInterface
 {
@@ -22,15 +21,11 @@ class CorrelationIdMiddleware implements MiddlewareInterface
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        if (
-            null !== $envelope->last(SentStamp::class) &&
-            null === $envelope->last(CorrelationIdStamp::class)
-        ) {
-            $envelope = $envelope->with(new CorrelationIdStamp($this->correlationId->getCorrelationId()));
-        }
         $stamp = $envelope->last(CorrelationIdStamp::class);
 
-        if ($stamp instanceof CorrelationIdStamp && null !== $stamp->correlationId) {
+        if (null === $stamp) {
+            $envelope = $envelope->with(new CorrelationIdStamp($this->correlationId->getCorrelationId()));
+        } elseif ($stamp instanceof CorrelationIdStamp && null !== $stamp->correlationId) {
             $this->correlationId->setCorrelationIdOverride($stamp->correlationId);
         }
 
@@ -40,6 +35,7 @@ class CorrelationIdMiddleware implements MiddlewareInterface
         } finally {
             // @codeCoverageIgnoreEnd
             $this->correlationId->resetCorrelationIdOverride();
+            $this->correlationId->regenerate();
         }
     }
 }

@@ -57,8 +57,8 @@ class CorrelationIdMiddlewareTest extends TestCase
         })($this, $envelope);
 
         $this->stack->next()->willReturn($this->middleware->reveal());
-        $this->correlationId->setCorrelationIdOverride('1234')->shouldBeCalled();
-        $this->correlationId->resetCorrelationIdOverride();
+        $this->correlationId->resetCorrelationIdOverride()->shouldBeCalled();
+        $this->correlationId->regenerate()->shouldBeCalled();
         $this->correlationIdMiddleware->handle($envelope, $this->stack->reveal());
     }
 
@@ -87,32 +87,8 @@ class CorrelationIdMiddlewareTest extends TestCase
 
         $this->stack->next()->willReturn($this->middleware->reveal());
         $this->correlationId->setCorrelationIdOverride('5678')->shouldBeCalled();
-        $this->correlationId->resetCorrelationIdOverride();
-        $this->correlationIdMiddleware->handle($envelope, $this->stack->reveal());
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::handle
-     */
-    public function testHandleWithUnsentMessage(): void
-    {
-        $envelope = new Envelope(new \stdClass());
-        $this->correlationId->getCorrelationId()->willReturn('1234');
-        (function ($test, $envelope) {
-            $this
-                ->middleware
-                ->handle(Argument::type(Envelope::class), $this->stack->reveal())
-                ->shouldBeCalled()
-                ->will(function ($args) use ($test, $envelope) {
-                    $test->assertEquals($envelope, $args[0]);
-
-                    return $envelope;
-                });
-        })($this, $envelope);
-
-        $this->stack->next()->willReturn($this->middleware->reveal());
-        $this->correlationId->resetCorrelationIdOverride();
+        $this->correlationId->resetCorrelationIdOverride()->shouldBeCalled();
+        $this->correlationId->regenerate()->shouldBeCalled();
         $this->correlationIdMiddleware->handle($envelope, $this->stack->reveal());
     }
 }
