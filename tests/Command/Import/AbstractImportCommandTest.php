@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Command\Import;
 
 use App\Helper\CSVParser;
+use JMS\Serializer\SerializerInterface;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -43,7 +44,15 @@ abstract class AbstractImportCommandTest extends KernelTestCase
     protected Application $application;
     protected Command $command;
     protected CommandTester $commandTester;
+
+    /**
+     * @var ObjectProphecy|ValidatorInterface
+     */
     protected ObjectProphecy $validator;
+    /**
+     * @var ObjectProphecy|SerializerInterface
+     */
+    protected $serializer;
 
     protected function setUp(): void
     {
@@ -53,11 +62,12 @@ abstract class AbstractImportCommandTest extends KernelTestCase
         $this->validator = $this->prophesize(ValidatorInterface::class);
         $this->application = new Application(static::createKernel());
         $this->messageBus->dispatch(Argument::any())->willReturn(new Envelope($this->requestClass));
+        $this->serializer = $this->prophesize(SerializerInterface::class);
     }
 
     protected function executeWithInvalidData(\Iterator $requestIterator): void
     {
-        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($requestIterator);
+        $this->helper->readFile(Argument::any(), Argument::any())->shouldBeCalled()->willReturn($requestIterator);
         $errors = new ConstraintViolationList([]);
         $errors->add(new ConstraintViolation(Argument::any(), null, [], Argument::any(), null, null));
         $this->validator->validate(Argument::any())->willReturn($errors);

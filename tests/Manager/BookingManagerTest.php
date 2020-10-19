@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Contract\Request\Booking\BookingCreate\Experience as BookingCreateExperience;
 use App\Contract\Request\Booking\BookingCreate\Guest;
 use App\Contract\Request\Booking\BookingCreate\Room;
 use App\Contract\Request\Booking\BookingCreate\RoomDate;
 use App\Contract\Request\Booking\BookingCreateRequest;
+use App\Contract\Request\Booking\BookingImport\BookingImportRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
 use App\Entity\Box;
@@ -494,12 +496,15 @@ class BookingManagerTest extends TestCase
         $asserts($this, $booking);
     }
 
+    /**
+     * @see testCreate
+     */
     public function dataForCreate(): iterable
     {
         $baseBookingCreateRequest = new BookingCreateRequest();
         $baseBookingCreateRequest->bookingId = 'SBXFRJBO200101123123';
         $baseBookingCreateRequest->box = '2406';
-        $baseBookingCreateRequest->experience = new \App\Contract\Request\Booking\BookingCreate\Experience();
+        $baseBookingCreateRequest->experience = new BookingCreateExperience();
         $baseBookingCreateRequest->experience->id = '3216334';
         $baseBookingCreateRequest->experience->components = [
             'Cup of tea',
@@ -1369,5 +1374,340 @@ class BookingManagerTest extends TestCase
         $this->expectException(InvalidExperienceComponentListException::class);
 
         $this->bookingManager->create($bookingCreateRequest);
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::import
+     * @dataProvider dataForImport
+     */
+    public function testImport(
+        BookingImportRequest $bookingCreateRequest,
+        ?int $duration,
+        ?callable $setUp,
+        ?string $exceptionClass,
+        callable $asserts,
+        array $extraParams = []
+    ) {
+        $partner = new Partner();
+        $partner->goldenId = '5678';
+        $partner->currency = $extraParams['partnerCurrency'] ?? 'EUR';
+
+        $experience = new Experience();
+        $experience->goldenId = $bookingCreateRequest->experience->id;
+        $experience->partner = $partner;
+        $experience->price = $extraParams['price'] ?? 500;
+        $this->experienceRepository->findOneByGoldenId($bookingCreateRequest->experience->id)->willReturn($experience);
+
+        $box = new Box();
+        $box->goldenId = $bookingCreateRequest->box;
+        $box->brand = $extraParams['boxBrand'] ?? 'SBX';
+        $box->country = $extraParams['boxCountry'] ?? 'FR';
+        $box->currency = 'EUR';
+        $this->boxRepository->findOneByGoldenId($bookingCreateRequest->box)->willReturn($box);
+
+        $boxExperience = new BoxExperience();
+        $this->boxExperienceRepository->findOneEnabledByBoxExperience($box, $experience)->willReturn($boxExperience);
+
+        $component = new Component();
+        $component->goldenId = 'component-id';
+        $component->duration = $duration;
+        $this->componentRepository->findDefaultRoomByExperience($experience)->willReturn($component);
+
+        $money = new Money($experience->price, new Currency($bookingCreateRequest->currency));
+        $this->moneyHelper->create($experience->price, $bookingCreateRequest->currency)->willReturn($money);
+
+        if ($setUp) {
+            $setUp($this);
+        }
+
+        if ($exceptionClass) {
+            $this->expectException($exceptionClass);
+        }
+
+        $booking = $this->bookingManager->import($bookingCreateRequest);
+
+        $asserts($this, $booking);
+    }
+
+    /**
+     * @see testImport
+     */
+    public function dataForImport()
+    {
+        $bookingImportRequest = new BookingImportRequest();
+        $bookingImportRequest->bookingId = 'SBXFRJBO200101123123';
+        $bookingImportRequest->box = '2406';
+        $bookingImportRequest->experience = new BookingCreateExperience();
+        $bookingImportRequest->experience->id = '3216334';
+        $bookingImportRequest->experience->components = [
+            'Cup of tea',
+            'Una noche muy buena',
+        ];
+        $bookingImportRequest->currency = 'EUR';
+        $bookingImportRequest->voucher = '198257918';
+        $bookingImportRequest->startDate = new \DateTime('2020-01-01');
+        $bookingImportRequest->endDate = new \DateTime('2020-01-02');
+        $bookingImportRequest->customerComment = 'Clean sheets please';
+        $bookingImportRequest->guests = [new \App\Contract\Request\Booking\BookingImport\Guest()];
+        $bookingImportRequest->guests[0]->firstName = 'Hermano';
+        $bookingImportRequest->guests[0]->lastName = 'Guido';
+        $bookingImportRequest->guests[0]->email = 'maradona@worldcup.ar';
+        $bookingImportRequest->guests[0]->phone = '123 123 123';
+        $bookingImportRequest->guests[0]->isPrimary = true;
+        $bookingImportRequest->guests[0]->age = 30;
+        $bookingImportRequest->guests[0]->country = 'AR';
+
+        yield 'happy days' => [
+            (function ($bookingImportRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 10;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingImportRequest->rooms = [$room];
+
+                return $bookingImportRequest;
+            })(clone $bookingImportRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(10, $booking->totalPrice);
+                $test->assertCount(1, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'happy days, null duration (defaulting to one)' => [
+            (function ($bookingImportRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingImportRequest->rooms = [$room];
+
+                return $bookingImportRequest;
+            })(clone $bookingImportRequest),
+            null,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(0, $booking->totalPrice);
+                $test->assertCount(1, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'happy extra days' => [
+            (function ($bookingImportRequest) {
+                $bookingImportRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 300;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+                $bookingImportRequest->rooms = [$room];
+
+                return $bookingImportRequest;
+            })(clone $bookingImportRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(300, $booking->totalPrice);
+                $test->assertCount(2, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'happy extra rooms' => [
+            (function ($bookingImportRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-01');
+                $roomDate2->price = 300;
+                $roomDate2->extraNight = false;
+                $room2 = new Room();
+                $room2->extraRoom = true;
+                $room2->dates = [$roomDate2];
+                $bookingImportRequest->rooms = [$room, $room2];
+
+                return $bookingImportRequest;
+            })(clone $bookingImportRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(300, $booking->totalPrice);
+                $test->assertCount(2, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'happy extra days and extra rooms' => [
+            (function ($bookingImportRequest) {
+                $bookingImportRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 300;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $roomDate3 = new RoomDate();
+                $roomDate3->day = new \DateTime('2020-01-01');
+                $roomDate3->price = 300;
+                $roomDate3->extraNight = false;
+                $roomDate4 = new RoomDate();
+                $roomDate4->day = new \DateTime('2020-01-02');
+                $roomDate4->price = 300;
+                $roomDate4->extraNight = true;
+                $room2 = new Room();
+                $room2->extraRoom = true;
+                $room2->dates = [$roomDate3, $roomDate4];
+                $bookingImportRequest->rooms = [$room, $room2, $room2];
+
+                return $bookingImportRequest;
+            })(clone $bookingImportRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(1500, $booking->totalPrice);
+                $test->assertCount(6, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'duplicated booking' => [
+            (function ($bookingImportRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingImportRequest->rooms = [$room];
+
+                return $bookingImportRequest;
+            })(clone $bookingImportRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willReturn(new Booking());
+            },
+            ResourceConflictException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(400, $booking->totalPrice);
+                $test->assertCount(1, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'box with missing brand' => [
+            (function ($bookingImportRequest) {
+                $bookingImportRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 0;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $bookingImportRequest->rooms = [$room];
+
+                return $bookingImportRequest;
+            })(clone $bookingImportRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::type('string'))->willThrow(new BookingNotFoundException());
+            },
+            InvalidBoxBrandException::class,
+            function ($test) {
+                $test->entityManager->rollback()->shouldHaveBeenCalledTimes(1);
+            },
+            ['boxBrand' => '0'],
+        ];
+
+        yield 'box with missing country' => [
+            (function ($bookingImportRequest) {
+                $bookingImportRequest->endDate = new \DateTime('2020-01-03');
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $roomDate2 = new RoomDate();
+                $roomDate2->day = new \DateTime('2020-01-02');
+                $roomDate2->price = 0;
+                $roomDate2->extraNight = true;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate, $roomDate2];
+
+                $bookingImportRequest->rooms = [$room];
+
+                return $bookingImportRequest;
+            })(clone $bookingImportRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::type('string'))->willThrow(new BookingNotFoundException());
+            },
+            InvalidBoxCountryException::class,
+            function ($test) {
+                $test->entityManager->rollback()->shouldHaveBeenCalledTimes(1);
+            },
+            ['boxCountry' => '0'],
+        ];
     }
 }

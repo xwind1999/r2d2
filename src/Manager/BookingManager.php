@@ -7,6 +7,7 @@ namespace App\Manager;
 use App\Constants\DateTimeConstants;
 use App\Constraint\BookingStatusConstraint;
 use App\Contract\Request\Booking\BookingCreateRequest;
+use App\Contract\Request\Booking\BookingImport\BookingImportRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
@@ -325,6 +326,95 @@ class BookingManager
         $this->em->persist($booking);
         $this->em->flush();
         $this->eventDispatcher->dispatch(new BookingStatusEvent($booking));
+    }
+
+    public function import(BookingImportRequest $bookingImportRequest): Booking
+    {
+        try {
+            $this->repository->findOneByGoldenId($bookingImportRequest->bookingId);
+
+            throw new ResourceConflictException();
+        } catch (BookingNotFoundException $exception) {
+        }
+
+        $experience = $this->experienceRepository->findOneByGoldenId($bookingImportRequest->experience->id);
+        $box = $this->boxRepository->findOneByGoldenId($bookingImportRequest->box);
+
+        if (empty($box->brand)) {
+            throw new InvalidBoxBrandException();
+        }
+
+        if (empty($box->country)) {
+            throw new InvalidBoxCountryException();
+        }
+
+        $this->boxExperienceRepository->findOneEnabledByBoxExperience($box, $experience);
+        $component = $this->componentRepository->findDefaultRoomByExperience($experience);
+
+        $partner = $experience->partner;
+
+        $booking = new Booking();
+        $booking->partner = $partner;
+        $booking->experience = $experience;
+        $booking->goldenId = $bookingImportRequest->bookingId;
+        $booking->partnerGoldenId = $partner->goldenId;
+        $booking->experienceGoldenId = $bookingImportRequest->experience->id;
+        $booking->voucher = $bookingImportRequest->voucher;
+        $booking->brand = $box->brand;
+        $booking->country = $box->country;
+        $booking->startDate = $bookingImportRequest->startDate;
+        $booking->endDate = $bookingImportRequest->endDate;
+        $booking->status = BookingStatusConstraint::BOOKING_STATUS_COMPLETE;
+        $booking->customerComment = $bookingImportRequest->customerComment;
+        $booking->components = $bookingImportRequest->experience->components;
+        $booking->currency = strtoupper($bookingImportRequest->currency);
+        $booking->cancelledAt = null;
+        $booking->expiredAt = (new \DateTime('now'))->add(new \DateInterval(self::EXPIRATION_TIME));
+        $totalPrice = 0;
+
+        /** @var ArrayCollection<int, BookingDate> */
+        $bookingDatesCollection = new ArrayCollection();
+        foreach ($bookingImportRequest->rooms as $roomIndex => $room) {
+            foreach ($room->dates as $date) {
+                $totalPrice += $date->price;
+                $bookingDate = new BookingDate();
+                $bookingDate->booking = $booking;
+                $bookingDate->bookingGoldenId = $booking->goldenId;
+                $bookingDate->component = $component;
+                $bookingDate->componentGoldenId = $component->goldenId;
+                $bookingDate->date = $date->day;
+                $bookingDate->price = $date->price;
+                $bookingDate->guestsCount = $experience->peopleNumber ?? 1; //should we?
+
+                $bookingDatesCollection->add($bookingDate);
+                $this->em->persist($bookingDate);
+            }
+        }
+
+        $booking->bookingDate = $bookingDatesCollection;
+        $booking->totalPrice = $totalPrice;
+
+        /** @var ArrayCollection<int, Guest> */
+        $guestCollection = new ArrayCollection();
+        foreach ($bookingImportRequest->guests as $guestRequest) {
+            $guest = new Guest();
+            $guest->booking = $booking;
+            $guest->bookingGoldenId = $booking->goldenId;
+            $guest->firstName = $guestRequest->firstName;
+            $guest->lastName = $guestRequest->lastName;
+            $guest->email = $guestRequest->email;
+            $guest->phone = $guestRequest->phone;
+
+            $guestCollection->add($guest);
+            $this->em->persist($guest);
+        }
+
+        $booking->guest = $guestCollection;
+
+        $this->em->persist($booking);
+        $this->em->flush();
+
+        return $booking;
     }
 
     public function isUnavailableForBookings(Booking $booking): bool

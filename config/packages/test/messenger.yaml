@@ -87,6 +87,13 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
+            event-import-booking:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: event-import-booking
+                retry_strategy:
+                    service: App\Messenger\RetryCustomStrategy
+
         routing:
         # Route your messages to the transports
             'App\Contract\Request\BroadcastListener\PartnerRequest': listener-partner
@@ -101,6 +108,7 @@ framework:
             'App\Contract\Request\EAI\RoomRequest': event-push-room-type-information
             'App\Contract\Request\EAI\ChannelManagerBookingRequest': event-push-booking-information
             'App\Contract\Message\CalculateFlatManageableComponent': event-calculate-flat-manageable-component
+            'App\Contract\Request\Booking\BookingImport\BookingImportRequest': event-import-booking
 
         buses:
             default:

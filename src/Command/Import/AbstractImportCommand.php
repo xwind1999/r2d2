@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Command\Import;
 
 use App\Helper\CSVParser;
+use JMS\Serializer\SerializerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,31 +18,30 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class AbstractImportCommand extends Command
 {
-    protected LoggerInterface $logger;
-
-    protected MessageBusInterface $messageBus;
-
-    protected SymfonyStyle $io;
-
-    protected CSVParser $csvParser;
-
-    protected ValidatorInterface $validator;
-
     /**
      * @var array
      */
     protected const IMPORT_FIELDS = [];
 
+    protected LoggerInterface $logger;
+    protected MessageBusInterface $messageBus;
+    protected SymfonyStyle $io;
+    protected CSVParser $csvParser;
+    protected ValidatorInterface $validator;
+    protected SerializerInterface $serializer;
+
     public function __construct(
         LoggerInterface $logger,
         MessageBusInterface $messageBus,
         CSVParser $csvParser,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        SerializerInterface $serializer
     ) {
         $this->logger = $logger;
         $this->messageBus = $messageBus;
         $this->csvParser = $csvParser;
         $this->validator = $validator;
+        $this->serializer = $serializer;
 
         parent::__construct();
     }
