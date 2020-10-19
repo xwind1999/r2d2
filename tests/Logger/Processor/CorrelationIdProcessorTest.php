@@ -7,6 +7,7 @@ namespace App\Tests\Logger\Processor;
 use App\Http\CorrelationId\CorrelationId;
 use App\Logger\Processor\CorrelationIdProcessor;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @coversDefaultClass \App\Logger\Processor\CorrelationIdProcessor
@@ -14,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 class CorrelationIdProcessorTest extends TestCase
 {
     /**
-     * @var \Prophecy\Prophecy\ObjectProphecy
+     * @var CorrelationId|ObjectProphecy
      */
     private $correlationId;
 
@@ -42,6 +43,23 @@ class CorrelationIdProcessorTest extends TestCase
                 ],
             ],
             $this->correlationProcessor->__invoke(['test' => 'test2'])
+        );
+    }
+
+    public function testAddInfoWithExistingContext(): void
+    {
+        $this->correlationId->getCorrelationId()->shouldNotBeCalled();
+        $this->assertEquals(
+            [
+                'test' => 'test2',
+                'extra' => [
+                    'correlation_id' => 'correlation-id-is-1234567',
+                ],
+                'context' => [
+                    'correlation_id' => 'correlation-id-is-1234567',
+                ],
+            ],
+            $this->correlationProcessor->__invoke(['test' => 'test2', 'context' => ['correlation_id' => 'correlation-id-is-1234567']])
         );
     }
 }

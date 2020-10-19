@@ -17,7 +17,9 @@ class EaiTransactionProcessor
 
     public function __invoke(array $record): array
     {
-        if ($this->eaiTransactionId->getTransactionId()) {
+        if (isset($record['context'][EaiTransactionId::LOG_FIELD])) {
+            $record['extra'][EaiTransactionId::LOG_FIELD] = $record['context'][EaiTransactionId::LOG_FIELD];
+        } elseif ($this->eaiTransactionId->getTransactionId()) {
             $record['extra'][EaiTransactionId::LOG_FIELD] = $this->eaiTransactionId->getTransactionId();
             $record['context'][EaiTransactionId::LOG_FIELD] = $this->eaiTransactionId->getTransactionId();
         }

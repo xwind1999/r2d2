@@ -232,6 +232,8 @@ framework:
             default:
                 middleware:
                     - App\Messenger\NewrelicMessengerMiddleware
+                    - App\Messenger\CorrelationIdMiddleware
+                    - App\Messenger\EaiTransactionIdMiddleware
 
         serializer:
             default_serializer: 'App\Helper\Serializer\IgbinarySerializer'

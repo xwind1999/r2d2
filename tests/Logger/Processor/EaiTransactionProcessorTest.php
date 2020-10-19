@@ -45,6 +45,23 @@ class EaiTransactionProcessorTest extends TestCase
         );
     }
 
+    public function testAddInfoWithExistingContext(): void
+    {
+        $this->eaiTransactionId->getTransactionId()->shouldNotBeCalled();
+        $this->assertEquals(
+            [
+                'test' => 'test2',
+                'context' => [
+                    'eai_transaction_id' => 'eai-transaction-is-1234567',
+                ],
+                'extra' => [
+                    'eai_transaction_id' => 'eai-transaction-is-1234567',
+                ],
+            ],
+            $this->eaiTransactionProcessor->__invoke(['test' => 'test2', 'context' => ['eai_transaction_id' => 'eai-transaction-is-1234567']])
+        );
+    }
+
     public function testAddInfoWithNullEaiTransactionId(): void
     {
         $this->eaiTransactionId->getTransactionId()->willReturn(null);

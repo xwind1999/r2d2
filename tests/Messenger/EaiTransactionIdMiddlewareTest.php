@@ -57,7 +57,6 @@ class EaiTransactionIdMiddlewareTest extends TestCase
         })($this, $envelope);
 
         $this->stack->next()->willReturn($this->middleware->reveal());
-        $this->eaiTransactionId->setTransactionIdOverride('1234')->shouldBeCalled();
         $this->eaiTransactionId->resetTransactionIdOverride()->shouldBeCalled();
         $this->eaiTransactionIdMiddleware->handle($envelope, $this->stack->reveal());
     }
@@ -87,31 +86,6 @@ class EaiTransactionIdMiddlewareTest extends TestCase
 
         $this->stack->next()->willReturn($this->middleware->reveal());
         $this->eaiTransactionId->setTransactionIdOverride('5678')->shouldBeCalled();
-        $this->eaiTransactionId->resetTransactionIdOverride()->shouldBeCalled();
-        $this->eaiTransactionIdMiddleware->handle($envelope, $this->stack->reveal());
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::handle
-     */
-    public function testHandleWithUnsentMessage(): void
-    {
-        $envelope = new Envelope(new \stdClass());
-        $this->eaiTransactionId->getTransactionId()->willReturn('1234');
-        (function ($test, $envelope) {
-            $this
-                ->middleware
-                ->handle(Argument::type(Envelope::class), $this->stack->reveal())
-                ->shouldBeCalled()
-                ->will(function ($args) use ($test, $envelope) {
-                    $test->assertEquals($envelope, $args[0]);
-
-                    return $envelope;
-                });
-        })($this, $envelope);
-
-        $this->stack->next()->willReturn($this->middleware->reveal());
         $this->eaiTransactionId->resetTransactionIdOverride()->shouldBeCalled();
         $this->eaiTransactionIdMiddleware->handle($envelope, $this->stack->reveal());
     }
