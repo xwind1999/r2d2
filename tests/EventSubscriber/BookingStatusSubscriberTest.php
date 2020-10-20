@@ -131,7 +131,10 @@ class BookingStatusSubscriberTest extends TestCase
     {
         $this->booking->status = BookingStatusConstraint::BOOKING_STATUS_CREATED;
         $this->booking->createdAt = new \DateTime();
-        $this->logger->info(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CREATED, ['booking' => $this->booking])->shouldBeCalledOnce();
+        $this->logger
+            ->info(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CREATED, ['booking' => $this->booking])
+            ->shouldBeCalledOnce()
+        ;
         $this->bookingUpdatedEvent->getBooking()->willReturn($this->booking);
         $this->messageBus->dispatch(Argument::any())->shouldNotBeCalled();
         $this->bookingUpdatedSubscriber->handleBookingStatus($this->bookingUpdatedEvent->reveal());
@@ -152,10 +155,13 @@ class BookingStatusSubscriberTest extends TestCase
         $this->booking->endDate = new \DateTime();
         $this->booking->createdAt = new \DateTime();
         $this->booking->currency = 'EUR';
-        $this->logger->info(
-            BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_COMPLETED,
-            ['booking' => $this->booking]
-        )->shouldBeCalledOnce();
+        $this->logger
+            ->info(
+                BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_COMPLETED,
+                ['booking' => $this->booking]
+            )
+            ->shouldBeCalledOnce()
+        ;
         $this->bookingUpdatedEvent->getBooking()->willReturn($this->booking);
         $this->messageBus->dispatch(Argument::any())->shouldBeCalledOnce()->willReturn(new Envelope(new \stdClass()));
         $this->bookingUpdatedSubscriber->handleBookingStatus($this->bookingUpdatedEvent->reveal());
@@ -173,8 +179,15 @@ class BookingStatusSubscriberTest extends TestCase
         $this->booking->status = BookingStatusConstraint::BOOKING_STATUS_CANCELLED;
         $this->booking->currency = 'EUR';
         $this->booking->createdAt = new \DateTime();
-        $this->logger->info(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CANCELLED, ['booking' => $this->booking])->shouldBeCalledOnce();
+        $this->logger
+            ->info(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CANCELLED, ['booking' => $this->booking])
+            ->shouldBeCalledOnce()
+        ;
         $this->bookingUpdatedEvent->getBooking()->willReturn($this->booking);
+        $this->bookingUpdatedEvent
+            ->getPreviousBookingStatus()
+            ->willReturn(BookingStatusConstraint::BOOKING_STATUS_COMPLETE)
+        ;
         $this->messageBus->dispatch(Argument::any())->shouldBeCalledOnce()->willReturn(new Envelope(new \stdClass()));
         $this->bookingUpdatedSubscriber->handleBookingStatus($this->bookingUpdatedEvent->reveal());
     }
@@ -188,11 +201,13 @@ class BookingStatusSubscriberTest extends TestCase
     {
         $this->booking->status = 'created';
         $this->booking->expiredAt = new \DateTime('yesterday');
-
-        $this->logger->info(
-            BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_EXPIRED,
-            ['booking' => $this->booking]
-        )->shouldBeCalledOnce();
+        $this->logger
+            ->info(
+                BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_EXPIRED,
+                ['booking' => $this->booking]
+            )
+            ->shouldBeCalledOnce()
+        ;
         $this->bookingUpdatedEvent->getBooking()->willReturn($this->booking);
         $this->messageBus->dispatch(Argument::any())->shouldNotBeCalled();
         $this->bookingUpdatedSubscriber->handleBookingStatus($this->bookingUpdatedEvent->reveal());

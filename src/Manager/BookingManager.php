@@ -294,6 +294,7 @@ class BookingManager
     public function update(BookingUpdateRequest $bookingUpdateRequest): void
     {
         $booking = $this->repository->findOneByGoldenId($bookingUpdateRequest->bookingId);
+        $previousBookingStatus = $booking->status;
 
         if (
             BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status ||
@@ -325,7 +326,7 @@ class BookingManager
 
         $this->em->persist($booking);
         $this->em->flush();
-        $this->eventDispatcher->dispatch(new BookingStatusEvent($booking));
+        $this->eventDispatcher->dispatch(new BookingStatusEvent($booking, $previousBookingStatus));
     }
 
     public function import(BookingImportRequest $bookingImportRequest): Booking
