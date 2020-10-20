@@ -57,8 +57,6 @@ class CorrelationIdMiddlewareTest extends TestCase
         })($this, $envelope);
 
         $this->stack->next()->willReturn($this->middleware->reveal());
-        $this->correlationId->resetCorrelationIdOverride()->shouldBeCalled();
-        $this->correlationId->regenerate()->shouldBeCalled();
         $this->correlationIdMiddleware->handle($envelope, $this->stack->reveal());
     }
 
@@ -86,9 +84,7 @@ class CorrelationIdMiddlewareTest extends TestCase
         })($this, $envelope);
 
         $this->stack->next()->willReturn($this->middleware->reveal());
-        $this->correlationId->setCorrelationIdOverride('5678')->shouldBeCalled();
-        $this->correlationId->resetCorrelationIdOverride()->shouldBeCalled();
-        $this->correlationId->regenerate()->shouldBeCalled();
+        $this->correlationId->getCorrelationId()->shouldNotBeCalled();
         $this->correlationIdMiddleware->handle($envelope, $this->stack->reveal());
     }
 }

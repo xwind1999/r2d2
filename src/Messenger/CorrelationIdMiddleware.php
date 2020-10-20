@@ -25,17 +25,8 @@ class CorrelationIdMiddleware implements MiddlewareInterface
 
         if (null === $stamp) {
             $envelope = $envelope->with(new CorrelationIdStamp($this->correlationId->getCorrelationId()));
-        } elseif ($stamp instanceof CorrelationIdStamp && null !== $stamp->correlationId) {
-            $this->correlationId->setCorrelationIdOverride($stamp->correlationId);
         }
 
-        try {
-            return $stack->next()->handle($envelope, $stack);
-            // @codeCoverageIgnoreStart
-        } finally {
-            // @codeCoverageIgnoreEnd
-            $this->correlationId->resetCorrelationIdOverride();
-            $this->correlationId->regenerate();
-        }
+        return $stack->next()->handle($envelope, $stack);
     }
 }

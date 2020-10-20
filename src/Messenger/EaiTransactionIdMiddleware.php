@@ -22,19 +22,12 @@ class EaiTransactionIdMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $stamp = $envelope->last(EaiTransactionIdStamp::class);
+        $eaiTransactionId = $this->eaiTransactionId->getTransactionId();
 
-        if (null === $stamp && null !== $this->eaiTransactionId->getTransactionId()) {
-            $envelope = $envelope->with(new EaiTransactionIdStamp($this->eaiTransactionId->getTransactionId()));
-        } elseif ($stamp instanceof EaiTransactionIdStamp && null !== $stamp->eaiTransactionId) {
-            $this->eaiTransactionId->setTransactionIdOverride($stamp->eaiTransactionId);
+        if (null === $stamp && null !== $eaiTransactionId) {
+            $envelope = $envelope->with(new EaiTransactionIdStamp($eaiTransactionId));
         }
 
-        try {
-            return $stack->next()->handle($envelope, $stack);
-            // @codeCoverageIgnoreStart
-        } finally {
-            // @codeCoverageIgnoreEnd
-            $this->eaiTransactionId->resetTransactionIdOverride();
-        }
+        return $stack->next()->handle($envelope, $stack);
     }
 }

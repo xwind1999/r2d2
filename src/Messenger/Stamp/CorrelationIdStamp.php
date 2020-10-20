@@ -8,9 +8,9 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 
 class CorrelationIdStamp implements StampInterface
 {
-    public ?string $correlationId = null;
+    public string $correlationId;
 
-    public function __construct(?string $correlationId)
+    public function __construct(string $correlationId)
     {
         $this->correlationId = $correlationId;
     }

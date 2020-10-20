@@ -57,7 +57,6 @@ class EaiTransactionIdMiddlewareTest extends TestCase
         })($this, $envelope);
 
         $this->stack->next()->willReturn($this->middleware->reveal());
-        $this->eaiTransactionId->resetTransactionIdOverride()->shouldBeCalled();
         $this->eaiTransactionIdMiddleware->handle($envelope, $this->stack->reveal());
     }
 
@@ -84,9 +83,8 @@ class EaiTransactionIdMiddlewareTest extends TestCase
                 });
         })($this, $envelope);
 
+        $this->eaiTransactionId->getTransactionId()->willReturn('whatever');
         $this->stack->next()->willReturn($this->middleware->reveal());
-        $this->eaiTransactionId->setTransactionIdOverride('5678')->shouldBeCalled();
-        $this->eaiTransactionId->resetTransactionIdOverride()->shouldBeCalled();
         $this->eaiTransactionIdMiddleware->handle($envelope, $this->stack->reveal());
     }
 }
