@@ -12,6 +12,7 @@ class EaiTransactionId
     public const LOG_FIELD = 'eai_transaction_id';
     protected const HEADER_KEY = 'x-transaction-id';
 
+    private ?string $transactionId = null;
     private ?string $transactionIdOverride = null;
 
     private RequestStack $requestStack;
@@ -21,15 +22,21 @@ class EaiTransactionId
         $this->requestStack = $requestStack;
     }
 
+    public function loadTransactionId(): void
+    {
+        $request = $this->requestStack->getMasterRequest() instanceof Request ? $this->requestStack->getMasterRequest() : null;
+        $this->transactionId = $request ? $request->headers->get(self::HEADER_KEY, null) : null;
+    }
+
     public function getTransactionId(): ?string
     {
+        $this->loadTransactionId();
+
         if (null !== $this->transactionIdOverride) {
             return $this->transactionIdOverride;
         }
 
-        $request = $this->requestStack->getMasterRequest() instanceof Request ? $this->requestStack->getMasterRequest() : null;
-
-        return $request ? $request->headers->get(self::HEADER_KEY, null) : null;
+        return $this->transactionId;
     }
 
     public function setTransactionIdOverride(string $transactionId): void

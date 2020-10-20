@@ -44,7 +44,7 @@ class CorrelationIdTest extends TestCase
      * @covers ::__construct
      * @covers ::getCorrelationId
      */
-    public function testGetUuidWithHeaderCorrelationId(): void
+    public function testGetCorrelationIdWithHeaderCorrelationId(): void
     {
         $this->request->headers = $this->headers->reveal();
         $this->headers->get('Correlation-Id', null)->willReturn('correlation-id-is-1234567');
@@ -60,7 +60,7 @@ class CorrelationIdTest extends TestCase
      * @covers ::__construct
      * @covers ::getCorrelationId
      */
-    public function testGetUuidWithoutRequestWillGenerateANewCorrelationId(): void
+    public function testGetCorrelationIdWithoutRequestWillGenerateANewCorrelationId(): void
     {
         $this->requestStack->getMasterRequest()->willReturn(null);
         $this->correlationId = new CorrelationId($this->requestStack->reveal());
@@ -71,7 +71,19 @@ class CorrelationIdTest extends TestCase
      * @covers ::__construct
      * @covers ::getCorrelationId
      */
-    public function testGetUuidWithoutHeadersWillGenerateANewCorrelationId(): void
+    public function testGetCorrelationIdWithoutRequestWillGenerateANewCorrelationIdAndReuseIt(): void
+    {
+        $this->requestStack->getMasterRequest()->willReturn(null);
+        $this->correlationId = new CorrelationId($this->requestStack->reveal());
+        $correlationId = $this->correlationId->getCorrelationId();
+        $this->assertEquals($correlationId, $this->correlationId->getCorrelationId());
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getCorrelationId
+     */
+    public function testGetCorrelationIdWithoutHeadersWillGenerateANewCorrelationId(): void
     {
         $this->request->headers = $this->headers->reveal();
         $this->headers->get('Correlation-Id', null)->willReturn(null);
@@ -86,7 +98,7 @@ class CorrelationIdTest extends TestCase
      * @covers ::resetCorrelationIdOverride
      * @covers ::setCorrelationIdOverride
      */
-    public function testGetUuidWithOverride(): void
+    public function testGetCorrelationIdWithOverride(): void
     {
         $this->request->headers = $this->headers->reveal();
         $this->headers->get('Correlation-Id', null)->willReturn('original-correlation-id');

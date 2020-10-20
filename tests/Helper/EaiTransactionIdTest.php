@@ -44,6 +44,7 @@ class EaiTransactionIdTest extends TestCase
     /**
      * @covers ::__construct
      * @covers ::getTransactionId
+     * @covers ::loadTransactionId
      */
     public function testGetTransactionId(): void
     {

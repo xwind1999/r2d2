@@ -19,7 +19,7 @@ class EaiTransactionProcessor
     {
         if (isset($record['context'][EaiTransactionId::LOG_FIELD])) {
             $record['extra'][EaiTransactionId::LOG_FIELD] = $record['context'][EaiTransactionId::LOG_FIELD];
-        } elseif ($this->eaiTransactionId->getTransactionId()) {
+        } elseif (null !== $this->eaiTransactionId->getTransactionId()) {
             $record['extra'][EaiTransactionId::LOG_FIELD] = $this->eaiTransactionId->getTransactionId();
             $record['context'][EaiTransactionId::LOG_FIELD] = $this->eaiTransactionId->getTransactionId();
         }

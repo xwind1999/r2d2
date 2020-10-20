@@ -8,9 +8,9 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 
 class EaiTransactionIdStamp implements StampInterface
 {
-    public ?string $eaiTransactionId = null;
+    public string $eaiTransactionId;
 
-    public function __construct(?string $eaiTransactionId)
+    public function __construct(string $eaiTransactionId)
     {
         $this->eaiTransactionId = $eaiTransactionId;
     }
