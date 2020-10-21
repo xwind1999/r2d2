@@ -239,6 +239,8 @@ class BookingManager
                 $bookingDate->date = $date->day;
                 $bookingDate->price = $price;
                 $bookingDate->guestsCount = $experience->peopleNumber ?? 1; //should we?
+                $bookingDate->isExtraRoom = $room->extraRoom;
+                $bookingDate->isExtraNight = $date->extraNight;
 
                 $bookingDatesCollection->add($bookingDate);
                 $this->em->persist($bookingDate);
@@ -386,6 +388,8 @@ class BookingManager
                 $bookingDate->date = $date->day;
                 $bookingDate->price = $date->price;
                 $bookingDate->guestsCount = $experience->peopleNumber ?? 1; //should we?
+                $bookingDate->isExtraRoom = $room->extraRoom;
+                $bookingDate->isExtraNight = $date->extraNight;
 
                 $bookingDatesCollection->add($bookingDate);
                 $this->em->persist($bookingDate);
