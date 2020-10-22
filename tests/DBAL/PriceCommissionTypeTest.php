@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\DBAL;
 
 use App\DBAL\PriceCommissionType;
+use App\Tests\ProphecyTestCase;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass \App\DBAL\PriceCommissionType
  */
-class PriceCommissionTypeTest extends TestCase
+class PriceCommissionTypeTest extends ProphecyTestCase
 {
     /**
      * @covers ::getName

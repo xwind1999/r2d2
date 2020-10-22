@@ -8,14 +8,14 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\ComponentBroadcastEvent;
 use App\Exception\Resolver\UnprocessableProductTypeException;
 use App\Resolver\ProductTypeResolver;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @coversDefaultClass \App\Resolver\ProductTypeResolver
  */
-class ProductTypeResolverTest extends TestCase
+class ProductTypeResolverTest extends ProphecyTestCase
 {
     /**
      * @var ObjectProphecy|ProductRequest

@@ -10,7 +10,7 @@ use App\Entity\Partner;
 use App\Exception\Resolver\UnprocessableManageableProductTypeException;
 use App\Handler\ManageableProductHandler;
 use App\Resolver\ManageableProductResolver;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @coversDefaultClass \App\Handler\ManageableProductHandler
  */
-class ManageableProductHandlerTest extends TestCase
+class ManageableProductHandlerTest extends ProphecyTestCase
 {
     /**
      * @var EventDispatcherInterface|ObjectProphecy

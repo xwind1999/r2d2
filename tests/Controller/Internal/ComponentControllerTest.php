@@ -13,14 +13,14 @@ use App\Entity\Component;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Manager\ComponentManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
  * @coversDefaultClass \App\Controller\Internal\ComponentController
  */
-class ComponentControllerTest extends TestCase
+class ComponentControllerTest extends ProphecyTestCase
 {
     /**
      * @covers ::get

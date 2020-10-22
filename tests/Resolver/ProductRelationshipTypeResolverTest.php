@@ -9,12 +9,12 @@ use App\Event\ProductRelationship\BoxExperienceRelationshipBroadcastEvent;
 use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\Exception\Resolver\UnprocessableProductRelationshipTypeException;
 use App\Resolver\ProductRelationshipTypeResolver;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Resolver\ProductRelationshipTypeResolver
  */
-class ProductRelationshipTypeResolverTest extends TestCase
+class ProductRelationshipTypeResolverTest extends ProphecyTestCase
 {
     /**
      * @covers ::resolve

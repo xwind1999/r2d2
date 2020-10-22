@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Contract\Message;
 
 use App\Contract\Message\CalculateFlatManageableComponent;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
-class CalculateFlatManageableComponentTest extends TestCase
+class CalculateFlatManageableComponentTest extends ProphecyTestCase
 {
     public function testGetContext()
     {

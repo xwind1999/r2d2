@@ -7,7 +7,7 @@ namespace App\Tests\EventSubscriber\Manageable;
 use App\Event\Manageable\ManageableBoxEvent;
 use App\EventSubscriber\Manageable\ManageableBoxSubscriber;
 use App\Repository\BoxExperienceRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 /**
  * @coversDefaultClass \App\EventSubscriber\Manageable\ManageableBoxSubscriber
  */
-class ManageableBoxSubscriberTest extends TestCase
+class ManageableBoxSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

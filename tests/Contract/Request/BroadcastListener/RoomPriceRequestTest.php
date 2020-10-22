@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Contract\Request\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\RoomPriceRequest;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
-class RoomPriceRequestTest extends TestCase
+class RoomPriceRequestTest extends ProphecyTestCase
 {
     public function testGetEventName()
     {

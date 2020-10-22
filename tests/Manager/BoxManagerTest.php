@@ -20,7 +20,7 @@ use App\Exception\Repository\BoxNotFoundException;
 use App\Helper\Manageable\ManageableProductService;
 use App\Manager\BoxManager;
 use App\Repository\BoxRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Ramsey\Uuid\UuidInterface;
@@ -28,7 +28,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * @coversDefaultClass \App\Manager\BoxManager
  */
-class BoxManagerTest extends TestCase
+class BoxManagerTest extends ProphecyTestCase
 {
     /**
      * @var BoxRepository|ObjectProphecy

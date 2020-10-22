@@ -13,14 +13,14 @@ use App\Event\Product\ComponentBroadcastEvent;
 use App\EventSubscriber\ProductBroadcast\ComponentBroadcastSubscriber;
 use App\Exception\Manager\Component\OutdatedComponentException;
 use App\Manager\ComponentManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \App\EventSubscriber\ProductBroadcast\ComponentBroadcastSubscriber
  */
-class ComponentBroadcastSubscriberTest extends TestCase
+class ComponentBroadcastSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

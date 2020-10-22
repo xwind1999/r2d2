@@ -51,12 +51,12 @@ namespace App\Exception\Test {
 
 namespace App\Tests\Command {
     use App\Command\ExceptionDumpCommand;
+    use App\Tests\ProphecyKernelTestCase;
     use Symfony\Bundle\FrameworkBundle\Console\Application;
-    use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
     use Symfony\Component\Console\Tester\CommandTester;
     use Symfony\Component\Finder\SplFileInfo;
 
-    class ExceptionDumpCommandTest extends KernelTestCase
+    class ExceptionDumpCommandTest extends ProphecyKernelTestCase
     {
         /**
          * @var Application

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Helper\Serializer;
 
 use App\Helper\Serializer\StrictIntegerHandler;
+use App\Tests\ProphecyTestCase;
 use JMS\Serializer\Context;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
-use PHPUnit\Framework\TestCase;
 
-class StrictIntegerHandlerTest extends TestCase
+class StrictIntegerHandlerTest extends ProphecyTestCase
 {
     public function testDeserializeStrictIntegerFromJSON()
     {

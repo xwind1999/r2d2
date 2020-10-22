@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Constraint;
 
 use App\Constraint\RoomStockTypeConstraint;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
-class RoomStockTypeConstraintTest extends TestCase
+class RoomStockTypeConstraintTest extends ProphecyTestCase
 {
     /**
      * @dataProvider validValues

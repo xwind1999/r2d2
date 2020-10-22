@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Messenger\EventListener;
 
 use App\Messenger\EventListener\EntityManagerClosedExceptionListener;
+use App\Tests\ProphecyTestCase;
 use Doctrine\ORM\ORMException;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 /**
  * @coversDefaultClass \App\Messenger\EventListener\EntityManagerClosedExceptionListener
  */
-class EntityManagerClosedExceptionListenerTest extends TestCase
+class EntityManagerClosedExceptionListenerTest extends ProphecyTestCase
 {
     /**
      * @var CacheItemPoolInterface

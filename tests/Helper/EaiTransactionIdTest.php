@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Helper;
 
 use App\Helper\EaiTransactionId;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * @coversDefaultClass \App\Helper\EaiTransactionId
  */
-class EaiTransactionIdTest extends TestCase
+class EaiTransactionIdTest extends ProphecyTestCase
 {
     /**
      * @var ObjectProphecy|RequestStack

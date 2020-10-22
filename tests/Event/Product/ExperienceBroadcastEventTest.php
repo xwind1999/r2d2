@@ -6,12 +6,12 @@ namespace App\Tests\Event\Product;
 
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\ExperienceBroadcastEvent;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Event\Product\ExperienceBroadcastEvent
  */
-class ExperienceBroadcastEventTest extends TestCase
+class ExperienceBroadcastEventTest extends ProphecyTestCase
 {
     /**
      * @covers ::__construct

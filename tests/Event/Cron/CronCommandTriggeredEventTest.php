@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Event\Cron;
 
 use App\Event\Cron\CronCommandTriggeredEvent;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Symfony\Component\Console\Command\Command;
 
 /**
  * @coversDefaultClass \App\Event\Cron\CronCommandTriggeredEvent
  */
-class CronCommandTriggeredEventTest extends TestCase
+class CronCommandTriggeredEventTest extends ProphecyTestCase
 {
     private CronCommandTriggeredEvent $event;
 

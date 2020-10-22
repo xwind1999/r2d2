@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Contract\Request\BroadcastListener\Product;
 
 use App\Contract\Request\BroadcastListener\Product\Product;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Ramsey\Uuid\Uuid;
 
 /**
  * @coversDefaultClass \App\Contract\Request\BroadcastListener\Product\Product
  * @group broadcast-product
  */
-class ProductTest extends TestCase
+class ProductTest extends ProphecyTestCase
 {
     /**
      * @covers ::getContext

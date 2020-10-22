@@ -8,12 +8,12 @@ use App\Constants\AvailabilityConstants;
 use App\Constants\DateTimeConstants;
 use App\Exception\Helper\InvalidDatesForPeriod;
 use App\Helper\AvailabilityHelper;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Helper\AvailabilityHelper
  */
-class AvailabilityHelperTest extends TestCase
+class AvailabilityHelperTest extends ProphecyTestCase
 {
     /**
      * @covers ::convertAvailabilityTypeToExplicitQuickdataValue

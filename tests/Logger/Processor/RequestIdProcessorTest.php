@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Logger\Processor;
 
 use App\Logger\Processor\RequestIdProcessor;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Ramsey\Uuid\UuidInterface;
 
 /**
  * @coversDefaultClass \App\Logger\Processor\RequestIdProcessor
  */
-class RequestIdProcessorTest extends TestCase
+class RequestIdProcessorTest extends ProphecyTestCase
 {
     /**
      * @covers ::__construct

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Command {
     use App\Command\ApiDumpCommand;
+    use App\Tests\ProphecyKernelTestCase;
     use Nelmio\ApiDocBundle\ApiDocGenerator;
     use OpenApi\Annotations\OpenApi;
     use Prophecy\Argument;
     use Prophecy\Prophecy\ObjectProphecy;
     use Symfony\Bundle\FrameworkBundle\Console\Application;
-    use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
     use Symfony\Component\Console\Input\InputOption;
     use Symfony\Component\Console\Tester\CommandTester;
 
-    class ApiDumpCommandTest extends KernelTestCase
+    class ApiDumpCommandTest extends ProphecyKernelTestCase
     {
         /**
          * @var Application

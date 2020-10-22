@@ -11,13 +11,13 @@ use App\Contract\Request\Manageable\ManageableProductRequest;
 use App\Event\Manageable\ManageablePartnerEvent;
 use App\Exception\Resolver\UnprocessableManageableProductTypeException;
 use App\Resolver\ManageableProductResolver;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @coversDefaultClass \App\Resolver\ManageableProductResolver
  */
-class ManageableProductResolverTest extends TestCase
+class ManageableProductResolverTest extends ProphecyTestCase
 {
     /**
      * @var ManageableProductRequest|ObjectProphecy

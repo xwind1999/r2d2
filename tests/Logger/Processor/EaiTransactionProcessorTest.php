@@ -6,12 +6,12 @@ namespace App\Tests\Logger\Processor;
 
 use App\Helper\EaiTransactionId;
 use App\Logger\Processor\EaiTransactionProcessor;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Logger\Processor\EaiTransactionProcessor
  */
-class EaiTransactionProcessorTest extends TestCase
+class EaiTransactionProcessorTest extends ProphecyTestCase
 {
     /**
      * @var \Prophecy\Prophecy\ObjectProphecy

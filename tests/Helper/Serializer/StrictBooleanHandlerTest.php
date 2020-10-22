@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Helper\Serializer;
 
 use App\Helper\Serializer\StrictBooleanHandler;
+use App\Tests\ProphecyTestCase;
 use JMS\Serializer\Context;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
-use PHPUnit\Framework\TestCase;
 
-class StrictBooleanHandlerTest extends TestCase
+class StrictBooleanHandlerTest extends ProphecyTestCase
 {
     public function testDeserializeStrictBooleanFromJSON()
     {

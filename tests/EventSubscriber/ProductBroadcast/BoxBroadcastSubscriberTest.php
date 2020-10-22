@@ -13,14 +13,14 @@ use App\Event\Product\BoxBroadcastEvent;
 use App\EventSubscriber\ProductBroadcast\BoxBroadcastSubscriber;
 use App\Exception\Manager\Box\OutdatedBoxException;
 use App\Manager\BoxManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \App\EventSubscriber\ProductBroadcast\BoxBroadcastSubscriber
  */
-class BoxBroadcastSubscriberTest extends TestCase
+class BoxBroadcastSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

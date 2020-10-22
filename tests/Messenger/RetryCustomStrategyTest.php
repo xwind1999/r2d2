@@ -11,7 +11,7 @@ use App\Exception\Repository\ExperienceNotFoundException;
 use App\Exception\Repository\RoomAvailabilityNotFoundException;
 use App\Exception\Resolver\UnprocessableProductTypeException;
 use App\Messenger\RetryCustomStrategy;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceivedStamp;
@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
  * @coversDefaultClass \App\Messenger\RetryCustomStrategy
  * @group retry-strategy
  */
-class RetryCustomStrategyTest extends TestCase
+class RetryCustomStrategyTest extends ProphecyTestCase
 {
     private RetryCustomStrategy $retryCustomStrategy;
     private ObjectProphecy $logger;

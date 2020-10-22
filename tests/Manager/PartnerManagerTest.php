@@ -14,7 +14,7 @@ use App\Exception\Repository\PartnerNotFoundException;
 use App\Helper\Manageable\ManageableProductService;
 use App\Manager\PartnerManager;
 use App\Repository\PartnerRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Ramsey\Uuid\UuidInterface;
@@ -22,7 +22,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * @coversDefaultClass \App\Manager\PartnerManager
  */
-class PartnerManagerTest extends TestCase
+class PartnerManagerTest extends ProphecyTestCase
 {
     /**
      * @var ObjectProphecy|PartnerRepository

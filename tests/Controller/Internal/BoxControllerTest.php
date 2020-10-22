@@ -14,16 +14,16 @@ use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Manager\BoxManager;
+use App\Tests\ProphecyTestCase;
 use Doctrine\DBAL\Driver\DriverException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
  * @coversDefaultClass \App\Controller\Internal\BoxController
  */
-class BoxControllerTest extends TestCase
+class BoxControllerTest extends ProphecyTestCase
 {
     /**
      * @covers ::get

@@ -11,15 +11,15 @@ use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\RequestQueryInterface;
 use App\Helper\Request\RequestQueryResolver;
 use App\Helper\Request\ValidatableRequest;
+use App\Tests\ProphecyTestCase;
 use JMS\Serializer\ArrayTransformerInterface;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class RequestQueryResolverTest extends TestCase
+class RequestQueryResolverTest extends ProphecyTestCase
 {
     /**
      * @var ArrayTransformerInterface|ObjectProphecy

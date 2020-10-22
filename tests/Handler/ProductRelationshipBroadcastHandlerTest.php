@@ -9,15 +9,15 @@ use App\Event\ProductRelationship\ExperienceComponentRelationshipBroadcastEvent;
 use App\Exception\Resolver\UnprocessableProductRelationshipTypeException;
 use App\Handler\ProductRelationshipBroadcastHandler;
 use App\Resolver\ProductRelationshipTypeResolver;
+use App\Tests\ProphecyTestCase;
 use phpDocumentor\Reflection\Types\Void_;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @coversDefaultClass \App\Handler\ProductRelationshipBroadcastHandler
  */
-class ProductRelationshipBroadcastHandlerTest extends TestCase
+class ProductRelationshipBroadcastHandlerTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject

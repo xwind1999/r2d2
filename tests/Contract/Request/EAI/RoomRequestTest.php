@@ -7,12 +7,12 @@ namespace App\Tests\Contract\Request\EAI;
 use App\Contract\Request\EAI\RoomRequest;
 use App\Entity\Component;
 use App\Entity\Partner;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Contract\Request\EAI\RoomRequest
  */
-class RoomRequestTest extends TestCase
+class RoomRequestTest extends ProphecyTestCase
 {
     /**
      * @covers ::transformFromComponent

@@ -11,16 +11,16 @@ use App\Entity\Box;
 use App\Entity\Experience;
 use App\Entity\Partner;
 use App\Helper\Manageable\ManageableProductService;
+use App\Tests\ProphecyKernelTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @coversDefaultClass \App\Helper\Manageable\ManageableProductService
  */
-class ManageableProductServiceTest extends KernelTestCase
+class ManageableProductServiceTest extends ProphecyKernelTestCase
 {
     /**
      * @var MessageBusInterface|ObjectProphecy

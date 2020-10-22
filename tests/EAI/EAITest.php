@@ -6,7 +6,7 @@ namespace App\Tests\EAI;
 
 use App\Contract\Request\EAI\RoomRequest;
 use App\EAI\EAI;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Smartbox\ApiRestClient\ApiRestResponse;
@@ -16,7 +16,7 @@ use Smartbox\CDM\Entity\Booking\ChannelManagerBooking;
 /**
  * @coversDefaultClass \App\EAI\EAI
  */
-class EAITest extends TestCase
+class EAITest extends ProphecyTestCase
 {
     /**
      * @var EaiV0Client|ObjectProphecy

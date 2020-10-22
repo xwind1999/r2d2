@@ -10,14 +10,14 @@ use App\Event\Product\AvailabilityUpdatedEvent;
 use App\EventSubscriber\Availability\AvailabilityCacheInvalidator;
 use App\Helper\DateDurationExpander;
 use App\Repository\Flat\FlatManageableComponentRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @coversDefaultClass \App\EventSubscriber\Availability\AvailabilityCacheInvalidator
  */
-class AvailabilityCacheInvalidatorTest extends TestCase
+class AvailabilityCacheInvalidatorTest extends ProphecyTestCase
 {
     /**
      * @var ObjectProphecy|QuickDataCache

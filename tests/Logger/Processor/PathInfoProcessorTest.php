@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Logger\Processor;
 
 use App\Logger\Processor\PathInfoProcessor;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class PathInfoProcessorTest extends TestCase
+class PathInfoProcessorTest extends ProphecyTestCase
 {
     public function testAddInfo(): void
     {

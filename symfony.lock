@@ -8,6 +8,9 @@
     "behat/transliterator": {
         "version": "v1.3.0"
     },
+    "brick/math": {
+        "version": "0.9.1"
+    },
     "composer/semver": {
         "version": "1.5.1"
     },
@@ -124,9 +127,6 @@
             "config/packages/prod/ekino_new_relic.yaml"
         ]
     },
-    "exsyst/swagger": {
-        "version": "v0.4.1"
-    },
     "felixfbecker/advanced-json-rpc": {
         "version": "v3.0.4"
     },
@@ -159,6 +159,12 @@
     },
     "guzzlehttp/psr7": {
         "version": "1.6.1"
+    },
+    "infection/abstract-testframework-adapter": {
+        "version": "0.3.1"
+    },
+    "infection/include-interceptor": {
+        "version": "0.2.4"
     },
     "infection/infection": {
         "version": "0.15.0"
@@ -250,6 +256,9 @@
     "ocramius/proxy-manager": {
         "version": "2.6.0"
     },
+    "ondram/ci-detector": {
+        "version": "3.5.1"
+    },
     "openlss/lib-array2xml": {
         "version": "1.0.0"
     },
@@ -280,6 +289,9 @@
     "phpspec/prophecy": {
         "version": "v1.10.2"
     },
+    "phpspec/prophecy-phpunit": {
+        "version": "v2.0.1"
+    },
     "phpstan/phpstan": {
         "version": "0.12.7"
     },
@@ -288,6 +300,9 @@
     },
     "phpunit/php-file-iterator": {
         "version": "2.0.2"
+    },
+    "phpunit/php-invoker": {
+        "version": "3.1.1"
     },
     "phpunit/php-text-template": {
         "version": "1.2.1"
@@ -334,6 +349,9 @@
     "ralouphie/getallheaders": {
         "version": "3.0.3"
     },
+    "ramsey/collection": {
+        "version": "1.1.1"
+    },
     "ramsey/uuid": {
         "version": "3.9.2"
     },
@@ -349,11 +367,23 @@
             "config/packages/ramsey_uuid_doctrine.yaml"
         ]
     },
+    "sanmai/pipeline": {
+        "version": "v5.0.1"
+    },
+    "sebastian/cli-parser": {
+        "version": "1.0.1"
+    },
+    "sebastian/code-unit": {
+        "version": "1.0.7"
+    },
     "sebastian/code-unit-reverse-lookup": {
         "version": "1.0.1"
     },
     "sebastian/comparator": {
         "version": "3.0.2"
+    },
+    "sebastian/complexity": {
+        "version": "2.0.1"
     },
     "sebastian/diff": {
         "version": "3.0.2"
@@ -366,6 +396,9 @@
     },
     "sebastian/global-state": {
         "version": "3.0.0"
+    },
+    "sebastian/lines-of-code": {
+        "version": "1.0.1"
     },
     "sebastian/object-enumerator": {
         "version": "3.0.3"

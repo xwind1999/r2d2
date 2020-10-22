@@ -20,14 +20,14 @@ use App\Manager\BoxManager;
 use App\Repository\BoxExperienceRepository;
 use App\Repository\BoxRepository;
 use App\Repository\ExperienceRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @coversDefaultClass \App\Manager\BoxExperienceManager
  */
-class BoxExperienceManagerTest extends TestCase
+class BoxExperienceManagerTest extends ProphecyTestCase
 {
     /**
      * @var BoxExperienceRepository|ObjectProphecy

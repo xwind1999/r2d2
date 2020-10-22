@@ -8,14 +8,14 @@ use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Exception\Manager\Partner\OutdatedPartnerException;
 use App\Handler\PartnerBroadcastHandler;
 use App\Manager\PartnerManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \App\Handler\PartnerBroadcastHandler
  */
-class PartnerBroadcastHandlerTest extends TestCase
+class PartnerBroadcastHandlerTest extends ProphecyTestCase
 {
     /**
      * @covers ::__construct

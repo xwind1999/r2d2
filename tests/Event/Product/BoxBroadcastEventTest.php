@@ -6,12 +6,12 @@ namespace App\Tests\Event\Product;
 
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Event\Product\BoxBroadcastEvent;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Event\Product\BoxBroadcastEvent
  */
-class BoxBroadcastEventTest extends TestCase
+class BoxBroadcastEventTest extends ProphecyTestCase
 {
     /**
      * @covers ::__construct

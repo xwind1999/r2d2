@@ -7,7 +7,7 @@ namespace App\Tests\Messenger;
 use App\Http\CorrelationId\CorrelationId;
 use App\Messenger\CorrelationIdMiddleware;
 use App\Messenger\Stamp\CorrelationIdStamp;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Stamp\SentStamp;
 /**
  * @coversDefaultClass \App\Messenger\CorrelationIdMiddleware
  */
-class CorrelationIdMiddlewareTest extends TestCase
+class CorrelationIdMiddlewareTest extends ProphecyTestCase
 {
     private $correlationId;
 

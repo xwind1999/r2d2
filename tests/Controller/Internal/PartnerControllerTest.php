@@ -13,14 +13,14 @@ use App\Entity\Partner;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\PartnerNotFoundException;
 use App\Manager\PartnerManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
  * @coversDefaultClass \App\Controller\Internal\PartnerController
  */
-class PartnerControllerTest extends TestCase
+class PartnerControllerTest extends ProphecyTestCase
 {
     /**
      * @covers ::get

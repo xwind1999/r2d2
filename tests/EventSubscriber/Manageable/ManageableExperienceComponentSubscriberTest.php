@@ -9,7 +9,7 @@ use App\Entity\Partner;
 use App\Event\Manageable\ManageableExperienceComponentEvent;
 use App\EventSubscriber\Manageable\ManageableExperienceComponentSubscriber;
 use App\Manager\ComponentManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @coversDefaultClass \App\EventSubscriber\Manageable\ManageableExperienceComponentSubscriber
  */
-class ManageableExperienceComponentSubscriberTest extends TestCase
+class ManageableExperienceComponentSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

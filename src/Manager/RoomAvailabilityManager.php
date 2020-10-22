@@ -82,14 +82,21 @@ class RoomAvailabilityManager
 
         /** @var \DateTime $date */
         foreach ($datePeriod as $date) {
-            $roomAvailability = $roomAvailabilityList[$date->format('Y-m-d')] ?? new RoomAvailability();
+            $newAvailability = true;
+            $roomAvailability = new RoomAvailability();
+
+            if (isset($roomAvailabilityList[$date->format('Y-m-d')])) {
+                $roomAvailability = $roomAvailabilityList[$date->format('Y-m-d')];
+                $newAvailability = false;
+            }
+
             if ($roomAvailability->externalUpdatedAt &&
                 $roomAvailabilityRequest->updatedAt < $roomAvailability->externalUpdatedAt) {
                 $this->logger->warning(OutdatedRoomAvailabilityInformationException::class, $roomAvailabilityRequest->getContext());
                 continue;
             }
 
-            if ($this->hasAvailabilityChangedForBoxCache($roomAvailabilityRequest, $roomAvailability)) {
+            if (true === $newAvailability || $this->hasAvailabilityChangedForBoxCache($roomAvailabilityRequest, $roomAvailability)) {
                 $changedDates[$date->format('Y-m-d')] = $date;
             }
 
@@ -132,11 +139,6 @@ class RoomAvailabilityManager
         RoomAvailabilityRequest $roomAvailabilityRequest,
         RoomAvailability $roomAvailability
     ): bool {
-        //check if its a new availability
-        if (!isset($roomAvailability->isStopSale) || !isset($roomAvailability->stock)) {
-            return true;
-        }
-
         $hasStopSaleChanged = $roomAvailability->isStopSale !== $roomAvailabilityRequest->isStopSale;
 
         $hasStockChanged = $roomAvailability->stock !== $roomAvailabilityRequest->quantity;

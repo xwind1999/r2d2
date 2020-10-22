@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Helper;
 
 use App\Exception\Helper\InvalidCSVHeadersException;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use App\Tests\ProphecyKernelTestCase;
 
 /**
  * @coversDefaultClass \App\Helper\CSVParser
  */
-class CSVParserTest extends KernelTestCase
+class CSVParserTest extends ProphecyKernelTestCase
 {
     private $tmpFile;
 

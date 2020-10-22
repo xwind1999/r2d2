@@ -7,7 +7,7 @@ namespace App\Tests\Messenger;
 use App\Helper\EaiTransactionId;
 use App\Messenger\EaiTransactionIdMiddleware;
 use App\Messenger\Stamp\EaiTransactionIdStamp;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Stamp\SentStamp;
 /**
  * @coversDefaultClass \App\Messenger\EaiTransactionIdMiddleware
  */
-class EaiTransactionIdMiddlewareTest extends TestCase
+class EaiTransactionIdMiddlewareTest extends ProphecyTestCase
 {
     private $eaiTransactionId;
 

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Helper\Serializer;
 
 use App\Helper\Serializer\CSVHandler;
+use App\Tests\ProphecyTestCase;
 use JMS\Serializer\Context;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
-use PHPUnit\Framework\TestCase;
 
-class CSVHandlerTest extends TestCase
+class CSVHandlerTest extends ProphecyTestCase
 {
     public function testDeserializeCSVFromJSON()
     {

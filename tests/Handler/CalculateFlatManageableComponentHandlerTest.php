@@ -7,13 +7,13 @@ namespace App\Tests\Handler;
 use App\Contract\Message\CalculateFlatManageableComponent;
 use App\Handler\CalculateFlatManageableComponentHandler;
 use App\Repository\Flat\FlatManageableComponentRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @coversDefaultClass \App\Handler\CalculateFlatManageableComponentHandler
  */
-class CalculateFlatManageableComponentHandlerTest extends TestCase
+class CalculateFlatManageableComponentHandlerTest extends ProphecyTestCase
 {
     /**
      * @var FlatManageableComponentRepository|ObjectProphecy

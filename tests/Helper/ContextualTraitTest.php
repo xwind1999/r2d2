@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Helper;
 
 use App\Helper\ContextualTrait;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Helper\ContextualTrait
  */
-class ContextualTraitTest extends TestCase
+class ContextualTraitTest extends ProphecyTestCase
 {
     /**
      * @covers ::getContext

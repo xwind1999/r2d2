@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Event\Cleanup;
 
 use App\Event\Cleanup\AvailabilityCleanupEvent;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Event\Cleanup\AvailabilityCleanupEvent
  */
-class AvailabilityCleanupEventTest extends TestCase
+class AvailabilityCleanupEventTest extends ProphecyTestCase
 {
     /**
      * @covers ::getEventName

@@ -6,14 +6,14 @@ namespace App\Tests\Command\Cron;
 
 use App\Command\Cron\CronCleanupRoomAvailabilityCommand;
 use App\Event\Cleanup\AvailabilityCleanupEvent;
+use App\Tests\ProphecyKernelTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CronCleanupRoomAvailabilityCommandTest extends KernelTestCase
+class CronCleanupRoomAvailabilityCommandTest extends ProphecyKernelTestCase
 {
     /**
      * @var Application

@@ -6,12 +6,12 @@ namespace App\Tests\Helper;
 
 use App\Entity\Component;
 use App\Helper\DateDurationExpander;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Helper\DateDurationExpander
  */
-class DateDurationExpanderTest extends TestCase
+class DateDurationExpanderTest extends ProphecyTestCase
 {
     private DateDurationExpander $dateDurationExpander;
 

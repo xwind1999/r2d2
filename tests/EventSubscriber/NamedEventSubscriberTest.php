@@ -6,12 +6,12 @@ namespace App\Tests\EventSubscriber;
 
 use App\Event\NamedEventInterface;
 use App\EventSubscriber\NamedEventSubscriber;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class NamedEventSubscriberTest extends TestCase
+class NamedEventSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

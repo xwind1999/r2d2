@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Constraint;
 
 use App\Constraint\BookingStatusConstraint;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
-class BookingStatusConstraintTest extends TestCase
+class BookingStatusConstraintTest extends ProphecyTestCase
 {
     /**
      * @dataProvider validValues

@@ -14,16 +14,16 @@ use App\Exception\Http\ResourceConflictException;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceManager;
+use App\Tests\ProphecyTestCase;
 use Doctrine\DBAL\Driver\DriverException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
  * @coversDefaultClass \App\Controller\Internal\ExperienceController
  */
-class ExperienceControllerTest extends TestCase
+class ExperienceControllerTest extends ProphecyTestCase
 {
     /**
      * @covers ::get

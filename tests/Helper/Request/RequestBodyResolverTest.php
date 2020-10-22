@@ -10,8 +10,8 @@ use App\Exception\Http\UnprocessableEntityException;
 use App\Helper\Request\RequestBodyInterface;
 use App\Helper\Request\RequestBodyResolver;
 use App\Helper\Request\ValidatableRequest;
+use App\Tests\ProphecyTestCase;
 use JMS\Serializer\SerializerInterface;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @coversDefaultClass \App\Helper\Request\RequestBodyResolver
  */
-class RequestBodyResolverTest extends TestCase
+class RequestBodyResolverTest extends ProphecyTestCase
 {
     /**
      * @var ObjectProphecy|SerializerInterface

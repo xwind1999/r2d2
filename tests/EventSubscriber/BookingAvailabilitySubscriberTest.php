@@ -11,8 +11,8 @@ use App\Event\BookingStatusEvent;
 use App\EventSubscriber\BookingAvailabilitySubscriber;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\RoomAvailabilityManager;
+use App\Tests\ProphecyTestCase;
 use Doctrine\Common\Collections\ArrayCollection;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
  * @coversDefaultClass \App\EventSubscriber\BookingAvailabilitySubscriber
  * @group booking-availability
  */
-class BookingAvailabilitySubscriberTest extends TestCase
+class BookingAvailabilitySubscriberTest extends ProphecyTestCase
 {
     /**
      * @var ObjectProphecy | RoomAvailabilityManager

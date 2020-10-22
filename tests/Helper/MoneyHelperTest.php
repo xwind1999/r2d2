@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Helper;
 
 use App\Helper\MoneyHelper;
+use App\Tests\ProphecyTestCase;
 use Money\Money;
-use PHPUnit\Framework\TestCase;
 
-class MoneyHelperTest extends TestCase
+class MoneyHelperTest extends ProphecyTestCase
 {
     public function testCreate()
     {

@@ -13,12 +13,12 @@ use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Manager\BoxExperience\RelationshipAlreadyExistsException;
 use App\Exception\Repository\BoxNotFoundException;
 use App\Manager\BoxExperienceManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Controller\Internal\BoxExperienceController
  */
-class BoxExperienceControllerTest extends TestCase
+class BoxExperienceControllerTest extends ProphecyTestCase
 {
     /**
      * @covers ::delete

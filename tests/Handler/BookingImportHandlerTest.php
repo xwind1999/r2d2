@@ -9,14 +9,14 @@ use App\Contract\Request\Booking\BookingImport\BookingImportRequest;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Handler\BookingImportHandler;
 use App\Manager\BookingManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \App\Handler\BookingImportHandler
  */
-class BookingImportHandlerTest extends TestCase
+class BookingImportHandlerTest extends ProphecyTestCase
 {
     /**
      * @dataProvider bookingImportRequestProvider

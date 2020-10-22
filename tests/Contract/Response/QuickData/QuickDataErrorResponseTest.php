@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Contract\Response\QuickData;
 
 use App\Contract\Response\QuickData\QuickDataErrorResponse;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
-class QuickDataErrorResponseTest extends TestCase
+class QuickDataErrorResponseTest extends ProphecyTestCase
 {
     public function testGetHttpCode()
     {

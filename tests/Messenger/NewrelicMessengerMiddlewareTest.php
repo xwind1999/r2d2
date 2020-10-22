@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\Messenger;
 
 use App\Messenger\NewrelicMessengerMiddleware;
+use App\Tests\ProphecyTestCase;
 use Ekino\NewRelicBundle\NewRelic\NewRelicInteractorInterface;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 
-class NewrelicMessengerMiddlewareTest extends TestCase
+class NewrelicMessengerMiddlewareTest extends ProphecyTestCase
 {
     /**
      * @var NewRelicInteractorInterface|ObjectProphecy
