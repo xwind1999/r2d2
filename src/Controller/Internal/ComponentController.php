@@ -26,10 +26,8 @@ class ComponentController
      * @Route("/internal/component", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="component")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=ComponentCreateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=ComponentCreateRequest::class)
      * )
      * @OA\Response(
      *     response=201,
@@ -122,10 +120,8 @@ class ComponentController
      *         format="uuid"
      *     )
      * )
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=ComponentUpdateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=ComponentUpdateRequest::class)
      * )
      * @OA\Response(
      *     response=200,

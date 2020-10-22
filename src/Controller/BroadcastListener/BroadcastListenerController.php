@@ -8,9 +8,7 @@ use App\Contract\Request\BroadcastListener\PartnerRequest;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Contract\Request\BroadcastListener\ProductRelationshipRequest;
 use App\Contract\Request\BroadcastListener\ProductRequest;
-use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
-use App\Contract\Request\BroadcastListener\RoomPriceRequest;
 use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -29,10 +27,8 @@ class BroadcastListenerController
      * @Route("/broadcast-listener/product", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="broadcast-listener")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=ProductRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=ProductRequest::class)
      * )
      * @OA\Response(
      *     response=202,
@@ -53,10 +49,8 @@ class BroadcastListenerController
      * @Route("/broadcast-listener/partner", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="broadcast-listener")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=PartnerRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=PartnerRequest::class)
      * )
      * @OA\Response(
      *     response=202,
@@ -77,10 +71,8 @@ class BroadcastListenerController
      * @Route("/broadcast-listener/product-relationship", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="broadcast-listener")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=ProductRelationshipRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=ProductRelationshipRequest::class)
      * )
      * @OA\Response(
      *     response=202,
@@ -104,10 +96,8 @@ class BroadcastListenerController
      * @Route("/broadcast-listener/price-information", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="broadcast-listener")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=PriceInformationRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=PriceInformationRequest::class)
      * )
      * @OA\Response(
      *     response=202,
@@ -131,17 +121,12 @@ class BroadcastListenerController
      * @Route("/broadcast-listener/room-availability", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="broadcast-listener")
-     * @OA\Parameter(
-     *    name="body",
-     *    in="query",
-     *    @OA\Schema(
-     *        type="array",
-     *        @OA\Items(
-     *            ref=@Model(type=RoomAvailabilityRequest::class)
-     *        )
-     *    )
+     * @OA\RequestBody(
+     *     @OA\JsonContent(
+     *         type="array",
+     *         @OA\Items(ref=@Model(type="App\Contract\Request\BroadcastListener\RoomAvailabilityRequest"))
+     *     )
      * )
-     *
      * @OA\Response(
      *     response=202,
      *     description="Room availability handled")
@@ -161,15 +146,11 @@ class BroadcastListenerController
      * @Route("/broadcast-listener/room-price", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="broadcast-listener")
-     * @OA\Parameter(
-     *    name="body",
-     *    in="query",
-     *    @OA\Schema(
-     *        type="array",
-     *        @OA\Items(
-     *            ref=@Model(type=RoomPriceRequest::class)
-     *        )
-     *    )
+     * @OA\RequestBody(
+     *     @OA\JsonContent(
+     *         type="array",
+     *         @OA\Items(ref=@Model(type="App\Contract\Request\BroadcastListener\RoomPriceRequest"))
+     *     )
      * )
      * @OA\Response(
      *     response=202,

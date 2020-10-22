@@ -28,10 +28,8 @@ class ExperienceController
      * @Route("/internal/experience", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="experience")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=ExperienceCreateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=ExperienceCreateRequest::class)
      * )
      * @OA\Response(
      *     response=201,
@@ -130,10 +128,8 @@ class ExperienceController
      *         format="uuid"
      *     )
      * )
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=ExperienceUpdateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=ExperienceUpdateRequest::class)
      * )
      * @OA\Response(
      *     response=200,

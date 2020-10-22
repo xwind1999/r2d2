@@ -26,10 +26,8 @@ class PartnerController
      * @Route("/internal/partner", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="partner")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=PartnerCreateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=PartnerCreateRequest::class)
      * )
      * @OA\Response(
      *     response=201,
@@ -122,10 +120,8 @@ class PartnerController
      *         format="uuid"
      *     )
      * )
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=PartnerUpdateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=PartnerUpdateRequest::class)
      * )
      * @OA\Response(
      *     response=200,

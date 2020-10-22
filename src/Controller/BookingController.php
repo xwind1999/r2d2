@@ -21,10 +21,8 @@ class BookingController
      * @Route("/booking", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="booking")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=BookingCreateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=BookingCreateRequest::class)
      * )
      * @OA\Response(
      *     response=201,
@@ -60,10 +58,8 @@ class BookingController
      * @Route("/booking", methods={"PATCH"}, format="json")
      *
      * @OA\Tag(name="booking")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=BookingUpdateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=BookingUpdateRequest::class)
      * )
      * @OA\Response(
      *     response=204,
