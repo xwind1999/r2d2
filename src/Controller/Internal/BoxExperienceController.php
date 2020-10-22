@@ -24,10 +24,8 @@ class BoxExperienceController
      * @Route("/internal/box-experience", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="box-experience")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=BoxExperienceCreateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=BoxExperienceCreateRequest::class)
      * )
      * @OA\Response(
      *     response=201,
@@ -61,10 +59,8 @@ class BoxExperienceController
      * @Route("/internal/box-experience", methods={"DELETE"}, format="json")
      *
      * @OA\Tag(name="box-experience")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=BoxExperienceDeleteRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=BoxExperienceDeleteRequest::class)
      * )
      * @OA\Response(
      *     response=204,

@@ -27,10 +27,8 @@ class ExperienceComponentController
      * @Route("/internal/experience-component", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="experience-component")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=ExperienceComponentCreateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=ExperienceComponentCreateRequest::class)
      * )
      * @OA\Response(
      *     response=201,
@@ -66,10 +64,8 @@ class ExperienceComponentController
      * @Route("/internal/experience-component", methods={"DELETE"}, format="json")
      *
      * @OA\Tag(name="experience-component")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=ExperienceComponentDeleteRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=ExperienceComponentDeleteRequest::class)
      * )
      * @OA\Response(
      *     response=204,
@@ -100,10 +96,8 @@ class ExperienceComponentController
      * @Route("/internal/experience-component/", methods={"PUT"}, format="json")
      *
      * @OA\Tag(name="experience-component")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=ExperienceComponentUpdateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=ExperienceComponentUpdateRequest::class)
      * )
      * @OA\Response(
      *     response=200,

@@ -28,10 +28,8 @@ class BoxController
      * @Route("/internal/box", methods={"POST"}, format="json")
      *
      * @OA\Tag(name="box")
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=BoxCreateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=BoxCreateRequest::class)
      * )
      * @OA\Response(
      *     response=201,
@@ -128,10 +126,8 @@ class BoxController
      *         format="uuid"
      *     )
      * )
-     * @OA\Parameter(
-     *         name="body",
-     *         in="query",
-     *         @Model(type=BoxUpdateRequest::class)
+     * @OA\RequestBody(
+     *     @Model(type=BoxUpdateRequest::class)
      * )
      * @OA\Response(
      *     response=200,
