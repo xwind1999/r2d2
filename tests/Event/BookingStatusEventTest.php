@@ -7,12 +7,12 @@ namespace App\Tests\Event;
 use App\Constraint\BookingStatusConstraint;
 use App\Entity\Booking;
 use App\Event\BookingStatusEvent;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Event\BookingStatusEvent
  */
-class BookingStatusEventTest extends TestCase
+class BookingStatusEventTest extends ProphecyTestCase
 {
     /**
      * @covers ::__construct

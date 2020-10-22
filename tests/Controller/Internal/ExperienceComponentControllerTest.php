@@ -16,12 +16,12 @@ use App\Exception\Manager\ExperienceComponent\RelationshipAlreadyExistsException
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\ExperienceComponentNotFoundException;
 use App\Manager\ExperienceComponentManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Controller\Internal\ExperienceComponentController
  */
-class ExperienceComponentControllerTest extends TestCase
+class ExperienceComponentControllerTest extends ProphecyTestCase
 {
     /**
      * @covers ::delete

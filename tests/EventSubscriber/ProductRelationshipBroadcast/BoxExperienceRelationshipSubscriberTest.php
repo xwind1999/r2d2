@@ -11,14 +11,14 @@ use App\Exception\Manager\BoxExperience\OutdatedBoxExperienceRelationshipExcepti
 use App\Exception\Repository\BoxNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\BoxExperienceManager;
+use App\Tests\ProphecyTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \App\EventSubscriber\ProductRelationshipBroadcast\BoxExperienceRelationshipSubscriber
  */
-class BoxExperienceRelationshipSubscriberTest extends TestCase
+class BoxExperienceRelationshipSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|MockObject

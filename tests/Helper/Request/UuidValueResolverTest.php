@@ -6,13 +6,13 @@ namespace App\Tests\Helper\Request;
 
 use App\Exception\Http\UnprocessableEntityException;
 use App\Helper\Request\UuidValueResolver;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-class UuidValueResolverTest extends TestCase
+class UuidValueResolverTest extends ProphecyTestCase
 {
     /**
      * @dataProvider providerSupports
@@ -34,7 +34,7 @@ class UuidValueResolverTest extends TestCase
 
         $requestBodyResolver = new UuidValueResolver();
 
-        $this->assertInstanceOf(Uuid::class, $requestBodyResolver->resolve($request, $argumentMetadata)[0]);
+        $this->assertInstanceOf(UuidInterface::class, $requestBodyResolver->resolve($request, $argumentMetadata)[0]);
     }
 
     public function testResolveNullable(): void

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Contract\Response;
 
 use App\Contract\Response\ErrorResponse;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Contract\Response\ErrorResponse
  */
-class ErrorResponseTest extends TestCase
+class ErrorResponseTest extends ProphecyTestCase
 {
     /**
      * @covers ::toArray

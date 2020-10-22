@@ -6,13 +6,13 @@ namespace App\Tests\Logger\Processor;
 
 use App\Http\CorrelationId\CorrelationId;
 use App\Logger\Processor\CorrelationIdProcessor;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @coversDefaultClass \App\Logger\Processor\CorrelationIdProcessor
  */
-class CorrelationIdProcessorTest extends TestCase
+class CorrelationIdProcessorTest extends ProphecyTestCase
 {
     /**
      * @var CorrelationId|ObjectProphecy

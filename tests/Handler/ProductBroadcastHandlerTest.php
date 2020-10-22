@@ -14,8 +14,8 @@ use App\Event\Product\BoxBroadcastEvent;
 use App\Exception\Resolver\UnprocessableProductTypeException;
 use App\Handler\ProductBroadcastHandler;
 use App\Resolver\ProductTypeResolver;
+use App\Tests\ProphecyTestCase;
 use phpDocumentor\Reflection\Types\Void_;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @coversDefaultClass \App\Handler\ProductBroadcastHandler
  */
-class ProductBroadcastHandlerTest extends TestCase
+class ProductBroadcastHandlerTest extends ProphecyTestCase
 {
     /**
      * @covers ::__construct

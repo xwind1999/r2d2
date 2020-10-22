@@ -9,11 +9,11 @@ use App\Event\Http\ExternalServiceRequestMadeEvent;
 use App\Event\Http\WellFormedResponseReceivedEvent;
 use App\EventSubscriber\LoggableEventSubscriber;
 use App\Helper\LoggableEventInterface;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 
-class LoggableEventSubscriberTest extends TestCase
+class LoggableEventSubscriberTest extends ProphecyTestCase
 {
     protected LoggableEventSubscriber $subscriber;
 

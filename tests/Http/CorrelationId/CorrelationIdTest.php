@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Http\CorrelationId;
 
 use App\Http\CorrelationId\CorrelationId;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * @coversDefaultClass \App\Http\CorrelationId\CorrelationId
  */
-class CorrelationIdTest extends TestCase
+class CorrelationIdTest extends ProphecyTestCase
 {
     /**
      * @var ObjectProphecy|RequestStack

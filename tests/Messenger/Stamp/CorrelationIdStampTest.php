@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Messenger\Stamp;
 
 use App\Messenger\Stamp\CorrelationIdStamp;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Messenger\Stamp\CorrelationIdStamp
  */
-class CorrelationIdStampTest extends TestCase
+class CorrelationIdStampTest extends ProphecyTestCase
 {
     /**
      * @covers ::__construct

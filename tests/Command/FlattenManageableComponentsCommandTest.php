@@ -7,15 +7,15 @@ namespace App\Tests\Command;
 use App\Command\FlattenManageableComponentsCommand;
 use App\Contract\Message\CalculateFlatManageableComponent;
 use App\Repository\ComponentRepository;
+use App\Tests\ProphecyKernelTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class FlattenManageableComponentsCommandTest extends KernelTestCase
+class FlattenManageableComponentsCommandTest extends ProphecyKernelTestCase
 {
     /**
      * @var MessageBusInterface|ObjectProphecy

@@ -14,12 +14,12 @@ use App\Event\Manageable\ManageableComponentEvent;
 use App\Event\Manageable\ManageableExperienceComponentEvent;
 use App\Event\Manageable\ManageableExperienceEvent;
 use App\Event\Manageable\ManageablePartnerEvent;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Contract\Request\Manageable\ManageableProductRequest
  */
-class ManageableProductRequestTest extends TestCase
+class ManageableProductRequestTest extends ProphecyTestCase
 {
     /**
      * @covers \App\Event\Manageable\ManageableBoxEvent::fromBox

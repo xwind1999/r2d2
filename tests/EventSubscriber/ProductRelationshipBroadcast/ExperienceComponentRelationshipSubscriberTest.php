@@ -11,14 +11,14 @@ use App\Exception\Manager\ExperienceComponent\OutdatedExperienceComponentRelatio
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\ExperienceComponentManager;
+use App\Tests\ProphecyTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \App\EventSubscriber\ProductRelationshipBroadcast\ExperienceComponentRelationshipSubscriber
  */
-class ExperienceComponentRelationshipSubscriberTest extends TestCase
+class ExperienceComponentRelationshipSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|MockObject

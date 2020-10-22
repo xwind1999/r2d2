@@ -11,14 +11,14 @@ use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Handler\RoomPriceListBroadcastHandler;
 use App\Manager\RoomPriceManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \App\Handler\RoomPriceListBroadcastHandler
  */
-class RoomPriceListBroadcastHandlerTest extends TestCase
+class RoomPriceListBroadcastHandlerTest extends ProphecyTestCase
 {
     /**
      * @dataProvider roomPriceRequestProvider

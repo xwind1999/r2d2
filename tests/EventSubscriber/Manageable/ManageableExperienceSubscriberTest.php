@@ -10,7 +10,7 @@ use App\Entity\ExperienceComponent;
 use App\Event\Manageable\ManageableExperienceEvent;
 use App\EventSubscriber\Manageable\ManageableExperienceSubscriber;
 use App\Repository\ExperienceComponentRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 /**
  * @coversDefaultClass \App\EventSubscriber\Manageable\ManageableExperienceSubscriber
  */
-class ManageableExperienceSubscriberTest extends TestCase
+class ManageableExperienceSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

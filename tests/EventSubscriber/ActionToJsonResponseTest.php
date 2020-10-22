@@ -7,14 +7,14 @@ namespace App\Tests\EventSubscriber;
 use App\Contract\ResponseContract;
 use App\EventSubscriber\ActionToJsonResponse;
 use App\Kernel;
+use App\Tests\ProphecyTestCase;
 use JMS\Serializer\SerializerInterface;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ActionToJsonResponseTest extends TestCase
+class ActionToJsonResponseTest extends ProphecyTestCase
 {
     /**
      * @var \Prophecy\Prophecy\ObjectProphecy|SerializerInterface

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Contract\Request\BroadcastListener\Product;
 
 use App\Contract\Request\BroadcastListener\Product\Partner;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Contract\Request\BroadcastListener\Product\Partner
  * @group partner-request
  */
-class PartnerTest extends TestCase
+class PartnerTest extends ProphecyTestCase
 {
     /**
      * @covers ::create

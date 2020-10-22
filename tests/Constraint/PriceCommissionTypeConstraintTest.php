@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Constraint;
 
 use App\Constraint\PriceCommissionTypeConstraint;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
-class PriceCommissionTypeConstraintTest extends TestCase
+class PriceCommissionTypeConstraintTest extends ProphecyTestCase
 {
     /**
      * @dataProvider validValues

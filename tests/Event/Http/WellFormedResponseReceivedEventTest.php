@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Event\Http;
 
 use App\Event\Http\WellFormedResponseReceivedEvent;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class WellFormedResponseReceivedEventTest extends TestCase
+class WellFormedResponseReceivedEventTest extends ProphecyTestCase
 {
     public function testGetMessage()
     {

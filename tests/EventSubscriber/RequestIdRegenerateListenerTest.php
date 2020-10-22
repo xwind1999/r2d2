@@ -6,14 +6,14 @@ namespace App\Tests\EventSubscriber;
 
 use App\EventSubscriber\RequestIdRegenerateListener;
 use App\Logger\Processor\RequestIdProcessor;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 
 /**
  * @coversDefaultClass \App\EventSubscriber\RequestIdRegenerateListener
  */
-class RequestIdRegenerateListenerTest extends TestCase
+class RequestIdRegenerateListenerTest extends ProphecyTestCase
 {
     /**
      * @covers ::__construct

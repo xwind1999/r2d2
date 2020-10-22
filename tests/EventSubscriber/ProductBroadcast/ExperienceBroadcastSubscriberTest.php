@@ -13,14 +13,14 @@ use App\Event\Product\ExperienceBroadcastEvent;
 use App\EventSubscriber\ProductBroadcast\ExperienceBroadcastSubscriber;
 use App\Exception\Manager\Experience\OutdatedExperienceException;
 use App\Manager\ExperienceManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \App\EventSubscriber\ProductBroadcast\ExperienceBroadcastSubscriber
  */
-class ExperienceBroadcastSubscriberTest extends TestCase
+class ExperienceBroadcastSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

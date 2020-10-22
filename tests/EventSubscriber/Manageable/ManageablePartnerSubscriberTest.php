@@ -9,7 +9,7 @@ use App\Event\Manageable\ManageablePartnerEvent;
 use App\EventSubscriber\Manageable\ManageablePartnerSubscriber;
 use App\Repository\ComponentRepository;
 use App\Repository\ExperienceRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 /**
  * @coversDefaultClass \App\EventSubscriber\Manageable\ManageablePartnerSubscriber
  */
-class ManageablePartnerSubscriberTest extends TestCase
+class ManageablePartnerSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

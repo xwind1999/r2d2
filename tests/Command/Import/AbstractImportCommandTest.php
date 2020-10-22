@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Command\Import;
 
 use App\Helper\CSVParser;
+use App\Tests\ProphecyKernelTestCase;
 use JMS\Serializer\SerializerInterface;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Envelope;
@@ -19,7 +19,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-abstract class AbstractImportCommandTest extends KernelTestCase
+abstract class AbstractImportCommandTest extends ProphecyKernelTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

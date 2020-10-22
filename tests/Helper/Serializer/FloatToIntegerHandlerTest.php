@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\Helper\Serializer;
 
 use App\Helper\Serializer\FloatToIntegerHandler;
+use App\Tests\ProphecyTestCase;
 use JMS\Serializer\Context;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \App\Helper\Serializer\FloatToIntegerHandler
  */
-class FloatToIntegerHandlerTest extends TestCase
+class FloatToIntegerHandlerTest extends ProphecyTestCase
 {
     public function testDeserializeFloatToIntegerFromJSON()
     {

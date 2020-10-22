@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Constraint;
 
 use App\Constraint\ProductStatusConstraint;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
-class ProductStatusConstraintTest extends TestCase
+class ProductStatusConstraintTest extends ProphecyTestCase
 {
     /**
      * @dataProvider validValues

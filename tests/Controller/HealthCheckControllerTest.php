@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Controller;
 
 use App\Controller\HealthCheckController;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @coversDefaultClass \App\Controller\HealthCheckController
  */
-class HealthCheckControllerTest extends TestCase
+class HealthCheckControllerTest extends ProphecyTestCase
 {
     /**
      * @covers ::ping

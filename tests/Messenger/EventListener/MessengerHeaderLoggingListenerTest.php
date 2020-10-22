@@ -9,7 +9,7 @@ use App\Http\CorrelationId\CorrelationId;
 use App\Messenger\EventListener\MessengerHeaderLoggingListener;
 use App\Messenger\Stamp\CorrelationIdStamp;
 use App\Messenger\Stamp\EaiTransactionIdStamp;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Messenger\Envelope;
@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 /**
  * @coversDefaultClass \App\Messenger\EventListener\MessengerHeaderLoggingListener
  */
-class MessengerHeaderLoggingListenerTest extends TestCase
+class MessengerHeaderLoggingListenerTest extends ProphecyTestCase
 {
     /**
      * @var EaiTransactionId|ObjectProphecy

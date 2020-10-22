@@ -10,11 +10,11 @@ use App\Entity\Partner;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Helper\CSVParser;
 use App\Repository\ComponentRepository;
+use App\Tests\ProphecyKernelTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Envelope;
@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 /**
  * @coversDefaultClass \App\Command\PushRoomsToEaiCommand
  */
-class PushRoomsToEaiCommandTest extends KernelTestCase
+class PushRoomsToEaiCommandTest extends ProphecyKernelTestCase
 {
     /**
      * @var CSVParser|ObjectProphecy

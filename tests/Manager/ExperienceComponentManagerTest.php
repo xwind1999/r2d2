@@ -21,14 +21,14 @@ use App\Manager\ExperienceComponentManager;
 use App\Repository\ComponentRepository;
 use App\Repository\ExperienceComponentRepository;
 use App\Repository\ExperienceRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @coversDefaultClass \App\Manager\ExperienceComponentManager
  */
-class ExperienceComponentManagerTest extends TestCase
+class ExperienceComponentManagerTest extends ProphecyTestCase
 {
     /**
      * @var ExperienceComponentRepository|ObjectProphecy

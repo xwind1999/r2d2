@@ -45,10 +45,10 @@ use App\Repository\BoxRepository;
 use App\Repository\ComponentRepository;
 use App\Repository\ExperienceRepository;
 use App\Repository\RoomAvailabilityRepository;
+use App\Tests\ProphecyTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -57,7 +57,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * @coversDefaultClass \App\Manager\BookingManager
  * @group booking
  */
-class BookingManagerTest extends TestCase
+class BookingManagerTest extends ProphecyTestCase
 {
     /**
      * @var EntityManagerInterface|ObjectProphecy

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\DBAL;
 
 use App\DBAL\AbstractCommentedStringType;
+use App\Tests\ProphecyTestCase;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use PHPUnit\Framework\TestCase;
 
-class AbstractCommentedStringTypeTest extends TestCase
+class AbstractCommentedStringTypeTest extends ProphecyTestCase
 {
     public function testRequiresSQLCommentHint()
     {

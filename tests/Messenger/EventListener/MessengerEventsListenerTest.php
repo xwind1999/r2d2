@@ -8,8 +8,8 @@ use App\Event\NamedEventInterface;
 use App\Messenger\EventListener\MessengerEventsListener;
 use App\Messenger\Stamp\CorrelationIdStamp;
 use App\Messenger\Stamp\EaiTransactionIdStamp;
+use App\Tests\ProphecyTestCase;
 use Clogger\ContextualInterface;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 /**
  * @coversDefaultClass \App\Messenger\EventListener\MessengerEventsListener
  */
-class MessengerEventsListenerTest extends TestCase
+class MessengerEventsListenerTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

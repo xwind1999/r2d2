@@ -7,9 +7,9 @@ namespace App\Tests\EventSubscriber\Cleanup;
 use App\Event\Cleanup\AvailabilityCleanupEvent;
 use App\EventSubscriber\Cleanup\CleanupRoomAvailabilityEventSubscriber;
 use App\Repository\RoomAvailabilityRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
-class CleanupRoomAvailabilityEventSubscriberTest extends TestCase
+class CleanupRoomAvailabilityEventSubscriberTest extends ProphecyTestCase
 {
     private CleanupRoomAvailabilityEventSubscriber $eventSubscriber;
 

@@ -9,14 +9,14 @@ use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Handler\RoomAvailabilityBroadcastHandler;
 use App\Manager\RoomAvailabilityManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \App\Handler\RoomAvailabilityBroadcastHandler
  */
-class RoomAvailabilityBroadcastHandlerTest extends TestCase
+class RoomAvailabilityBroadcastHandlerTest extends ProphecyTestCase
 {
     /**
      * @dataProvider roomAvailabilityRequestProvider

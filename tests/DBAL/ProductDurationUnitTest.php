@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\DBAL;
 
 use App\DBAL\ProductDurationUnit;
+use App\Tests\ProphecyTestCase;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass \App\DBAL\ProductDurationUnit
  */
-class ProductDurationUnitTest extends TestCase
+class ProductDurationUnitTest extends ProphecyTestCase
 {
     /**
      * @covers ::getName

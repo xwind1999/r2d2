@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Event\QuickData;
 
 use App\Event\QuickData\BoxCacheErrorEvent;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Event\Quickdata\BoxCacheErrorEvent
  */
-class BoxCacheErrorEventTest extends TestCase
+class BoxCacheErrorEventTest extends ProphecyTestCase
 {
     /**
      * @covers ::__construct

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\HealthCheck;
 
 use App\HealthCheck\EAICheck;
+use App\Tests\ProphecyTestCase;
 use Laminas\Diagnostics\Result\Failure;
 use Laminas\Diagnostics\Result\Success;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Smartbox\ApiRestClient\ApiRestResponse;
 use Smartbox\ApiRestClient\Clients\ChecksV0Client;
@@ -15,7 +15,7 @@ use Smartbox\ApiRestClient\Clients\ChecksV0Client;
 /**
  * @coversDefaultClass \App\HealthCheck\EAICheck
  */
-class EAICheckTest extends TestCase
+class EAICheckTest extends ProphecyTestCase
 {
     /**
      * @covers ::__construct

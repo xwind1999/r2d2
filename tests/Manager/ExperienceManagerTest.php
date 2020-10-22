@@ -21,7 +21,7 @@ use App\Manager\ExperienceManager;
 use App\Manager\PartnerManager;
 use App\Repository\ExperienceRepository;
 use App\Repository\PartnerRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Ramsey\Uuid\UuidInterface;
@@ -29,7 +29,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * @coversDefaultClass \App\Manager\ExperienceManager
  */
-class ExperienceManagerTest extends TestCase
+class ExperienceManagerTest extends ProphecyTestCase
 {
     /**
      * @var ExperienceRepository|ObjectProphecy

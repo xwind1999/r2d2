@@ -12,9 +12,9 @@ use App\Contract\Response\QuickData\GetRangeResponse;
 use App\Contract\Response\QuickData\QuickDataResponse;
 use App\Controller\QuickDataController;
 use App\Provider\LegacyAvailabilityProvider;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
-class QuickDataControllerTest extends TestCase
+class QuickDataControllerTest extends ProphecyTestCase
 {
     public function testGetPackage()
     {

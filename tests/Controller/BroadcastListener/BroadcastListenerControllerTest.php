@@ -15,7 +15,7 @@ use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
 use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
 use App\Controller\BroadcastListener\BroadcastListenerController;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +26,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
  * @coversDefaultClass \App\Controller\BroadcastListener\BroadcastListenerController
  * @group broadcast-listener
  */
-class BroadcastListenerControllerTest extends TestCase
+class BroadcastListenerControllerTest extends ProphecyTestCase
 {
     /**
      * @var MessageBusInterface|\PHPUnit\Framework\MockObject\MockObject

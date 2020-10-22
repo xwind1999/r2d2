@@ -10,13 +10,13 @@ use App\Controller\BookingController;
 use App\Exception\Http\ResourceNotFoundException;
 use App\Exception\Repository\BookingNotFoundException;
 use App\Manager\BookingManager;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @coversDefaultClass \App\Controller\BookingController
  */
-class BookingControllerTest extends TestCase
+class BookingControllerTest extends ProphecyTestCase
 {
     /**
      * @covers ::create

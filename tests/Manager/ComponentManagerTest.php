@@ -21,7 +21,7 @@ use App\Manager\ComponentManager;
 use App\Manager\PartnerManager;
 use App\Repository\ComponentRepository;
 use App\Repository\PartnerRepository;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Ramsey\Uuid\UuidInterface;
@@ -31,7 +31,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 /**
  * @coversDefaultClass \App\Manager\ComponentManager
  */
-class ComponentManagerTest extends TestCase
+class ComponentManagerTest extends ProphecyTestCase
 {
     /**
      * @var ComponentRepository|ObjectProphecy

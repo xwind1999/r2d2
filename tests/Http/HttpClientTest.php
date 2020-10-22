@@ -9,14 +9,14 @@ use App\Event\Http\ExternalServiceRequestMadeEvent;
 use App\Event\Http\WellFormedResponseReceivedEvent;
 use App\Exception\HttpClient\ConnectException;
 use App\Http\HttpClient;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class HttpClientTest extends TestCase
+class HttpClientTest extends ProphecyTestCase
 {
     protected string $clientId = 'client';
 

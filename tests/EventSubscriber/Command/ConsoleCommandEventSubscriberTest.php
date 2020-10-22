@@ -7,7 +7,7 @@ namespace App\Tests\EventSubscriber\Command;
 use App\Command\Cron\CronCleanupRoomAvailabilityCommand;
 use App\Event\Cron\CronCommandTriggeredEvent;
 use App\EventSubscriber\Command\ConsoleCommandEventSubscriber;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Console\Command\Command;
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ConsoleCommandEventSubscriberTest extends TestCase
+class ConsoleCommandEventSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var EventDispatcherInterface|ObjectProphecy

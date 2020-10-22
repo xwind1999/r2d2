@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Messenger\Stamp;
 
 use App\Messenger\Stamp\EaiTransactionIdStamp;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Messenger\Stamp\EaiTransactionIdStamp
  */
-class EaiTransactionIdStampTest extends TestCase
+class EaiTransactionIdStampTest extends ProphecyTestCase
 {
     /**
      * @covers ::__construct

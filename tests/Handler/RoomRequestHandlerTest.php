@@ -7,7 +7,7 @@ namespace App\Tests\Handler;
 use App\Contract\Request\EAI\RoomRequest;
 use App\EAI\EAI;
 use App\Handler\RoomRequestHandler;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -17,7 +17,7 @@ use Smartbox\CDM\Entity\Product\Product;
 /**
  * @coversDefaultClass \App\Handler\RoomRequestHandler
  */
-class RoomRequestHandlerTest extends TestCase
+class RoomRequestHandlerTest extends ProphecyTestCase
 {
     /**
      * @var EAI|ObjectProphecy

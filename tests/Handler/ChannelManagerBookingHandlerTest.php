@@ -7,7 +7,7 @@ namespace App\Tests\Handler;
 use App\Contract\Request\EAI\ChannelManagerBookingRequest;
 use App\EAI\EAI;
 use App\Handler\ChannelManagerBookingHandler;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -16,7 +16,7 @@ use Smartbox\ApiRestClient\ApiRestException;
 /**
  * @coversDefaultClass \App\Handler\ChannelManagerBookingHandler
  */
-class ChannelManagerBookingHandlerTest extends TestCase
+class ChannelManagerBookingHandlerTest extends ProphecyTestCase
 {
     /**
      * @var EAI|ObjectProphecy

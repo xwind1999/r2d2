@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Logger\Processor;
 
 use App\Logger\Processor\RouteParametersProcessor;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RouteParametersProcessorTest extends TestCase
+class RouteParametersProcessorTest extends ProphecyTestCase
 {
     public function testAddInfo(): void
     {

@@ -12,8 +12,8 @@ use App\Exception\Repository\ExperienceNotFoundException;
 use App\Handler\PriceInformationBroadcastHandler;
 use App\Manager\BoxManager;
 use App\Manager\ExperienceManager;
+use App\Tests\ProphecyTestCase;
 use phpDocumentor\Reflection\Types\Void_;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @coversDefaultClass \App\Handler\PriceInformationBroadcastHandler
  */
-class PriceInformationBroadcastHandlerTest extends TestCase
+class PriceInformationBroadcastHandlerTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

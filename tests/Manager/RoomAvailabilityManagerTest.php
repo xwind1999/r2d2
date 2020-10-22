@@ -24,9 +24,9 @@ use App\Exception\Repository\ComponentNotFoundException;
 use App\Manager\RoomAvailabilityManager;
 use App\Repository\ComponentRepository;
 use App\Repository\RoomAvailabilityRepository;
+use App\Tests\ProphecyTestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -38,7 +38,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 /**
  * @coversDefaultClass \App\Manager\RoomAvailabilityManager
  */
-class RoomAvailabilityManagerTest extends TestCase
+class RoomAvailabilityManagerTest extends ProphecyTestCase
 {
     /**
      * @var ObjectProphecy|RoomAvailabilityRepository

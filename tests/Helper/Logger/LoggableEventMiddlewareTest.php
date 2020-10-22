@@ -6,9 +6,9 @@ namespace App\Tests\Helper\Logger;
 
 use App\Helper\LoggableEventInterface;
 use App\Helper\Logger\LoggableEventMiddleware;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
-class LoggableEventMiddlewareTest extends TestCase
+class LoggableEventMiddlewareTest extends ProphecyTestCase
 {
     public function testProcess()
     {

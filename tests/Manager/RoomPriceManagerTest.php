@@ -14,8 +14,8 @@ use App\Exception\Repository\ComponentNotFoundException;
 use App\Manager\RoomPriceManager;
 use App\Repository\ComponentRepository;
 use App\Repository\RoomPriceRepository;
+use App\Tests\ProphecyTestCase;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 /**
  * @coversDefaultClass \App\Manager\RoomPriceManager
  */
-class RoomPriceManagerTest extends TestCase
+class RoomPriceManagerTest extends ProphecyTestCase
 {
     /**
      * @var ObjectProphecy|RoomPriceRepository

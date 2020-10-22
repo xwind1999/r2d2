@@ -16,8 +16,8 @@ use App\Entity\Guest;
 use App\Entity\Partner;
 use App\Event\BookingStatusEvent;
 use App\EventSubscriber\BookingStatusSubscriber;
+use App\Tests\ProphecyTestCase;
 use Doctrine\Common\Collections\ArrayCollection;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
@@ -27,7 +27,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 /**
  * @coversDefaultClass \App\EventSubscriber\BookingStatusSubscriber
  */
-class BookingStatusSubscriberTest extends TestCase
+class BookingStatusSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecy

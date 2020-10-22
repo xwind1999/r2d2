@@ -29,7 +29,7 @@
         "ocramius/package-versions": "1.8.0",
         "ocramius/proxy-manager": "^2.8.0",
         "phpstan/phpstan": "^0.12.48",
-        "ramsey/uuid": "^3.9",
+        "ramsey/uuid": "^4.0",
         "ramsey/uuid-doctrine": "^1.6",
         "smartbox/api-rest-client": "v10.0.0",
         "smartbox/canonical-data-model": "v8.52.0",
@@ -54,18 +54,19 @@
         "symfony/security-bundle": "5.1.*",
         "symfony/twig-pack": "^1.0",
         "symfony/validator": "5.1.*",
-        "symfony/yaml": "5.1.*",
-        "vimeo/psalm": "^3.16"
+        "symfony/yaml": "5.1.*"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.3",
         "friendsofphp/php-cs-fixer": "^2.16",
-        "infection/infection": "^0.15.0",
+        "infection/infection": "^0.18",
         "phpmetrics/phpmetrics": "^2.5",
-        "phpunit/phpunit": "^8.5.1",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^9.0",
         "symfony/maker-bundle": "^1.14",
         "symfony/profiler-pack": "^1.0",
-        "symfony/test-pack": "^1.0"
+        "symfony/test-pack": "^1.0",
+        "vimeo/psalm": "^4.0"
     },
     "config": {
         "preferred-install": {

@@ -6,7 +6,7 @@ namespace App\Tests\EventSubscriber\Http;
 
 use App\EventSubscriber\Http\CorrelationIdSubscriber;
 use App\Http\CorrelationId\CorrelationId;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * @covers \App\Http\CorrelationId\CorrelationId
  * @group correlation-id
  */
-class CorrelationIdSubscriberTest extends TestCase
+class CorrelationIdSubscriberTest extends ProphecyTestCase
 {
     /**
      * @covers ::getSubscribedEvents
@@ -59,7 +59,7 @@ class CorrelationIdSubscriberTest extends TestCase
             $responseEvent->getResponse()->headers->all(),
             'The header must contain correlation-id'
         );
-        $this->assertRegExp('/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/',
+        $this->assertMatchesRegularExpression('/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/',
             $responseEvent->getResponse()->headers->get('correlation-id'));
     }
 

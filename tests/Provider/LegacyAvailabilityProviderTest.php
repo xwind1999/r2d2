@@ -17,8 +17,8 @@ use App\Exception\Cache\ResourceNotCachedException;
 use App\Manager\ExperienceManager;
 use App\Provider\AvailabilityProvider;
 use App\Provider\LegacyAvailabilityProvider;
+use App\Tests\ProphecyTestCase;
 use JMS\Serializer\ArrayTransformerInterface;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -26,7 +26,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @coversDefaultClass \App\Provider\LegacyAvailabilityProvider
  */
-class LegacyAvailabilityProviderTest extends TestCase
+class LegacyAvailabilityProviderTest extends ProphecyTestCase
 {
     /**
      * @var ArrayTransformerInterface|ObjectProphecy

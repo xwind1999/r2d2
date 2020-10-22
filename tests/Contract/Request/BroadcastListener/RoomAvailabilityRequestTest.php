@@ -6,13 +6,13 @@ namespace App\Tests\Contract\Request\BroadcastListener;
 
 use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
 /**
  * @coversDefaultClass \App\Contract\Request\BroadcastListener\RoomAvailabilityRequest
  * @group room-availability-request
  */
-class RoomAvailabilityRequestTest extends TestCase
+class RoomAvailabilityRequestTest extends ProphecyTestCase
 {
     /**
      * @dataProvider roomAvailabilityRequestProvider

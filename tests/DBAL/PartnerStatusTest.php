@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\DBAL;
 
 use App\DBAL\PartnerStatus;
+use App\Tests\ProphecyTestCase;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass \App\DBAL\PartnerStatus
  */
-class PartnerStatusTest extends TestCase
+class PartnerStatusTest extends ProphecyTestCase
 {
     /**
      * @covers ::getName

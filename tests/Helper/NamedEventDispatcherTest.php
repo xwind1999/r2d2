@@ -6,7 +6,7 @@ namespace App\Tests\Helper;
 
 use App\Event\NamedEventInterface;
 use App\Helper\NamedEventDispatcher;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -14,7 +14,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @coversDefaultClass \App\Helper\NamedEventDispatcher
  */
-class NamedEventDispatcherTest extends TestCase
+class NamedEventDispatcherTest extends ProphecyTestCase
 {
     /**
      * @var EventDispatcherInterface|ObjectProphecy

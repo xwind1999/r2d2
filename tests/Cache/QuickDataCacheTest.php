@@ -7,13 +7,13 @@ namespace App\Tests\Cache;
 use App\Cache\MemcachedWrapper;
 use App\Cache\QuickDataCache;
 use App\Contract\Response\QuickData\GetRangeResponse;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @coversDefaultClass \App\Cache\QuickDataCache
  */
-class QuickDataCacheTest extends TestCase
+class QuickDataCacheTest extends ProphecyTestCase
 {
     /**
      * @var MemcachedWrapper|ObjectProphecy

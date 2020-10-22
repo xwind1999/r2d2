@@ -7,7 +7,7 @@ namespace App\Tests\EventSubscriber;
 use App\EventSubscriber\ApiExceptionSubscriber;
 use App\Exception\Http\ApiException;
 use App\Kernel;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy as ObjectProphecyAlias;
 use Psr\Log\LoggerInterface;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * @coversDefaultClass \App\EventSubscriber\ApiExceptionSubscriber
  */
-class ApiExceptionSubscriberTest extends TestCase
+class ApiExceptionSubscriberTest extends ProphecyTestCase
 {
     /**
      * @var LoggerInterface|ObjectProphecyAlias

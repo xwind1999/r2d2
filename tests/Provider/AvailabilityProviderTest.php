@@ -10,9 +10,9 @@ use App\Manager\RoomAvailabilityManager;
 use App\Manager\RoomPriceManager;
 use App\Provider\AvailabilityProvider;
 use App\Repository\BookingDateRepository;
+use App\Tests\ProphecyTestCase;
 use JMS\Serializer\ArrayTransformerInterface;
 use JMS\Serializer\SerializerInterface;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -20,7 +20,7 @@ use Prophecy\Prophecy\ObjectProphecy;
  * @coversDefaultClass \App\Provider\AvailabilityProvider
  * @group availability-provider
  */
-class AvailabilityProviderTest extends TestCase
+class AvailabilityProviderTest extends ProphecyTestCase
 {
     /**
      * @var ObjectProphecy|SerializerInterface

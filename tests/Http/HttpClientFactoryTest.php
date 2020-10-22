@@ -7,7 +7,7 @@ namespace App\Tests\Http;
 use App\Http\CorrelationId\CorrelationId;
 use App\Http\HttpClient;
 use App\Http\HttpClientFactory;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\CurlHttpClient;
@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @coversDefaultClass \App\Http\HttpClientFactory
  * @group http
  */
-class HttpClientFactoryTest extends TestCase
+class HttpClientFactoryTest extends ProphecyTestCase
 {
     public function testBuildWithOptions()
     {

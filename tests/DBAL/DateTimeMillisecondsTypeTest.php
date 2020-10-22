@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\DBAL;
 
 use App\DBAL\DateTimeMillisecondsType;
+use App\Tests\ProphecyTestCase;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @coversDefaultClass \App\DBAL\DateTimeMillisecondsType
  */
-class DateTimeMillisecondsTypeTest extends TestCase
+class DateTimeMillisecondsTypeTest extends ProphecyTestCase
 {
     private DateTimeMillisecondsType $dateTimeMillisecondsType;
 

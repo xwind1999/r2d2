@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Event\Http;
 
 use App\Event\Http\ExternalServiceRequestMadeEvent;
-use PHPUnit\Framework\TestCase;
+use App\Tests\ProphecyTestCase;
 
-class ExternalServiceRequestMadeEventTest extends TestCase
+class ExternalServiceRequestMadeEventTest extends ProphecyTestCase
 {
     public function testGetMessage()
     {
