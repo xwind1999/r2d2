@@ -18,8 +18,8 @@ stages:
   - Generate Documentation
   - Publish Reports
 
-variables:
-  GIT_DEPTH: 1
+#variables:
+#  GIT_DEPTH: 1
 
 default:
   image: ${BASE_IMAGE}
@@ -32,6 +32,7 @@ include:
   - local: '/.ci/quality.yaml'
   - local: '/.ci/static-analysis.yaml'
   - local: '/.ci/build-reports.yaml'
+  - local: '/.ci/edith.yaml'
 
 composer:
   stage: Dependencies
