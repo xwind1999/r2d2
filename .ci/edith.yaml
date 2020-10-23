@@ -10,7 +10,7 @@ edith-create-release:
     - export RELEASE_TITLE="R2D2 Release $(date +%F\ %R)"
     - cd /app
   script:
-    - bin/console edith:change:create "${RELEASE_TEAM}" "${RELEASE_TITLE}" "${RELEASE_DESCRIPTION}"
+    - bin/console edith:change:create "R2D2" "${RELEASE_TITLE}" "${RELEASE_DESCRIPTION}"
   after_script:
     - mv /app/edith.txt .
   artifacts:
@@ -37,6 +37,8 @@ edith-preprod-ready:
   extends: .edith
   stage: Preprod Deploy
   when: on_success
+  needs:
+    - edith-create-release
   script:
     - bin/console edith:change:self-approve ${ITSM_CHANGE_ID}
     - bin/console edith:change:preprod-ready ${ITSM_CHANGE_ID}
