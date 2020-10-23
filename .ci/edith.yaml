@@ -6,7 +6,7 @@ edith-create-release:
   image: ${EDITH_DOCKER_IMAGE}
   when: manual
   before_script:
-    - export RELEASE_DESCRIPTION=$(git log $(curl http://r2-d2-api-devint.sbxtest.net/version.txt -s -o -)..${CI_COMMIT_SHA} --pretty=format:'%s' --abbrev-commit --no-merges | cat -)
+    - export RELEASE_DESCRIPTION=$(git log $(curl https://r2-d2-api.production.smartbox.com/version.txt -s -o -)..${CI_COMMIT_SHA} --pretty=format:'%s' --abbrev-commit --no-merges | cat -)
     - export RELEASE_TITLE="R2D2 Release $(date +%F\ %R)"
     - cd /app
   script:
