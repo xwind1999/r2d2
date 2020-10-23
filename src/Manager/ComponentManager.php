@@ -166,6 +166,7 @@ class ComponentManager
             }
 
             $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
+            $this->messageBus->dispatch(new CalculateFlatManageableComponent($componentGoldenId));
         } catch (ManageableProductNotFoundException $exception) {
             $component = $this->repository->findComponentWithManageableRelationships(
                 $this->createComponentRequiredCriteria($componentGoldenId, Criteria::create())
@@ -175,10 +176,9 @@ class ComponentManager
                 $component->isManageable = false;
                 $this->repository->save($component);
                 $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
+                $this->messageBus->dispatch(new CalculateFlatManageableComponent($componentGoldenId));
             }
         }
-
-        $this->messageBus->dispatch(new CalculateFlatManageableComponent($componentGoldenId));
     }
 
     /**

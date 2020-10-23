@@ -455,7 +455,7 @@ class ComponentManagerTest extends ProphecyTestCase
 
                 return new Envelope(new \stdClass());
             })
-                ->shouldBeCalled();
+                ->shouldNotBeCalled();
         })($this, $component->goldenId);
 
         $this->manager->calculateManageableFlag($component->goldenId);
