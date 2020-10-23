@@ -313,9 +313,6 @@
     "phpunit/php-timer": {
         "version": "2.1.2"
     },
-    "phpunit/php-token-stream": {
-        "version": "3.1.1"
-    },
     "phpunit/phpunit": {
         "version": "4.7",
         "recipe": {
@@ -330,9 +327,6 @@
             "config/bootstrap.php",
             "tests/.gitignore"
         ]
-    },
-    "pimple/pimple": {
-        "version": "v3.2.3"
     },
     "psr/cache": {
         "version": "1.0.1"
