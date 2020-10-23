@@ -1,0 +1,82 @@
+variables:
+  EDITH_DOCKER_IMAGE: docker-registry.production.smartbox.com/shared_tools/edith:latest
+
+edith-create-release:
+  stage: Preprod Check
+  image: ${EDITH_DOCKER_IMAGE}
+  when: manual
+  before_script:
+    - export RELEASE_DESCRIPTION=$(git log $(curl http://r2-d2-api-devint.sbxtest.net/version.txt -s -o -)..${CI_COMMIT_SHA} --pretty=format:'%s' --abbrev-commit --no-merges | cat -)
+    - export RELEASE_TITLE="R2D2 Release $(date +%F\ %R)"
+    - cd /app
+  script:
+    - bin/console edith:change:create "${RELEASE_TEAM}" "${RELEASE_TITLE}" "${RELEASE_DESCRIPTION}"
+  after_script:
+    - mv /app/edith.txt .
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - edith.txt
+  allow_failure: true
+  only:
+    - master
+
+.edith:
+  image: ${EDITH_DOCKER_IMAGE}
+  allow_failure: true
+  when: manual
+  dependencies:
+    - edith-create-release
+  before_script:
+    - export ITSM_CHANGE_ID=$(cat edith.txt)
+    - cd /app
+  only:
+    - master
+
+edith-preprod-ready:
+  extends: .edith
+  stage: Preprod Deploy
+  when: on_success
+  script:
+    - bin/console edith:change:self-approve ${ITSM_CHANGE_ID}
+    - bin/console edith:change:preprod-ready ${ITSM_CHANGE_ID}
+
+edith-preprod-deploy:
+  extends: .edith
+  stage: Preprod Deploy
+  script:
+    - bin/console edith:change:preprod-deploy ${ITSM_CHANGE_ID}
+
+edith-preprod-validation:
+  extends: .edith
+  stage: Preprod Validation
+  when: on_success
+  script:
+    - bin/console edith:change:preprod-validation ${ITSM_CHANGE_ID}
+
+edith-prod-ready:
+  extends: .edith
+  stage: Production Deploy
+  when: on_success
+  script:
+    - bin/console edith:change:prod-ready ${ITSM_CHANGE_ID}
+
+edith-prod-deploy:
+  extends: .edith
+  stage: Production Deploy
+  script:
+    - bin/console edith:change:prod-ready ${ITSM_CHANGE_ID}
+
+edith-prod-validation:
+  extends: .edith
+  stage: Production Validation
+  when: on_success
+  script:
+    - bin/console edith:change:prod-completed ${ITSM_CHANGE_ID}
+
+edith-finish-release:
+  extends: .edith
+  stage: Build Reports
+  when: on_success
+  script:
+    - bin/console edith:change:review-completed ${ITSM_CHANGE_ID}

@@ -1,5 +1,6 @@
 variables:
   CONSOLE_NEWRELIC_COMPLETED: bin/console newrelic:notify-deployment --user=${GITLAB_USER_EMAIL} --revision=${CI_PIPELINE_ID}_${CI_COMMIT_SHA}
+  EDITH_DOCKER_IMAGE: docker-registry.production.smartbox.com/shared_tools/edith:latest
 
 .deploy:
   image: docker-registry.production.smartbox.com/moby/moby-docker:test6
