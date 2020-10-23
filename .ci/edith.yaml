@@ -25,6 +25,8 @@ edith-create-release:
   image: ${EDITH_DOCKER_IMAGE}
   allow_failure: true
   when: manual
+  needs:
+    - edith-create-release
   dependencies:
     - edith-create-release
   before_script:
