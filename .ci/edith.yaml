@@ -24,7 +24,6 @@ edith-create-release:
 .edith:
   image: ${EDITH_DOCKER_IMAGE}
   allow_failure: true
-  when: manual
   dependencies:
     - edith-create-release
   before_script:
@@ -36,7 +35,6 @@ edith-create-release:
 edith-preprod-ready:
   extends: .edith
   stage: Preprod Deploy
-  when: on_success
   needs:
     - edith-create-release
   script:
@@ -46,39 +44,37 @@ edith-preprod-ready:
 edith-preprod-deploy:
   extends: .edith
   stage: Preprod Deploy
+  when: manual
   script:
     - bin/console edith:change:preprod-deploy ${ITSM_CHANGE_ID}
 
 edith-preprod-validation:
   extends: .edith
   stage: Preprod Validation
-  when: on_success
   script:
     - bin/console edith:change:preprod-validation ${ITSM_CHANGE_ID}
 
 edith-prod-ready:
   extends: .edith
   stage: Production Deploy
-  when: on_success
   script:
     - bin/console edith:change:prod-ready ${ITSM_CHANGE_ID}
 
 edith-prod-deploy:
   extends: .edith
   stage: Production Deploy
+  when: manual
   script:
     - bin/console edith:change:prod-ready ${ITSM_CHANGE_ID}
 
 edith-prod-validation:
   extends: .edith
   stage: Production Validation
-  when: on_success
   script:
     - bin/console edith:change:prod-completed ${ITSM_CHANGE_ID}
 
 edith-finish-release:
   extends: .edith
   stage: Build Reports
-  when: on_success
   script:
     - bin/console edith:change:review-completed ${ITSM_CHANGE_ID}
