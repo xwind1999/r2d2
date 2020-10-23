@@ -50,7 +50,7 @@ edith-preprod-deploy:
 edith-preprod-validation:
   extends: .edith
   stage: Preprod Validation
-  needs: [ 'deploy-PREPROD' ]
+  needs: [ 'edith-create-release', 'deploy-PREPROD' ]
   script:
     - bin/console edith:change:preprod-validation ${ITSM_CHANGE_ID}
 
@@ -70,7 +70,7 @@ edith-prod-deploy:
 edith-prod-validation:
   extends: .edith
   stage: Production Validation
-  needs: [ 'deploy-PROD' ]
+  needs: [ 'edith-create-release', 'deploy-PROD' ]
   script:
     - bin/console edith:change:prod-completed ${ITSM_CHANGE_ID}
 
