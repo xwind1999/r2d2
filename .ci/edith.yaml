@@ -4,7 +4,6 @@ variables:
 edith-create-release:
   stage: Preprod Check
   image: ${EDITH_DOCKER_IMAGE}
-  when: manual
   before_script:
     - export RELEASE_DESCRIPTION=$(git log $(curl https://r2-d2-api.production.smartbox.com/version.txt -s -o -)..${CI_COMMIT_SHA} --pretty=format:'%s' --abbrev-commit --no-merges | cat -)
     - export RELEASE_TITLE="R2D2 Release $(date +%F\ %R)"
@@ -18,8 +17,10 @@ edith-create-release:
     paths:
       - edith.txt
   allow_failure: true
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+      when: manual
+    - when: never
 
 .edith:
   image: ${EDITH_DOCKER_IMAGE}
@@ -29,8 +30,6 @@ edith-create-release:
   before_script:
     - export ITSM_CHANGE_ID=$(cat edith.txt)
     - cd /app
-  only:
-    - master
 
 edith-preprod-ready:
   extends: .edith
@@ -39,17 +38,26 @@ edith-preprod-ready:
   script:
     - bin/console edith:change:self-approve ${ITSM_CHANGE_ID}
     - bin/console edith:change:preprod-ready ${ITSM_CHANGE_ID}
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
 
 edith-preprod-deploy:
   extends: .edith
   stage: Preprod Deploy
-  when: manual
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+      when: manual
+    - when: never
   script:
     - bin/console edith:change:preprod-deploy ${ITSM_CHANGE_ID}
 
 edith-preprod-validation:
   extends: .edith
   stage: Preprod Validation
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
   needs: [ 'edith-create-release', 'deploy-PREPROD' ]
   script:
     - bin/console edith:change:preprod-validation ${ITSM_CHANGE_ID}
@@ -57,13 +65,19 @@ edith-preprod-validation:
 edith-prod-ready:
   extends: .edith
   stage: Production Deploy
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
   script:
     - bin/console edith:change:prod-ready ${ITSM_CHANGE_ID}
 
 edith-prod-deploy:
   extends: .edith
   stage: Production Deploy
-  when: manual
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+      when: manual
+    - when: never
   script:
     - bin/console edith:change:prod-ready ${ITSM_CHANGE_ID}
 
@@ -71,11 +85,17 @@ edith-prod-validation:
   extends: .edith
   stage: Production Validation
   needs: [ 'edith-create-release', 'deploy-PROD' ]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
   script:
     - bin/console edith:change:prod-completed ${ITSM_CHANGE_ID}
 
 edith-finish-release:
   extends: .edith
   stage: Build Reports
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
   script:
     - bin/console edith:change:review-completed ${ITSM_CHANGE_ID}

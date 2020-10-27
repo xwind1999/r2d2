@@ -13,8 +13,6 @@ generate-api-reference:
     expire_in: 1 day
     paths:
       - openapi.json
-  except:
-    - tags
 
 phpmetrics:
   stage: Build Reports
@@ -27,8 +25,6 @@ phpmetrics:
     expire_in: 1 day
     paths:
       - report/
-  except:
-    - tags
 
 mermaid-generate-images:
   stage: Build Reports
@@ -44,11 +40,9 @@ mermaid-generate-images:
   script:
     - mkdir -p report/html/docs/architecture/diagram/
     - 'for flow in docs/architecture/diagram/*.mmd; do mmdc -p mmdc-config.json -i ${flow%%.*}.mmd -o ${flow%%.*}.png --width 8000 --height 6000; done; mv docs/architecture/diagram/*.png report/html/docs/architecture/diagram/;'
-  only:
-    - master
-  except:
-    - schedules
-    - tags
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
 
 code-tests-aggregate:
   stage: Build Reports
@@ -64,8 +58,6 @@ code-tests-aggregate:
     paths:
       - report/
       - openapi.json
-  except:
-    - tags
 
 schemaspy:
   stage: Build Reports
@@ -89,8 +81,6 @@ schemaspy:
     expire_in: 1 day
     paths:
       - report/html/db
-  except:
-    - tags
 
 generate-extra-docs:
   stage: Build Reports
@@ -108,8 +98,6 @@ generate-extra-docs:
       - mkdocs.yml
       - docs/exceptions.md
       - docs/README.md
-  except:
-    - tags
 
 locust-report:
   stage: Build Reports
@@ -118,8 +106,9 @@ locust-report:
   image: ${LOCUST_REPORT_IMAGE}
   script:
     - python ${CI_PROJECT_DIR}/tests/LoadTests/reportFile/graph.py
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
   artifacts:
     expire_in: 3 days
     paths:
@@ -131,8 +120,9 @@ locust-report:
   before_script:
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - cd /app
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
 
 blue-pill-DEV-INT:
   extends: .blue-pill

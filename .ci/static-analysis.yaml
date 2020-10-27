@@ -5,8 +5,6 @@ phpstan:
     - composer
   script:
     - php -d memory_limit=-1 vendor/bin/phpstan analyse $(pwd)/src --level 8
-  except:
-    - tags
 
 psalm:
   stage: Static Analysis
@@ -15,8 +13,6 @@ psalm:
     - composer
   script:
     - vendor/bin/psalm
-  except:
-    - tags
 
 infection:
   stage: Static Analysis
@@ -33,5 +29,3 @@ infection:
     expire_in: 1 day
     paths:
       - report/
-  except:
-    - tags

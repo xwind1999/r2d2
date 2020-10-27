@@ -6,9 +6,9 @@ variables:
 build-base-image:
   stage: Build Base Image
   image: docker:dind
-  only:
-    - CI-master
-    - R2D2-360
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_BRANCH'
+    - when: never
   script:
     - docker pull ${BASE_IMAGE}
     - docker build --tag ${BASE_IMAGE} .ci/docker/base
@@ -17,8 +17,9 @@ build-base-image:
 build-validation-image:
   stage: Build Validation Image
   image: docker:dind
-  only:
-    - CI-master
+  rules:
+      - if: '$CI_COMMIT_BRANCH == $CI_BRANCH'
+      - when: never
   script:
     - docker pull ${BASE_IMAGE}
     - docker pull ${VALIDATION_IMAGE}
@@ -30,9 +31,9 @@ build-app-container:
   image: docker:dind
   dependencies:
     - composer
-  only:
-    - master
-    - tags
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
   script:
     - docker pull ${BASE_IMAGE}
     - docker build -f .ci/docker/app/Dockerfile --tag "$APP_IMAGE" .

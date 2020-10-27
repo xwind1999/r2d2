@@ -18,13 +18,21 @@ stages:
   - Generate Documentation
   - Publish Reports
 
-#variables:
+variables:
+  MAIN_BRANCH: master
+  CI_BRANCH: CI-master
 #  GIT_DEPTH: 1
 
 default:
   image: ${BASE_IMAGE}
   tags:
     - k8s
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      when: always
+    - when: never
 
 include:
   - local: '/.ci/build-app-container.yaml'
@@ -68,8 +76,9 @@ build-docs:
     paths:
       - mkdocs
     expire_in: 1 day
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
 
 pages:
   stage: Publish Reports
@@ -101,5 +110,6 @@ pages:
     paths:
       - public
     expire_in: 1 day
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
