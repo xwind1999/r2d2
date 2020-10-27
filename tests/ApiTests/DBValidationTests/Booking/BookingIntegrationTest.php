@@ -805,7 +805,6 @@ class BookingIntegrationTest extends IntegrationTestCase
                 new \DateTime($payload['startDate']),
                 new \DateTime($payload['endDate'])
             );
-
         $responseCreate = self::$bookingHelper->create($payload);
 
         $this->assertEquals(201, $responseCreate->getStatusCode());

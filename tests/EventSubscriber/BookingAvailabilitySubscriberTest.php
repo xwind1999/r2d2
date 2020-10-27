@@ -83,35 +83,59 @@ class BookingAvailabilitySubscriberTest extends ProphecyTestCase
         $bookingDate->price = 1212;
         $booking->bookingDate = new ArrayCollection([$bookingDate->reveal()]);
 
-        $bookingStatusEvent = $this->prophesize(BookingStatusEvent::class);
-        $bookingStatusEvent->getBooking()->willReturn($booking);
-
-        yield 'booking-confirmation-success' => [
-            (function ($booking, $bookingStatusEvent) {
+        yield 'booking confirmation' => [
+            (function ($booking) {
                 $booking->status = BookingStatusConstraint::BOOKING_STATUS_COMPLETE;
-                $bookingStatusEvent->getBooking()->willReturn($booking);
 
-                return $bookingStatusEvent->reveal();
-            })(new $booking(), $bookingStatusEvent),
+                return new BookingStatusEvent($booking, BookingStatusConstraint::BOOKING_STATUS_CREATED);
+            })(clone $booking),
             (function ($test) {
-                $test->roomAvailabilityManager->updateStockBookingConfirmation(Argument::type(Booking::class))->shouldBeCalledOnce();
+                $test
+                    ->roomAvailabilityManager
+                    ->updateStockBookingConfirmation(Argument::type(Booking::class))
+                    ->shouldBeCalledOnce();
+            }),
+        ];
+
+        yield 'booking cancellation with previous status=created' => [
+            (function ($booking) {
+                $booking->status = BookingStatusConstraint::BOOKING_STATUS_CANCELLED;
+
+                return new BookingStatusEvent($booking, BookingStatusConstraint::BOOKING_STATUS_CREATED);
+            })(clone $booking),
+            (function ($test) {
+                $test
+                    ->roomAvailabilityManager
+                    ->updateStockBookingCancellation(Argument::type(Booking::class))
+                    ->shouldNotBeCalled();
+            }),
+        ];
+
+        yield 'booking cancellation with previous status=complete' => [
+            (function ($booking) {
+                $booking->status = BookingStatusConstraint::BOOKING_STATUS_CANCELLED;
+
+                return new BookingStatusEvent($booking, BookingStatusConstraint::BOOKING_STATUS_COMPLETE);
+            })(clone $booking),
+            (function ($test) {
+                $test
+                    ->roomAvailabilityManager
+                    ->updateStockBookingCancellation(Argument::type(Booking::class))
+                    ->shouldBeCalled();
             }),
         ];
 
         yield 'booking-confirmation-error' => [
-            (function ($booking, $bookingStatusEvent) {
+            (function ($booking) {
                 $booking->status = BookingStatusConstraint::BOOKING_STATUS_COMPLETE;
-                $bookingStatusEvent->getBooking()->willReturn($booking);
 
-                return $bookingStatusEvent->reveal();
-            })(new $booking(), $bookingStatusEvent),
+                return new BookingStatusEvent($booking, BookingStatusConstraint::BOOKING_STATUS_CREATED);
+            })(clone $booking),
             (function ($test) {
                 $test->roomAvailabilityManager
                     ->updateStockBookingConfirmation(Argument::type(Booking::class))
+                    ->shouldBeCalledOnce()
                     ->willThrow(ExperienceNotFoundException::class);
-                $test->roomAvailabilityManager
-                    ->updateStockBookingConfirmation(Argument::type(Booking::class))
-                    ->shouldBeCalledOnce();
                 $test->logger->warning(Argument::any(), Argument::any())->shouldBeCalled();
             }),
         ];

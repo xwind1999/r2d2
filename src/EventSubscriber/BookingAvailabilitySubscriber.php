@@ -35,6 +35,11 @@ class BookingAvailabilitySubscriber implements EventSubscriberInterface
         try {
             if (BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $event->getBooking()->status) {
                 $this->roomAvailabilityManager->updateStockBookingConfirmation($event->getBooking());
+            } elseif (
+                BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $event->getBooking()->status
+                && BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $event->getPreviousBookingStatus()
+            ) {
+                $this->roomAvailabilityManager->updateStockBookingCancellation($event->getBooking());
             }
         } catch (\Exception $exception) {
             $this->logger->warning($exception->getMessage(), ['booking' => $event->getBooking()]);
