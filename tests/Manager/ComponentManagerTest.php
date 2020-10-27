@@ -209,9 +209,16 @@ class ComponentManagerTest extends ProphecyTestCase
         $component->status = 'active';
         $component->isReservable = true;
 
-        $this->partnerRepository->findOneByGoldenId($productRequest->partner->id);
+        $partnerEntity = new Partner();
+        $partnerEntity->goldenId = '5678';
+        $this->partnerRepository->findOneByGoldenId($productRequest->partner->id)->willReturn($partnerEntity);
         $this->repository->findOneByGoldenId($productRequest->id)->willReturn($component->reveal());
         $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
+        $this->messageBus
+            ->dispatch(Argument::type(RoomRequest::class))
+            ->shouldBeCalled()
+            ->willReturn(new Envelope(new \stdClass()))
+        ;
         $this->manageableProductService->dispatchForProduct(Argument::any())->shouldBeCalled();
         $this->manager->replace($productRequest->reveal());
     }
@@ -245,7 +252,12 @@ class ComponentManagerTest extends ProphecyTestCase
         $this->partnerManager->createPlaceholder($productRequest->partner->id)->shouldBeCalled()->willReturn($partnerEntity);
         $this->repository->findOneByGoldenId($productRequest->id)->willReturn($component->reveal());
         $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
-        $this->manageableProductService->dispatchForProduct(Argument::any(), Argument::any())->shouldBeCalled();
+        $this->messageBus
+            ->dispatch(Argument::type(RoomRequest::class))
+            ->shouldBeCalled()
+            ->willReturn(new Envelope(new \stdClass()))
+        ;
+        $this->manageableProductService->dispatchForProduct(Argument::any())->shouldBeCalled();
         $this->manager->replace($productRequest->reveal());
     }
 
@@ -290,13 +302,20 @@ class ComponentManagerTest extends ProphecyTestCase
         $productRequest->status = 'test Status';
         $productRequest->roomStockType = 'allotment';
 
-        $this->partnerRepository->findOneByGoldenId($productRequest->id);
+        $partnerEntity = new Partner();
+        $partnerEntity->goldenId = '5678';
+        $this->partnerRepository->findOneByGoldenId($productRequest->partner->id)->willReturn($partnerEntity);
         $this->repository
             ->findOneByGoldenId($productRequest->id)
             ->shouldBeCalled()
             ->willThrow(new ComponentNotFoundException())
         ;
         $this->repository->save(Argument::type(Component::class))->shouldBeCalled();
+        $this->messageBus
+            ->dispatch(Argument::type(RoomRequest::class))
+            ->shouldBeCalled()
+            ->willReturn(new Envelope(new \stdClass()))
+        ;
 
         $this->manager->replace($productRequest->reveal());
     }
