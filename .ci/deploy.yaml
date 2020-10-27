@@ -20,13 +20,24 @@ variables:
 
 'deploy-DEV-INT':
   extends: .deploy
-  stage: DevInt Deploy
+  stage: Project Env Deploy
   environment:
     name: ie1-devint-r2d2
   only:
     - master
   except:
     - tags
+
+'deploy-STAGING':
+  extends: .deploy
+  stage: Project Env Deploy
+  environment:
+    name: ie1-staging-r2d2
+  variables:
+    NR_ENABLE: "false"
+  when: manual
+  only:
+    - master
 
 'deploy-PREPROD':
   extends: .deploy

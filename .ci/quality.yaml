@@ -81,6 +81,23 @@ api-tests-DEV-INT:
   except:
     - tags
 
+api-tests-STAGING:
+  stage: Deploy Validation
+  image: ${BASE_IMAGE}
+  needs:
+    - deploy-STAGING
+    - composer
+  dependencies:
+    - composer
+  variables:
+    API_TEST_BASE_URL: "http://ie1-staging-r2d2-api-01.z.sbxtest.net"
+  script:
+    - php vendor/bin/phpunit --testsuite=ApiTests --testdox --no-coverage
+  only:
+    - master
+  except:
+    - tags
+
 .locust-template: &locust
   image: ${LOCUST_IMAGE}
   inherit:
@@ -112,6 +129,20 @@ locust-DEV-INT:
   variables:
     LOCUST_ENV: "staging"
     LOCUST_HOST: "http://r2-d2-api-devint.sbxtest.net"
+    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
+    LOCUST_FILE: "end2EndTests.py"
+
+locust-STAGING:
+  <<: *locust
+  stage: Deploy Validation
+  allow_failure: true
+  needs: [ 'deploy-STAGING' ]
+  when: on_success
+  only:
+    - master
+  variables:
+    LOCUST_ENV: "staging"
+    LOCUST_HOST: "http://ie1-staging-r2d2-api-01.z.sbxtest.net/"
     LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
     LOCUST_FILE: "end2EndTests.py"
 
@@ -166,6 +197,26 @@ locust-PROD:
     CHECK_ENVIRONMENT: http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
   only:
     - master
+
+'pre-health-smoke-test-STAGING':
+  extends: .health-smoke-test
+  stage: Deploy Setup
+  variables:
+    CHECK_ENVIRONMENT: http://ie1-staging-r2d2-api-01.z.sbxtest.net/_monitor/health/run
+  only:
+    - master
+
+'post-health-smoke-test-STAGING':
+  extends: .health-smoke-test
+  stage: Deploy Validation
+  allow_failure: false
+  needs: ['deploy-STAGING']
+  when: on_success
+  variables:
+    CHECK_ENVIRONMENT: http://ie1-staging-r2d2-api-01.z.sbxtest.net/_monitor/health/run
+  only:
+    - master
+
 
 'pre-health-smoke-test-PREPROD':
   extends: .health-smoke-test

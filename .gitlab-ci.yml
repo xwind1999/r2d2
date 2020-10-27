@@ -6,7 +6,7 @@ stages:
   - Test
   - Static Analysis
   - Deploy Setup
-  - DevInt Deploy
+  - Project Env Deploy
   - Deploy Validation
   - Preprod Check
   - Preprod Deploy

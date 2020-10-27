@@ -1,0 +1,110 @@
+version: '3.4'
+
+x-service-template: &service-template
+  image: "${APP_IMAGE}"
+  hostname: '{{.Node.Hostname}}'
+  env_file:
+    - "${ENV_FILE}"
+  volumes:
+    - /var/log/jarvis/:/app/var/log/
+
+x-worker-template: &worker-template
+  <<: *service-template
+  deploy:
+    replicas: 1
+  command: ['/app/bin/start-command.sh']
+
+services:
+  api:
+    <<: *service-template
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: ingress
+    deploy:
+      mode: global
+      update_config:
+        order: start-first
+    stop_grace_period: 10s
+
+  cron:
+    <<: *service-template
+    command: ['/app/bin/start-crond.sh']
+
+  worker-listener-partner:
+    <<: *worker-template
+    environment:
+      QUEUES: listener-partner
+
+  worker-listener-product:
+    <<: *worker-template
+    environment:
+      QUEUES: listener-product
+
+  worker-listener-price-information:
+    <<: *worker-template
+    environment:
+      QUEUES: listener-price-information
+
+  worker-listener-product-relationship:
+    <<: *worker-template
+    environment:
+      QUEUES: listener-product-relationship
+    deploy:
+      replicas: 6
+
+  worker-calculate-manageable-flag:
+    <<: *worker-template
+    environment:
+      QUEUES: event-calculate-manageable-flag
+    deploy:
+      replicas: 10
+
+  worker-push-room-information:
+    <<: *worker-template
+    environment:
+      QUEUES: event-push-room-type-information
+
+  worker-listener-room-availability:
+    <<: *worker-template
+    environment:
+      QUEUES: listener-room-availability
+    deploy:
+      replicas: 10
+
+  worker-listener-room-availability-list:
+    <<: *worker-template
+    environment:
+      QUEUES: listener-room-availability-list
+
+  worker-listener-room-price:
+    <<: *worker-template
+    environment:
+      QUEUES: listener-room-price
+    deploy:
+      replicas: 10
+
+  worker-listener-room-price-list:
+    <<: *worker-template
+    environment:
+      QUEUES: listener-room-price-list
+
+  worker-flat-manageable-component:
+    <<: *worker-template
+    environment:
+      QUEUES: event-calculate-flat-manageable-component
+    deploy:
+      replicas: 10
+
+  worker-push-booking-information:
+    <<: *worker-template
+    environment:
+      QUEUES: event-push-booking-information
+
+  worker-fallback:
+    <<: *worker-template
+    environment:
+      QUEUES: fallback-queue
+    deploy:
+      replicas: 0
