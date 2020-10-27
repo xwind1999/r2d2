@@ -429,20 +429,44 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
      */
     public function testUpdateStockBookingConfirmation(Booking $booking, array $availability, callable $prophecies)
     {
-        $prophecies($this, $availability);
+        $prophecies($this, $availability, 1);
 
         $response = $this->manager->updateStockBookingConfirmation($booking);
         $this->assertNull($response);
     }
 
+    /**
+     * @dataProvider bookingProvider
+     */
+    public function testUpdateStockBookingCancellation(Booking $booking, array $availability, callable $prophecies)
+    {
+        $prophecies($this, $availability, -1);
+
+        $response = $this->manager->updateStockBookingCancellation($booking);
+        $this->assertNull($response);
+    }
+
     public function bookingProvider()
     {
+        $populateBookingDates = function (Booking $booking, int $rooms = 1) {
+            $period = new \DatePeriod($booking->startDate, new \DateInterval('P1D'), $booking->endDate);
+            $booking->bookingDate = new ArrayCollection();
+            for ($i = 0; $i < $rooms; ++$i) {
+                foreach ($period as $date) {
+                    $bookingDate = new BookingDate();
+                    $bookingDate->componentGoldenId = $i.'5464';
+                    $bookingDate->date = $date;
+                    $bookingDate->price = 1212;
+                    $booking->bookingDate->add($bookingDate);
+                }
+            }
+        };
+
         $booking = new Booking();
         $booking->voucher = '198257918';
         $booking->goldenId = '12345';
         $dateTime = new \DateTime('2020-10-01');
-        $booking->startDate = $dateTime;
-        $booking->endDate = (new $dateTime())->modify('+1 day');
+        $booking->startDate = new \DateTime('2020-10-01');
         $booking->createdAt = $dateTime;
         $booking->updatedAt = $dateTime;
         $booking->expiredAt = (new $dateTime())->modify('+15 minutes');
@@ -474,12 +498,6 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
         $partner->currency = 'EUR';
         $booking->partner = $partner->reveal();
 
-        $bookingDate = new BookingDate();
-        $bookingDate->componentGoldenId = '5464';
-        $bookingDate->date = $dateTime;
-        $bookingDate->price = 1212;
-        $booking->bookingDate = new ArrayCollection([$bookingDate]);
-
         $guest = $this->prophesize(Guest::class);
         $guest->firstName = 'First Name';
         $guest->lastName = 'Last Name';
@@ -496,71 +514,60 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
         ];
 
         yield 'update-booking-with-success' => [
-            $booking,
+            (function ($booking) use ($populateBookingDates) {
+                $booking->startDate = new \DateTime('2020-10-01');
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
+                $populateBookingDates($booking);
+
+                return $booking;
+            })(clone $booking),
             $availability,
-            (function ($test, $availability) {
+            (function ($test, $availability, $increment) {
                 $availability[0]['stock'] = 7;
                 $test->repository
                     ->getAvailabilityByBookingAndDates(Argument::type(Booking::class))
                     ->willReturn($availability);
                 $test->repository
-                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
-                    ->shouldBeCalledOnce();
-                $test->repository
-                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
+                    ->updateStockForAvailability(Argument::type('string'), Argument::type(\DateTime::class), $increment)
+                    ->shouldBeCalledTimes(1)
                     ->willReturn(1);
             }),
         ];
 
         yield 'update-bookings-big-range' => [
-            (function ($booking) {
-                $booking->endDate = (new $booking->startDate())->modify('+10 day');
+            (function ($booking) use ($populateBookingDates) {
+                $booking->endDate = (clone $booking->startDate)->modify('+10 day');
+                $populateBookingDates($booking);
 
                 return $booking;
             })(clone $booking),
             $availability,
-            (function ($test, $availability) {
+            (function ($test, $availability, $increment) {
                 $test->repository
                     ->getAvailabilityByBookingAndDates(Argument::type(Booking::class))
                     ->willReturn($availability);
                 $test->repository
-                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
-                    ->shouldBeCalledOnce();
-                $test->repository
-                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
+                    ->updateStockForAvailability(Argument::type('string'), Argument::type(\DateTime::class), $increment)
+                    ->shouldBeCalledTimes(10)
                     ->willReturn(1);
             }),
         ];
 
         yield 'update-bookings-with-extra-room' => [
-            (function ($booking, $dateTime) {
-                $booking->endDate = (new $booking->startDate())->modify('+10 day');
-                $bookingDate = new BookingDate();
-                $bookingDate->componentGoldenId = '5464';
-                $bookingDate->date = $dateTime;
-                $bookingDate->price = 1212;
-                $bookingDate2 = clone $bookingDate;
-                $bookingDate2->price = 500;
-                $bookingDate3 = clone $bookingDate;
-                $bookingDate3->price = 500;
-                $booking->bookingDate = new ArrayCollection([
-                    $bookingDate,
-                    $bookingDate2,
-                    $bookingDate3,
-                ]);
+            (function ($booking, $dateTime) use ($populateBookingDates) {
+                $booking->endDate = (clone $booking->startDate)->modify('+10 day');
+                $populateBookingDates($booking, 2);
 
                 return $booking;
             })(clone $booking, $dateTime),
             $availability,
-            (function ($test, $availability) {
+            (function ($test, $availability, $increment) {
                 $test->repository
                     ->getAvailabilityByBookingAndDates(Argument::type(Booking::class))
                     ->willReturn($availability);
                 $test->repository
-                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
-                    ->shouldBeCalled(3);
-                $test->repository
-                    ->updateStockByComponentAndDates(Argument::type('string'), Argument::type(\DateTime::class))
+                    ->updateStockForAvailability(Argument::type('string'), Argument::type(\DateTime::class), $increment)
+                    ->shouldBeCalledTimes(20)
                     ->willReturn(1);
             }),
         ];

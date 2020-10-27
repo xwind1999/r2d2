@@ -214,20 +214,24 @@ SQL;
         return $statement->fetchAllAssociative();
     }
 
-    public function updateStockByComponentAndDates(
+    public function updateStockForAvailability(
         string $componentGoldenId,
-        \DateTime $date
+        \DateTime $date,
+        int $decrement
     ): int {
         $sql = <<<SQL
     UPDATE 
-        room_availability 
+        room_availability ra
+        JOIN flat_manageable_component fmc ON fmc.component_uuid = ra.component_uuid
     SET
-        stock = IF(stock > 0, stock - 1, 0),
+        stock = stock - :decrement,
         updated_at = now() 
-    WHERE component_golden_id = :componentGoldenId AND date = :date
+    WHERE ra.component_golden_id = :componentGoldenId AND date = :date AND fmc.room_stock_type != :requestType
 SQL;
         $params = [
             'componentGoldenId' => $componentGoldenId,
+            'decrement' => $decrement,
+            'requestType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST,
             'date' => $date->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
         ];
 

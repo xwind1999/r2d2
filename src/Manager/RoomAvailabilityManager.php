@@ -157,9 +157,23 @@ class RoomAvailabilityManager
     {
         $bookingDates = $booking->bookingDate->getValues();
         foreach ($bookingDates as $bookingDate) {
-            $this->repository->updateStockByComponentAndDates(
+            $this->repository->updateStockForAvailability(
                 $bookingDate->componentGoldenId,
-                $bookingDate->date);
+                $bookingDate->date,
+                1
+            );
+        }
+    }
+
+    public function updateStockBookingCancellation(Booking $booking): void
+    {
+        $bookingDates = $booking->bookingDate->getValues();
+        foreach ($bookingDates as $bookingDate) {
+            $this->repository->updateStockForAvailability(
+                $bookingDate->componentGoldenId,
+                $bookingDate->date,
+                -1
+            );
         }
     }
 
