@@ -23,10 +23,9 @@ variables:
   stage: Project Env Deploy
   environment:
     name: ie1-devint-r2d2
-  only:
-    - master
-  except:
-    - tags
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
 
 'deploy-STAGING':
   extends: .deploy
@@ -35,9 +34,10 @@ variables:
     name: ie1-staging-r2d2
   variables:
     NR_ENABLE: "false"
-  when: manual
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+      when: manual
+    - when: never
 
 'deploy-PREPROD':
   extends: .deploy
@@ -46,9 +46,10 @@ variables:
     name: ie1-preprod-r2d2
   variables:
     NR_ENABLE: "true"
-  when: manual
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+      when: manual
+    - when: never
 
 'deploy-PROD':
   extends: .deploy
@@ -58,6 +59,7 @@ variables:
   variables:
     ENVIRONMENT_NAME: ie1-prod-r2d2
     NR_ENABLE: "true"
-  when: manual
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+      when: manual
+    - when: never
