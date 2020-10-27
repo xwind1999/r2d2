@@ -71,7 +71,7 @@ services:
     environment:
       QUEUES: listener-room-availability
     deploy:
-      replicas: 10
+      replicas: 20
 
   worker-listener-room-availability-list:
     <<: *worker-template
@@ -83,7 +83,7 @@ services:
     environment:
       QUEUES: listener-room-price
     deploy:
-      replicas: 10
+      replicas: 20
 
   worker-listener-room-price-list:
     <<: *worker-template
