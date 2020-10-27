@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contract\Request\BroadcastListener;
 
+use App\Constants\DateTimeConstants;
 use App\Contract\Request\BroadcastListener\Common\Price;
 use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Event\NamedEventInterface;
@@ -60,9 +61,10 @@ class RoomPriceRequest implements ContextualInterface, NamedEventInterface
     {
         return [
             'product' => $this->product->getContext(),
-            'dateFrom' => $this->dateFrom,
-            'dateTo' => $this->dateTo,
-            'updatedAt' => $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : null,
+            'dateFrom' => $this->dateFrom->format(DateTimeConstants::DEFAULT_DATE_TIME_FORMAT),
+            'dateTo' => $this->dateTo->format(DateTimeConstants::DEFAULT_DATE_TIME_FORMAT),
+            'updatedAt' => $this->updatedAt ?
+                $this->updatedAt->format(DateTimeConstants::DEFAULT_DATE_TIME_FORMAT) : null,
             'price' => $this->price->getContext(),
         ];
     }

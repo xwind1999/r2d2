@@ -94,12 +94,15 @@ class BookingStatusSubscriberTest extends ProphecyTestCase
         $partner->currency = 'EUR';
         $this->booking->partner = $partner->reveal();
 
-        $bookingDate = $this->prophesize(BookingDate::class);
-        $bookingDate->componentGoldenId = '5464';
-        $bookingDate->component = $component;
-        $bookingDate->date = $dateTime;
-        $bookingDate->price = 1212;
-        $this->booking->bookingDate = new ArrayCollection([$bookingDate->reveal()]);
+        $bookingDateDayOne = $this->prophesize(BookingDate::class);
+        $bookingDateDayOne->componentGoldenId = '5464';
+        $bookingDateDayOne->component = $component;
+        $bookingDateDayOne->date = $dateTime;
+        $bookingDateDayOne->price = 606;
+        $bookingDateDayOne->isExtraNight = true;
+        $bookingDateDayOne->isExtraRoom = true;
+
+        $this->booking->bookingDate = new ArrayCollection([$bookingDateDayOne->reveal()]);
 
         $guest = $this->prophesize(Guest::class);
         $guest->firstName = 'First Name';

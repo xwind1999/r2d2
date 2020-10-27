@@ -29,7 +29,7 @@ class EAICheck extends AbstractCheck
         }
     }
 
-    public function validateEai(): ResultInterface
+    private function validateEai(): ResultInterface
     {
         $request = new Request();
         $request->request->add(['data' => ['_format' => 'json']]);

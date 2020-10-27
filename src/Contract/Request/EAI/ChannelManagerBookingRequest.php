@@ -7,6 +7,8 @@ namespace App\Contract\Request\EAI;
 use App\Constraint\CMHStatusConstraint;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
+use App\Event\NamedEventInterface;
+use Clogger\ContextualInterface;
 use Smartbox\CDM\Entity\Booking\ChannelManagerBooking;
 use Smartbox\CDM\Entity\Booking\Guest;
 use Smartbox\CDM\Entity\Common\Country;
@@ -20,8 +22,9 @@ use Smartbox\CDM\Entity\Room\DailyRate;
 use Smartbox\CDM\Entity\Room\Room;
 use Smartbox\CDM\Entity\Voucher\Voucher;
 
-class ChannelManagerBookingRequest extends ChannelManagerBooking
+class ChannelManagerBookingRequest extends ChannelManagerBooking implements ContextualInterface, NamedEventInterface
 {
+    private const EVENT_NAME = '%s booking pushed to EAI';
     private const DEFAULT_AGE = 25; // age is hardcoded
 
     public static function fromCompletedBooking(Booking $booking): self
@@ -34,23 +37,22 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking
         return self::createChannelManagerBookingRequest($booking, CMHStatusConstraint::BOOKING_STATUS_CANCELLED);
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public function getContext(): array
     {
         return [
             'booking_golden_id' => $this->getId(),
             'booking_status' => $this->getStatus(),
+            'booking_total_amount' => $this->getTotalPrice()->getAmount(),
+            'booking_currency_code' => $this->getTotalPrice()->getCurrencyCode(),
             'booking_start_date' => $this->getStartDate(),
             'booking_end_date' => $this->getEndDate(),
             'booking_created_at' => $this->getCreatedAt(),
             'booking_updated_at' => $this->getUpdatedAt(),
-            'voucher_golden_id' => $this->getVoucher()->getId() ?: '',
+            'voucher_golden_id' => $this->getVoucher()->getId(),
             'partner_golden_id' => $this->getPartner()->getId(),
-            'price_amount' => $this->getTotalPrice()->getAmount(),
-            'price_currency_code' => $this->getTotalPrice()->getCurrencyCode(),
             'experience_golden_id' => $this->getExperience()->getId(),
+            'experience_total_price' => $this->getExperience()->getPrice()->getAmount(),
+            'experience_currency' => $this->getExperience()->getPrice()->getCurrencyCode(),
         ];
     }
 
@@ -77,15 +79,17 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking
         $experience = new Experience();
         $experience->setId($booking->experienceGoldenId);
 
-        $price = new Price();
+        $experiencePrice = new Price();
         if (!empty($booking->experience->price)) {
-            $price->setAmount($booking->experience->price);
+            $experiencePrice->setAmount($booking->experience->price);
         }
-        $price->setCurrencyCode($booking->currency);
-        $experience->setPrice($price);
+        $experiencePrice->setCurrencyCode($booking->experience->currency ?: $booking->currency);
+        $experience->setPrice($experiencePrice);
 
-        $price->setAmount($booking->totalPrice);
-        $bookingRequest->setTotalPrice($price);
+        $bookingPrice = new Price();
+        $bookingPrice->setAmount($booking->totalPrice);
+        $bookingPrice->setCurrencyCode($booking->currency);
+        $bookingRequest->setTotalPrice($bookingPrice);
 
         $componentsArray = [];
         foreach ($booking->components as $component) {
@@ -99,47 +103,66 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking
         $country = new Country();
         $country->setCode($booking->country);
 
-        $roomArray = [];
-        $dailyRateArray = [];
         $guestArray = [];
+        $loopIdentifier = 0;
+        $mainGuest = new Guest();
+        foreach ($booking->guest->getIterator() as $guest) {
+            $guestObject = new Guest();
+            $guestObject->setFirstName($guest->firstName ?: $mainGuest->getFirstName());
+            $guestObject->setLastName($guest->lastName ?: $mainGuest->getLastName());
+            $guestObject->setEmailAddress($guest->email ?: $mainGuest->getEmailAddress());
+            $guestObject->setPhoneNumber($guest->phone ?: $mainGuest->getPhoneNumber());
+            $guestObject->setIsPrimary(0 === $loopIdentifier);
+            $guestObject->setAge(self::DEFAULT_AGE);
+            $guestObject->setCountry($country);
+            $guestArray[] = $guestObject;
+
+            if (0 === $loopIdentifier) {
+                $mainGuest = clone $guestObject;
+                ++$loopIdentifier;
+            }
+        }
+
+        $extraRoomAndNightStatus = false;
+        $extraRoomStatus = false;
+        $dailyRateArray = [];
+        $roomsArray = [];
+        $roomsArrayIndex = 0;
+
         $room = new Room();
-        $previousComponentGoldenId = null;
-        $previousComponentGoldenIdIndex = 0;
+        $product = new Product();
+        $roomTypeProduct = new RoomTypeProduct();
 
         /**
          * @var BookingDate $bookingDate
          */
         foreach ($booking->bookingDate->getIterator() as $index => $bookingDate) {
-            if ($previousComponentGoldenId !== $bookingDate->componentGoldenId) {
-                $roomTypeProduct = new RoomTypeProduct();
-                $product = new Product();
+            if (true === $bookingDate->isExtraRoom &&
+                true === $bookingDate->isExtraNight &&
+                false === $extraRoomAndNightStatus
+            ) {
+                $room = new Room();
                 $product->setId($bookingDate->componentGoldenId);
                 $product->setName($bookingDate->component->name);
                 $roomTypeProduct->setProduct($product);
+
                 $room->setRoomTypeProduct($roomTypeProduct);
-                $previousComponentGoldenId = $bookingDate->componentGoldenId;
-                $previousComponentGoldenIdIndex = $index;
-
-                $loopIdentifier = 0;
-                $mainGuest = new Guest();
-                foreach ($booking->guest->getIterator() as $guest) {
-                    $guestObject = new Guest();
-                    $guestObject->setFirstName($guest->firstName ?: $mainGuest->getFirstName());
-                    $guestObject->setLastName($guest->lastName ?: $mainGuest->getLastName());
-                    $guestObject->setEmailAddress($guest->email ?: $mainGuest->getEmailAddress());
-                    $guestObject->setPhoneNumber($guest->phone ?: $mainGuest->getPhoneNumber());
-                    $guestObject->setIsPrimary(0 === $loopIdentifier);
-                    $guestObject->setAge(self::DEFAULT_AGE);
-                    $guestObject->setCountry($country);
-                    $guestArray[] = $guestObject;
-
-                    if (0 === $loopIdentifier) {
-                        $mainGuest = clone $guestObject;
-                        ++$loopIdentifier;
-                    }
-                }
                 $room->setGuests($guestArray);
-                $guestArray = [];
+                $extraRoomAndNightStatus = true;
+                $roomsArrayIndex = 0;
+                $dailyRateArray = null;
+            } elseif (false === $bookingDate->isExtraRoom && false === $extraRoomStatus) {
+                $room = new Room();
+                $product->setId($bookingDate->componentGoldenId);
+                $product->setName($bookingDate->component->name);
+                $roomTypeProduct->setProduct($product);
+
+                $room->setRoomTypeProduct($roomTypeProduct);
+                $room->setGuests($guestArray);
+
+                $extraRoomStatus = true;
+                $roomsArrayIndex = 1;
+                $dailyRateArray = null;
             }
 
             $dailyRate = new DailyRate();
@@ -151,13 +174,16 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking
             $dailyRateArray[] = $dailyRate;
             $room->setDailyRates($dailyRateArray);
 
-            if ($previousComponentGoldenId === $bookingDate->componentGoldenId) {
-                $roomArray[$previousComponentGoldenIdIndex] = $room;
-            }
+            $roomsArray[$roomsArrayIndex] = $room;
         }
 
-        $bookingRequest->setRooms($roomArray);
+        $bookingRequest->setRooms($roomsArray);
 
         return $bookingRequest;
+    }
+
+    public function getEventName(): string
+    {
+        return sprintf(static::EVENT_NAME, $this->getStatus());
     }
 }

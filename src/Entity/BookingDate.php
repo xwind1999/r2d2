@@ -58,4 +58,14 @@ class BookingDate
      * @ORM\Column(type="integer", options={"unsigned"=true})
      */
     public int $guestsCount;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    public bool $isExtraNight;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    public bool $isExtraRoom;
 }

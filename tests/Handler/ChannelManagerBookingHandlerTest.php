@@ -54,9 +54,6 @@ class ChannelManagerBookingHandlerTest extends ProphecyTestCase
     public function testHandlerMessageSuccessfully(): void
     {
         $this->eaiProvider->pushChannelManagerBooking(Argument::any())->shouldBeCalledOnce();
-        $this->channelManagerBookingRequest->getStatus()->shouldBeCalledOnce()->willReturn('confirmed');
-        $this->channelManagerBookingRequest->getContext()->shouldBeCalledOnce();
-        $this->logger->info('confirmed booking pushed to EAI', [])->shouldBeCalledOnce();
         $this->logger->error(Argument::any(), Argument::any())->shouldNotBeCalled();
 
         $this->channelManagerBookingHandler->__invoke($this->channelManagerBookingRequest->reveal());
@@ -74,7 +71,6 @@ class ChannelManagerBookingHandlerTest extends ProphecyTestCase
             ->shouldBeCalledOnce()
             ->willThrow(ApiRestException::class)
         ;
-        $this->logger->info(Argument::any(), Argument::any())->shouldNotBeCalled();
         $this->channelManagerBookingRequest->getContext()->shouldBeCalledOnce();
         $this->logger->error(Argument::any(), Argument::any())->shouldBeCalledOnce();
         $this->expectException(ApiRestException::class);
