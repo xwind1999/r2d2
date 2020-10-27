@@ -147,6 +147,7 @@ class ComponentManager
         $component->durationUnit = $productRequest->productDurationUnit;
 
         $this->repository->save($component);
+        $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));
         $this->manageableProductService->dispatchForProduct($productRequest);
     }
 
