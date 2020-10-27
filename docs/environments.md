@@ -19,6 +19,29 @@
 | RabbitMQ | http://10.8.116.13:15672/ | rabbit-admin | xgdfykuxdO | |
 | MySQL | ie1-devint-r2d2-db-01.z.sbxtest.net:3306 | u_r2d2 | JxUfkzcBigPE^Z*4 | |
 
+## Staging
+
+| Node | Service |
+| --- | --- |
+| ie1-staging-r2d2-api-01.z.sbxtest.net | `R2-D2 API` `R2-D2 Worker` `Portainer` |
+| ie1-staging-r2d2-db-01.z.sbxtest.net | `R2-D2 MySQL 8.0` |
+| ie1-staging-r2d2-rabbitmq-01.z.sbxtest.net | `R2-D2 RabbitMQ` |
+| ie1-staging-r2d2-rabbitmq-02.z.sbxtest.net | `R2-D2 RabbitMQ` |
+| ie1-staging-r2d2-rabbitmq-03.z.sbxtest.net | `R2-D2 RabbitMQ` |
+| ie1-staging-r2d2-rabbitmq-04.z.sbxtest.net | `R2-D2 RabbitMQ` |
+| ie1-staging-r2d2-rabbitmq-05.z.sbxtest.net | `R2-D2 RabbitMQ` |
+
+| Service | Access | User | Password | Roles |
+| --- | --- | --- | --- | --- |
+| Portainer | http://ie1-staging-r2d2-api-01.z.sbxtest.net:9000/ | admin | starwarssucks | |
+| R2D2 | http://ie1-staging-r2d2-api-01.z.sbxtest.net/ | admin | admin | everything, `/internal` |
+| R2D2 | http://ie1-staging-r2d2-api-01.z.sbxtest.net/ | eai | eai | `/broadcast-listener`  |
+| R2D2 | http://ie1-staging-r2d2-api-01.z.sbxtest.net/ | booking | booking | `/booking` |
+| R2D2 | http://ie1-staging-r2d2-api-01.z.sbxtest.net/ | | | `/quickdata`, `/`, `/ping` |
+| RabbitMQ | http://ie1-staging-r2d2-rabbitmq-01.z.sbxtest.net:15672/ | rabbit-admin | xgdfykuxdO | |
+| MySQL | ie1-staging-r2d2-db-01.z.sbxtest.net:3306 | u_r2d2 | gEUxb123.Z | |
+
+
 ## Preprod
 
 | Node | Service |
