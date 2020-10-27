@@ -30,7 +30,7 @@ services:
 
   cron:
     <<: *service-template
-    command: ['/app/bin/start-crond.sh']
+    command: [ '/app/bin/start-crond.sh' ]
 
   worker-listener-partner:
     <<: *worker-template
@@ -51,15 +51,11 @@ services:
     <<: *worker-template
     environment:
       QUEUES: listener-product-relationship
-    deploy:
-      replicas: 6
 
   worker-calculate-manageable-flag:
     <<: *worker-template
     environment:
       QUEUES: event-calculate-manageable-flag
-    deploy:
-      replicas: 10
 
   worker-push-room-information:
     <<: *worker-template
@@ -70,8 +66,6 @@ services:
     <<: *worker-template
     environment:
       QUEUES: listener-room-availability
-    deploy:
-      replicas: 10
 
   worker-listener-room-availability-list:
     <<: *worker-template
@@ -82,8 +76,6 @@ services:
     <<: *worker-template
     environment:
       QUEUES: listener-room-price
-    deploy:
-      replicas: 10
 
   worker-listener-room-price-list:
     <<: *worker-template
@@ -94,8 +86,6 @@ services:
     <<: *worker-template
     environment:
       QUEUES: event-calculate-flat-manageable-component
-    deploy:
-      replicas: 10
 
   worker-push-booking-information:
     <<: *worker-template
