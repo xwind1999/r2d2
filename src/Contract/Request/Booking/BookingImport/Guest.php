@@ -41,10 +41,10 @@ class Guest extends BookingCreateGuest
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Length(min="1", max="255")
+     * @Assert\Length(max="255")
      *
      * @JMS\Type("string")
-     * @JMS\SerializedName ("telephone")
+     * @JMS\SerializedName("telephone")
      */
     public ?string $phone = null;
 }
