@@ -129,14 +129,14 @@ blue-pill-DEV-INT:
   needs:
     - locust-DEV-INT
   script:
-    - bin/console blue-pill:locust:push-report --app=r2-d2 --environment=devint --code=${CI_COMMIT_SHORT_SHA} --date=${COMMIT_TIME} ${CI_PROJECT_DIR}/report/html/locust/staging_end2EndTests.py_stats.csv
+    - bin/console blue-pill:locust:push-report --app=r2-d2 --environment=devint --code=${CI_COMMIT_SHORT_SHA} --date=${COMMIT_TIME} ${CI_PROJECT_DIR}/report/html/locust/devint_end2EndTests.py_stats.csv
 
 blue-pill-STAGING:
   extends: .blue-pill
   needs:
     - locust-STAGING
   script:
-    - bin/console blue-pill:locust:push-report --app=r2-d2 --environment=staging --code=${CI_COMMIT_SHORT_SHA} --date=${COMMIT_TIME} ${CI_PROJECT_DIR}/report/html/locust/preprod_end2EndTests.py_stats.csv
+    - bin/console blue-pill:locust:push-report --app=r2-d2 --environment=staging --code=${CI_COMMIT_SHORT_SHA} --date=${COMMIT_TIME} ${CI_PROJECT_DIR}/report/html/locust/staging_end2EndTests.py_stats.csv
 
 blue-pill-PREPROD:
   extends: .blue-pill
