@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Constraint\PartnerStatusConstraint;
+use App\Constraint\ProductDurationUnitConstraint;
 use App\Constraint\ProductStatusConstraint;
 use App\Contract\Message\CalculateFlatManageableComponent;
 use App\Contract\Request\BroadcastListener\ProductRequest;
@@ -212,6 +213,11 @@ class ComponentManager
         $criteria->andWhere(Criteria::expr()->eq('boxExperience.isEnabled', true));
         $criteria->andWhere(Criteria::expr()->eq('experienceComponent.isEnabled', true));
         $criteria->andWhere(Criteria::expr()->eq('partner.status', PartnerStatusConstraint::PARTNER_STATUS_PARTNER));
+        $criteria->andWhere(Criteria::expr()->gte('component.duration', 1));
+        $criteria->andWhere(Criteria::expr()->eq(
+            'component.durationUnit',
+            ProductDurationUnitConstraint::PRODUCT_DURATION_UNIT_NIGHTS
+        ));
 
         /**
          * @var Criteria $c
