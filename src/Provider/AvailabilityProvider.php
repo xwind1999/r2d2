@@ -89,4 +89,9 @@ class AvailabilityProvider
 
         return $returnArray;
     }
+
+    public function getManageableComponentForGetPackage(string $experienceId): array
+    {
+        return $this->componentManager->getManageableComponentForGetPackage($experienceId);
+    }
 }

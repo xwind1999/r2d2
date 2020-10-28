@@ -317,4 +317,29 @@ class AvailabilityProviderTest extends ProphecyTestCase
             $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList($experienceIds, $startDate)
         );
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getManageableComponentForGetPackage
+     */
+    public function testGetManageableComponentForGetPackage(): void
+    {
+        $expected = [
+            0 => [
+                'goldenId' => '227914',
+                'duration' => '1',
+                'partnerGoldenId' => '00037411',
+                'isSellable' => '0',
+                'roomStockType' => 'stock',
+            ],
+        ];
+        $this->componentManager
+            ->getManageableComponentForGetPackage(Argument::type('string'))
+            ->shouldBeCalled()
+            ->willReturn($expected)
+        ;
+        $result = $this->availabilityProvider->getManageableComponentForGetPackage('12345');
+        $this->assertEquals($expected, $result);
+        $this->assertIsArray($result);
+    }
 }

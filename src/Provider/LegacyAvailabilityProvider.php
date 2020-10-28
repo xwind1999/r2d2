@@ -6,6 +6,7 @@ namespace App\Provider;
 
 use App\Cache\QuickDataCache;
 use App\Constants\DateTimeConstants;
+use App\Constraint\ProductDurationUnitConstraint;
 use App\Contract\Response\QuickData\AvailabilityPricePeriodResponse;
 use App\Contract\Response\QuickData\GetPackageResponse;
 use App\Contract\Response\QuickData\GetPackageV2Response;
@@ -60,20 +61,41 @@ class LegacyAvailabilityProvider
         );
 
         if (empty($roomAvailabilities)) {
-            $response = $this->serializer->fromArray(
-                [
-                    'ResponseStatus' => [
-                        'ErrorCode' => 'ArgumentException',
-                        'Message' => 'Invalid Request',
-                        'StackTrace' => '',
-                        'Errors' => [],
-                    ],
-                ],
-                QuickDataErrorResponse::class
-            );
-            $response->httpCode = Response::HTTP_BAD_REQUEST;
+            $component = $this->availabilityProvider->getManageableComponentForGetPackage($experienceId);
 
-            return $response;
+            if (empty($component)) {
+                $response = $this->serializer->fromArray(
+                    [
+                        'ResponseStatus' => [
+                            'ErrorCode' => 'ArgumentException',
+                            'Message' => 'Invalid Request',
+                            'StackTrace' => '',
+                            'Errors' => [],
+                        ],
+                    ],
+                    QuickDataErrorResponse::class
+                );
+                $response->httpCode = Response::HTTP_BAD_REQUEST;
+
+                return $response;
+            }
+
+            $returnArray = [
+                'ListPrestation' => [
+                    AvailabilityHelper::fillMissingAvailabilityForGetPackage(
+                        [],
+                        $component[0]['roomStockType'] ?: '',
+                        $component[0]['duration'] ?
+                            (int) $component[0]['duration'] : ProductDurationUnitConstraint::MINIMUM_DURATION,
+                        $component[0]['partnerGoldenId'],
+                        (bool) $component[0]['isSellable'],
+                        $dateFrom,
+                        $dateTo
+                    ),
+                ],
+            ];
+
+            return $this->serializer->fromArray($returnArray, GetPackageResponse::class);
         }
 
         $roomStockType = AvailabilityHelper::getRoomStockShortType($roomAvailabilities[0]['roomStockType']);

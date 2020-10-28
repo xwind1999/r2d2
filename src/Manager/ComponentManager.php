@@ -231,4 +231,9 @@ class ComponentManager
     {
         return $criteria->andWhere(Criteria::expr()->eq('component.goldenId', $componentGoldenId));
     }
+
+    public function getManageableComponentForGetPackage(string $experienceId): array
+    {
+        return $this->repository->findManageableComponentByExperienceId($experienceId);
+    }
 }

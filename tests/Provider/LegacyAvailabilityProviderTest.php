@@ -130,11 +130,62 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $result = $this->prophesize(QuickDataErrorResponse::class);
         $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
 
-        $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
-            Argument::any(),
-            Argument::any(),
-            Argument::any()
-        )->willReturn([]);
+        $this->availabilityProvider
+            ->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
+                Argument::any(),
+                Argument::any(),
+                Argument::any())
+            ->willReturn([])
+        ;
+        $this->availabilityProvider
+            ->getManageableComponentForGetPackage(Argument::any())
+            ->shouldBeCalled()
+            ->willReturn([])
+        ;
+
+        $this->assertInstanceOf(
+            QuickDataErrorResponse::class,
+            $this->legacyAvailabilityProvider->getAvailabilityForExperience('31209470194830912', $dateFrom, $dateTo)
+        );
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getAvailabilityForExperience
+     */
+    public function testGetAvailabilityForExperienceWithNoAvailabilitiesAndValidComponent()
+    {
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-01');
+
+        $result = $this->prophesize(QuickDataErrorResponse::class);
+        $this->serializer
+            ->fromArray(Argument::any(), Argument::any())
+            ->willReturn($result->reveal())
+            ->shouldBeCalledOnce()
+        ;
+
+        $this->availabilityProvider
+            ->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
+                Argument::any(),
+                Argument::any(),
+                Argument::any())
+            ->willReturn([])
+        ;
+        $this->availabilityProvider
+            ->getManageableComponentForGetPackage(Argument::any())
+            ->shouldBeCalled()
+            ->willReturn(
+                [
+                    0 => [
+                        'goldenId' => '227914',
+                        'duration' => '1',
+                        'partnerGoldenId' => '00037411',
+                        'isSellable' => '0',
+                        'roomStockType' => 'stock',
+                    ],
+                ]
+        );
 
         $this->assertInstanceOf(
             QuickDataErrorResponse::class,

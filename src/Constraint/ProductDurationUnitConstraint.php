@@ -6,6 +6,7 @@ namespace App\Constraint;
 
 class ProductDurationUnitConstraint extends AbstractChoiceConstraint
 {
+    public const MINIMUM_DURATION = 1;
     public const PRODUCT_DURATION_UNIT_MINUTES = 'Minutes';
     public const PRODUCT_DURATION_UNIT_HOURS = 'Hours';
     public const PRODUCT_DURATION_UNIT_DAYS = 'Days';
