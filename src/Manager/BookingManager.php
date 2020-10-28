@@ -6,6 +6,7 @@ namespace App\Manager;
 
 use App\Constants\DateTimeConstants;
 use App\Constraint\BookingStatusConstraint;
+use App\Constraint\ProductDurationUnitConstraint;
 use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Contract\Request\Booking\BookingImport\BookingImportRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
@@ -143,7 +144,7 @@ class BookingManager
             new \DateInterval(DateTimeConstants::PLUS_ONE_DAY_DATE_INTERVAL),
             $booking->endDate
         );
-        $minimumDuration = $component->duration ?? 1;
+        $minimumDuration = $component->duration ?? ProductDurationUnitConstraint::MINIMUM_DURATION;
         $perDay = $money->allocateTo($minimumDuration);
         $totalPrice = 0;
         $includedDaysCount = 0;

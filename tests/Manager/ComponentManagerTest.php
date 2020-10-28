@@ -481,4 +481,29 @@ class ComponentManagerTest extends ProphecyTestCase
 
         $this->assertFalse($component->isManageable);
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getManageableComponentForGetPackage
+     */
+    public function testGetManageableComponentForGetPackage(): void
+    {
+        $expected = [
+            0 => [
+                'goldenId' => '227914',
+                'duration' => '1',
+                'partnerGoldenId' => '00037411',
+                'isSellable' => '0',
+                'roomStockType' => 'stock',
+            ],
+        ];
+        $this->repository
+            ->findManageableComponentByExperienceId(Argument::type('string'))
+            ->shouldBeCalled()
+            ->willReturn($expected)
+        ;
+        $result = $this->manager->getManageableComponentForGetPackage('12345');
+        $this->assertEquals($expected, $result);
+        $this->assertIsArray($result);
+    }
 }

@@ -192,4 +192,20 @@ class ComponentRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getArrayResult();
     }
+
+    public function findManageableComponentByExperienceId(string $experienceId): array
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb
+            ->select('c.goldenId, c.duration, c.partnerGoldenId, c.isSellable, c.roomStockType')
+            ->join(ExperienceComponent::class, 'experienceComponent')
+            ->where('experienceComponent.component = c.uuid')
+            ->andWhere($qb->expr()->eq('experienceComponent.experienceGoldenId', $experienceId))
+            ->andWhere('c.isManageable = 1')
+            ->indexBy('c', 'c.goldenId')
+            ->setMaxResults(1)
+        ;
+
+        return  $qb->getQuery()->getScalarResult();
+    }
 }

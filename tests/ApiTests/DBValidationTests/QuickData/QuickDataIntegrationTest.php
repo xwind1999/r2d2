@@ -58,6 +58,67 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
+    public function testGetPackageWithInvalidExperienceId()
+    {
+        static::cleanUp();
+
+        $experienceId = '7306';
+        $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
+        $dateTo = (clone $dateFrom)->modify('+5 day');
+
+        $expectedResult = [
+            'ResponseStatus' => [
+                'ErrorCode' => 'ArgumentException',
+                'Message' => 'Invalid Request',
+                'StackTrace' => '',
+                'Errors' => [],
+            ],
+        ];
+
+        $response = self::$quickDataHelper->getPackage(
+            $experienceId,
+            $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        );
+        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+    }
+
+    public function testGetPackageWithoutAvailability()
+    {
+        static::cleanUp();
+
+        $experienceId = '7307';
+        $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of last month')));
+        $dateTo = (clone $dateFrom)->modify('+5 day');
+
+        $expectedResult = [
+            'ListPrestation' => [[
+                'Availabilities' => [
+                    '0',
+                    '0',
+                    '0',
+                    '0',
+                    '0',
+                    '0',
+                ],
+                'PrestId' => 1,
+                'Duration' => 1,
+                'LiheId' => 1,
+                'PartnerCode' => '00037411',
+                'ExtraNight' => false,
+                'ExtraRoom' => false,
+            ]],
+        ];
+
+        $response = self::$quickDataHelper->getPackage(
+            $experienceId,
+            $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        );
+
+        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+    }
+
     public function testGetPackageV2()
     {
         static::cleanUp();
