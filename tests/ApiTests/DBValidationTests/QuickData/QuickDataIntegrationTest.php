@@ -7,14 +7,10 @@ namespace App\Tests\ApiTests\QuickData;
 use App\Constants\AvailabilityConstants;
 use App\Constants\DateTimeConstants;
 use App\Entity\RoomAvailability;
+use App\Repository\ComponentRepository;
 use App\Repository\RoomAvailabilityRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
 
-/**
- * Class QuickDataIntegrationTest.
- *
- * @group quickdata
- */
 class QuickDataIntegrationTest extends IntegrationTestCase
 {
     public function testGetPackage()
@@ -22,29 +18,227 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         static::cleanUp();
 
         $experienceId = '7307';
+        $componentId = '227914';
+
         $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
         $dateTo = (clone $dateFrom)->modify('+5 day');
 
-        $roomAvailabilities = self::$container->get(RoomAvailabilityRepository::class)
-            ->findAvailableRoomsAndPricesByExperienceIdAndDates($experienceId, $dateFrom, $dateTo);
-        $resultArray = [];
+        $payload = [
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+2 day')->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+2 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+3 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+3 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+4 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => true,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+4 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+5 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '0',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+5 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+6 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+        ];
 
-        foreach ($roomAvailabilities as $availability) {
-            if ('stock' === $availability['roomStockType'] && $availability['stock'] > 0) {
-                $resultArray[] = '1';
-            } elseif ('on_request' === $availability['roomStockType']) {
-                $resultArray[] = 'r';
-            } else {
-                $resultArray[] = '0';
-            }
-        }
+        $response = self::$broadcastListenerHelper->testRoomAvailability($payload);
+        $this->assertEquals(202, $response->getStatusCode());
+
+        $this->consume('listener-room-availability-list', 30);
+        $this->consume('listener-room-availability', 30);
+
+        $component = self::$container->get(ComponentRepository::class)->findOneByGoldenId($componentId);
+
         $expectedResult = [
             'ListPrestation' => [[
-                'Availabilities' => $resultArray,
+                'Availabilities' => [1, 1, 1, 0, 0, 1],
                 'PrestId' => 1,
-                'Duration' => $roomAvailabilities[0]['duration'],
+                'Duration' => $component->duration,
                 'LiheId' => 1,
                 'PartnerCode' => '00037411',
+                'ExtraNight' => false,
+                'ExtraRoom' => false,
+            ]],
+        ];
+
+        $response = self::$quickDataHelper->getPackage(
+            $experienceId,
+            $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        );
+        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+    }
+
+    public function testGetPackageWithStopSale()
+    {
+        static::cleanUp();
+
+        $experienceId = '122476';
+        $componentId = '326541';
+        $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
+        $dateTo = (clone $dateFrom)->modify('+2 day');
+        $payload = [
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+2 day')->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => true,
+                'quantity' => '2',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+2 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+3 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '0',
+            ],
+        ];
+
+        $response = self::$broadcastListenerHelper->testRoomAvailability($payload);
+        $this->assertEquals(202, $response->getStatusCode());
+
+        $this->consume('listener-room-availability-list', 30);
+        $this->consume('listener-room-availability', 30);
+
+        $component = self::$container->get(ComponentRepository::class)->findOneByGoldenId($componentId);
+
+        $expectedResult = [
+            'ListPrestation' => [[
+                'Availabilities' => [1, 0, 0],
+                'PrestId' => 1,
+                'Duration' => $component->duration,
+                'LiheId' => 1,
+                'PartnerCode' => '00147276',
+                'ExtraNight' => true,
+                'ExtraRoom' => true,
+            ]],
+        ];
+
+        $response = self::$quickDataHelper->getPackage(
+            $experienceId,
+            $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        );
+        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+    }
+
+    public function testGetPackageWithOnRequestStopSale()
+    {
+        static::cleanUp();
+
+        $experienceId = '78034';
+        $componentId = '249910';
+        $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
+        $dateTo = (clone $dateFrom)->modify('+2 day');
+        $payload = [
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+2 day')->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => true,
+                'quantity' => '2',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+2 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+3 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '0',
+            ],
+        ];
+
+        $response = self::$broadcastListenerHelper->testRoomAvailability($payload);
+        $this->assertEquals(202, $response->getStatusCode());
+
+        $this->consume('listener-room-availability-list', 30);
+        $this->consume('listener-room-availability', 30);
+
+        $component = self::$container->get(ComponentRepository::class)->findOneByGoldenId($componentId);
+
+        $expectedResult = [
+            'ListPrestation' => [[
+                'Availabilities' => ['r', 0, 'r'],
+                'PrestId' => 1,
+                'Duration' => $component->duration,
+                'LiheId' => 1,
+                'PartnerCode' => '00142022',
                 'ExtraNight' => false,
                 'ExtraRoom' => false,
             ]],
@@ -177,6 +371,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $experienceId = '7307';
         $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
         $dateTo = (clone $dateFrom)->modify('+5 day');
+        $datePeriod = new \DatePeriod($dateFrom, new \DateInterval('P1D'), $dateTo);
 
         /** @var RoomAvailability[] $roomAvailabilities */
         $roomAvailabilities = self::$container
@@ -185,7 +380,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         ;
 
         $resultArray = [];
-        foreach ($roomAvailabilities as $date => $availability) {
+        foreach ($roomAvailabilities as $availability) {
             $availability['price'] = !empty($availability['price']) ? (int) $availability['price'] / 100 : 0;
             $result = [
                 'Date' => (new \DateTime($availability['date']))->format(DateTimeConstants::PRICE_PERIOD_DATE_TIME_FORMAT),
@@ -212,9 +407,25 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                     'AvailabilityValue' => 0,
                 ];
             }
-
-            $resultArray[] = $result;
+            $resultArray[$availability['date']] = $result;
         }
+
+        foreach ($datePeriod as $date) {
+            if (!isset($resultArray[$date->format('Y-m-d')])) {
+                $resultArray[$date->format('Y-m-d')] = [
+                    'Date' => $date->format(DateTimeConstants::PRICE_PERIOD_DATE_TIME_FORMAT),
+                    'AvailabilityValue' => 0,
+                    'SellingPrice' => 0,
+                    'BuyingPrice' => 0,
+                    'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
+                ];
+            }
+        }
+
+        usort($resultArray, function ($a, $b) {
+            return $a['Date'] <=> $b['Date'];
+        });
+
         $expectedResult = [
             'DaysAvailabilityPrice' => $resultArray,
         ];
@@ -239,13 +450,13 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             ->findAvailableRoomsByBoxId($boxId, $dateFrom);
 
         $data = [];
-        foreach ($avs as $comp => $avs) {
+        foreach ($avs as $comp => $avs2) {
             $d = [
-                'Package' => $avs['experienceGoldenId'],
+                'Package' => $avs2['experienceGoldenId'],
                 'Stock' => 0,
                 'Request' => 0,
             ];
-            if ('on_request' === $avs['roomStockType']) {
+            if ('on_request' === $avs2['roomStockType']) {
                 $d['Request'] = 1;
             } else {
                 $d['Stock'] = 1;

@@ -26,7 +26,7 @@ unit-tests:
       alias: mysql
       command:
         - mysqld
-        - --sql-mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION
+        - --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
   variables:
     MYSQL_DATABASE: r2d2
     MYSQL_ROOT_PASSWORD: admin123
@@ -39,8 +39,6 @@ unit-tests:
     - bin/console doctrine:database:import utils/fixtures/dumps/*
     - php -dmemory_limit=-1 bin/console doctrine:fixtures:load --append
     - bin/console -e test messenger:setup-transports
-    - bin/console -e test r2d2:flatten:manageable-components
-    - bin/console -e test messenger:consume event-calculate-flat-manageable-component --time-limit=3 -vvv
   artifacts:
     expire_in: 1 day
     paths:
