@@ -21,6 +21,16 @@ class BookingImportRequest extends BookingCreateRequest
      */
     public array $guests;
 
+    /**
+     * @Assert\Type(type="array")
+     * @Assert\Valid
+     *
+     * @JMS\Type("array<App\Contract\Request\Booking\BookingImport\Room>")
+     *
+     * @var Room[]
+     */
+    public array $rooms = [];
+
     public function getContext(): array
     {
         return [
