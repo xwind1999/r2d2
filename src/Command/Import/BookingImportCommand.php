@@ -80,7 +80,7 @@ class BookingImportCommand extends AbstractImportCommand
                 $datePeriod = new \DatePeriod(
                     new \DateTime($record['arrivalDate']),
                     new \DateInterval('P1D'),
-                    (new \DateTime($record['endDate']))
+                    new \DateTime($record['endDate'])
                 );
 
                 $bookingDatePerNightPrice = (int) $record['experiencePrice'] / iterator_count($datePeriod);
@@ -94,25 +94,42 @@ class BookingImportCommand extends AbstractImportCommand
                 }
             } else {
                 foreach ($roomTypeArray as $index => $roomType) {
-                    $datePeriod = new \DatePeriod(
-                        new \DateTime($roomBeginDatesArray[$index]),
-                        new \DateInterval('P1D'),
-                        (new \DateTime($roomEndDatesArray[$index]))
-                    );
-
                     if (self::JARVIS_BOOKING_EXTRA_NIGHT_STATUS === $roomType) {
+                        $datePeriod = new \DatePeriod(
+                            new \DateTime($record['arrivalDate']),
+                            new \DateInterval('P1D'),
+                            new \DateTime($record['endDate'])
+                        );
+
                         $extraNightPerDayPrice = (int) $roomPriceArray[$index] / iterator_count($datePeriod);
+                        $bookingDatePerNightPrice = (int) $record['experiencePrice'] / iterator_count($datePeriod);
+                        $extraNightStartDate = new \DateTime($roomBeginDatesArray[$index]);
+                        $extraNightEndDate = new \DateTime($roomEndDatesArray[$index]);
 
                         foreach ($datePeriod as $date) {
                             $roomDate = new RoomDateImport();
-                            $roomDate->price = (int) $extraNightPerDayPrice;
                             $roomDate->day = $date;
-                            $roomDate->extraNight = true;
+
+                            if ($date > $extraNightStartDate && $date < $extraNightEndDate) { // if it is extra night
+                                $roomDate->price = (int) $extraNightPerDayPrice;
+                                $roomDate->extraNight = true;
+                            } else {
+                                $roomDate->price = (int) $bookingDatePerNightPrice;
+                                $roomDate->extraNight = false;
+                            }
+
                             $roomDatesArray[$roomDateIndex] = $roomDate;
                             ++$roomDateIndex;
                         }
                     } else {
+                        $datePeriod = new \DatePeriod(
+                            new \DateTime($roomBeginDatesArray[$index]),
+                            new \DateInterval('P1D'),
+                            new \DateTime($roomEndDatesArray[$index])
+                        );
+
                         $bookingDatePerNightPrice = (int) $record['experiencePrice'] / iterator_count($datePeriod);
+
                         foreach ($datePeriod as $date) {
                             $roomDate = new RoomDateImport();
                             $roomDate->price = (int) $bookingDatePerNightPrice;
