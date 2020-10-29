@@ -333,6 +333,10 @@ FROM
  WHERE
    r.date BETWEEN :startDate AND :endDate
   AND f.experience_golden_id = :experienceGoldenId
+  AND r.is_stop_sale = false AND
+    (
+        (f.room_stock_type = :onRequestType) OR (f.room_stock_type in (:stockType, :allotmentType) AND r.stock > 0)
+    )
 GROUP BY
    r.stock,
    r.date,
@@ -351,6 +355,9 @@ SQL;
 
         $query->bindValue('dateNow', (new \DateTime('now'))->format(DateTimeConstants::DEFAULT_DATE_TIME_FORMAT));
         $query->bindValue('status', BookingStatusConstraint::BOOKING_STATUS_CREATED);
+        $query->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
+        $query->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
+        $query->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
         $query->execute();
 
         return $query->fetchAllAssociative();
