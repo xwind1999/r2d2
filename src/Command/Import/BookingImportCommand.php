@@ -77,6 +77,7 @@ class BookingImportCommand extends AbstractImportCommand
             $room = new Room();
 
             if (empty($roomTypeArray) || empty($roomBeginDatesArray) || empty($roomEndDatesArray)) {
+                $room->extraRoom = false;
                 $datePeriod = new \DatePeriod(
                     new \DateTime($record['arrivalDate']),
                     new \DateInterval('P1D'),
@@ -92,9 +93,13 @@ class BookingImportCommand extends AbstractImportCommand
                     $roomDatesArray[$roomDateIndex] = $roomDate;
                     ++$roomDateIndex;
                 }
+
+                $room->dates = $roomDatesArray;
+                $bookingCreateRequest->rooms = [$room];
             } else {
                 foreach ($roomTypeArray as $index => $roomType) {
                     if (self::JARVIS_BOOKING_EXTRA_NIGHT_STATUS === $roomType) {
+                        $room->extraRoom = false;
                         $datePeriod = new \DatePeriod(
                             new \DateTime($record['arrivalDate']),
                             new \DateInterval('P1D'),
@@ -110,7 +115,7 @@ class BookingImportCommand extends AbstractImportCommand
                             $roomDate = new RoomDateImport();
                             $roomDate->day = $date;
 
-                            if ($date > $extraNightStartDate && $date < $extraNightEndDate) { // if it is extra night
+                            if ($date >= $extraNightStartDate && $date < $extraNightEndDate) { // if it is extra night
                                 $roomDate->price = (int) $extraNightPerDayPrice;
                                 $roomDate->extraNight = true;
                             } else {
@@ -121,6 +126,9 @@ class BookingImportCommand extends AbstractImportCommand
                             $roomDatesArray[$roomDateIndex] = $roomDate;
                             ++$roomDateIndex;
                         }
+
+                        $room->dates = $roomDatesArray;
+                        $bookingCreateRequest->rooms = [$room];
                     } else {
                         $datePeriod = new \DatePeriod(
                             new \DateTime($roomBeginDatesArray[$index]),
@@ -138,12 +146,16 @@ class BookingImportCommand extends AbstractImportCommand
                             $roomDatesArray[$roomDateIndex] = $roomDate;
                             ++$roomDateIndex;
                         }
+                        $room->dates = $roomDatesArray;
+
+                        $extraRoom = new Room();
+                        $extraRoom->extraRoom = true;
+                        $extraRoom->dates = $roomDatesArray;
+
+                        $bookingCreateRequest->rooms = [$room, $extraRoom];
                     }
                 }
             }
-
-            $room->dates = empty($roomDatesArray) ? [new RoomDateImport()] : $roomDatesArray;
-            $bookingCreateRequest->rooms = [$room];
 
             $errors = $this->validator->validate($bookingCreateRequest);
             if ($errors->count() > 0) {
