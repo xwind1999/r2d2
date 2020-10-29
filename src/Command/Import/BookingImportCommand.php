@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Command\Import;
 
 use App\Contract\Request\Booking\BookingCreate\Experience;
-use App\Contract\Request\Booking\BookingCreate\Room;
-use App\Contract\Request\Booking\BookingCreate\RoomDate;
 use App\Contract\Request\Booking\BookingImport\BookingImportRequest;
 use App\Contract\Request\Booking\BookingImport\Guest;
+use App\Contract\Request\Booking\BookingImport\Room;
+use App\Contract\Request\Booking\BookingImport\RoomDate as RoomDateImport;
 
 class BookingImportCommand extends AbstractImportCommand
 {
@@ -46,21 +46,35 @@ class BookingImportCommand extends AbstractImportCommand
 
             $bookingCreateRequest->experience = new Experience();
             $bookingCreateRequest->experience->id = $record['experienceId'];
-            $record['components'] = json_decode($record['components'], true, 512, JSON_THROW_ON_ERROR);
-            $bookingCreateRequest->experience->components = $record['components']['components'][0];
-            $bookingCreateRequest->guests = [
-                $this->serializer->deserialize($record['customerData'], Guest::class, 'json'),
-            ];
 
-            $roomTypeArray = explode(';', $record['roomType']);
-            $roomPriceArray = explode(';', $record['roomPrice']);
-            $roomBeginDatesArray = explode(';', $record['beginRoomDate']);
-            $roomEndDatesArray = explode(';', $record['endRoomDate']);
+            $record['components'] = str_replace('0x', '', $record['components']);
+            $record['components'] = hex2bin($record['components']);
+            $record['components'] = gzdecode($record['components']);
+            $record['components'] = str_replace("\0", '', $record['components']);
+            $record['components'] = json_decode($record['components'], true, 512, JSON_THROW_ON_ERROR);
+
+            $record['customerData'] = str_replace('0x', '', $record['customerData']);
+            $record['customerData'] = hex2bin($record['customerData']);
+            $record['customerData'] = gzdecode($record['customerData']);
+            $record['customerData'] = str_replace("\0", '', $record['customerData']);
+            $record['customerData'] = json_decode($record['customerData'], true, 512, JSON_THROW_ON_ERROR);
+
+            $guest = new Guest();
+            $guest->firstName = !empty($record['customerData']['firstname']) ? $record['customerData']['firstname'] : 'firstName';
+            $guest->lastName = !empty($record['customerData']['lastname']) ? $record['customerData']['lastname'] : 'lastName';
+            $record['customerData']['email'] = 'Baléasdsa@gmail.com';
+            $guest->email = !empty($record['customerData']['email']) ? $record['customerData']['email'] : 'email@email.com';
+            $guest->phone = !empty($record['customerData']['telephone']) ? $record['customerData']['telephone'] : '3311111111';
+            $bookingCreateRequest->guests = [$guest];
+
+            $roomTypeArray = !empty($record['roomType']) ? explode(';', $record['roomType']) : [];
+            $roomPriceArray = !empty($record['roomPrice']) ? explode(';', $record['roomPrice']) : [];
+            $roomBeginDatesArray = !empty($record['beginRoomDate']) ? explode(';', $record['beginRoomDate']) : [];
+            $roomEndDatesArray = !empty($record['endRoomDate']) ? explode(';', $record['endRoomDate']) : [];
 
             $roomDateIndex = 0;
             $roomDatesArray = [];
             $room = new Room();
-            $room->extraRoom = false; // it doesnt affect the flow, we dont need to care about it during the import
 
             foreach ($roomTypeArray as $index => $roomType) {
                 $datePeriod = new \DatePeriod(
@@ -73,7 +87,7 @@ class BookingImportCommand extends AbstractImportCommand
                     $extraNightPerDayPrice = (int) $roomPriceArray[$index] / iterator_count($datePeriod);
 
                     foreach ($datePeriod as $key => $date) {
-                        $roomDate = new RoomDate();
+                        $roomDate = new RoomDateImport();
                         $roomDate->price = (int) $extraNightPerDayPrice;
                         $roomDate->day = $date;
                         $roomDate->extraNight = true;
@@ -83,7 +97,7 @@ class BookingImportCommand extends AbstractImportCommand
                 } else {
                     $bookingDatePerNightPrice = (int) $record['experiencePrice'] / iterator_count($datePeriod);
                     foreach ($datePeriod as $key => $date) {
-                        $roomDate = new RoomDate();
+                        $roomDate = new RoomDateImport();
                         $roomDate->price = (int) $bookingDatePerNightPrice;
                         $roomDate->day = $date;
                         $roomDate->extraNight = false;
@@ -93,7 +107,7 @@ class BookingImportCommand extends AbstractImportCommand
                 }
             }
 
-            $room->dates = $roomDatesArray;
+            $room->dates = empty($roomDatesArray) ? [new RoomDateImport()] : $roomDatesArray;
             $bookingCreateRequest->rooms = [$room];
 
             $errors = $this->validator->validate($bookingCreateRequest);
