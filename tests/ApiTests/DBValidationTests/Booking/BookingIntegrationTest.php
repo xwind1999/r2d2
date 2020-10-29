@@ -174,7 +174,7 @@ class BookingIntegrationTest extends IntegrationTestCase
     public function testCreate(array $payload, callable $asserts, callable $extraActions = null)
     {
         if ($extraActions) {
-            $extraActions($this, $payload);
+            $extraActions($this, $payload, $this->componentGoldenId);
         }
 
         $this->fulfillAvailability($payload);
@@ -201,7 +201,7 @@ class BookingIntegrationTest extends IntegrationTestCase
                 new \DateTime($payload['endDate'])
             );
 
-        $asserts($this, $response, $payload, $availabilityBeforeBooking, $availabilityAfterBooking, $bookedDates);
+        $asserts($this, $response, $availabilityBeforeBooking, $availabilityAfterBooking, $bookedDates);
     }
 
     public function defaultDataForCreate(): iterable
@@ -212,10 +212,10 @@ class BookingIntegrationTest extends IntegrationTestCase
             function (
                 BookingIntegrationTest $test,
                 $response,
-                $payload,
                 $availabilityBeforeBooking,
                 $availabilityAfterBooking,
-                $bookedDates) {
+                $bookedDates
+            ) {
                 $test->assertEmpty($response->getContent());
                 $test->assertEquals(201, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -256,10 +256,10 @@ class BookingIntegrationTest extends IntegrationTestCase
             function (
                 BookingIntegrationTest $test,
                 $response,
-                $payload,
                 $availabilityBeforeBooking,
                 $availabilityAfterBooking,
-                $bookedDates) {
+                $bookedDates
+            ) {
                 $test->assertEmpty($response->getContent());
                 $test->assertEquals(201, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -304,10 +304,10 @@ class BookingIntegrationTest extends IntegrationTestCase
             function (
                 BookingIntegrationTest $test,
                 $response,
-                $payload,
                 $availabilityBeforeBooking,
                 $availabilityAfterBooking,
-                $bookedDates) {
+                $bookedDates
+            ) {
                 $test->assertEmpty($response->getContent());
                 $test->assertEquals(201, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -363,10 +363,10 @@ class BookingIntegrationTest extends IntegrationTestCase
             function (
                 BookingIntegrationTest $test,
                 $response,
-                $payload,
                 $availabilityBeforeBooking,
                 $availabilityAfterBooking,
-                $bookedDates) {
+                $bookedDates
+            ) {
                 $test->assertEmpty($response->getContent());
                 $test->assertEquals(201, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -398,7 +398,7 @@ class BookingIntegrationTest extends IntegrationTestCase
                     ],
                 ],
             ]),
-            function (BookingIntegrationTest $test, $response, $payload, $availabilityBeforeBooking, $availabilityAfterBooking) {
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Date out of range","code":1300002}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -429,7 +429,7 @@ class BookingIntegrationTest extends IntegrationTestCase
                     ],
                 ],
             ]),
-            function (BookingIntegrationTest $test, $response, $payload, $availabilityBeforeBooking, $availabilityAfterBooking) {
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Bad price","code":1300001}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -470,7 +470,7 @@ class BookingIntegrationTest extends IntegrationTestCase
                     ],
                 ],
             ]),
-            function (BookingIntegrationTest $test, $response, $payload, $availabilityBeforeBooking, $availabilityAfterBooking) {
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Date out of range","code":1300002}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -517,7 +517,7 @@ class BookingIntegrationTest extends IntegrationTestCase
                     ],
                 ],
             ]),
-            function (BookingIntegrationTest $test, $response, $payload, $availabilityBeforeBooking, $availabilityAfterBooking) {
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Bad price","code":1300001}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -557,10 +557,10 @@ class BookingIntegrationTest extends IntegrationTestCase
             function (
                 BookingIntegrationTest $test,
                 $response,
-                $payload,
                 $availabilityBeforeBooking,
                 $availabilityAfterBooking,
-                $bookedDates) {
+                $bookedDates
+            ) {
                 $test->assertEmpty($response->getContent());
                 $test->assertEquals(201, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -613,7 +613,7 @@ class BookingIntegrationTest extends IntegrationTestCase
                     ],
                 ],
             ]),
-            function (BookingIntegrationTest $test, $response, $payload, $availabilityBeforeBooking, $availabilityAfterBooking) {
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"No included room found","code":1300007}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -655,7 +655,7 @@ class BookingIntegrationTest extends IntegrationTestCase
                     ],
                 ],
             ]),
-            function (BookingIntegrationTest $test, $response, $payload, $availabilityBeforeBooking, $availabilityAfterBooking) {
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Rooms dont have same duration","code":1300004}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -687,7 +687,7 @@ class BookingIntegrationTest extends IntegrationTestCase
                     ],
                 ],
             ]),
-            function (BookingIntegrationTest $test, $response, $payload, $availabilityBeforeBooking, $availabilityAfterBooking) {
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Duplicated dates for same room","code":1300008}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -719,7 +719,7 @@ class BookingIntegrationTest extends IntegrationTestCase
                     ],
                 ],
             ]),
-            function (BookingIntegrationTest $test, $response, $payload, $availabilityBeforeBooking, $availabilityAfterBooking) {
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Unallocated date","code":1300003}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -756,7 +756,7 @@ class BookingIntegrationTest extends IntegrationTestCase
                     ],
                 ],
             ]),
-            function (BookingIntegrationTest $test, $response, $payload, $availabilityBeforeBooking, $availabilityAfterBooking) {
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Invalid extra night","code":1300005}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
@@ -769,7 +769,7 @@ class BookingIntegrationTest extends IntegrationTestCase
 
         yield 'experience-without-price-and-currency' => [
             $this->defaultPayload(),
-            function (BookingIntegrationTest $test, $response, $payload, $availabilityBeforeBooking, $availabilityAfterBooking) {
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals(
                     '{"error":{"message":"The experience price must be a number greater than zero","code":1300006}}',
                     $response->getContent()
@@ -787,6 +787,56 @@ class BookingIntegrationTest extends IntegrationTestCase
                     ->executeStatement("UPDATE experience SET price = 0, currency = null 
                     WHERE golden_id = '".self::EXPERIENCE_GOLDEN_ID."'")
                 ;
+            }),
+        ];
+
+        yield 'availability-with-stop-sale-date' => [
+            $this->defaultPayload([
+                'startDate' => (clone $this->startDate)->modify('+12 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                'endDate' => (clone $this->startDate)->modify('+15 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                'rooms' => [
+                    [
+                        'extraRoom' => false,
+                        'dates' => [
+                            [
+                                'day' => (clone $this->startDate)->modify('+12 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                                'price' => 10,
+                                'extraNight' => false,
+                            ],
+                            [
+                                'day' => (clone $this->startDate)->modify('+13 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                                'price' => 1000,
+                                'extraNight' => true,
+                            ],
+                            [
+                                'day' => (clone $this->startDate)->modify('+14 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                                'price' => 1000,
+                                'extraNight' => true,
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
+                $test->assertEquals(
+                    '{"error":{"message":"Unavailable date for booking","code":1300016}}',
+                    $response->getContent()
+                );
+                $test->assertEquals(422, $response->getStatusCode());
+                foreach ($availabilityAfterBooking as $key => $availability) {
+                    $this->assertEquals($availabilityBeforeBooking[$key]['usedStock'], $availability['usedStock']);
+                    $this->assertEquals($availabilityBeforeBooking[$key]['realStock'], $availability['realStock']);
+                    $this->assertEquals($availabilityBeforeBooking[$key]['stock'], $availability['stock']);
+                }
+            },
+            (function ($test, $payload, $componentGoldenId) {
+                $date = (new \DateTime($payload['endDate']))->modify('-1 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+                $test->entityManager->getConnection()
+                    ->executeStatement("
+                        UPDATE room_availability SET is_stop_sale = true 
+                            WHERE component_golden_id = '".$componentGoldenId."'
+                            AND date = '".$date."'"
+                    );
             }),
         ];
     }

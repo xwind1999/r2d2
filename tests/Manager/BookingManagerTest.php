@@ -1358,6 +1358,49 @@ class BookingManagerTest extends ProphecyTestCase
                 $test->assertTrue($response);
             }),
         ];
+
+        yield 'validate-booking-creation-with-stop-sale-date' => [
+            (function ($booking) {
+                $booking->startDate = new \DateTime('2020-11-13');
+                $booking->endDate = new \DateTime('2020-11-16');
+
+                return $booking;
+            })(clone $booking),
+            (function ($test) {
+                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
+                    Argument::type('string'),
+                    Argument::type(\DateTimeInterface::class),
+                    Argument::type(\DateTimeInterface::class)
+                )->shouldBeCalledOnce();
+                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
+                    Argument::type('string'),
+                    Argument::type(\DateTimeInterface::class),
+                    Argument::type(\DateTimeInterface::class)
+                )->willReturn(
+                    [
+                        [
+                            'experienceGoldenId' => '59593',
+                            'componentGoldenId' => '213072',
+                            'date' => '2020-11-13',
+                            'realStock' => 7,
+                            'usedStock' => 2,
+                            'stock' => 9,
+                        ],
+                        [
+                            'experienceGoldenId' => '59593',
+                            'componentGoldenId' => '213072',
+                            'date' => '2020-11-14',
+                            'realStock' => 2,
+                            'usedStock' => 3,
+                            'stock' => 5,
+                        ],
+                    ]
+                );
+            }),
+            (function ($test, $response) {
+                $test->assertTrue($response);
+            }),
+        ];
     }
 
     /**
