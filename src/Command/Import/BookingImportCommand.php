@@ -52,6 +52,7 @@ class BookingImportCommand extends AbstractImportCommand
             $record['components'] = gzdecode($record['components']);
             $record['components'] = str_replace("\0", '', $record['components']);
             $record['components'] = json_decode($record['components'], true, 512, JSON_THROW_ON_ERROR);
+            $bookingCreateRequest->experience->components = $record['components']['components'][0];
 
             $record['customerData'] = str_replace('0x', '', $record['customerData']);
             $record['customerData'] = hex2bin($record['customerData']);
@@ -75,33 +76,51 @@ class BookingImportCommand extends AbstractImportCommand
             $roomDatesArray = [];
             $room = new Room();
 
-            foreach ($roomTypeArray as $index => $roomType) {
+            if (empty($roomTypeArray) || empty($roomBeginDatesArray) || empty($roomEndDatesArray)) {
                 $datePeriod = new \DatePeriod(
-                    new \DateTime($roomBeginDatesArray[$index]),
+                    new \DateTime($record['arrivalDate']),
                     new \DateInterval('P1D'),
-                    (new \DateTime($roomEndDatesArray[$index]))
+                    (new \DateTime($record['endDate']))
                 );
 
-                if (self::JARVIS_BOOKING_EXTRA_NIGHT_STATUS === $roomType) {
-                    $extraNightPerDayPrice = (int) $roomPriceArray[$index] / iterator_count($datePeriod);
+                $bookingDatePerNightPrice = (int) $record['experiencePrice'] / iterator_count($datePeriod);
+                foreach ($datePeriod as $date) {
+                    $roomDate = new RoomDateImport();
+                    $roomDate->price = (int) $bookingDatePerNightPrice;
+                    $roomDate->day = $date;
+                    $roomDate->extraNight = false;
+                    $roomDatesArray[$roomDateIndex] = $roomDate;
+                    ++$roomDateIndex;
+                }
+            } else {
+                foreach ($roomTypeArray as $index => $roomType) {
+                    $datePeriod = new \DatePeriod(
+                        new \DateTime($roomBeginDatesArray[$index]),
+                        new \DateInterval('P1D'),
+                        (new \DateTime($roomEndDatesArray[$index]))
+                    );
 
-                    foreach ($datePeriod as $key => $date) {
-                        $roomDate = new RoomDateImport();
-                        $roomDate->price = (int) $extraNightPerDayPrice;
-                        $roomDate->day = $date;
-                        $roomDate->extraNight = true;
-                        $roomDatesArray[$roomDateIndex] = $roomDate;
-                        ++$roomDateIndex;
-                    }
-                } else {
-                    $bookingDatePerNightPrice = (int) $record['experiencePrice'] / iterator_count($datePeriod);
-                    foreach ($datePeriod as $key => $date) {
-                        $roomDate = new RoomDateImport();
-                        $roomDate->price = (int) $bookingDatePerNightPrice;
-                        $roomDate->day = $date;
-                        $roomDate->extraNight = false;
-                        $roomDatesArray[$roomDateIndex] = $roomDate;
-                        ++$roomDateIndex;
+                    if (self::JARVIS_BOOKING_EXTRA_NIGHT_STATUS === $roomType) {
+                        $extraNightPerDayPrice = (int) $roomPriceArray[$index] / iterator_count($datePeriod);
+
+                        foreach ($datePeriod as $date) {
+                            $roomDate = new RoomDateImport();
+                            $roomDate->price = (int) $extraNightPerDayPrice;
+                            $roomDate->day = $date;
+                            $roomDate->extraNight = true;
+                            $roomDatesArray[$roomDateIndex] = $roomDate;
+                            ++$roomDateIndex;
+                        }
+                    } else {
+                        $bookingDatePerNightPrice = (int) $record['experiencePrice'] / iterator_count($datePeriod);
+                        foreach ($datePeriod as $date) {
+                            $roomDate = new RoomDateImport();
+                            $roomDate->price = (int) $bookingDatePerNightPrice;
+                            $roomDate->day = $date;
+                            $roomDate->extraNight = false;
+                            $roomDatesArray[$roomDateIndex] = $roomDate;
+                            ++$roomDateIndex;
+                        }
                     }
                 }
             }

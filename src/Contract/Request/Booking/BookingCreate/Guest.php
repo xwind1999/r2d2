@@ -35,7 +35,7 @@ class Guest
     /**
      * @Assert\Type(type="string")
      * @Assert\Length(min="1", max="255")
-     * @Assert\Email(mode="html5")
+     * @Assert\Email(mode="loose")
      *
      * @JMS\Type("string")
      *

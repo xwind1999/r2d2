@@ -352,7 +352,6 @@ class BookingManager
             throw new InvalidBoxCountryException();
         }
 
-        $this->boxExperienceRepository->findOneEnabledByBoxExperience($box, $experience);
         $component = $this->componentRepository->findDefaultRoomByExperience($experience);
 
         $partner = $experience->partner;
