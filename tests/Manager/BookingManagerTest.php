@@ -1412,7 +1412,7 @@ class BookingManagerTest extends ProphecyTestCase
         $component = new Component();
         $component->goldenId = 'component-id';
         $component->duration = $duration;
-        $this->componentRepository->findDefaultRoomByExperience($experience)->willReturn($component);
+        $this->componentRepository->findAnyRoomByExperience($experience)->willReturn($component);
 
         $money = new Money($experience->price, new Currency($bookingCreateRequest->currency));
         $this->moneyHelper->create($experience->price, $bookingCreateRequest->currency)->willReturn($money);

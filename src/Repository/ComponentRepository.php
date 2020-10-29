@@ -109,6 +109,26 @@ class ComponentRepository extends ServiceEntityRepository
         return $component;
     }
 
+    public function findAnyRoomByExperience(Experience $experience): Component
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb
+            ->join('c.experienceComponent', 'ec')
+            ->where('ec.experience = :experience')
+            ->setParameter('experience', $experience->uuid->getBytes())
+            ->orderBy('c.isReservable', 'DESC')
+            ->setMaxResults(1)
+        ;
+
+        $component = $qb->getQuery()->getOneOrNullResult();
+
+        if (null === $component) {
+            throw new ComponentNotFoundException();
+        }
+
+        return $component;
+    }
+
     /**
      * @throws ManageableProductNotFoundException|NonUniqueResultException
      */
