@@ -62,7 +62,6 @@ class BookingImportCommand extends AbstractImportCommand
             $guest = new Guest();
             $guest->firstName = !empty($record['customerData']['firstname']) ? $record['customerData']['firstname'] : 'firstName';
             $guest->lastName = !empty($record['customerData']['lastname']) ? $record['customerData']['lastname'] : 'lastName';
-            $record['customerData']['email'] = 'Baléasdsa@gmail.com';
             $guest->email = !empty($record['customerData']['email']) ? $record['customerData']['email'] : 'email@email.com';
             $guest->phone = !empty($record['customerData']['telephone']) ? $record['customerData']['telephone'] : '3311111111';
             $bookingCreateRequest->guests = [$guest];
