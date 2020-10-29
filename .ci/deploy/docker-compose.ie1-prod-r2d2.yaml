@@ -102,6 +102,13 @@ services:
     environment:
       QUEUES: event-push-booking-information
 
+  worker-import-booking:
+    <<: *worker-template
+    environment:
+      QUEUES: event-import-booking
+    deploy:
+      replicas: 0
+
   worker-fallback:
     <<: *worker-template
     environment:
