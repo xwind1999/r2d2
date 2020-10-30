@@ -12,7 +12,7 @@ variables:
     - docker run -t --env-file=${ENV_FILE} ${APP_IMAGE} bin/console d:m:m -n --allow-no-migration
     - docker run -t --env-file=${ENV_FILE} ${APP_IMAGE} bin/console messenger:setup-transports
     - docker stack deploy --prune --compose-file .ci/deploy/docker-compose.${CI_ENVIRONMENT_SLUG}.yaml r2d2
-    - .ci/utils/docker-stack-wait.sh -t 180 r2d2
+    - .ci/utils/docker-stack-wait.sh -t 360 r2d2
     - >
       if [ "$NR_ENABLE" = "true" ]; then
         docker run -t --env-file=${ENV_FILE} ${APP_IMAGE} ${CONSOLE_NEWRELIC_COMPLETED} || true

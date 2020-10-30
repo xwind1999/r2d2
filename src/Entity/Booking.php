@@ -13,7 +13,12 @@ use Ramsey\Uuid\UuidInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BookingRepository")
- * @ORM\Table(indexes={@ORM\Index(columns={"golden_id"})})
+ * @ORM\Table(
+ *     indexes={
+ *         @ORM\Index(columns={"golden_id"}),
+ *         @ORM\Index(columns={"experience_golden_id"}),
+ *     }
+ * )
  */
 class Booking
 {

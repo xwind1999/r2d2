@@ -10,6 +10,12 @@ use Ramsey\Uuid\UuidInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BookingDateRepository")
+ * @ORM\Table(
+ *     indexes={
+ *         @ORM\Index(columns={"component_uuid","date"}),
+ *         @ORM\Index(columns={"component_golden_id","date"}),
+ *     }
+ * )
  */
 class BookingDate
 {
