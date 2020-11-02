@@ -65,15 +65,22 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
     ): array {
         $sql = <<<SQL
 SELECT
-   ar.experience_golden_id as experienceGoldenId, ar.room_stock_type as roomStockType
-FROM flat_manageable_component ar
-JOIN room_availability ra on ar.component_uuid = ra.component_uuid
-WHERE ar.box_golden_id = :boxId AND
-      ra.is_stop_sale = false AND
-      (ar.last_bookable_date IS NULL OR ra.date <= (ar.last_bookable_date - INTERVAL ar.duration DAY)) AND 
-      (((ar.room_stock_type in (:stockType,:allotmentType)) and ra.stock > 0) OR (ar.room_stock_type = :onRequestType)) AND
-      ra.date BETWEEN :dateFrom AND DATE_ADD(:dateFrom, interval ar.duration - 1 day)
-GROUP BY ar.experience_golden_id, ar.duration, ar.room_stock_type HAVING count(ra.date) = ar.duration;
+    t.experience_golden_id as experienceGoldenId, t.room_stock_type as roomStockType
+    FROM (
+        SELECT
+            fmc.experience_golden_id, fmc.duration, fmc.last_bookable_date, fmc.room_stock_type, ra.date
+        FROM
+            room_availability ra
+        JOIN
+            flat_manageable_component fmc ON ra.component_uuid = fmc.component_uuid
+        WHERE
+          fmc.box_golden_id = :boxId
+          AND ra.date BETWEEN :dateFrom AND DATE_ADD(:dateFrom, interval fmc.duration - 1 day)
+          AND (fmc.last_bookable_date IS NULL OR ra.date <= (fmc.last_bookable_date - INTERVAL fmc.duration DAY))
+          AND ra.is_stop_sale = false
+          AND ((fmc.room_stock_type in (:stockType,:allotmentType) and ra.stock > 0) OR fmc.room_stock_type = :onRequestType)
+        ) t
+GROUP BY t.experience_golden_id, t.duration HAVING count(t.date) = t.duration;
 SQL;
 
         $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
