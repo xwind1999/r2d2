@@ -57,7 +57,7 @@ class BookingControllerTest extends ProphecyTestCase
         $manager = $this->prophesize(BookingManager::class);
         $manager->update($bookingUpdateRequest)->shouldBeCalled()->willThrow(BookingNotFoundException::class);
         $this->expectException(ResourceNotFoundException::class);
-        $this->expectExceptionMessage('Resource Not Found');
+        $this->expectExceptionMessage('Booking not found');
         $response = $controller->update($bookingUpdateRequest, $manager->reveal());
 
         $this->assertInstanceOf(Response::class, $response);

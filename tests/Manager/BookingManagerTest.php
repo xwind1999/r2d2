@@ -24,7 +24,6 @@ use App\Exception\Booking\BookingHasExpiredException;
 use App\Exception\Booking\CurrencyMismatchException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
-use App\Exception\Booking\InvalidBookingNewStatus;
 use App\Exception\Booking\InvalidBoxBrandException;
 use App\Exception\Booking\InvalidBoxCountryException;
 use App\Exception\Booking\InvalidBoxCurrencyException;
@@ -223,20 +222,34 @@ class BookingManagerTest extends ProphecyTestCase
             null,
         ];
 
-        yield 'invalid new booking status' => [
+        yield 'booking in final status receiving cancelled booking' => [
             (function ($bookingUpdateRequest) {
-                $bookingUpdateRequest->status = 'created';
+                $bookingUpdateRequest->status = 'cancelled';
 
                 return $bookingUpdateRequest;
             })(clone $bookingUpdateRequest),
             (function ($booking) {
-                $booking->status = 'created';
+                $booking->status = 'cancelled';
 
                 return $booking;
             })(clone $booking),
-            InvalidBookingNewStatus::class,
             null,
-            null,
+            function ($test, $booking) {
+                $test->entityManager->persist($booking)->shouldNotHaveBeenCalled();
+                $test->entityManager->flush()->shouldNotHaveBeenCalled();
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+                $test->assertEquals('cancelled', $booking->status);
+            },
+            function (BookingManagerTest $test) {
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class)
+                    )->shouldNotHaveBeenCalled()
+                ;
+            },
         ];
 
         yield 'booking with date expired and no availability' => [

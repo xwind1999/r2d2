@@ -6,8 +6,6 @@ namespace App\Controller;
 
 use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
-use App\Exception\Http\ResourceNotFoundException;
-use App\Exception\Repository\BookingNotFoundException;
 use App\Manager\BookingManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -86,11 +84,7 @@ class BookingController
      */
     public function update(BookingUpdateRequest $bookingUpdateRequest, BookingManager $bookingManager): Response
     {
-        try {
-            $bookingManager->update($bookingUpdateRequest);
-        } catch (BookingNotFoundException $exception) {
-            throw new ResourceNotFoundException();
-        }
+        $bookingManager->update($bookingUpdateRequest);
 
         return new Response(null, Response::HTTP_NO_CONTENT);
     }

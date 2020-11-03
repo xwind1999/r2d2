@@ -945,8 +945,8 @@ class BookingIntegrationTest extends IntegrationTestCase
                     }
                 }
                 $test->assertEquals(404, $response->getStatusCode());
-                $test->assertStringContainsString('Resource Not Found', $response->getContent());
-                $test->assertStringContainsString('"code":1000003', $response->getContent());
+                $test->assertStringContainsString('Booking not found', $response->getContent());
+                $test->assertStringContainsString('"code":1000012', $response->getContent());
             }),
         ];
     }
@@ -1035,9 +1035,7 @@ class BookingIntegrationTest extends IntegrationTestCase
         $this->assertEquals(204, $responseUpdate->getStatusCode());
 
         $responseUpdate2 = self::$bookingHelper->update($updatePayload);
-        $this->assertEquals(422, $responseUpdate2->getStatusCode());
-        $this->assertStringContainsString('Booking already in final status', $responseUpdate2->getContent());
-        $this->assertStringContainsString('"code":1300009', $responseUpdate2->getContent());
+        $this->assertEquals(204, $responseUpdate2->getStatusCode());
 
         $availabilityAfterComplete = $this->entityManager->getRepository(RoomAvailability::class)
             ->findBookingAvailabilityByExperienceAndDates(
