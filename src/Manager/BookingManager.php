@@ -20,7 +20,6 @@ use App\Exception\Booking\BookingHasExpiredException;
 use App\Exception\Booking\CurrencyMismatchException;
 use App\Exception\Booking\DateOutOfRangeException;
 use App\Exception\Booking\DuplicatedDatesForSameRoomException;
-use App\Exception\Booking\InvalidBookingNewStatus;
 use App\Exception\Booking\InvalidBoxBrandException;
 use App\Exception\Booking\InvalidBoxCountryException;
 use App\Exception\Booking\InvalidBoxCurrencyException;
@@ -292,25 +291,20 @@ class BookingManager
      * @throws BookingAlreadyInFinalStatusException
      * @throws BookingHasExpiredException
      * @throws BookingNotFoundException
-     * @throws InvalidBookingNewStatus
      */
     public function update(BookingUpdateRequest $bookingUpdateRequest): void
     {
         $booking = $this->repository->findOneByGoldenId($bookingUpdateRequest->bookingId);
-        $previousBookingStatus = $booking->status;
-
-        if (
-            BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status ||
-            (
-                BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $booking->status &&
-                BookingStatusConstraint::BOOKING_STATUS_CANCELLED !== $bookingUpdateRequest->status
-            )
-        ) {
-            throw new BookingAlreadyInFinalStatusException();
-        }
 
         if ($booking->status === $bookingUpdateRequest->status) {
-            throw new InvalidBookingNewStatus();
+            return;
+        }
+
+        if (
+            BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $bookingUpdateRequest->status &&
+            BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status
+        ) {
+            throw new BookingAlreadyInFinalStatusException();
         }
 
         if (
@@ -321,6 +315,7 @@ class BookingManager
             throw new BookingHasExpiredException();
         }
 
+        $previousBookingStatus = $booking->status;
         $booking->status = $bookingUpdateRequest->status;
 
         if (null !== $bookingUpdateRequest->voucher) {
