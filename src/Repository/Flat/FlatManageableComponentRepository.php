@@ -34,7 +34,7 @@ SELECT
        c.duration,
        c.is_sellable,
        c.room_stock_type,
-       IF(ISNULL(p.cease_date), DATE_SUB(p.cease_date, interval c.duration day), null)
+       IF(ISNULL(p.cease_date), null, DATE_SUB(p.cease_date, interval c.duration day))
 FROM box_experience be
     JOIN experience_component ec on be.experience_uuid = ec.experience_uuid  AND ec.component_golden_id = :componentGoldenId
     JOIN component c on c.uuid = ec.component_uuid and c.is_manageable = 1 and c.duration > 0
