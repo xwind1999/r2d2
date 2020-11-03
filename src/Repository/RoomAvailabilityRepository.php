@@ -64,7 +64,7 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         \DateTimeInterface $startDate,
         bool $disableTest = false
     ): array {
-        if (false !== $disableTest && random_int(0, 1)) {
+        if (false === $disableTest && random_int(0, 1)) {
             return $this->findAvailableRoomsByBoxIdProcessingOnPHP($boxId, $startDate);
         }
 
