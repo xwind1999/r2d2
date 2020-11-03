@@ -447,7 +447,10 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
 
         $avs = self::$container->get(RoomAvailabilityRepository::class)
-            ->findAvailableRoomsByBoxId($boxId, $dateFrom);
+            ->findAvailableRoomsByBoxId($boxId, $dateFrom, true);
+        $avs2 = self::$container->get(RoomAvailabilityRepository::class)
+            ->findAvailableRoomsByBoxIdProcessingOnPHP($boxId, $dateFrom);
+        $this->assertEquals($avs, $avs2);
 
         $data = [];
         foreach ($avs as $comp => $avs2) {

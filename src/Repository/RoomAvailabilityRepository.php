@@ -61,8 +61,13 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
 
     public function findAvailableRoomsByBoxId(
         string $boxId,
-        \DateTimeInterface $startDate
+        \DateTimeInterface $startDate,
+        bool $disableTest = false
     ): array {
+        if (false !== $disableTest && random_int(0, 1)) {
+            return $this->findAvailableRoomsByBoxIdProcessingOnPHP($boxId, $startDate);
+        }
+
         $sql = <<<SQL
 SELECT
     t.experience_golden_id as experienceGoldenId, t.room_stock_type as roomStockType
@@ -92,6 +97,56 @@ SQL;
         $statement->execute();
 
         return $statement->fetchAllAssociative();
+    }
+
+    public function findAvailableRoomsByBoxIdProcessingOnPHP(
+        string $boxId,
+        \DateTimeInterface $startDate
+    ): array {
+        $sql = <<<SQL
+        SELECT
+            fmc.experience_golden_id, fmc.duration, fmc.room_stock_type, ra.date
+        FROM
+            room_availability ra
+        JOIN
+            flat_manageable_component fmc ON ra.component_uuid = fmc.component_uuid
+        WHERE
+          fmc.box_golden_id = :boxId
+          AND ra.date BETWEEN :dateFrom AND DATE_ADD(:dateFrom, interval fmc.duration - 1 day)
+          AND (fmc.last_bookable_date IS NULL OR ra.date <= (fmc.last_bookable_date - INTERVAL fmc.duration DAY))
+          AND ra.is_stop_sale = false
+          AND ((fmc.room_stock_type in (:stockType,:allotmentType) and ra.stock > 0) OR fmc.room_stock_type = :onRequestType)
+SQL;
+
+        $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
+        $statement->bindValue('boxId', $boxId);
+        $statement->bindValue('dateFrom', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
+        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
+        $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
+        $statement->execute();
+
+        $st = $statement->fetchAllAssociative();
+
+        $h = [];
+        $z = [];
+        foreach ($st as $entry) {
+            $experienceId = $entry['experience_golden_id'];
+            if (!isset($h[$experienceId])) {
+                $h[$experienceId] = 0;
+            }
+
+            ++$h[$experienceId];
+
+            if ($h[$experienceId] === (int) $entry['duration']) {
+                $z[] = [
+                    'experienceGoldenId' => $experienceId,
+                    'roomStockType' => $entry['room_stock_type'],
+                ];
+            }
+        }
+
+        return $z;
     }
 
     public function findAvailableRoomsByMultipleExperienceIds(
