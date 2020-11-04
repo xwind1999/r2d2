@@ -64,10 +64,22 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         \DateTimeInterface $startDate,
         bool $disableTest = false
     ): array {
-        if (false === $disableTest && random_int(0, 1)) {
-            return $this->findAvailableRoomsByBoxIdProcessingOnPHP($boxId, $startDate);
+        if (false === $disableTest) {
+            switch (random_int(0, 2)) {
+                case 1:
+                    return $this->findAvailableRoomsByBoxIdProcessingOnPHP($boxId, $startDate);
+                case 2:
+                    return $this->findAvailableRoomsByBoxIdWithUpdatedQuery($boxId, $startDate);
+            }
         }
 
+        return $this->findAvailableRoomsByBoxIdWithFirstQuery($boxId, $startDate);
+    }
+
+    public function findAvailableRoomsByBoxIdWithFirstQuery(
+        string $boxId,
+        \DateTimeInterface $startDate
+    ): array {
         $sql = <<<SQL
 SELECT
     t.experience_golden_id as experienceGoldenId, t.room_stock_type as roomStockType
@@ -97,6 +109,51 @@ SQL;
         $statement->execute();
 
         return $statement->fetchAllAssociative();
+    }
+
+    public function findAvailableRoomsByBoxIdWithUpdatedQuery(
+        string $boxId,
+        \DateTimeInterface $startDate
+    ): array {
+        $sql = <<<SQL
+SELECT
+    fmc.experience_golden_id as experienceGoldenId, fmc.room_stock_type as roomStockType, fmc.duration
+FROM
+    flat_manageable_component fmc
+LEFT JOIN
+    room_availability ra on fmc.component_uuid = ra.component_uuid AND ra.date BETWEEN :dateFrom AND DATE_ADD(:dateFrom, interval fmc.duration - 1 day)
+WHERE
+    fmc.box_golden_id = :boxId
+    AND ((
+        fmc.room_stock_type in (:stockType, :allotmentType) AND
+        ra.uuid is not null AND
+        ra.stock > 0 AND
+        ra.is_stop_sale = 0
+    ) OR (
+        fmc.room_stock_type = :onRequestType
+    ))
+GROUP BY
+    fmc.experience_golden_id
+HAVING (
+    (fmc.room_stock_type in (:stockType, :allotmentType) AND fmc.duration = count(ra.uuid))
+    OR (fmc.room_stock_type = :onRequestType and max(ra.is_stop_sale) != 1)
+);
+SQL;
+
+        $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
+        $statement->bindValue('boxId', $boxId);
+        $statement->bindValue('dateFrom', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
+        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
+        $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
+        $statement->execute();
+
+        $data = $statement->fetchAllAssociative();
+        foreach ($data as &$item) {
+            unset($item['duration']);
+        }
+
+        return $data;
     }
 
     public function findAvailableRoomsByBoxIdProcessingOnPHP(

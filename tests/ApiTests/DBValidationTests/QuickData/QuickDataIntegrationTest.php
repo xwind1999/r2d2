@@ -447,10 +447,25 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
 
         $avs = self::$container->get(RoomAvailabilityRepository::class)
-            ->findAvailableRoomsByBoxId($boxId, $dateFrom, true);
+            ->findAvailableRoomsByBoxIdWithFirstQuery($boxId, $dateFrom, true);
         $avs2 = self::$container->get(RoomAvailabilityRepository::class)
             ->findAvailableRoomsByBoxIdProcessingOnPHP($boxId, $dateFrom);
-        $this->assertEquals($avs, $avs2);
+        $avs3 = self::$container->get(RoomAvailabilityRepository::class)
+            ->findAvailableRoomsByBoxIdWithUpdatedQuery($boxId, $dateFrom);
+
+        $avs1 = $avs;
+        usort($avs1, function ($a, $b) {
+            return $a['experienceGoldenId'] <=> $b['experienceGoldenId'];
+        });
+
+        usort($avs2, function ($a, $b) {
+            return $a['experienceGoldenId'] <=> $b['experienceGoldenId'];
+        });
+        usort($avs3, function ($a, $b) {
+            return $a['experienceGoldenId'] <=> $b['experienceGoldenId'];
+        });
+        $this->assertEquals($avs1, $avs2);
+        $this->assertEquals($avs1, $avs3);
 
         $data = [];
         foreach ($avs as $comp => $avs2) {
