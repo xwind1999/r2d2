@@ -6,7 +6,6 @@ namespace App\Tests\Helper;
 
 use App\Constants\AvailabilityConstants;
 use App\Constants\DateTimeConstants;
-use App\Exception\Helper\InvalidDatesForPeriod;
 use App\Helper\AvailabilityHelper;
 use App\Tests\ProphecyTestCase;
 
@@ -20,9 +19,11 @@ class AvailabilityHelperTest extends ProphecyTestCase
      */
     public function testConvertAvailableValueToRequest(): void
     {
+        $availabilityHelper = new AvailabilityHelper();
+
         $this->assertEquals(
             'Unavailable',
-            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+            $availabilityHelper->convertAvailabilityTypeToExplicitQuickdataValue(
                 'stock',
                 0,
                 '0'
@@ -30,7 +31,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
         );
         $this->assertEquals(
             'Unavailable',
-            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+            $availabilityHelper->convertAvailabilityTypeToExplicitQuickdataValue(
                 'stock',
                 0,
                 '1'
@@ -38,7 +39,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
         );
         $this->assertEquals(
             AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_AVAILABLE,
-            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+            $availabilityHelper->convertAvailabilityTypeToExplicitQuickdataValue(
                 'stock',
                 1,
                 '0'
@@ -46,7 +47,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
         );
         $this->assertEquals(
             AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
-            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+            $availabilityHelper->convertAvailabilityTypeToExplicitQuickdataValue(
                 'stock',
                 1,
                 '1'
@@ -54,7 +55,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
         );
         $this->assertEquals(
             AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST,
-            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+            $availabilityHelper->convertAvailabilityTypeToExplicitQuickdataValue(
                 'on_request',
                 0,
                 '0'
@@ -62,7 +63,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
         );
         $this->assertEquals(
             'Unavailable',
-            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+            $availabilityHelper->convertAvailabilityTypeToExplicitQuickdataValue(
                 'on_request',
                 0,
                 '1'
@@ -70,7 +71,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
         );
         $this->assertEquals(
             'Request',
-            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+            $availabilityHelper->convertAvailabilityTypeToExplicitQuickdataValue(
                 'on_request',
                 1,
                 '0'
@@ -78,7 +79,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
         );
         $this->assertEquals(
             'Unavailable',
-            AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+            $availabilityHelper->convertAvailabilityTypeToExplicitQuickdataValue(
                 'on_request',
                 1,
                 '1'
@@ -93,7 +94,9 @@ class AvailabilityHelperTest extends ProphecyTestCase
      */
     public function testGetRoomStockShortType(string $inputString, string $expectedString): void
     {
-        $this->assertEquals($expectedString, AvailabilityHelper::getRoomStockShortType($inputString));
+        $availabilityHelper = new AvailabilityHelper();
+
+        $this->assertEquals($expectedString, $availabilityHelper->getRoomStockShortType($inputString));
     }
 
     /**
@@ -101,6 +104,8 @@ class AvailabilityHelperTest extends ProphecyTestCase
      */
     public function testBuildDataForGetPackageV2(): void
     {
+        $availabilityHelper = new AvailabilityHelper();
+
         $availabilities = ['1', '1', '1'];
         $duration = 1;
         $partnerId = '1234';
@@ -118,7 +123,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
         $this->assertEquals(
             $returnArray,
-            AvailabilityHelper::buildDataForGetPackage(
+            $availabilityHelper->buildDataForGetPackage(
                 $availabilities,
                 $duration,
                 $partnerId,
@@ -135,6 +140,8 @@ class AvailabilityHelperTest extends ProphecyTestCase
      */
     public function testBuildDataForGetPackage(): void
     {
+        $availabilityHelper = new AvailabilityHelper();
+
         $dateFrom = new \DateTime('2020-10-01');
         $dateTo = new \DateTime('2020-10-02');
         $roomStockType = '1';
@@ -174,7 +181,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
         $this->assertEquals(
             $returnArray,
-            AvailabilityHelper::fillMissingAvailabilityForGetPackage(
+            $availabilityHelper->fillMissingAvailabilityForGetPackage(
                 $availabilities,
                 $roomStockType,
                 $duration,
@@ -194,6 +201,8 @@ class AvailabilityHelperTest extends ProphecyTestCase
      */
     public function testBuildDataForGetPackageWithMissingAvailabilities(): void
     {
+        $availabilityHelper = new AvailabilityHelper();
+
         $dateFrom = new \DateTime('2020-10-01');
         $dateTo = new \DateTime('2020-10-02');
         $roomStockType = '1';
@@ -224,7 +233,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
         $this->assertEquals(
             $returnArray,
-            AvailabilityHelper::fillMissingAvailabilityForGetPackage(
+            $availabilityHelper->fillMissingAvailabilityForGetPackage(
                 $availabilities,
                 $roomStockType,
                 $duration,
@@ -241,6 +250,8 @@ class AvailabilityHelperTest extends ProphecyTestCase
      */
     public function testBuildDataForGetRange(): void
     {
+        $availabilityHelper = new AvailabilityHelper();
+
         $availabilities = [
             [
                 'roomStockType' => 'stock',
@@ -276,7 +287,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
         $this->assertEquals(
             $returnArray,
-            AvailabilityHelper::buildDataForGetRange($availabilities)
+            $availabilityHelper->buildDataForGetRange($availabilities)
         );
     }
 
@@ -285,12 +296,14 @@ class AvailabilityHelperTest extends ProphecyTestCase
      */
     public function testConvertToShortTypeInstant(): void
     {
+        $availabilityHelper = new AvailabilityHelper();
+
         $stockList = ['1', '2', '3', '0', '1', '0', '5', '1'];
         $returnArray = ['1', '1', '1', '0', '1', '0', '1', '1'];
 
         $this->assertEquals(
             $returnArray,
-            AvailabilityHelper::convertToShortType(
+            $availabilityHelper->convertToShortType(
                 $stockList,
                 '1'
             )
@@ -302,12 +315,14 @@ class AvailabilityHelperTest extends ProphecyTestCase
      */
     public function testConvertToShortTypeOnRequest(): void
     {
+        $availabilityHelper = new AvailabilityHelper();
+
         $stockList = ['1', '2', '3', '0', '1', '0', '5', '1'];
         $returnArray = ['r', 'r', 'r', '0', 'r', '0', 'r', 'r'];
 
         $this->assertEquals(
             $returnArray,
-            AvailabilityHelper::convertToShortType(
+            $availabilityHelper->convertToShortType(
                 $stockList,
                 'r'
             )
@@ -319,6 +334,8 @@ class AvailabilityHelperTest extends ProphecyTestCase
      */
     public function testFillMissingAvailabilities(): void
     {
+        $availabilityHelper = new AvailabilityHelper();
+
         $availabilities = [
             '2020-06-20T00:00:00.000000' => [
                 'Date' => '2020-06-20T00:00:00.000000',
@@ -393,7 +410,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
         $this->assertEquals(
             $returnArray,
-            AvailabilityHelper::fillMissingAvailabilitiesForAvailabilityPrice($availabilities, $dateFrom, $dateTo)
+            $availabilityHelper->fillMissingAvailabilitiesForAvailabilityPrice($availabilities, $dateFrom, $dateTo)
         );
     }
 
@@ -402,6 +419,8 @@ class AvailabilityHelperTest extends ProphecyTestCase
      */
     public function testFillMissingAvailabilitiesWithEnoughDate(): void
     {
+        $availabilityHelper = new AvailabilityHelper();
+
         $availabilities = [
             '2020-06-20T00:00:00.000000' => [
                 'Date' => '2020-06-20T00:00:00.000000',
@@ -431,7 +450,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
         $this->assertEquals(
             $availabilities,
-            AvailabilityHelper::fillMissingAvailabilitiesForAvailabilityPrice($availabilities, $dateFrom, $dateTo)
+            $availabilityHelper->fillMissingAvailabilitiesForAvailabilityPrice($availabilities, $dateFrom, $dateTo)
         );
     }
 
@@ -463,7 +482,8 @@ class AvailabilityHelperTest extends ProphecyTestCase
      */
     public function testGetRoomAvailabilityRealStock(array $availabilities, array $bookingStockDate, callable $asserts)
     {
-        $usedAvailabilities = AvailabilityHelper::getRealStock($availabilities, $bookingStockDate);
+        $availabilityHelper = new AvailabilityHelper();
+        $usedAvailabilities = $availabilityHelper->getRealStock($availabilities, $bookingStockDate);
 
         $asserts($this, $usedAvailabilities, $bookingStockDate, $availabilities);
     }
@@ -639,82 +659,6 @@ class AvailabilityHelperTest extends ProphecyTestCase
             (function ($test, $usedAvailabilities, $bookingStock, $roomAvailabilities) {
                 $test->assertEquals($usedAvailabilities, $roomAvailabilities);
             }),
-        ];
-    }
-
-    /**
-     * @dataProvider periodProvider
-     * @covers ::createDatePeriod
-     */
-    public function testCreateDatePeriod($beginDate, $endDate, callable $asserts, string $exception = null)
-    {
-        if ($exception) {
-            $this->expectException($exception);
-        }
-
-        $datePeriod = AvailabilityHelper::createDatePeriod($beginDate, $endDate);
-
-        $asserts($this, $datePeriod);
-    }
-
-    public function periodProvider()
-    {
-        yield 'three-days-difference-dates' => [
-            new \DateTime('today'),
-            new \DateTime('+3 days'),
-            (function ($test, $period) {
-                $test->assertEquals(
-                    (new \DateTime('today'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                    $period->start->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
-                );
-                $test->assertEquals(
-                    (new \DateTime('+3 days'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                    $period->end->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
-                );
-            }),
-        ];
-        yield 'two-days-difference-dates' => [
-            new \DateTime('today'),
-            new \DateTime('+2 days'),
-            (function ($test, $period) {
-                $test->assertEquals(
-                    (new \DateTime('today'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                    $period->start->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
-                );
-                $test->assertEquals(
-                    (new \DateTime('+2 days'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                    $period->end->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
-                );
-            }),
-        ];
-        yield 'one-days-difference-dates' => [
-            new \DateTime('today'),
-            new \DateTime('+1 day'),
-            (function ($test, $period) {
-                $test->assertEquals(
-                    (new \DateTime('today'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                    $period->start->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
-                );
-                $test->assertEquals(
-                    (new \DateTime('+1 day'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                    $period->end->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
-                );
-            }),
-        ];
-        yield 'same-days-difference-dates' => [
-            new \DateTime('today'),
-            new \DateTime('today'),
-            (function ($test, $period) {
-                $test->assertEquals(
-                    (new \DateTime('today'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                    $period->start->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
-                );
-                $test->assertEquals(
-                    (new \DateTime('+1 day'))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                    $period->end->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
-                );
-            }),
-            InvalidDatesForPeriod::class,
         ];
     }
 }

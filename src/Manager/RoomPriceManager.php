@@ -8,7 +8,7 @@ use App\Contract\Request\BroadcastListener\RoomPriceRequest;
 use App\Contract\Request\BroadcastListener\RoomPriceRequestList;
 use App\Entity\RoomPrice;
 use App\Exception\Manager\RoomPrice\OutdatedRoomPriceException;
-use App\Helper\AvailabilityHelper;
+use App\Helper\DateTimeHelper;
 use App\Repository\ComponentRepository;
 use App\Repository\RoomPriceRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -53,7 +53,7 @@ class RoomPriceManager
         $dateFrom = $roomPriceRequest->dateFrom->setTime(0, 0, 0, 0);
         $dateTo = $roomPriceRequest->dateTo->setTime(0, 0, 0, 0);
 
-        $datePeriod = AvailabilityHelper::createDatePeriod($dateFrom, $dateTo);
+        $datePeriod = DateTimeHelper::createDatePeriod($dateFrom, $dateTo);
         foreach ($datePeriod as $date) {
             $dateString = $date->format('Y-m-d');
 
