@@ -31,6 +31,7 @@ class LegacyAvailabilityProvider
     protected ArrayTransformerInterface $serializer;
     protected ExperienceManager $experienceManager;
     protected AvailabilityProvider $availabilityProvider;
+    protected AvailabilityHelper $availabilityHelper;
 
     private QuickDataCache $quickDataCache;
     private EventDispatcherInterface $eventDispatcher;
@@ -40,13 +41,15 @@ class LegacyAvailabilityProvider
         ExperienceManager $experienceManager,
         AvailabilityProvider $availabilityProvider,
         QuickDataCache $quickDataCache,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        AvailabilityHelper $availabilityHelper
     ) {
         $this->serializer = $serializer;
         $this->experienceManager = $experienceManager;
         $this->availabilityProvider = $availabilityProvider;
         $this->quickDataCache = $quickDataCache;
         $this->eventDispatcher = $eventDispatcher;
+        $this->availabilityHelper = $availabilityHelper;
     }
 
     public function getAvailabilityForExperience(
@@ -82,7 +85,7 @@ class LegacyAvailabilityProvider
 
             $returnArray = [
                 'ListPrestation' => [
-                    AvailabilityHelper::fillMissingAvailabilityForGetPackage(
+                    $this->availabilityHelper->fillMissingAvailabilityForGetPackage(
                         [],
                         $component[0]['roomStockType'] ?: '',
                         $component[0]['duration'] ?
@@ -98,7 +101,7 @@ class LegacyAvailabilityProvider
             return $this->serializer->fromArray($returnArray, GetPackageResponse::class);
         }
 
-        $roomStockType = AvailabilityHelper::getRoomStockShortType($roomAvailabilities[0]['roomStockType']);
+        $roomStockType = $this->availabilityHelper->getRoomStockShortType($roomAvailabilities[0]['roomStockType']);
         $duration = (int) $roomAvailabilities[0]['duration'];
         $partnerCode = (string) $roomAvailabilities[0]['partnerGoldenId'];
         $isSellable = (bool) $roomAvailabilities[0]['isSellable'];
@@ -110,7 +113,7 @@ class LegacyAvailabilityProvider
 
         $returnArray = [
             'ListPrestation' => [
-                AvailabilityHelper::fillMissingAvailabilityForGetPackage(
+                $this->availabilityHelper->fillMissingAvailabilityForGetPackage(
                     $sortedRoomAvailabilities,
                     $roomStockType,
                     $duration,
@@ -140,7 +143,7 @@ class LegacyAvailabilityProvider
             $this->eventDispatcher->dispatch(new BoxCacheErrorEvent($boxId, $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT), $exception));
         }
 
-        $roomAvailabilities = AvailabilityHelper::buildDataForGetRange(
+        $roomAvailabilities = $this->availabilityHelper->buildDataForGetRange(
             $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate(
                 $boxId,
                 $startDate)
@@ -169,7 +172,7 @@ class LegacyAvailabilityProvider
                 $availabilitiesArray['ListPackage'][] = [
                     'PackageCode' => $availability['experienceId'],
                     'ListPrestation' => [
-                        AvailabilityHelper::buildDataForGetPackage(
+                        $this->availabilityHelper->buildDataForGetPackage(
                             ['1'],
                             (int) $availability['duration'],
                             $availability['partnerId'],
@@ -205,7 +208,7 @@ class LegacyAvailabilityProvider
                 'Date' => (new \DateTime($availability['date']))->format(
                     DateTimeConstants::PRICE_PERIOD_DATE_TIME_FORMAT
                 ),
-                'AvailabilityStatus' => AvailabilityHelper::convertAvailabilityTypeToExplicitQuickdataValue(
+                'AvailabilityStatus' => $this->availabilityHelper->convertAvailabilityTypeToExplicitQuickdataValue(
                     $availability['roomStockType'],
                     $availability['AvailabilityValue'],
                     $availability['isStopSale']
@@ -219,7 +222,7 @@ class LegacyAvailabilityProvider
 
         return $this->serializer->fromArray(
             [
-                'DaysAvailabilityPrice' => AvailabilityHelper::fillMissingAvailabilitiesForAvailabilityPrice(
+                'DaysAvailabilityPrice' => $this->availabilityHelper->fillMissingAvailabilitiesForAvailabilityPrice(
                     $availabilities,
                     $dateFrom,
                     $dateTo

@@ -10,7 +10,7 @@ use App\Entity\Booking;
 use App\Entity\RoomAvailability;
 use App\Event\Product\AvailabilityUpdatedEvent;
 use App\Exception\Manager\RoomAvailability\OutdatedRoomAvailabilityInformationException;
-use App\Helper\AvailabilityHelper;
+use App\Helper\DateTimeHelper;
 use App\Repository\ComponentRepository;
 use App\Repository\RoomAvailabilityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -65,7 +65,7 @@ class RoomAvailabilityManager
      */
     public function replace(RoomAvailabilityRequest $roomAvailabilityRequest): void
     {
-        $datePeriod = AvailabilityHelper::createDatePeriod(
+        $datePeriod = DateTimeHelper::createDatePeriod(
             $roomAvailabilityRequest->dateFrom,
             $roomAvailabilityRequest->dateTo
         );

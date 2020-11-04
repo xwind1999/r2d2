@@ -22,6 +22,7 @@ class AvailabilityProvider
     protected RoomAvailabilityManager $roomAvailabilityManager;
     private RoomPriceManager $roomPriceManager;
     private BookingDateRepository $bookingDateRepository;
+    protected AvailabilityHelper $availabilityHelper;
 
     public function __construct(
         SerializerInterface $serializer,
@@ -30,7 +31,8 @@ class AvailabilityProvider
         ComponentManager $componentManager,
         RoomAvailabilityManager $roomAvailabilityManager,
         RoomPriceManager $roomPriceManager,
-        BookingDateRepository $bookingDateRepository
+        BookingDateRepository $bookingDateRepository,
+        AvailabilityHelper $availabilityHelper
     ) {
         $this->serializer = $serializer;
         $this->arraySerializer = $arraySerializer;
@@ -39,6 +41,7 @@ class AvailabilityProvider
         $this->roomAvailabilityManager = $roomAvailabilityManager;
         $this->roomPriceManager = $roomPriceManager;
         $this->bookingDateRepository = $bookingDateRepository;
+        $this->availabilityHelper = $availabilityHelper;
     }
 
     public function getRoomAvailabilitiesByBoxIdAndStartDate(
@@ -65,7 +68,7 @@ class AvailabilityProvider
             $dateTo
         );
 
-        return AvailabilityHelper::getRealStock($roomAvailabilities, $bookingStockDate);
+        return $this->availabilityHelper->getRealStock($roomAvailabilities, $bookingStockDate);
     }
 
     public function getRoomAvailabilitiesByExperienceIdsList(
