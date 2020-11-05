@@ -11,6 +11,7 @@ use Ramsey\Uuid\UuidInterface;
  * @ORM\Entity()
  * @ORM\Table(
  *     indexes={
+ *         @ORM\Index(columns={"box_golden_id","experience_golden_id"}),
  *         @ORM\Index(columns={"experience_golden_id"}),
  *         @ORM\Index(columns={"component_golden_id"}),
  *     }
