@@ -116,28 +116,36 @@ SQL;
         \DateTimeInterface $startDate
     ): array {
         $sql = <<<SQL
-SELECT
-    fmc.experience_golden_id as experienceGoldenId, fmc.room_stock_type as roomStockType, fmc.duration
-FROM
-    flat_manageable_component fmc
-LEFT JOIN
-    room_availability ra on fmc.component_uuid = ra.component_uuid AND ra.date BETWEEN :dateFrom AND DATE_ADD(:dateFrom, interval fmc.duration - 1 day)
-WHERE
-    fmc.box_golden_id = :boxId
-    AND ((
+(
+    SELECT
+        fmc.experience_golden_id as experienceGoldenId, fmc.room_stock_type as roomStockType, fmc.duration
+    FROM
+        flat_manageable_component fmc
+    LEFT JOIN
+        room_availability ra on fmc.component_uuid = ra.component_uuid AND ra.date BETWEEN :dateFrom AND DATE_ADD(:dateFrom, interval fmc.duration - 1 day)
+    WHERE
+        fmc.box_golden_id = :boxId AND
+        fmc.room_stock_type = :onRequestType
+    GROUP BY
+        fmc.experience_golden_id
+    HAVING max(ra.is_stop_sale) != 1
+) UNION ALL (
+    SELECT
+        fmc.experience_golden_id as experienceGoldenId, fmc.room_stock_type  as roomStockType, fmc.duration
+    FROM
+        flat_manageable_component fmc
+    LEFT JOIN
+        room_availability ra on fmc.component_uuid = ra.component_uuid AND ra.date BETWEEN :dateFrom AND DATE_ADD(:dateFrom, interval fmc.duration - 1 day)
+    WHERE
+        fmc.box_golden_id = :boxId AND
         fmc.room_stock_type in (:stockType, :allotmentType) AND
         ra.uuid is not null AND
         ra.stock > 0 AND
         ra.is_stop_sale = 0
-    ) OR (
-        fmc.room_stock_type = :onRequestType
-    ))
-GROUP BY
-    fmc.experience_golden_id
-HAVING (
-    (fmc.room_stock_type in (:stockType, :allotmentType) AND fmc.duration = count(ra.uuid))
-    OR (fmc.room_stock_type = :onRequestType and max(ra.is_stop_sale) != 1)
-);
+    GROUP BY
+        fmc.experience_golden_id
+    HAVING fmc.duration = count(ra.uuid)
+)
 SQL;
 
         $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
