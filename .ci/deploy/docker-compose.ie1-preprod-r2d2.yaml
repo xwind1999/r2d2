@@ -2,6 +2,8 @@ version: '3.4'
 
 x-service-template: &service-template
   image: "${APP_IMAGE}"
+  networks:
+    - r2d2
   hostname: '{{.Node.Hostname}}'
   env_file:
     - "${ENV_FILE}"
@@ -105,3 +107,8 @@ services:
       QUEUES: fallback-queue
     deploy:
       replicas: 0
+
+networks:
+  r2d2:
+    driver: overlay
+    attachable: true
