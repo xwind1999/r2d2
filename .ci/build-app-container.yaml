@@ -1,8 +1,3 @@
-variables:
-  BASE_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:latest
-  VALIDATION_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-validation:latest
-  APP_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-api:${CI_PIPELINE_ID}_${CI_COMMIT_SHA}
-
 build-base-image:
   stage: Build Base Image
   image: docker:dind
@@ -13,6 +8,18 @@ build-base-image:
     - docker pull ${BASE_IMAGE}
     - docker build --tag ${BASE_IMAGE} .ci/docker/base
     - docker push ${BASE_IMAGE}
+
+build-base-image-php8.0:
+  stage: Build Base Image
+  image: docker:dind
+  script:
+    - docker pull ${BASE_IMAGE_PHP8}
+    - docker build --tag ${BASE_IMAGE_PHP8} .ci/docker/base8.0
+    - docker push ${BASE_IMAGE_PHP8}
+  rules:
+    - if: '$BUILD_IMAGES == "1"'
+      when: always
+    - when: never
 
 build-validation-image:
   stage: Build Validation Image
