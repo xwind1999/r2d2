@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+set -eu
+exec 2>&1
+
+COMMAND=/usr/sbin/crond
+#test command
+test -x ${COMMAND} || exit 0
+
+exec ${COMMAND} -f

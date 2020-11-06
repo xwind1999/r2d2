@@ -21,7 +21,12 @@ stages:
 variables:
   MAIN_BRANCH: master
   CI_BRANCH: CI-master
-#  GIT_DEPTH: 1
+#  GIT_DEPTH: "1"
+  BASE_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base:latest
+  BASE_IMAGE_PHP8: docker-registry.production.smartbox.com/millenium-falcon/r2d2-base8.0:latest
+  VALIDATION_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-validation:latest
+  VALIDATION_IMAGE_PHP8: docker-registry.production.smartbox.com/millenium-falcon/r2d2-validation8.0:latest
+  APP_IMAGE: docker-registry.production.smartbox.com/millenium-falcon/r2d2-api:${CI_PIPELINE_ID}_${CI_COMMIT_SHA}
 
 default:
   image: ${BASE_IMAGE}
@@ -113,3 +118,8 @@ pages:
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
     - when: never
+
+build-php8-validation:
+  stage: Dependencies
+  trigger:
+    include: .ci/quality-php8.yaml
