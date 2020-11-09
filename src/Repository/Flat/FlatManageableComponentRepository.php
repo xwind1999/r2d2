@@ -36,9 +36,13 @@ SELECT
        c.room_stock_type,
        IF(ISNULL(p.cease_date), null, DATE_SUB(p.cease_date, interval c.duration day))
 FROM box_experience be
-    JOIN experience_component ec on be.experience_uuid = ec.experience_uuid  AND ec.component_golden_id = :componentGoldenId
-    JOIN component c on c.uuid = ec.component_uuid and c.is_manageable = 1 and c.duration > 0
-    JOIN partner p on p.uuid = c.partner_uuid;
+    JOIN experience_component ec 
+        ON be.experience_uuid = ec.experience_uuid  AND ec.component_golden_id = :componentGoldenId AND be.is_enabled = 1 AND ec.is_enabled = 1
+    JOIN component c 
+        ON c.uuid = ec.component_uuid AND c.is_manageable = 1 AND c.duration > 0
+    JOIN partner p 
+        ON p.uuid = c.partner_uuid
+;
 
 SQL;
             $statement = $conn->prepare($sql);
