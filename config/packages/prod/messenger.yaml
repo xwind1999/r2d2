@@ -99,6 +99,21 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
+            event-cleanup-invalid-room-availability:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queues:
+                        event-cleanup-invalid-room-availability:
+                            binding_keys: [event-cleanup-invalid-room-availability]
+                            arguments:
+                                x-queue-type: quorum
+                                x-max-in-memory-length: 100000
+                    exchange:
+                        type: direct
+                        default_publish_routing_key: event-cleanup-invalid-room-availability
+                retry_strategy:
+                    service: App\Messenger\RetryCustomStrategy
+
             event-push-room-type-information:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
@@ -245,6 +260,7 @@ framework:
             'App\Contract\Request\EAI\ChannelManagerBookingRequest': event-push-booking-information
             'App\Contract\Message\CalculateFlatManageableComponent': event-calculate-flat-manageable-component
             'App\Contract\Request\Booking\BookingImport\BookingImportRequest': event-import-booking
+            'App\Contract\Message\InvalidAvailabilityCleanup': event-cleanup-invalid-room-availability
 
         buses:
             default:

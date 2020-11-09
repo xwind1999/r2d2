@@ -301,6 +301,22 @@ SQL;
         ;
     }
 
+    public function cleanupInvalid(): int
+    {
+        $sql = <<<SQL
+DELETE FROM
+            room_availability ra
+WHERE
+      ra.stock = 0
+      AND ra.is_stop_sale=0
+LIMIT 500;
+SQL;
+        $statement = $this->_em->getConnection()->prepare($sql);
+        $statement->execute();
+
+        return $statement->rowCount();
+    }
+
     public function getAvailabilityReadOnlyConnection(): Connection
     {
         $conn = $this->registry->getConnection(static::AVAILABILITY_READ_DATABASE);
