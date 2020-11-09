@@ -89,6 +89,13 @@ services:
     environment:
       QUEUES: event-calculate-flat-manageable-component
 
+  worker-cleanup-invalid-room-availability:
+    <<: *worker-template
+    environment:
+      QUEUES: event-cleanup-invalid-room-availability
+    deploy:
+      replicas: 0
+
   worker-push-booking-information:
     <<: *worker-template
     environment:

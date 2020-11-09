@@ -63,6 +63,13 @@ services:
     deploy:
       replicas: 10
 
+  worker-cleanup-invalid-room-availability:
+    <<: *worker-template
+    environment:
+      QUEUES: event-cleanup-invalid-room-availability
+    deploy:
+      replicas: 0
+
   worker-push-room-information:
     <<: *worker-template
     environment:
