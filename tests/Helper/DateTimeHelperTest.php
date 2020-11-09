@@ -9,6 +9,9 @@ use App\Exception\Helper\InvalidDatesForPeriod;
 use App\Helper\DateTimeHelper;
 use App\Tests\ProphecyTestCase;
 
+/**
+ * @coversDefaultClass \App\Helper\DateTimeHelper
+ */
 class DateTimeHelperTest extends ProphecyTestCase
 {
     /**

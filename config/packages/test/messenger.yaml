@@ -45,6 +45,13 @@ framework:
                 retry_strategy:
                     service: App\Messenger\RetryCustomStrategy
 
+            event-cleanup-invalid-room-availability:
+                dsn: 'doctrine://default'
+                options:
+                    queue_name: event-cleanup-invalid-room-availability
+                retry_strategy:
+                    service: App\Messenger\RetryCustomStrategy
+
             event-push-room-type-information:
                 dsn: 'doctrine://default'
                 options:
@@ -109,6 +116,7 @@ framework:
             'App\Contract\Request\EAI\ChannelManagerBookingRequest': event-push-booking-information
             'App\Contract\Message\CalculateFlatManageableComponent': event-calculate-flat-manageable-component
             'App\Contract\Request\Booking\BookingImport\BookingImportRequest': event-import-booking
+            'App\Contract\Message\InvalidAvailabilityCleanup': event-cleanup-invalid-room-availability
 
         buses:
             default:
