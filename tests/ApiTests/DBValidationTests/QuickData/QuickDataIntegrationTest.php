@@ -252,6 +252,174 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
+    public function testGetPackageWithInactiveRelationshipBetweenComponents()
+    {
+        static::cleanUp();
+
+        $experienceId = '7307';
+        $componentId = '227914';
+
+        $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
+        $dateTo = (clone $dateFrom)->modify('+5 day');
+
+        $payload = [
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+2 day')->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+2 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+3 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+3 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+4 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => true,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+4 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+5 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '0',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+5 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+6 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+        ];
+
+        $response = self::$broadcastListenerHelper->testRoomAvailability($payload);
+        $this->assertEquals(202, $response->getStatusCode());
+
+        $componentId = '227915';
+        $payload = [
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+2 day')->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+2 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+3 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+3 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+4 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => true,
+                'quantity' => '1',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+4 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+5 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '0',
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+5 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+6 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'isStopSale' => false,
+                'quantity' => '1',
+            ],
+        ];
+
+        $response = self::$broadcastListenerHelper->testRoomAvailability($payload);
+        $this->assertEquals(202, $response->getStatusCode());
+
+        $this->consume('listener-room-availability-list', 30);
+        $this->consume('listener-room-availability', 30);
+
+        $component = self::$container->get(ComponentRepository::class)->findOneByGoldenId($componentId);
+
+        $expectedResult = [
+            'ListPrestation' => [[
+                'Availabilities' => [1, 1, 1, 0, 0, 1],
+                'PrestId' => 1,
+                'Duration' => $component->duration,
+                'LiheId' => 1,
+                'PartnerCode' => '00037411',
+                'ExtraNight' => false,
+                'ExtraRoom' => false,
+            ]],
+        ];
+
+        $response = self::$quickDataHelper->getPackage(
+            $experienceId,
+            $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        );
+        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+    }
+
     public function testGetPackageWithInvalidExperienceId()
     {
         static::cleanUp();
