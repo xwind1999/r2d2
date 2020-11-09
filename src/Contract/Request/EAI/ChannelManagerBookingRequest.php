@@ -106,6 +106,8 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking implements Cont
         $guestArray = [];
         $loopIdentifier = 0;
         $mainGuest = new Guest();
+
+        $expPeopleNumber = $booking->experience->peopleNumber ?? 1;
         foreach ($booking->guest->getIterator() as $guest) {
             $guestObject = new Guest();
             $guestObject->setFirstName($guest->firstName ?: $mainGuest->getFirstName());
@@ -121,6 +123,12 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking implements Cont
                 $mainGuest = clone $guestObject;
                 ++$loopIdentifier;
             }
+        }
+
+        while (count($guestArray) < $expPeopleNumber) {
+            $guest = clone $mainGuest;
+            $guest->setIsPrimary(false);
+            $guestArray[] = $guest;
         }
 
         $extraRoomAndNightStatus = false;

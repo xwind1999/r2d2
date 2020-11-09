@@ -67,6 +67,7 @@ class ChannelManagerBookingRequestTest extends ProphecyTestCase
         $experience->currency = 'EUR';
         $experience->experienceComponent = new ArrayCollection([$experienceComponent->reveal()]);
         $experience->boxExperience = new ArrayCollection([$boxExperience->reveal()]);
+        $experience->peopleNumber = 4;
         $this->booking->experience = $experience->reveal();
 
         $partner = $this->prophesize(Partner::class);
@@ -143,6 +144,17 @@ class ChannelManagerBookingRequestTest extends ProphecyTestCase
         $this->assertEquals($this->booking->experienceGoldenId, $result->getExperience()->getId());
         $this->assertEquals($this->booking->experience->price, $result->getExperience()->getPrice()->getAmount());
         $this->assertEquals($this->booking->totalPrice, $result->getTotalPrice()->getAmount());
+
+        $guests = $result->getRooms()[0]->getGuests();
+        $primaryGuest = [];
+        foreach ($guests as $guest) {
+            if ($guest->isPrimary()) {
+                $primaryGuest[] = $guest;
+            }
+        }
+
+        $this->assertEquals(1, count($primaryGuest));
+        $this->assertEquals($this->booking->experience->peopleNumber, count($result->getRooms()[0]->getGuests()));
     }
 
     /**
