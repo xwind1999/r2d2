@@ -15,8 +15,8 @@ use App\Tests\ApiTests\IntegrationTestCase;
  */
 class BookingIntegrationTest extends IntegrationTestCase
 {
-    private const BOX_GOLDEN_ID = '851518';
-    private const EXPERIENCE_GOLDEN_ID = '7307';
+    private const BOX_GOLDEN_ID = '1796';
+    private const EXPERIENCE_GOLDEN_ID = '59593';
 
     private $entityManager;
     private \DateTime $startDate;
@@ -24,7 +24,7 @@ class BookingIntegrationTest extends IntegrationTestCase
 
     public function setup(): void
     {
-        $this->componentGoldenId = '227914';
+        $this->componentGoldenId = '213072';
         static::cleanUp();
         $this->entityManager = self::$container->get('doctrine.orm.entity_manager');
         $this->cleanUpBooking();
