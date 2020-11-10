@@ -10,7 +10,7 @@ abstract class AbstractProductImportCommand extends AbstractImportCommand
 {
     protected static $defaultName = 'r2d2:product:import';
 
-    protected function process(\Iterator $records): void
+    public function process(\Iterator $records): void
     {
         foreach ($records as $record) {
             $productRequest = ProductRequest::fromArray($record);

@@ -6,28 +6,63 @@ namespace App\Tests\Command\Import;
 
 use App\Command\Import\PriceInformationImportCommand;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
+use App\Helper\CSVParser;
+use App\Tests\ProphecyKernelTestCase;
+use JMS\Serializer\SerializerInterface;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @coversDefaultClass \App\Command\Import\PriceInformationImportCommand
  */
-class PriceInformationImportCommandTest extends AbstractImportCommandTest
+class PriceInformationImportCommandTest extends ProphecyKernelTestCase
 {
     /**
-     * @var ObjectProphecy|PriceInformationRequest
+     * @var LoggerInterface|ObjectProphecy
      */
-    protected ObjectProphecy $requestClass;
+    protected ObjectProphecy $logger;
+
+    /**
+     * @var MessageBusInterface|ObjectProphecy
+     */
+    protected ObjectProphecy $messageBus;
+
+    /**
+     * @var ObjectProphecy|ValidatorInterface
+     */
+    protected ObjectProphecy $productRequest;
+
+    /**
+     * @var CSVParser|ObjectProphecy
+     */
+    protected ObjectProphecy $helper;
+
+    protected PriceInformationImportCommand $command;
+
+    /**
+     * @var ObjectProphecy|ValidatorInterface
+     */
+    protected ObjectProphecy $validator;
+    /**
+     * @var ObjectProphecy|SerializerInterface
+     */
+    protected $serializer;
 
     protected function setUp(): void
     {
-        $this->requestClass = $this->prophesize(ProductRelationshipRequest::class);
-        parent::setUp();
-        $application = new Application(static::createKernel());
+        $this->logger = $this->prophesize(LoggerInterface::class);
+        $this->messageBus = $this->prophesize(MessageBusInterface::class);
+        $this->helper = $this->prophesize(CSVParser::class);
+        $this->validator = $this->prophesize(ValidatorInterface::class);
+        $this->messageBus->dispatch(Argument::any())->willReturn(new Envelope(new \stdClass()));
+        $this->serializer = $this->prophesize(SerializerInterface::class);
 
         $this->command = new PriceInformationImportCommand(
             $this->logger->reveal(),
@@ -36,143 +71,68 @@ class PriceInformationImportCommandTest extends AbstractImportCommandTest
             $this->validator->reveal(),
             $this->serializer->reveal()
         );
-        $application->add($this->command);
-        $this->commandTester = new CommandTester($this->command);
     }
 
-    public function requestProvider(): \Generator
+    public function testProcess(): void
     {
-        $iterator = new \ArrayIterator([
-            [
-                'product.id' => 'BB0000335658',
-                'averageValue.amount' => 3000,
-                'averageValue.currencyCode' => 'EUR',
-                'averageCommissionType' => 'amount',
-                'averageCommission' => '20.00',
-                'updatedAt' => '2020-01-01 00:00:00',
-            ],
-        ]);
+        $item = [
+            'product.id' => 'BB0000335658',
+            'averageValue.amount' => 30.99,
+            'averageValue.currencyCode' => 'EUR',
+            'averageCommissionType' => 'amount',
+            'averageCommission' => '20.00',
+            'updatedAt' => '2020-01-01 00:00:00',
+        ];
 
-        yield [$iterator];
+        $iterator = new \ArrayIterator([$item]);
 
-        $iterator = new \ArrayIterator([
-            [
-                'product.id' => 'BB0000335658',
-                'averageValue.amount' => 240,
-                'averageValue.currencyCode' => 'EUR',
-                'averageCommissionType' => 'percentage',
-                'averageCommission' => '0.100',
-                'updatedAt' => '2020-01-01 00:00:00',
-            ],
-        ]);
+        $constraintViolation = $this->prophesize(ConstraintViolationListInterface::class);
+        $constraintViolation->count()->willReturn(0);
+        $this->validator->validate(Argument::type(PriceInformationRequest::class))->shouldBeCalled()->willReturn($constraintViolation->reveal());
 
-        yield [$iterator];
+        (function ($item, $test) {
+            $this
+                ->messageBus
+                ->dispatch(Argument::type(PriceInformationRequest::class))
+                ->will(function ($args) use ($item, $test) {
+                    $test->assertEquals($args[0]->averageValue->currencyCode, $item['averageValue.currencyCode']);
+                    $test->assertEquals($args[0]->averageValue->amount, 3099);
+                    $test->assertEquals($args[0]->product->id, $item['product.id']);
+                    $test->assertEquals($args[0]->averageCommissionType, $item['averageCommissionType']);
+                    $test->assertEquals($args[0]->averageCommission, $item['averageCommission']);
+                    $test->assertEquals($args[0]->updatedAt, new \DateTime($item['updatedAt']));
+
+                    return new Envelope(new \stdClass());
+                });
+        })($item, $this);
+
+        $this->command->process($iterator);
     }
 
-    public function requestProviderInvalidData(): \Generator
+    public function testProcessWithInvalidData(): void
     {
-        $iterator = new \ArrayIterator([
-            [
-                'product.id' => 'BB0000335658',
-                'averageValue.amount' => '30.00',
-                'averageValue.currencyCode' => 'EURO',
-                'averageCommissionType' => 'percentage',
-                'averageCommission' => '20.00',
-                'updatedAt' => '2020-01-01 00:00:00',
-            ],
-        ]);
+        $item = [
+            'product.id' => 'BB0000335658',
+            'averageValue.amount' => 30.99,
+            'averageValue.currencyCode' => 'EUR',
+            'averageCommissionType' => 'amount',
+            'averageCommission' => '20.00',
+            'updatedAt' => '2020-01-01 00:00:00',
+        ];
 
-        yield [$iterator];
+        $iterator = new \ArrayIterator([$item]);
+        $v = new ConstraintViolation('aaa', 'aaa', [], '', '', '', null, '', null, '');
+        $constraintViolation = new ConstraintViolationList([$v]);
+        $this->validator->validate(Argument::type(PriceInformationRequest::class))->shouldBeCalled()->willReturn($constraintViolation);
 
-        $iterator = new \ArrayIterator([
-            [
-                'product.id' => 'BB0000335658',
-                'averageValue.amount' => '30.00',
-                'averageValue.currencyCode' => 'EUR',
-                'averageCommissionType' => 'on demand',
-                'averageCommission' => '20.00',
-                'updatedAt' => '2020-01-01 00:00:00',
-            ],
-        ]);
-
-        yield [$iterator];
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::configure
-     * @covers ::execute
-     * @covers ::process
-     *
-     * @dataProvider requestProvider
-     */
-    public function testExecuteSuccessfully(\ArrayIterator $arrayProductRelationshipRequest): void
-    {
-        $this->executeWithValidData($arrayProductRelationshipRequest);
-
-        $this->assertEquals(0, $this->commandTester->getStatusCode());
-        $this->assertEquals('r2d2:price-information:import', $this->command::getDefaultName());
-        $this->assertStringContainsString('[OK] Command executed', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Total records: 1', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Starting at:', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Finishing at :', $this->commandTester->getDisplay());
-        $this->messageBus
+        $this
+            ->messageBus
             ->dispatch(Argument::type(PriceInformationRequest::class))
-            ->shouldBeCalledTimes(count($arrayProductRelationshipRequest));
-    }
+            ->shouldNotBeCalled();
 
-    /**
-     * @covers ::__construct
-     * @covers ::configure
-     * @covers ::execute
-     * @covers ::process
-     * @covers ::logError
-     *
-     * @dataProvider requestProviderInvalidData
-     */
-    public function testExecuteWithInvalidData(\ArrayIterator $arrayProductRelationshipRequest): void
-    {
-        $this->executeWithInvalidData($arrayProductRelationshipRequest);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->logger->error(Argument::any(), Argument::any())->shouldBeCalled();
 
-        $this->assertEquals(1, $this->commandTester->getStatusCode());
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::configure
-     * @covers ::execute
-     * @covers ::process
-     * @covers ::logError
-     *
-     * @dataProvider requestProvider
-     */
-    public function testExecuteCatchesException(\ArrayIterator $arrayProductRelationshipRequest): void
-    {
-        $this->helper->readFile(Argument::any(), Argument::any())->willReturn($arrayProductRelationshipRequest);
-        $errors = new ConstraintViolationList([]);
-        $errors->add(new ConstraintViolation(Argument::any(), null, [], Argument::any(), null, null));
-        $this->validator->validate(Argument::any())->willReturn($errors);
-
-        $this->commandTester->execute([
-            'command' => $this->command->getName(),
-            'file' => 'Prices_Test.csv',
-        ]);
-
-        $this->assertEquals(1, $this->commandTester->getStatusCode());
-        $this->assertStringContainsString('Total records: 1', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Starting at:', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('[ERROR] Command exited', $this->commandTester->getDisplay());
-    }
-
-    /**
-     * @covers::configure
-     */
-    public function testConfigureOutput()
-    {
-        $definition = $this->command->getDefinition();
-
-        $this->assertEquals('Command to push CSV price-information to the queue', $this->command->getDescription());
-        $this->assertArrayHasKey('file', $definition->getArguments());
-        $this->assertEquals('CSV file path', $definition->getArgument('file')->getDescription());
+        $this->command->process($iterator);
     }
 }

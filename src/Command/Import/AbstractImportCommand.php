@@ -83,7 +83,7 @@ abstract class AbstractImportCommand extends Command
         return 0;
     }
 
-    abstract protected function process(\Iterator $records): void;
+    abstract public function process(\Iterator $records): void;
 
     protected function logError(ConstraintViolationListInterface $errors): int
     {
@@ -95,7 +95,6 @@ abstract class AbstractImportCommand extends Command
                 $violation->getInvalidValue(),
                 $violation->getMessage()
             );
-            $this->io->error($msgError);
             $this->logger->error($msgError, $violation->getParameters());
         }
         throw new \InvalidArgumentException($msgError);
