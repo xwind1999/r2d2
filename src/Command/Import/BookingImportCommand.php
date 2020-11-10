@@ -32,7 +32,7 @@ class BookingImportCommand extends AbstractImportCommand
         'endRoomDate',
     ];
 
-    protected function process(\Iterator $records): void
+    public function process(\Iterator $records): void
     {
         foreach ($records as $record) {
             $bookingCreateRequest = new BookingImportRequest();

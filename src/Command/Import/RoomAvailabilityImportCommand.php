@@ -25,7 +25,7 @@ class RoomAvailabilityImportCommand extends AbstractImportCommand
         parent::configure();
     }
 
-    protected function process(\Iterator $records): void
+    public function process(\Iterator $records): void
     {
         foreach ($records as $record) {
             $roomAvailabilityRequest = new RoomAvailabilityRequest();

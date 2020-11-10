@@ -18,7 +18,7 @@ class RelationshipImportCommand extends AbstractImportCommand
         'updatedAt',
     ];
 
-    protected function process(\Iterator $records): void
+    public function process(\Iterator $records): void
     {
         foreach ($records as $record) {
             $productRelationshipRequest = new ProductRelationshipRequest();

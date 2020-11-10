@@ -22,7 +22,7 @@ class PriceInformationImportCommand extends AbstractImportCommand
 
     private const MULTIPLIER_VALUE = 100;
 
-    protected function process(\Iterator $records): void
+    public function process(\Iterator $records): void
     {
         foreach ($records as $record) {
             $priceInformationRequest = new PriceInformationRequest();
@@ -32,8 +32,7 @@ class PriceInformationImportCommand extends AbstractImportCommand
 
             $price = new Price();
             $price->currencyCode = $record['averageValue.currencyCode'];
-            $price->amount = (int) $record['averageValue.amount'] * self::MULTIPLIER_VALUE;
-
+            $price->amount = (int) ((float) $record['averageValue.amount'] * self::MULTIPLIER_VALUE);
             $priceInformationRequest->product = $product;
             $priceInformationRequest->averageValue = $price;
             $priceInformationRequest->averageCommission = $record['averageCommission'];
