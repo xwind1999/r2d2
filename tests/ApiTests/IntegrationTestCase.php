@@ -37,10 +37,11 @@ class IntegrationTestCase extends ApiTestCase
 
     protected function consume(string $queue, int $iterations = 1): void
     {
-        /**
+        /*
          * TODO: find a way to test in a real environment (devint),
          *       maybe by waiting a second for the workers to pick up the message.
          */
+        self::bootKernel();
         $transport = static::$container->get('messenger.transport.'.$queue);
         (new DisposableWorker(
             [$transport],
