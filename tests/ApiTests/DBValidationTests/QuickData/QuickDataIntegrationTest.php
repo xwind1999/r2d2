@@ -673,9 +673,11 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         usort($avs2, function ($a, $b) {
             return $a['experienceGoldenId'] <=> $b['experienceGoldenId'];
         });
+
         usort($avs3, function ($a, $b) {
             return $a['experienceGoldenId'] <=> $b['experienceGoldenId'];
         });
+
         $this->assertEquals($avs1, $avs2);
         $this->assertEquals($avs1, $avs3);
 

@@ -65,15 +65,15 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         bool $disableTest = false
     ): array {
         if (false === $disableTest) {
-            switch (random_int(0, 2)) {
+            switch (random_int(0, 3)) {
                 case 1:
                     return $this->findAvailableRoomsByBoxIdProcessingOnPHP($boxId, $startDate);
                 case 2:
-                    return $this->findAvailableRoomsByBoxIdWithUpdatedQuery($boxId, $startDate);
+                    return $this->findAvailableRoomsByBoxIdWithFirstQuery($boxId, $startDate);
             }
         }
 
-        return $this->findAvailableRoomsByBoxIdWithFirstQuery($boxId, $startDate);
+        return $this->findAvailableRoomsByBoxIdWithUpdatedQuery($boxId, $startDate);
     }
 
     public function findAvailableRoomsByBoxIdWithFirstQuery(
@@ -125,16 +125,16 @@ SQL;
         room_availability ra on fmc.component_uuid = ra.component_uuid AND ra.date BETWEEN :dateFrom AND DATE_ADD(:dateFrom, interval fmc.duration - 1 day)
     WHERE
         fmc.box_golden_id = :boxId AND
-        fmc.room_stock_type = :onRequestType
+        fmc.room_stock_type = :onRequestType AND
+        (ra.is_stop_sale is null OR ra.is_stop_sale = 0)
     GROUP BY
-        fmc.experience_golden_id
-    HAVING max(ra.is_stop_sale) != 1
+        fmc.experience_golden_id, ra.is_stop_sale
 ) UNION ALL (
     SELECT
         fmc.experience_golden_id as experienceGoldenId, fmc.room_stock_type  as roomStockType, fmc.duration
     FROM
         flat_manageable_component fmc
-    LEFT JOIN
+    JOIN
         room_availability ra on fmc.component_uuid = ra.component_uuid AND ra.date BETWEEN :dateFrom AND DATE_ADD(:dateFrom, interval fmc.duration - 1 day)
     WHERE
         fmc.box_golden_id = :boxId AND
