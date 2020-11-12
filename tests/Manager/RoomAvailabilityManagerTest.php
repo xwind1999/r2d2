@@ -223,6 +223,7 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
      * @dataProvider roomAvailabilityRequestProvider
      * @covers ::replace
      * @covers ::hasAvailabilityChangedForBoxCache
+     * @covers ::isMeaninglessData
      * @group replace-room-availability
      *
      * @throws \Exception
@@ -306,6 +307,7 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
             (function ($roomAvailabilityRequest) {
                 $roomAvailabilityRequest->quantity = random_int(0, 9) < 2 ? 0 : 1;
                 $roomAvailabilityRequest->updatedAt->modify('now');
+                $roomAvailabilityRequest->isStopSale = true;
 
                 return $roomAvailabilityRequest;
             })(clone $roomAvailabilityRequest),
@@ -330,6 +332,7 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
                 //zeroing the stock, so we may need to recalculate some stuff
                 $roomAvailabilityRequest->quantity = 0;
                 $roomAvailabilityRequest->updatedAt->modify('now');
+                $roomAvailabilityRequest->isStopSale = true;
 
                 return $roomAvailabilityRequest;
             })(clone $roomAvailabilityRequest),
@@ -421,6 +424,24 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
                 return $roomAvailabilityList;
             })($roomAvailabilityList),
             null,
+        ];
+
+        yield 'room-availability-update-request-with-stock-zero-stop-sale-false' => [
+            $component,
+            (function ($test, $roomAvailabilityList, $component) {
+                $test->repository->findByComponentAndDateRange(Argument::cetera())->willReturn($roomAvailabilityList);
+                $test->em->flush()->shouldBeCalledTimes(1);
+                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(0);
+                $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
+            }),
+            (function ($roomAvailabilityRequest) {
+                $roomAvailabilityRequest->quantity = 0;
+                $roomAvailabilityRequest->updatedAt->modify('now');
+                $roomAvailabilityRequest->isStopSale = false;
+
+                return $roomAvailabilityRequest;
+            })(clone $roomAvailabilityRequest),
+            $roomAvailabilityList,
         ];
     }
 
