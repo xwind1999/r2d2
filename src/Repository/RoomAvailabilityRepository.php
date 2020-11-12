@@ -505,4 +505,25 @@ SQL;
 
         return $query->fetchAllAssociative();
     }
+
+    public function deleteByComponentIdAndDateRange(
+        Component $component,
+        \DateTime $dateFrom,
+        \DateTime $dateTo
+    ): void {
+        $sql = <<<SQL
+            DELETE FROM
+                room_availability ra
+            WHERE
+                ra.component_golden_id = :componentGoldenId
+                AND ra.date >= :dateFrom AND ra.date < :dateTo
+            ;
+        SQL;
+
+        $statement = $this->_em->getConnection()->prepare($sql);
+        $statement->bindValue('componentGoldenId', $component->goldenId);
+        $statement->bindValue('dateFrom', $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        $statement->bindValue('dateTo', $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        $statement->execute();
+    }
 }

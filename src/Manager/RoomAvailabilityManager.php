@@ -73,6 +73,16 @@ class RoomAvailabilityManager
 
         $component = $this->componentRepository->findOneByGoldenId($roomAvailabilityRequest->product->id);
 
+        if ($this->canRoomAvailabilityBeDeleted($roomAvailabilityRequest)) {
+            $this->repository->deleteByComponentIdAndDateRange(
+                $component,
+                $roomAvailabilityRequest->dateFrom,
+                $roomAvailabilityRequest->dateTo
+            );
+
+            return;
+        }
+
         $roomAvailabilityList = $this->repository->findByComponentAndDateRange(
             $component,
             $roomAvailabilityRequest->dateFrom,
@@ -85,10 +95,6 @@ class RoomAvailabilityManager
         foreach ($datePeriod as $date) {
             $newAvailability = true;
             $roomAvailability = new RoomAvailability();
-
-            if ($this->isMeaninglessData($roomAvailabilityRequest)) {
-                continue;
-            }
 
             if (isset($roomAvailabilityList[$date->format(DateTimeConstants::DEFAULT_DATE_FORMAT)])) {
                 $roomAvailability = $roomAvailabilityList[$date->format(DateTimeConstants::DEFAULT_DATE_FORMAT)];
@@ -194,11 +200,7 @@ class RoomAvailabilityManager
         );
     }
 
-    /**
-     * To be a meaningful data the request must to have the quantity (stock) different than zero
-     * or stop sale equals true if the quantity is zero.
-     */
-    private function isMeaninglessData(RoomAvailabilityRequest $roomAvailabilityRequest): bool
+    private function canRoomAvailabilityBeDeleted(RoomAvailabilityRequest $roomAvailabilityRequest): bool
     {
         return 0 === (int) $roomAvailabilityRequest->quantity && false === (bool) $roomAvailabilityRequest->isStopSale;
     }

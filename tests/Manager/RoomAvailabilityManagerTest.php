@@ -223,7 +223,7 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
      * @dataProvider roomAvailabilityRequestProvider
      * @covers ::replace
      * @covers ::hasAvailabilityChangedForBoxCache
-     * @covers ::isMeaninglessData
+     * @covers ::canRoomAvailabilityBeDeleted
      * @group replace-room-availability
      *
      * @throws \Exception
@@ -429,10 +429,11 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
         yield 'room-availability-update-request-with-stock-zero-stop-sale-false' => [
             $component,
             (function ($test, $roomAvailabilityList, $component) {
-                $test->repository->findByComponentAndDateRange(Argument::cetera())->willReturn($roomAvailabilityList);
-                $test->em->flush()->shouldBeCalledTimes(1);
-                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(0);
-                $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
+                $test->repository->deleteByComponentIdAndDateRange(Argument::cetera(), Argument::cetera(), Argument::cetera())->shouldBeCalledOnce();
+                $test->repository->findByComponentAndDateRange(Argument::cetera(), Argument::cetera(), Argument::cetera())->shouldNotBeCalled()->willReturn($roomAvailabilityList);
+                $test->em->flush()->shouldNotBeCalled();
+                $test->em->persist(Argument::type(RoomAvailability::class))->shouldNotBeCalled();
+                $test->componentRepository->findOneByGoldenId(Argument::any())->shouldBeCalledOnce()->willReturn($component);
             }),
             (function ($roomAvailabilityRequest) {
                 $roomAvailabilityRequest->quantity = 0;
