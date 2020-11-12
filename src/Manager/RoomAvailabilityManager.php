@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manager;
 
+use App\Constants\DateTimeConstants;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
 use App\Entity\Booking;
@@ -85,8 +86,12 @@ class RoomAvailabilityManager
             $newAvailability = true;
             $roomAvailability = new RoomAvailability();
 
-            if (isset($roomAvailabilityList[$date->format('Y-m-d')])) {
-                $roomAvailability = $roomAvailabilityList[$date->format('Y-m-d')];
+            if ($this->isMeaninglessData($roomAvailabilityRequest)) {
+                continue;
+            }
+
+            if (isset($roomAvailabilityList[$date->format(DateTimeConstants::DEFAULT_DATE_FORMAT)])) {
+                $roomAvailability = $roomAvailabilityList[$date->format(DateTimeConstants::DEFAULT_DATE_FORMAT)];
                 $newAvailability = false;
             }
 
@@ -97,7 +102,7 @@ class RoomAvailabilityManager
             }
 
             if (true === $newAvailability || $this->hasAvailabilityChangedForBoxCache($roomAvailabilityRequest, $roomAvailability)) {
-                $changedDates[$date->format('Y-m-d')] = $date;
+                $changedDates[$date->format(DateTimeConstants::DEFAULT_DATE_FORMAT)] = $date;
             }
 
             $roomAvailability->componentGoldenId = $roomAvailabilityRequest->product->id;
@@ -187,5 +192,14 @@ class RoomAvailabilityManager
             $startDate,
             $endDate
         );
+    }
+
+    /**
+     * To be a meaningful data the request must to have the quantity (stock) different than zero
+     * or stop sale equals true if the quantity is zero.
+     */
+    private function isMeaninglessData(RoomAvailabilityRequest $roomAvailabilityRequest): bool
+    {
+        return 0 === (int) $roomAvailabilityRequest->quantity && false === (bool) $roomAvailabilityRequest->isStopSale;
     }
 }
