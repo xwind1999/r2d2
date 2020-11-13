@@ -106,7 +106,8 @@ class AvailabilityHelper
             foreach ($datePeriod as $date) {
                 $date = $date->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
                 $availabilities['stock'][] = isset($availabilities[$date]) ?
-                    $this->validateStockType($availabilities[$date]['stock'], $roomStockType) : '0';
+                    $this->validateStockType($availabilities[$date]['stock'], $roomStockType)
+                    : (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType ? AvailabilityConstants::AVAILABILITY_SHORTEN_ON_REQUEST : '0');
             }
         } else {
             foreach ($availabilities as $availability) {
