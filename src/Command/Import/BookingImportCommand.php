@@ -47,12 +47,26 @@ class BookingImportCommand extends AbstractImportCommand
             $bookingCreateRequest->experience = new Experience();
             $bookingCreateRequest->experience->id = $record['experienceId'];
 
-            $record['components'] = str_replace('0x', '', $record['components']);
-            $record['components'] = hex2bin($record['components']);
-            $record['components'] = gzdecode($record['components']);
-            $record['components'] = str_replace("\0", '', $record['components']);
-            $record['components'] = json_decode($record['components'], true, 512, JSON_THROW_ON_ERROR);
-            $bookingCreateRequest->experience->components = $record['components']['components'][0];
+            $components = '';
+            $bookingCreateRequest->experience->components = [];
+            if (!empty($record['components'])) {
+                $components = str_replace('0x', '', $record['components']);
+                $components = (string) hex2bin($components);
+                $components = (string) gzdecode($components);
+                $components = str_replace("\0", '', $components);
+            }
+
+            try {
+                $componentsArray = json_decode($components, true, 512, JSON_THROW_ON_ERROR);
+                $bookingCreateRequest->experience->components = $componentsArray['components'][0];
+            } catch (\Exception $exception) {
+                $components = str_replace(['[', ']'], '', $components);
+                $components = explode('", ', $components);
+                foreach ($components as $key => $component) {
+                    $components[$key] = utf8_encode($component);
+                }
+                $bookingCreateRequest->experience->components = $components;
+            }
 
             $record['customerData'] = str_replace('0x', '', $record['customerData']);
             $record['customerData'] = hex2bin($record['customerData']);
