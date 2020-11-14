@@ -59,7 +59,7 @@ class BookingImportCommand extends AbstractImportCommand
             try {
                 $componentsArray = json_decode($components, true, 512, JSON_THROW_ON_ERROR);
                 $bookingCreateRequest->experience->components = $componentsArray['components'][0];
-            } catch (\Exception $exception) {
+            } catch (\Exception | \Throwable $exception) {
                 $components = str_replace(['[', ']'], '', $components);
                 $components = explode('", ', $components);
                 foreach ($components as $key => $component) {
