@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Constraint\RoomStockTypeConstraint;
 use App\Contract\Request\Booking\BookingCreate\Experience as BookingCreateExperience;
 use App\Contract\Request\Booking\BookingCreate\Guest;
 use App\Contract\Request\Booking\BookingCreate\Room;
@@ -389,6 +390,8 @@ class BookingManagerTest extends ProphecyTestCase
     /**
      * @covers ::__construct
      * @covers ::create
+     * @covers ::isUnavailableForBookings
+     * @covers ::hasStopSaleOnRequestBookings
      * @group create
      *
      * @dataProvider dataForCreate
@@ -425,6 +428,7 @@ class BookingManagerTest extends ProphecyTestCase
         $component = new Component();
         $component->goldenId = 'component-id';
         $component->duration = $duration;
+        $component->roomStockType = $extraParams['roomStockType'] ?? RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
         $this->componentRepository->findDefaultRoomByExperience($experience)->willReturn($component);
 
         $money = new Money($experience->price, new Currency($experience->currency));
@@ -571,6 +575,94 @@ class BookingManagerTest extends ProphecyTestCase
                 $test->assertCount(1, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
+        ];
+
+        yield 'on-request happy days' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+                $test->roomAvailabilityRepository->findStopSaleOnRequestAvailabilityByExperienceAndDates(
+                    Argument::type('string'),
+                    Argument::type(\DateTimeInterface::class),
+                    Argument::type(\DateTimeInterface::class)
+                )->shouldBeCalledOnce();
+                $test->roomAvailabilityRepository->findStopSaleOnRequestAvailabilityByExperienceAndDates(
+                    Argument::type('string'),
+                    Argument::type(\DateTimeInterface::class),
+                    Argument::type(\DateTimeInterface::class)
+                )->willReturn([]);
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(500, $booking->totalPrice);
+                $test->assertCount(1, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
+            },
+            ['roomStockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST],
+        ];
+
+        yield 'on-request not so happy days' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+                $test->roomAvailabilityRepository->findStopSaleOnRequestAvailabilityByExperienceAndDates(
+                    Argument::type('string'),
+                    Argument::type(\DateTimeInterface::class),
+                    Argument::type(\DateTimeInterface::class)
+                )->willReturn(
+                    [
+                        [
+                            'experienceGoldenId' => '59593',
+                            'componentGoldenId' => '213072',
+                            'date' => '2020-01-01',
+                        ],
+                        [
+                            'experienceGoldenId' => '59593',
+                            'componentGoldenId' => '213072',
+                            'date' => '2020-01-02',
+                        ],
+                    ]
+                );
+            },
+            UnavailableDateException::class,
+            function ($test) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+            },
+            ['roomStockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST],
         ];
 
         yield 'happy days, null duration (defaulting to one)' => [
@@ -1263,156 +1355,6 @@ class BookingManagerTest extends ProphecyTestCase
                     Argument::type(\DateTimeInterface::class)
                 )->shouldBeCalled();
             },
-        ];
-    }
-
-    /**
-     * @dataProvider bookingValidationProvider
-     * @covers ::isUnavailableForBookings
-     */
-    public function testValidateBookingAvailability(
-        Booking $booking,
-        callable $stubs,
-        callable $asserts
-    ) {
-        $stubs($this);
-
-        $return = $this->bookingManager->isUnavailableForBookings($booking);
-
-        $asserts($this, $return);
-    }
-
-    /**
-     * @return \Generator
-     */
-    public function bookingValidationProvider()
-    {
-        $booking = new Booking();
-        $experience = new Experience();
-        $experience->goldenId = '12345';
-
-        $booking->experience = $experience;
-        $booking->experienceGoldenId = '12345';
-        $booking->startDate = new \DateTime('2020-11-01');
-        $booking->endDate = new \DateTime('2020-11-03');
-
-        yield 'validate-booking-creation-with-availability' => [
-            $booking,
-            (function ($test) {
-                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
-                    Argument::type('string'),
-                    Argument::type(\DateTimeInterface::class),
-                    Argument::type(\DateTimeInterface::class)
-                )->shouldBeCalledOnce();
-                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
-                    Argument::type('string'),
-                    Argument::type(\DateTimeInterface::class),
-                    Argument::type(\DateTimeInterface::class)
-                )->willReturn(
-                    [
-                        [
-                            'experienceGoldenId' => '59593',
-                            'componentGoldenId' => '213072',
-                            'date' => '2020-01-01',
-                            'realStock' => 7,
-                            'usedStock' => 2,
-                            'stock' => 9,
-                        ],
-                        [
-                            'experienceGoldenId' => '59593',
-                            'componentGoldenId' => '213072',
-                            'date' => '2020-01-02',
-                            'realStock' => 2,
-                            'usedStock' => 3,
-                            'stock' => 5,
-                        ],
-                        [
-                            'experienceGoldenId' => '59593',
-                            'componentGoldenId' => '213072',
-                            'date' => '2020-01-03',
-                            'realStock' => 5,
-                            'usedStock' => 0,
-                            'stock' => 5,
-                        ],
-                    ]
-                );
-            }),
-            (function ($test, $response) {
-                $test->assertFalse($response);
-            }),
-        ];
-
-        yield 'validate-booking-creation-no-availability-first-date' => [
-            $booking,
-            (function ($test) {
-                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
-                    Argument::type('string'),
-                    Argument::type(\DateTimeInterface::class),
-                    Argument::type(\DateTimeInterface::class)
-                )->shouldBeCalled();
-                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
-                    Argument::type('string'),
-                    Argument::type(\DateTimeInterface::class),
-                    Argument::type(\DateTimeInterface::class)
-                )->willReturn(
-                    [
-                        [
-                            'experienceGoldenId' => '59593',
-                            'componentGoldenId' => '213072',
-                            'date' => '2020-11-02',
-                            'realStock' => '1',
-                            'usedStock' => '1',
-                            'stock' => '2',
-                        ],
-                    ]
-                );
-            }),
-            (function ($test, $response) {
-                $test->assertTrue($response);
-            }),
-        ];
-
-        yield 'validate-booking-creation-with-stop-sale-date' => [
-            (function ($booking) {
-                $booking->startDate = new \DateTime('2020-11-13');
-                $booking->endDate = new \DateTime('2020-11-16');
-
-                return $booking;
-            })(clone $booking),
-            (function ($test) {
-                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
-                    Argument::type('string'),
-                    Argument::type(\DateTimeInterface::class),
-                    Argument::type(\DateTimeInterface::class)
-                )->shouldBeCalledOnce();
-                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
-                    Argument::type('string'),
-                    Argument::type(\DateTimeInterface::class),
-                    Argument::type(\DateTimeInterface::class)
-                )->willReturn(
-                    [
-                        [
-                            'experienceGoldenId' => '59593',
-                            'componentGoldenId' => '213072',
-                            'date' => '2020-11-13',
-                            'realStock' => 7,
-                            'usedStock' => 2,
-                            'stock' => 9,
-                        ],
-                        [
-                            'experienceGoldenId' => '59593',
-                            'componentGoldenId' => '213072',
-                            'date' => '2020-11-14',
-                            'realStock' => 2,
-                            'usedStock' => 3,
-                            'stock' => 5,
-                        ],
-                    ]
-                );
-            }),
-            (function ($test, $response) {
-                $test->assertTrue($response);
-            }),
         ];
     }
 

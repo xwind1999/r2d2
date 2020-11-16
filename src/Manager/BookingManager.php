@@ -7,6 +7,7 @@ namespace App\Manager;
 use App\Constants\DateTimeConstants;
 use App\Constraint\BookingStatusConstraint;
 use App\Constraint\ProductDurationUnitConstraint;
+use App\Constraint\RoomStockTypeConstraint;
 use App\Contract\Request\Booking\BookingCreateRequest;
 use App\Contract\Request\Booking\BookingImport\BookingImportRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
@@ -114,6 +115,7 @@ class BookingManager
 
         $this->boxExperienceRepository->findOneEnabledByBoxExperience($box, $experience);
         $component = $this->componentRepository->findDefaultRoomByExperience($experience);
+        $roomStockType = $component->roomStockType;
 
         $partner = $experience->partner;
 
@@ -162,14 +164,19 @@ class BookingManager
          * 8. cannot have the same date in two entries for a room
          * 9. do not allow mismatch between box currency and partner currency with upsell
          * 10. validate the availability for the booking date and component duration
+         * 11. validate if any stop sales in on_request booking
          */
 
         if ($booking->endDate->diff($booking->startDate)->days < $minimumDuration) {
             throw new UnallocatedDateException();
         }
 
-        // validation #10
-        if (true === $this->isUnavailableForBookings($booking)) {
+        // validation #10 and #11
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType &&
+            false === $this->hasStopSaleOnRequestBookings($booking)
+        ) {
+            throw new UnavailableDateException();
+        } elseif (true === $this->isUnavailableForBookings($booking)) {
             throw new UnavailableDateException();
         }
 
@@ -417,7 +424,7 @@ class BookingManager
         return $booking;
     }
 
-    public function isUnavailableForBookings(Booking $booking): bool
+    protected function isUnavailableForBookings(Booking $booking): bool
     {
         $availabilities = $this->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
             $booking->experienceGoldenId,
@@ -426,5 +433,16 @@ class BookingManager
         );
 
         return count($availabilities) < $booking->startDate->diff($booking->endDate)->days;
+    }
+
+    protected function hasStopSaleOnRequestBookings(Booking $booking): bool
+    {
+        $availabilities = $this->roomAvailabilityRepository->findStopSaleOnRequestAvailabilityByExperienceAndDates(
+            $booking->experienceGoldenId,
+            $booking->startDate,
+            $booking->endDate
+        );
+
+        return empty($availabilities);
     }
 }
