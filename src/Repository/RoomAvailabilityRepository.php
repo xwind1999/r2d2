@@ -496,11 +496,51 @@ SQL;
             )->modify('-1 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
 
-        $query->bindValue('dateNow', (new \DateTime('now'))->format(DateTimeConstants::DEFAULT_DATE_TIME_FORMAT));
+        $dateNow = (new \DateTime('now'))->format(DateTimeConstants::DEFAULT_DATE_TIME_FORMAT);
+        $query->bindValue('dateNow', $dateNow);
         $query->bindValue('status', BookingStatusConstraint::BOOKING_STATUS_CREATED);
         $query->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
         $query->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
         $query->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
+        $query->execute();
+
+        return $query->fetchAllAssociative();
+    }
+
+    public function findStopSaleOnRequestAvailabilityByExperienceAndDates(
+        string $experienceGoldenId,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        $sql = <<<SQL
+SELECT
+   f.experience_golden_id as experienceGoldenId,
+   r.component_golden_id as componentGoldenId,
+   r.date AS date
+FROM
+    flat_manageable_component f
+    LEFT JOIN
+    room_availability r
+    ON  f.component_uuid = r.component_uuid 
+ WHERE
+   r.date BETWEEN :startDate AND :endDate
+  AND f.experience_golden_id = :experienceGoldenId
+  AND f.room_stock_type = :onRequestType
+  AND r.is_stop_sale = true
+GROUP BY
+   r.date,
+   f.experience_golden_id,
+   f.component_golden_id
+SQL;
+        $query = $this->getEntityManager()->getConnection()->prepare($sql);
+        $query->bindValue('experienceGoldenId', $experienceGoldenId);
+        $query->bindValue('startDate', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
+        // Removing the last date as it should not count due to do not have night stay
+        $query->bindValue('endDate', (
+        new \DateTime($endDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT))
+        )->modify('-1 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        );
+        $query->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
         $query->execute();
 
         return $query->fetchAllAssociative();
