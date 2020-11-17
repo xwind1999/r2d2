@@ -7,6 +7,7 @@ namespace App\Tests\Command\Import;
 use App\Command\Import\PriceInformationImportCommand;
 use App\Contract\Request\BroadcastListener\PriceInformationRequest;
 use App\Helper\CSVParser;
+use App\Helper\MoneyHelper;
 use App\Tests\ProphecyKernelTestCase;
 use JMS\Serializer\SerializerInterface;
 use Prophecy\Argument;
@@ -55,6 +56,11 @@ class PriceInformationImportCommandTest extends ProphecyKernelTestCase
      */
     protected $serializer;
 
+    /**
+     * @var MoneyHelper|ObjectProphecy
+     */
+    protected $moneyHelper;
+
     protected function setUp(): void
     {
         $this->logger = $this->prophesize(LoggerInterface::class);
@@ -63,13 +69,15 @@ class PriceInformationImportCommandTest extends ProphecyKernelTestCase
         $this->validator = $this->prophesize(ValidatorInterface::class);
         $this->messageBus->dispatch(Argument::any())->willReturn(new Envelope(new \stdClass()));
         $this->serializer = $this->prophesize(SerializerInterface::class);
+        $this->moneyHelper = $this->prophesize(MoneyHelper::class);
 
         $this->command = new PriceInformationImportCommand(
             $this->logger->reveal(),
             $this->messageBus->reveal(),
             $this->helper->reveal(),
             $this->validator->reveal(),
-            $this->serializer->reveal()
+            $this->serializer->reveal(),
+            $this->moneyHelper->reveal()
         );
     }
 
@@ -78,7 +86,7 @@ class PriceInformationImportCommandTest extends ProphecyKernelTestCase
         $item = [
             'product.id' => 'BB0000335658',
             'averageValue.amount' => 30.99,
-            'averageValue.currencyCode' => 'EUR',
+            'averageValue.currencyCode' => 'SEK',
             'averageCommissionType' => 'amount',
             'averageCommission' => '20.00',
             'updatedAt' => '2020-01-01 00:00:00',
@@ -86,25 +94,27 @@ class PriceInformationImportCommandTest extends ProphecyKernelTestCase
 
         $iterator = new \ArrayIterator([$item]);
 
+        $amount = 3099;
+        $this->moneyHelper->convertToInteger('30.99', 'SEK')->willReturn($amount);
+
         $constraintViolation = $this->prophesize(ConstraintViolationListInterface::class);
         $constraintViolation->count()->willReturn(0);
         $this->validator->validate(Argument::type(PriceInformationRequest::class))->shouldBeCalled()->willReturn($constraintViolation->reveal());
 
-        (function ($item, $test) {
-            $this
-                ->messageBus
-                ->dispatch(Argument::type(PriceInformationRequest::class))
-                ->will(function ($args) use ($item, $test) {
-                    $test->assertEquals($args[0]->averageValue->currencyCode, $item['averageValue.currencyCode']);
-                    $test->assertEquals($args[0]->averageValue->amount, 3099);
-                    $test->assertEquals($args[0]->product->id, $item['product.id']);
-                    $test->assertEquals($args[0]->averageCommissionType, $item['averageCommissionType']);
-                    $test->assertEquals($args[0]->averageCommission, $item['averageCommission']);
-                    $test->assertEquals($args[0]->updatedAt, new \DateTime($item['updatedAt']));
+        $that = $this;
+        $this
+            ->messageBus
+            ->dispatch(Argument::type(PriceInformationRequest::class))
+            ->will(function ($args) use ($item, $that, $amount) {
+                $that->assertEquals($args[0]->averageValue->currencyCode, $item['averageValue.currencyCode']);
+                $that->assertEquals($args[0]->averageValue->amount, $amount);
+                $that->assertEquals($args[0]->product->id, $item['product.id']);
+                $that->assertEquals($args[0]->averageCommissionType, $item['averageCommissionType']);
+                $that->assertEquals($args[0]->averageCommission, $item['averageCommission']);
+                $that->assertEquals($args[0]->updatedAt, new \DateTime($item['updatedAt']));
 
-                    return new Envelope(new \stdClass());
-                });
-        })($item, $this);
+                return new Envelope(new \stdClass());
+            });
 
         $this->command->process($iterator);
     }
@@ -119,6 +129,9 @@ class PriceInformationImportCommandTest extends ProphecyKernelTestCase
             'averageCommission' => '20.00',
             'updatedAt' => '2020-01-01 00:00:00',
         ];
+
+        $amount = 3099;
+        $this->moneyHelper->convertToInteger('30.99', 'EUR')->willReturn($amount);
 
         $iterator = new \ArrayIterator([$item]);
         $v = new ConstraintViolation('aaa', 'aaa', [], '', '', '', null, '', null, '');

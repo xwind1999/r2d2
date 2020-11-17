@@ -15,7 +15,7 @@ class Price implements ContextualInterface
      * @Assert\Type(type="integer")
      * @Assert\NotBlank()
      *
-     * @JMS\Type("float_to_integer")
+     * @JMS\Type("strict_integer")
      * @OA\Property(example=10.50, type="float")
      */
     public int $amount;
@@ -29,10 +29,10 @@ class Price implements ContextualInterface
      */
     public string $currencyCode;
 
-    public static function fromAmountAndCurrencyCode(string $amount, string $currencyCode): self
+    public static function fromAmountAndCurrencyCode(int $amount, string $currencyCode): self
     {
         $price = new self();
-        $price->amount = (int) $amount * 100;
+        $price->amount = $amount;
         $price->currencyCode = $currencyCode;
 
         return $price;

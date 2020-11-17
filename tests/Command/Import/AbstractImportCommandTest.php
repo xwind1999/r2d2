@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Command\Import;
 
 use App\Helper\CSVParser;
+use App\Helper\MoneyHelper;
 use App\Tests\ProphecyKernelTestCase;
 use JMS\Serializer\SerializerInterface;
 use Prophecy\Argument;
@@ -49,10 +50,16 @@ abstract class AbstractImportCommandTest extends ProphecyKernelTestCase
      * @var ObjectProphecy|ValidatorInterface
      */
     protected ObjectProphecy $validator;
+
     /**
      * @var ObjectProphecy|SerializerInterface
      */
     protected $serializer;
+
+    /**
+     * @var MoneyHelper|ObjectProphecy
+     */
+    protected $moneyHelper;
 
     protected function setUp(): void
     {
@@ -63,6 +70,7 @@ abstract class AbstractImportCommandTest extends ProphecyKernelTestCase
         $this->application = new Application(static::createKernel());
         $this->messageBus->dispatch(Argument::any())->willReturn(new Envelope($this->requestClass));
         $this->serializer = $this->prophesize(SerializerInterface::class);
+        $this->moneyHelper = $this->prophesize(MoneyHelper::class);
     }
 
     protected function executeWithInvalidData(\Iterator $requestIterator): void

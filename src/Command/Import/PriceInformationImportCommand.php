@@ -20,8 +20,6 @@ class PriceInformationImportCommand extends AbstractImportCommand
         'updatedAt',
     ];
 
-    private const MULTIPLIER_VALUE = 100;
-
     public function process(\Iterator $records): void
     {
         foreach ($records as $record) {
@@ -30,9 +28,10 @@ class PriceInformationImportCommand extends AbstractImportCommand
             $product = new Product();
             $product->id = $record['product.id'];
 
+            $amount = $this->moneyHelper->convertToInteger((string) $record['averageValue.amount'], $record['averageValue.currencyCode']);
             $price = new Price();
             $price->currencyCode = $record['averageValue.currencyCode'];
-            $price->amount = (int) ((float) $record['averageValue.amount'] * self::MULTIPLIER_VALUE);
+            $price->amount = $amount;
             $priceInformationRequest->product = $product;
             $priceInformationRequest->averageValue = $price;
             $priceInformationRequest->averageCommission = $record['averageCommission'];

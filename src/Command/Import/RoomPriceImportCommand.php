@@ -38,7 +38,8 @@ class RoomPriceImportCommand extends AbstractImportCommand
             $roomPriceRequest->dateFrom = new \DateTime($record['dateFrom']);
             $roomPriceRequest->dateTo = new \DateTime($record['dateTo']);
 
-            $roomPriceRequest->price = Price::fromAmountAndCurrencyCode($record['price.amount'], $record['price.currencyCode']);
+            $amount = $this->moneyHelper->convertToInteger((string) $record['price.amount'], $record['price.currencyCode']);
+            $roomPriceRequest->price = Price::fromAmountAndCurrencyCode($amount, $record['price.currencyCode']);
 
             if (!empty($record['updatedAt'])) {
                 $roomPriceRequest->updatedAt = new \DateTime($record['updatedAt']);

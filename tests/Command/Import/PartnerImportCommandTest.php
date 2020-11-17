@@ -29,7 +29,8 @@ class PartnerImportCommandTest extends AbstractImportCommandTest
             $this->messageBus->reveal(),
             $this->helper->reveal(),
             $this->validator->reveal(),
-            $this->serializer->reveal()
+            $this->serializer->reveal(),
+            $this->moneyHelper->reveal()
         );
 
         $this->commandTester = new CommandTester($this->command);
