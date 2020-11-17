@@ -6,11 +6,27 @@ namespace App\Command;
 
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\Manageable\ManageableProductRequest;
+use App\Helper\CSVParser;
+use App\Repository\ComponentRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class CalculateManageableFlagCommand extends BulkProcessAbstractCommand
 {
     protected static $defaultName = 'r2d2:calculate-manageable-flag';
+
+    private ComponentRepository $componentRepository;
+
+    public function __construct(
+        CSVParser $csvParser,
+        LoggerInterface $logger,
+        MessageBusInterface $messageBus,
+        ComponentRepository $componentRepository
+    ) {
+        $this->componentRepository = $componentRepository;
+        parent::__construct($csvParser, $logger, $messageBus);
+    }
 
     protected function configure(): void
     {
@@ -21,16 +37,19 @@ class CalculateManageableFlagCommand extends BulkProcessAbstractCommand
         ;
     }
 
-    protected function processComponents(array $components): void
+    protected function process(array $goldenIdList): void
     {
-        foreach ($components as $key => $component) {
-            $manageableProductRequest = new ManageableProductRequest();
-            try {
+        $components = $this->componentRepository->findListByGoldenId($goldenIdList);
+        $this->dataTotal += count($components);
+
+        try {
+            foreach ($components as $key => $component) {
+                $manageableProductRequest = new ManageableProductRequest();
                 $manageableProductRequest->setProductRequest(ProductRequest::fromComponent($component));
                 $this->messageBus->dispatch($manageableProductRequest);
-            } catch (\Exception $exception) {
-                $this->logger->error($exception);
             }
+        } catch (\Exception $exception) {
+            $this->logger->error($exception);
         }
     }
 }
