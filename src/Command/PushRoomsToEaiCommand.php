@@ -5,11 +5,27 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Contract\Request\EAI\RoomRequest;
+use App\Helper\CSVParser;
+use App\Repository\ComponentRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class PushRoomsToEaiCommand extends BulkProcessAbstractCommand
 {
     protected static $defaultName = 'r2d2:eai:push-rooms';
+
+    private ComponentRepository $componentRepository;
+
+    public function __construct(
+        CSVParser $csvParser,
+        LoggerInterface $logger,
+        MessageBusInterface $messageBus,
+        ComponentRepository $componentRepository
+    ) {
+        $this->componentRepository = $componentRepository;
+        parent::__construct($csvParser, $logger, $messageBus);
+    }
 
     protected function configure(): void
     {
@@ -20,8 +36,10 @@ class PushRoomsToEaiCommand extends BulkProcessAbstractCommand
         ;
     }
 
-    protected function processComponents(array $components): void
+    protected function process(array $goldenIdList): void
     {
+        $components = $this->componentRepository->findListByGoldenId($goldenIdList);
+        $this->dataTotal += count($components);
         foreach ($components as $key => $component) {
             try {
                 $roomRequest = RoomRequest::transformFromComponent($component);

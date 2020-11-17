@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @coversDefaultClass \App\Command\PushRoomsToEaiCommand
+ * @group import
  */
 class PushRoomsToEaiCommandTest extends ProphecyKernelTestCase
 {
@@ -102,7 +103,7 @@ class PushRoomsToEaiCommandTest extends ProphecyKernelTestCase
      * @cover ::processComponents
      * @dataProvider componentsAndIdsProvider
      */
-    public function testExecuteThrowsComponentNotFoundException(\Iterator $goldenIds, array $components): void
+    public function testExecuteThrowsComponentNotFoundException(\Iterator $goldenIds): void
     {
         $this->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
         $this->componentRepository

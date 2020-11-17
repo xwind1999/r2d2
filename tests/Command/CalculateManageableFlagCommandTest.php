@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @coversDefaultClass \App\Command\CalculateManageableFlagCommand
+ * @group import
  */
 class CalculateManageableFlagCommandTest extends ProphecyKernelTestCase
 {
@@ -107,8 +108,9 @@ class CalculateManageableFlagCommandTest extends ProphecyKernelTestCase
      * @cover ::transformFromIterator
      * @cover ::processComponents
      * @dataProvider componentsAndIdsProvider
+     * @group test
      */
-    public function testExecuteThrowsComponentNotFoundException(\Iterator $goldenIds, array $components): void
+    public function testExecuteThrowsComponentNotFoundException(\Iterator $goldenIds): void
     {
         $this->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
         $this->componentRepository
