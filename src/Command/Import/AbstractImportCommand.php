@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Command\Import;
 
 use App\Helper\CSVParser;
+use App\Helper\MoneyHelper;
 use JMS\Serializer\SerializerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -29,19 +30,22 @@ abstract class AbstractImportCommand extends Command
     protected CSVParser $csvParser;
     protected ValidatorInterface $validator;
     protected SerializerInterface $serializer;
+    protected MoneyHelper $moneyHelper;
 
     public function __construct(
         LoggerInterface $logger,
         MessageBusInterface $messageBus,
         CSVParser $csvParser,
         ValidatorInterface $validator,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        MoneyHelper $moneyHelper
     ) {
         $this->logger = $logger;
         $this->messageBus = $messageBus;
         $this->csvParser = $csvParser;
         $this->validator = $validator;
         $this->serializer = $serializer;
+        $this->moneyHelper = $moneyHelper;
 
         parent::__construct();
     }

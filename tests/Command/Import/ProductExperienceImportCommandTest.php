@@ -23,7 +23,8 @@ class ProductExperienceImportCommandTest extends AbstractProductImportCommandTes
             $this->messageBus->reveal(),
             $this->helper->reveal(),
             $this->validator->reveal(),
-            $this->serializer->reveal()
+            $this->serializer->reveal(),
+            $this->moneyHelper->reveal()
         );
     }
 

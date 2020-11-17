@@ -81,10 +81,6 @@ services:
         tags:
             - { name: jms_serializer.subscribing_handler }
 
-    App\Helper\Serializer\FloatToIntegerHandler:
-        tags:
-            - { name: jms_serializer.subscribing_handler }
-
     App\Helper\Feature\AvailabilityConvertFlag:
         arguments:
             - '%feature_flags.availability_convert%'
@@ -141,3 +137,7 @@ services:
         decorates: Symfony\Contracts\EventDispatcher\EventDispatcherInterface
         arguments:
             - '@.inner'
+
+    App\Helper\Serializer\EventSubscriber\MoneyEventSubscriber:
+        tags:
+            - { name: jms_serializer.event_subscriber }

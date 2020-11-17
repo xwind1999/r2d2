@@ -10,12 +10,26 @@ use Money\Money;
 
 class MoneyHelperTest extends ProphecyTestCase
 {
+    private MoneyHelper $moneyHelper;
+
+    public function setUp(): void
+    {
+        $this->moneyHelper = new MoneyHelper();
+    }
+
     public function testCreate()
     {
-        $moneyHelper = new MoneyHelper();
-        $money = $moneyHelper->create(400, 'EUR');
+        $money = $this->moneyHelper->create(400, 'EUR');
         $this->assertInstanceOf(Money::class, $money);
         $this->assertEquals(400, $money->getAmount());
         $this->assertEquals('EUR', $money->getCurrency()->getCode());
+    }
+
+    public function testConvertToInteger()
+    {
+        $amount = '30.99';
+        $currency = 'EUR';
+        $integer = $this->moneyHelper->convertToInteger($amount, $currency);
+        $this->assertSame(3099, $integer);
     }
 }

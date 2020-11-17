@@ -201,6 +201,11 @@ class LegacyAvailabilityProvider
 
         $availabilities = [];
         foreach ($roomAndPriceAvailability as $index => $availability) {
+            /*
+             * TODO: Find a way to get the currency here, and use the Money library to convert it.
+             *       Maybe implementing it in the MoneyHelper?
+             *       Maybe we should add the currency in the flat manageable component table?
+             */
             $availability['price'] = !empty($availability['price']) ?
                 ((int) $availability['price']) / self::DEFAULT_AVAILABILITY_DIVISOR : self::DEFAULT_AVAILABILITY_PRICE;
             $availability['AvailabilityValue'] = (int) $availability['stock'];

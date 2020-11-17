@@ -35,7 +35,8 @@ class RelationshipImportCommandTest extends AbstractImportCommandTest
             $this->messageBus->reveal(),
             $this->helper->reveal(),
             $this->validator->reveal(),
-            $this->serializer->reveal()
+            $this->serializer->reveal(),
+            $this->moneyHelper->reveal()
         );
         $application->add($this->command);
         $this->commandTester = new CommandTester($this->command);
