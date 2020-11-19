@@ -619,6 +619,55 @@ class BookingManagerTest extends ProphecyTestCase
             ['roomStockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST],
         ];
 
+        yield 'on-request with stop sales day' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingCreateRequest->rooms = [$room];
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+                $test->roomAvailabilityRepository->findStopSaleOnRequestAvailabilityByExperienceAndDates(
+                    Argument::type('string'),
+                    Argument::type(\DateTimeInterface::class),
+                    Argument::type(\DateTimeInterface::class)
+                )->shouldBeCalledOnce();
+                $test->roomAvailabilityRepository->findStopSaleOnRequestAvailabilityByExperienceAndDates(
+                    Argument::type('string'),
+                    Argument::type(\DateTimeInterface::class),
+                    Argument::type(\DateTimeInterface::class)
+                )->willReturn(
+                    [
+                    'experienceGoldenId' => '59593',
+                    'componentGoldenId' => '213072',
+                    'date' => '2020-01-01',
+                    ]
+                );
+                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates()->shouldNotBeCalled();
+            },
+            UnavailableDateException::class,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(500, $booking->totalPrice);
+                $test->assertCount(1, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
+            },
+            ['roomStockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST],
+        ];
+
         yield 'on-request not so happy days' => [
             (function ($bookingCreateRequest) {
                 $roomDate = new RoomDate();
