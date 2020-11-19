@@ -172,11 +172,10 @@ class BookingManager
         }
 
         // validation #10 and #11
-        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType &&
-            false === $this->hasStopSaleOnRequestBookings($booking)
-        ) {
-            throw new UnavailableDateException();
-        } elseif (true === $this->isUnavailableForBookings($booking)) {
+        if ((RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType &&
+                true === $this->hasStopSaleOnRequestBookings($booking)) ||
+            (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST !== $roomStockType &&
+                true === $this->isUnavailableForBookings($booking))) {
             throw new UnavailableDateException();
         }
 
@@ -443,6 +442,6 @@ class BookingManager
             $booking->endDate
         );
 
-        return empty($availabilities);
+        return !empty($availabilities);
     }
 }
