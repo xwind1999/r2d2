@@ -24,7 +24,8 @@ abstract class BulkProcessAbstractCommand extends Command
     protected CSVParser $csvParser;
     protected LoggerInterface $logger;
     protected MessageBusInterface $messageBus;
-    protected int $dataTotal = 0;
+    protected int $countDataTotal = 0;
+    protected array $processedDataCollection = [];
 
     public function __construct(
         CSVParser $csvParser,
@@ -67,19 +68,24 @@ abstract class BulkProcessAbstractCommand extends Command
                 $progressBar->advance();
             }
 
-            if ($this->dataTotal < count($goldenIdArray)) {
-                $this->process(array_slice($goldenIdArray, $this->dataTotal, $batchSize));
+            if ($this->countDataTotal < count($goldenIdArray)) {
+                $this->process(array_slice($goldenIdArray, $this->countDataTotal, $batchSize));
                 $progressBar->advance();
             }
         } catch (EntityNotFoundException $exception) {
             $this->logger->error($exception);
+        } catch (\Throwable $exception) {
+            $this->logger->error($exception);
 
             return 1;
         }
+
         $progressBar->finish();
+        $failedItems = array_diff($goldenIdArray, $this->processedDataCollection);
         $symfonyStyle->newLine(self::LINES_QUANTITY);
-        $symfonyStyle->note(sprintf('Total Collection IDs read: %s', $this->dataTotal));
         $symfonyStyle->note(sprintf('Finishing at : %s', (new \DateTime())->format('Y-m-d H:i:s')));
+        $symfonyStyle->note(sprintf('Total Collection IDs processed with success: %s', $this->countDataTotal));
+        $symfonyStyle->note(sprintf('Failed items: %s', implode(', ', $failedItems)));
         $symfonyStyle->success('Command executed');
 
         return 0;

@@ -91,28 +91,20 @@ class PushBookingsToCmhCommandTest extends ProphecyKernelTestCase
     public function testExecuteSuccessfully(
         \Iterator $goldenIds,
         array $bookings,
-        int $dipatchCount
+        callable $stubs,
+        callable $asserts
     ): void {
-        $this->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
-        $this->bookingRepository->findListByGoldenId(Argument::any())->shouldBeCalledTimes(6)->willReturn($bookings);
-        $this->logger->error(Argument::any())->shouldNotBeCalled();
-        $this->messageBus
-            ->dispatch(Argument::any())
-            ->shouldBeCalledTimes($dipatchCount)
-            ->willReturn(new Envelope(new \stdClass()));
+        $stubs($this, $goldenIds, $bookings);
 
         $this->commandTester->execute([
             'command' => $this->command->getName(),
             'file' => 'Import_Command.csv',
             'batchSize' => '2',
         ]);
-        $this->commandTester->getDisplay();
-        $this->assertEquals(0, $this->commandTester->getStatusCode());
-        $this->assertStringContainsString('Total CSV IDs received: 10', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Total Collection IDs read: 6', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Command executed', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Starting at: ', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Finishing at : ', $this->commandTester->getDisplay());
+
+        $output = $this->commandTester->getDisplay();
+
+        $asserts($this, $output);
     }
 
     public function bookingGoldenIdListProvider()
@@ -187,7 +179,23 @@ class PushBookingsToCmhCommandTest extends ProphecyKernelTestCase
 
                 return [$booking];
             })(clone $booking),
-            6,
+            (function ($test, \Iterator $goldenIds, array $bookings) {
+                $test->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
+                $test->bookingRepository->findListByGoldenId(Argument::any())->shouldBeCalledTimes(6)->willReturn($bookings);
+                $test->logger->error(Argument::any())->shouldNotBeCalled();
+                $test->messageBus
+                    ->dispatch(Argument::any())
+                    ->shouldBeCalledTimes(6)
+                    ->willReturn(new Envelope(new \stdClass()));
+            }),
+            (function ($test, string $output) {
+                $test->assertEquals(0, $test->commandTester->getStatusCode());
+                $test->assertStringContainsString('Total CSV IDs received: 10', $output);
+                $test->assertStringContainsString('Total Collection IDs processed with success: 6', $output);
+                $test->assertStringContainsString('Command executed', $output);
+                $test->assertStringContainsString('Starting at: ', $output);
+                $test->assertStringContainsString('Finishing at : ', $output);
+            }),
         ];
 
         yield 'push-canceled-bookings' => [
@@ -197,7 +205,23 @@ class PushBookingsToCmhCommandTest extends ProphecyKernelTestCase
 
                 return [$booking];
             })(clone $booking),
-            6,
+            (function ($test, \Iterator $goldenIds, array $bookings) {
+                $test->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
+                $test->bookingRepository->findListByGoldenId(Argument::any())->shouldBeCalledTimes(6)->willReturn($bookings);
+                $test->logger->error(Argument::any())->shouldNotBeCalled();
+                $test->messageBus
+                    ->dispatch(Argument::any())
+                    ->shouldBeCalledTimes(6)
+                    ->willReturn(new Envelope(new \stdClass()));
+            }),
+            (function ($test, string $output) {
+                $test->assertEquals(0, $test->commandTester->getStatusCode());
+                $test->assertStringContainsString('Total CSV IDs received: 10', $output);
+                $test->assertStringContainsString('Total Collection IDs processed with success: 6', $output);
+                $test->assertStringContainsString('Command executed', $output);
+                $test->assertStringContainsString('Starting at: ', $output);
+                $test->assertStringContainsString('Finishing at : ', $output);
+            }),
         ];
 
         yield 'push-created-bookings' => [
@@ -207,32 +231,62 @@ class PushBookingsToCmhCommandTest extends ProphecyKernelTestCase
 
                 return [$booking];
             })(clone $booking),
-            0,
+            (function ($test, \Iterator $goldenIds) {
+                $test->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
+                $test->bookingRepository->findListByGoldenId(Argument::any())->shouldBeCalledTimes(6);
+                $test->logger->error(Argument::any())->shouldNotBeCalled();
+                $test->messageBus->dispatch(Argument::any())->shouldNotBeCalled();
+            }),
+            (function ($test, string $output) {
+                $test->assertEquals(0, $test->commandTester->getStatusCode());
+                $test->assertStringContainsString('Total CSV IDs received: 10', $output);
+                $test->assertStringContainsString('Total Collection IDs processed with success: 0', $output);
+                $test->assertStringContainsString('Command executed', $output);
+                $test->assertStringContainsString('Starting at: ', $output);
+                $test->assertStringContainsString('Finishing at : ', $output);
+            }),
         ];
-    }
 
-    /**
-     * @cover ::execute
-     * @cover ::process
-     * @dataProvider bookingGoldenIdListProvider
-     */
-    public function testExecuteThrowsBookingNotFoundException(\Iterator $goldenIds): void
-    {
-        $this->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
-        $this->bookingRepository
-            ->findListByGoldenId(Argument::any())
-            ->shouldBeCalledOnce()
-            ->willThrow(BookingNotFoundException::class)
-        ;
-        $this->logger->error(Argument::any())->shouldBeCalledOnce();
-        $this->messageBus->dispatch(Argument::any())->shouldNotBeCalled();
-        $this->logger->error(Argument::any())->shouldBeCalledOnce();
-        $this->commandTester->execute([
-            'command' => $this->command->getName(),
-            'file' => 'Import_Command.csv',
-            'batchSize' => '1',
-        ]);
-        $this->commandTester->getDisplay();
-        $this->assertEquals(1, $this->commandTester->getStatusCode());
+        yield 'booking-not-found-throws-exception' => [
+            $goldenIds,
+            (function ($booking) {
+                $booking->status = BookingStatusConstraint::BOOKING_STATUS_COMPLETE;
+
+                return [$booking];
+            })(clone $booking),
+            (function ($test, \Iterator $goldenIds) {
+                $test->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
+                $test->bookingRepository->findListByGoldenId(Argument::any())->shouldBeCalled()
+                    ->willThrow(BookingNotFoundException::class);
+                $test->logger->error(Argument::any())->shouldBeCalled();
+                $test->messageBus->dispatch(Argument::any())->shouldNotBeCalled();
+            }),
+            (function ($test) {
+                $test->assertEquals(0, $test->commandTester->getStatusCode());
+                $test->assertStringContainsString(
+                    'Failed items',
+                    $test->commandTester->getDisplay()
+                );
+            }),
+        ];
+
+        yield 'process-throws-exception' => [
+            $goldenIds,
+            (function ($booking) {
+                $booking->status = BookingStatusConstraint::BOOKING_STATUS_COMPLETE;
+
+                return [$booking];
+            })(clone $booking),
+            (function ($test, \Iterator $goldenIds, array $bookings) {
+                $test->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
+                $test->bookingRepository->findListByGoldenId(Argument::any())->shouldBeCalled()
+                    ->willReturn($bookings);
+                $test->logger->error(Argument::any())->shouldBeCalled();
+                $test->messageBus->dispatch(Argument::any())->shouldBeCalled()->willThrow(\Exception::class);
+            }),
+            (function ($test) {
+                $test->assertEquals(1, $test->commandTester->getStatusCode());
+            }),
+        ];
     }
 }
