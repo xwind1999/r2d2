@@ -21,10 +21,12 @@ class BookingIntegrationTest extends IntegrationTestCase
     private $entityManager;
     private \DateTime $startDate;
     private string $componentGoldenId;
+    private string $componentGoldenIdWithDurationTwo;
 
     public function setup(): void
     {
         $this->componentGoldenId = '213072';
+        $this->componentGoldenIdWithDurationTwo = '1008863';
         static::cleanUp();
         $this->entityManager = self::$container->get('doctrine.orm.entity_manager');
         $this->cleanUpBooking();
@@ -46,7 +48,7 @@ class BookingIntegrationTest extends IntegrationTestCase
     {
         $this->entityManager->getConnection()->executeStatement('SET foreign_key_checks = 0');
         $this->entityManager->getConnection()
-            ->executeStatement("DELETE FROM r2d2.booking_date WHERE component_golden_id = '".$this->componentGoldenId."'");
+            ->executeStatement("DELETE FROM r2d2.booking_date WHERE component_golden_id IN ('".$this->componentGoldenId."', '".$this->componentGoldenIdWithDurationTwo."')");
         $this->entityManager->getConnection()
             ->executeStatement('DELETE FROM r2d2.booking WHERE experience_golden_id = \''.self::EXPERIENCE_GOLDEN_ID.'\'');
         $this->entityManager->getConnection()->executeStatement('SET foreign_key_checks = 1')
@@ -62,7 +64,7 @@ class BookingIntegrationTest extends IntegrationTestCase
         $this->entityManager
             ->getConnection()
             ->executeStatement("UPDATE room_availability SET stock = 50 
-                    WHERE component_golden_id = '".$this->componentGoldenId."' AND date BETWEEN 
+                    WHERE component_golden_id IN ('".$this->componentGoldenId."', '".$this->componentGoldenIdWithDurationTwo."') AND date BETWEEN 
                     '".$payload['startDate']."' AND '".$payload['endDate']."'")
         ;
     }
@@ -80,7 +82,7 @@ class BookingIntegrationTest extends IntegrationTestCase
     {
         $payload = $this->defaultPayload($payload);
         $this->entityManager->getConnection()
-            ->executeStatement("UPDATE room_availability SET stock = 0 WHERE component_golden_id = '".$this->componentGoldenId."'
+            ->executeStatement("UPDATE room_availability SET stock = 0 WHERE component_golden_id IN ('".$this->componentGoldenId."', '".$this->componentGoldenIdWithDurationTwo."')
                 AND date = '".$payload['startDate']."'")
         ;
     }
