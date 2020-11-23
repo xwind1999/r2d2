@@ -91,7 +91,7 @@ class PushRoomsToEaiCommandTest extends ProphecyKernelTestCase
         $this->commandTester->getDisplay();
         $this->assertEquals(0, $this->commandTester->getStatusCode());
         $this->assertStringContainsString('Total CSV IDs received: 2', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Total Collection IDs read: 2', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Total Collection IDs processed with success: 2', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Command executed', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Starting at: ', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Finishing at : ', $this->commandTester->getDisplay());
@@ -120,7 +120,11 @@ class PushRoomsToEaiCommandTest extends ProphecyKernelTestCase
             'batchSize' => '1',
         ]);
         $this->commandTester->getDisplay();
-        $this->assertEquals(1, $this->commandTester->getStatusCode());
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+        $this->assertStringContainsString(
+            'Failed items',
+            $this->commandTester->getDisplay()
+        );
     }
 
     /**
@@ -132,11 +136,11 @@ class PushRoomsToEaiCommandTest extends ProphecyKernelTestCase
     public function testExecuteCatchesException(\Iterator $goldenIds, array $components): void
     {
         $this->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
-        $this->componentRepository->findListByGoldenId(Argument::any())->shouldBeCalledTimes(2)->willReturn($components);
-        $this->logger->error(Argument::any())->shouldBeCalledTimes(2);
+        $this->componentRepository->findListByGoldenId(Argument::any())->shouldBeCalled()->willReturn($components);
+        $this->logger->error(Argument::any())->shouldBeCalled();
         $this->messageBus
             ->dispatch(Argument::any())
-            ->shouldBeCalledTimes(2)
+            ->shouldBeCalled()
             ->willThrow(\Exception::class)
         ;
         $this->commandTester->execute([
@@ -145,10 +149,8 @@ class PushRoomsToEaiCommandTest extends ProphecyKernelTestCase
             'batchSize' => '2',
         ]);
         $this->commandTester->getDisplay();
-        $this->assertEquals(0, $this->commandTester->getStatusCode());
-        $this->assertStringContainsString('Command executed', $this->commandTester->getDisplay());
+        $this->assertEquals(1, $this->commandTester->getStatusCode());
         $this->assertStringContainsString('Starting at: ', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Finishing at : ', $this->commandTester->getDisplay());
     }
 
     /**

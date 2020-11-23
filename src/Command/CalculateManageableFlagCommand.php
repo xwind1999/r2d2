@@ -40,16 +40,12 @@ class CalculateManageableFlagCommand extends BulkProcessAbstractCommand
     protected function process(array $goldenIdList): void
     {
         $components = $this->componentRepository->findListByGoldenId($goldenIdList);
-        $this->dataTotal += count($components);
-
-        try {
-            foreach ($components as $key => $component) {
-                $manageableProductRequest = new ManageableProductRequest();
-                $manageableProductRequest->setProductRequest(ProductRequest::fromComponent($component));
-                $this->messageBus->dispatch($manageableProductRequest);
-            }
-        } catch (\Exception $exception) {
-            $this->logger->error($exception);
+        $this->countDataTotal += count($components);
+        foreach ($components as $key => $component) {
+            $this->processedDataCollection[$key] = $component->goldenId;
+            $manageableProductRequest = new ManageableProductRequest();
+            $manageableProductRequest->setProductRequest(ProductRequest::fromComponent($component));
+            $this->messageBus->dispatch($manageableProductRequest);
         }
     }
 }

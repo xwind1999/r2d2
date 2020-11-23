@@ -39,14 +39,11 @@ class PushRoomsToEaiCommand extends BulkProcessAbstractCommand
     protected function process(array $goldenIdList): void
     {
         $components = $this->componentRepository->findListByGoldenId($goldenIdList);
-        $this->dataTotal += count($components);
+        $this->countDataTotal += count($components);
         foreach ($components as $key => $component) {
-            try {
-                $roomRequest = RoomRequest::transformFromComponent($component);
-                $this->messageBus->dispatch($roomRequest);
-            } catch (\Exception $exception) {
-                $this->logger->error($exception);
-            }
+            $this->processedDataCollection[$key] = $component->goldenId;
+            $roomRequest = RoomRequest::transformFromComponent($component);
+            $this->messageBus->dispatch($roomRequest);
         }
     }
 }

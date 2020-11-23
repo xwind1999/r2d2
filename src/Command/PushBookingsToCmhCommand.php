@@ -40,8 +40,9 @@ class PushBookingsToCmhCommand extends BulkProcessAbstractCommand
     protected function process(array $goldenIdList): void
     {
         $bookings = $this->bookingRepository->findListByGoldenId($goldenIdList);
-        $this->dataTotal += count($bookings);
+        $this->countDataTotal += count($bookings);
         foreach ($bookings as $key => $booking) {
+            $this->processedDataCollection[$key] = $booking->goldenId;
             if (BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $booking->status) {
                 $this->messageBus->dispatch(ChannelManagerBookingRequest::fromCompletedBooking($booking));
             } elseif (BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status) {

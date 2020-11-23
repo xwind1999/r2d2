@@ -76,7 +76,7 @@ class CalculateManageableFlagCommandTest extends ProphecyKernelTestCase
     /**
      * @cover ::execute
      * @cover ::transformFromIterator
-     * @cover ::processComponents
+     * @cover ::process
      * @dataProvider componentsAndIdsProvider
      */
     public function testExecuteSuccessfully(\Iterator $goldenIds, array $components): void
@@ -97,7 +97,7 @@ class CalculateManageableFlagCommandTest extends ProphecyKernelTestCase
         $this->commandTester->getDisplay();
         $this->assertEquals(0, $this->commandTester->getStatusCode());
         $this->assertStringContainsString('Total CSV IDs received: 2', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Total Collection IDs read: 2', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Total Collection IDs processed with success: 2', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Command executed', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Starting at: ', $this->commandTester->getDisplay());
         $this->assertStringContainsString('Finishing at : ', $this->commandTester->getDisplay());
@@ -106,9 +106,8 @@ class CalculateManageableFlagCommandTest extends ProphecyKernelTestCase
     /**
      * @cover ::execute
      * @cover ::transformFromIterator
-     * @cover ::processComponents
+     * @cover ::process
      * @dataProvider componentsAndIdsProvider
-     * @group test
      */
     public function testExecuteThrowsComponentNotFoundException(\Iterator $goldenIds): void
     {
@@ -128,23 +127,24 @@ class CalculateManageableFlagCommandTest extends ProphecyKernelTestCase
             'batchSize' => '1',
         ]);
         $this->commandTester->getDisplay();
-        $this->assertEquals(1, $this->commandTester->getStatusCode());
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+        $this->assertStringContainsString('Failed items', $this->commandTester->getDisplay());
     }
 
     /**
      * @cover ::execute
      * @cover ::transformFromIterator
-     * @cover ::processComponents
+     * @cover ::process
      * @dataProvider componentsAndIdsProvider
      */
     public function testExecuteCatchesException(\Iterator $goldenIds, array $components): void
     {
         $this->csvParser->readFile(Argument::any(), Argument::any())->willReturn($goldenIds);
-        $this->componentRepository->findListByGoldenId(Argument::any())->shouldBeCalledTimes(2)->willReturn($components);
-        $this->logger->error(Argument::any())->shouldBeCalledTimes(2);
+        $this->componentRepository->findListByGoldenId(Argument::any())->shouldBeCalled(1)->willReturn($components);
+        $this->logger->error(Argument::any())->shouldBeCalled(1);
         $this->messageBus
             ->dispatch(Argument::any())
-            ->shouldBeCalledTimes(2)
+            ->shouldBeCalled(1)
             ->willThrow(\Exception::class)
         ;
         $this->commandTester->execute([
@@ -153,10 +153,8 @@ class CalculateManageableFlagCommandTest extends ProphecyKernelTestCase
             'batchSize' => '1',
         ]);
         $this->commandTester->getDisplay();
-        $this->assertEquals(0, $this->commandTester->getStatusCode());
-        $this->assertStringContainsString('Command executed', $this->commandTester->getDisplay());
+        $this->assertEquals(1, $this->commandTester->getStatusCode());
         $this->assertStringContainsString('Starting at: ', $this->commandTester->getDisplay());
-        $this->assertStringContainsString('Finishing at : ', $this->commandTester->getDisplay());
     }
 
     /**
