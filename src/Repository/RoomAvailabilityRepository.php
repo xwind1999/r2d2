@@ -59,6 +59,16 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         return $roomAvailability;
     }
 
+    public function findOneByComponentGoldenIdAndDate(
+        string $componentGoldenId,
+        \DateTimeInterface $date
+    ): ?RoomAvailability {
+        return $this->findOneBy([
+            'componentGoldenId' => $componentGoldenId,
+            'date' => $date,
+        ]);
+    }
+
     public function findAvailableRoomsByBoxId(
         string $boxId,
         \DateTimeInterface $startDate,
@@ -371,6 +381,7 @@ SQL;
         updated_at = now() 
     WHERE ra.component_golden_id = :componentGoldenId AND date = :date AND fmc.room_stock_type != :requestType
 SQL;
+
         $params = [
             'componentGoldenId' => $componentGoldenId,
             'decrement' => $decrement,
