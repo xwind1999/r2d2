@@ -94,7 +94,8 @@ class ComponentRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c');
         $qb
             ->join('c.experienceComponent', 'ec')
-            ->where('c.isManageable = 1')
+            ->where('c.uuid = ec.component')
+            ->andWhere('c.isManageable = 1')
             ->andWhere('ec.experience = :experience')
             ->andWhere('ec.isEnabled = true')
             ->setParameter('experience', $experience->uuid->getBytes())
