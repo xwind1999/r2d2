@@ -167,25 +167,57 @@ class RoomAvailabilityManager
     public function updateStockBookingConfirmation(Booking $booking): void
     {
         $bookingDates = $booking->bookingDate->getValues();
+
         foreach ($bookingDates as $bookingDate) {
-            $this->repository->updateStockForAvailability(
+            $roomAvailability = $this->repository->findOneByComponentGoldenIdAndDate(
                 $bookingDate->componentGoldenId,
-                $bookingDate->date,
-                1
+                $bookingDate->date
             );
+
+            if (null === $roomAvailability) {
+                continue;
+            }
+
+            if (1 >= $roomAvailability->stock) {
+                $this->entityManager->remove($roomAvailability);
+            } else {
+                $this->repository->updateStockForAvailability(
+                    $bookingDate->componentGoldenId,
+                    $bookingDate->date,
+                    1
+                );
+            }
         }
+        $this->entityManager->flush();
     }
 
     public function updateStockBookingCancellation(Booking $booking): void
     {
         $bookingDates = $booking->bookingDate->getValues();
+
         foreach ($bookingDates as $bookingDate) {
-            $this->repository->updateStockForAvailability(
+            $roomAvailability = $this->repository->findOneByComponentGoldenIdAndDate(
                 $bookingDate->componentGoldenId,
-                $bookingDate->date,
-                -1
+                $bookingDate->date
             );
+
+            if (null === $roomAvailability) {
+                $component = $this->componentRepository->findOneByGoldenId($bookingDate->componentGoldenId);
+                $roomAvailability = new RoomAvailability();
+                $roomAvailability->stock = 1;
+                $roomAvailability->componentGoldenId = $bookingDate->componentGoldenId;
+                $roomAvailability->date = $bookingDate->date;
+                $roomAvailability->component = $component;
+                $this->entityManager->persist($roomAvailability);
+            } else {
+                $this->repository->updateStockForAvailability(
+                    $bookingDate->componentGoldenId,
+                    $bookingDate->date,
+                    -1
+                );
+            }
         }
+        $this->entityManager->flush();
     }
 
     public function getRoomAndPriceAvailabilitiesByExperienceIdAndDates(
