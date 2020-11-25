@@ -410,7 +410,12 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
         $this->assertEquals(
             $returnArray,
-            $availabilityHelper->fillMissingAvailabilitiesForAvailabilityPrice($availabilities, $dateFrom, $dateTo)
+            $availabilityHelper->fillMissingAvailabilitiesForAvailabilityPrice(
+                $availabilities,
+                $dateFrom,
+                $dateTo,
+                null
+            )
         );
     }
 
@@ -450,7 +455,12 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
         $this->assertEquals(
             $availabilities,
-            $availabilityHelper->fillMissingAvailabilitiesForAvailabilityPrice($availabilities, $dateFrom, $dateTo)
+            $availabilityHelper->fillMissingAvailabilitiesForAvailabilityPrice(
+                $availabilities,
+                $dateFrom,
+                $dateTo,
+                null
+            )
         );
     }
 

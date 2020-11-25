@@ -488,12 +488,50 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $this->availabilityProvider
             ->getRoomAndPricesAvailabilitiesByExperienceIdAndDates('1234', $dateFrom, $dateTo)
             ->willReturn($returnArray);
+        $this->availabilityProvider->getManageableComponentForGetPackage('1234')->shouldNotBeCalled();
         $this->availabilityHelper
             ->fillMissingAvailabilitiesForAvailabilityPrice(
                 Argument::any(),
                 $dateFrom,
-                $dateTo
+                $dateTo,
+                Argument::any()
             )->willReturn($returnArray);
+
+        $this->availabilityHelper
+            ->convertAvailabilityTypeToExplicitQuickdataValue(
+                Argument::any(),
+                Argument::any(),
+                Argument::any()
+            )->willReturn('stock');
+
+        $this->assertInstanceOf(
+            AvailabilityPricePeriodResponse::class,
+            $this->legacyAvailabilityProvider->getAvailabilityPriceForExperience('1234', $dateFrom, $dateTo)
+        );
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::getAvailabilityPriceForExperience
+     */
+    public function testGetAvailabilityPriceForExperienceForOnRequestWithoutAvailabilityAndPrice()
+    {
+        $dateFrom = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-02');
+        $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
+        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+
+        $this->availabilityProvider
+            ->getRoomAndPricesAvailabilitiesByExperienceIdAndDates('1234', $dateFrom, $dateTo)
+            ->willReturn([]);
+        $this->availabilityProvider->getManageableComponentForGetPackage('1234')->willReturn([0 => ['roomStockType' => 'on_request']]);
+        $this->availabilityHelper
+            ->fillMissingAvailabilitiesForAvailabilityPrice(
+                Argument::any(),
+                $dateFrom,
+                $dateTo,
+                Argument::any()
+            )->willReturn([]);
 
         $this->availabilityHelper
             ->convertAvailabilityTypeToExplicitQuickdataValue(
