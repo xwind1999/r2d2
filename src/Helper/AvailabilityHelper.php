@@ -39,7 +39,8 @@ class AvailabilityHelper
     public function fillMissingAvailabilitiesForAvailabilityPrice(
         array $availabilities,
         \DateTimeInterface $dateFrom,
-        \DateTimeInterface $dateTo
+        \DateTimeInterface $dateTo,
+        ?string $roomStockType
     ): array {
         $isAvailabilityMissing = $this->validateMissingAvailability($availabilities, $dateFrom, $dateTo);
         if (false === $isAvailabilityMissing) {
@@ -57,7 +58,7 @@ class AvailabilityHelper
                 $returnAvailabilities[$date] = [
                     'Date' => $date,
                     'AvailabilityValue' => 0,
-                    'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
+                    'AvailabilityStatus' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType ? AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST : AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
                     'SellingPrice' => 0.00,
                     'BuyingPrice' => 0.00,
                 ];

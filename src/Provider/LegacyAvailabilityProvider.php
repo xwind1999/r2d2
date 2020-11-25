@@ -200,6 +200,13 @@ class LegacyAvailabilityProvider
         );
 
         $availabilities = [];
+        $roomStockType = null;
+
+        if (empty($roomAndPriceAvailability)) {
+            $component = $this->availabilityProvider->getManageableComponentForGetPackage($experienceId);
+            $roomStockType = $component[0]['roomStockType'] ?? null;
+        }
+
         foreach ($roomAndPriceAvailability as $index => $availability) {
             /*
              * TODO: Find a way to get the currency here, and use the Money library to convert it.
@@ -230,7 +237,8 @@ class LegacyAvailabilityProvider
                 'DaysAvailabilityPrice' => $this->availabilityHelper->fillMissingAvailabilitiesForAvailabilityPrice(
                     $availabilities,
                     $dateFrom,
-                    $dateTo
+                    $dateTo,
+                    $roomStockType
                 ),
             ],
             AvailabilityPricePeriodResponse::class
