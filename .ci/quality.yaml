@@ -3,18 +3,20 @@ variables:
   BASE_IMAGE_STUB: docker-registry.production.smartbox.com/millenium-falcon/r2d2mock
   LOCUST_IMAGE: locustio/locust:1.0.2
 
-unit-tests:
-  stage: Test
-  image: ${BASE_IMAGE}
-  needs:
+# Templates >>>
+.running-r2d2:
+  variables:
+    DATABASE_URL: "sqlite:////tmp/db.sqlite"
+  dependencies:
     - composer
-  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
-  script:
-    - phpdbg -qrr vendor/bin/phpunit --testsuite=UnitTests --colors=never
-  artifacts:
-    expire_in: 1 day
-    paths:
-      - report/
+  services:
+    - name: ${BASE_IMAGE}
+      alias: r2-d2.localhost
+      command: ["bash", "-c", 'rm -rf /app; ln -s /builds/millenniumfalcon/r2-d2-api /app; php /builds/millenniumfalcon/r2-d2-api/bin/console doctrine:schema:update --force; chmod 777 /tmp/db.sqlite; /start.sh']
+  before_script:
+    - sleep 5
+  tags:
+    - docker
 
 .api-tests-template: &apiTests
   stage: Test
@@ -46,48 +48,6 @@ unit-tests:
       - report/html/db
       - report/raw/api-tests/
 
-api-tests:
-  <<: *apiTests
-  script:
-    - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
-
-DB-validation-tests:
-  <<: *apiTests
-  script:
-    - phpdbg -qrr vendor/bin/phpunit --testsuite=IntegrationTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
-
-api-tests-DEV-INT:
-  stage: Deploy Validation
-  image: ${BASE_IMAGE}
-  needs:
-    - deploy-DEV-INT
-    - composer
-  dependencies:
-    - composer
-  variables:
-    API_TEST_BASE_URL: "http://ie1-devint-r2d2-api-01.z.sbxtest.net"
-  script:
-    - php vendor/bin/phpunit --testsuite=ApiTests --testdox --no-coverage
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-
-api-tests-STAGING:
-  stage: Deploy Validation
-  image: ${BASE_IMAGE}
-  needs:
-    - deploy-STAGING
-    - composer
-  dependencies:
-    - composer
-  variables:
-    API_TEST_BASE_URL: "http://ie1-staging-r2d2-api-01.z.sbxtest.net"
-  script:
-    - php vendor/bin/phpunit --testsuite=ApiTests --testdox --no-coverage
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-
 .locust-template: &locust
   image: ${LOCUST_IMAGE}
   inherit:
@@ -106,163 +66,36 @@ api-tests-STAGING:
   tags:
     - k8s
 
-locust-DEV-INT:
-  <<: *locust
-  stage: Deploy Validation
-  allow_failure: true
-  needs: [ 'deploy-DEV-INT' ]
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-  variables:
-    LOCUST_ENV: "devint"
-    LOCUST_HOST: "http://r2-d2-api-devint.sbxtest.net"
-    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
-    LOCUST_FILE: "end2EndTests.py"
-
-locust-STAGING:
-  <<: *locust
-  stage: Deploy Validation
-  allow_failure: true
-  needs: [ 'deploy-STAGING' ]
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-  variables:
-    LOCUST_ENV: "staging"
-    LOCUST_HOST: "http://ie1-staging-r2d2-api-01.z.sbxtest.net"
-    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
-    LOCUST_FILE: "end2EndTests.py"
-
-locust-PREPROD:
-  <<: *locust
-  stage: Preprod Validation
-  allow_failure: true
-  needs: ['deploy-PREPROD']
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-  variables:
-    LOCUST_ENV: "preprod"
-    LOCUST_HOST: "https://r2-d2-api-preprod.sbxtest.net"
-    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
-    LOCUST_FILE: "end2EndTests.py"
-
-locust-PROD:
-  <<: *locust
-  stage: Production Validation
-  allow_failure: true
-  needs: ['deploy-PROD']
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-  variables:
-    LOCUST_ENV: "prod"
-    LOCUST_HOST: "https://r2-d2-api.production.smartbox.com"
-    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
-    LOCUST_FILE: "end2EndTests.py"
-    EXTRA_PARAMETERS: "QuickData"
-
 .health-smoke-test:
   allow_failure: true
   image: ${BASE_IMAGE}
   script:
     - curl -f ${CHECK_ENVIRONMENT}
+# Templates <<<
 
-'pre-health-smoke-test-DEV-INT':
-  extends: .health-smoke-test
-  stage: Deploy Setup
-  variables:
-    CHECK_ENVIRONMENT: http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-
-'post-health-smoke-test-DEV-INT':
-  extends: .health-smoke-test
-  stage: Deploy Validation
-  allow_failure: false
-  variables:
-    CHECK_ENVIRONMENT: http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-
-'pre-health-smoke-test-STAGING':
-  extends: .health-smoke-test
-  stage: Deploy Setup
-  variables:
-    CHECK_ENVIRONMENT: http://ie1-staging-r2d2-api-01.z.sbxtest.net/_monitor/health/run
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-
-'post-health-smoke-test-STAGING':
-  extends: .health-smoke-test
-  stage: Deploy Validation
-  allow_failure: false
-  needs: ['deploy-STAGING']
-  variables:
-    CHECK_ENVIRONMENT: http://ie1-staging-r2d2-api-01.z.sbxtest.net/_monitor/health/run
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-
-
-'pre-health-smoke-test-PREPROD':
-  extends: .health-smoke-test
-  stage: Preprod Check
-  variables:
-    CHECK_ENVIRONMENT: https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-
-'post-health-smoke-test-PREPROD':
-  extends: .health-smoke-test
-  stage: Preprod Validation
-  allow_failure: false
-  needs: ['deploy-PREPROD']
-  variables:
-    CHECK_ENVIRONMENT: https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-
-'pre-health-smoke-test-PROD':
-  extends: .health-smoke-test
-  stage: Production Check
-  needs: ['post-health-smoke-test-PREPROD', 'locust-PREPROD']
-  variables:
-    CHECK_ENVIRONMENT: https://r2-d2-api.production.smartbox.com/_monitor/health/run
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-
-'post-health-smoke-test-PROD':
-  extends: .health-smoke-test
-  stage: Production Validation
-  allow_failure: false
-  needs: ['deploy-PROD']
-  variables:
-    CHECK_ENVIRONMENT: https://r2-d2-api.production.smartbox.com/_monitor/health/run
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-    - when: never
-
-.running-r2d2:
-  variables:
-    DATABASE_URL: "sqlite:////tmp/db.sqlite"
-  dependencies:
+# Quality Tests >>>
+unit-tests:
+  stage: Test
+  image: ${BASE_IMAGE}
+  needs:
     - composer
-  services:
-    - name: ${BASE_IMAGE}
-      alias: r2-d2.localhost
-      command: ["bash", "-c", 'rm -rf /app; ln -s /builds/millenniumfalcon/r2-d2-api /app; php /builds/millenniumfalcon/r2-d2-api/bin/console doctrine:schema:update --force; chmod 777 /tmp/db.sqlite; /start.sh']
-  before_script:
-    - sleep 5
-  tags:
-    - docker
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  script:
+    - phpdbg -qrr vendor/bin/phpunit --testsuite=UnitTests --colors=never
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - report/
+
+api-tests:
+  <<: *apiTests
+  script:
+    - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
+
+DB-validation-tests:
+  <<: *apiTests
+  script:
+    - phpdbg -qrr vendor/bin/phpunit --testsuite=IntegrationTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
 
 contract-tests-against-stub:
   stage: Test
@@ -302,3 +135,174 @@ php-cs-fixer:
     - composer
   script:
     - vendor/bin/php-cs-fixer fix -v --dry-run
+# Quality Tests <<<
+
+# DEV-INT >>>
+'pre-health-smoke-test-DEV-INT':
+  extends: .health-smoke-test
+  stage: Deploy Setup
+  variables:
+    CHECK_ENVIRONMENT: http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+
+api-tests-DEV-INT:
+  stage: Deploy Validation
+  image: ${BASE_IMAGE}
+  needs: [ 'composer', 'build-app-container', 'deploy-DEV-INT' ]
+  dependencies:
+    - composer
+  variables:
+    API_TEST_BASE_URL: "http://ie1-devint-r2d2-api-01.z.sbxtest.net"
+  script:
+    - php vendor/bin/phpunit --testsuite=ApiTests --testdox --no-coverage
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+
+locust-DEV-INT:
+  <<: *locust
+  stage: Deploy Validation
+  needs: [ 'deploy-DEV-INT' ]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+  variables:
+    LOCUST_ENV: "devint"
+    LOCUST_HOST: "http://r2-d2-api-devint.sbxtest.net"
+    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
+    LOCUST_FILE: "end2EndTests.py"
+
+'post-health-smoke-test-DEV-INT':
+  extends: .health-smoke-test
+  stage: Deploy Validation
+  needs: [ 'deploy-DEV-INT' ]
+  variables:
+    CHECK_ENVIRONMENT: http://r2-d2-api-devint.sbxtest.net/_monitor/health/run
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+# DEV-INT <<<
+
+# STAGING >>>
+'pre-health-smoke-test-STAGING':
+  extends: .health-smoke-test
+  stage: Deploy Setup
+  variables:
+    CHECK_ENVIRONMENT: http://ie1-staging-r2d2-api-01.z.sbxtest.net/_monitor/health/run
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+
+api-tests-STAGING:
+  stage: Deploy Validation
+  image: ${BASE_IMAGE}
+  needs: [ 'composer', 'build-app-container', 'deploy-STAGING' ]
+  dependencies:
+    - composer
+  variables:
+    API_TEST_BASE_URL: "http://ie1-staging-r2d2-api-01.z.sbxtest.net"
+  script:
+    - php vendor/bin/phpunit --testsuite=ApiTests --testdox --no-coverage
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+
+locust-STAGING:
+  <<: *locust
+  stage: Deploy Validation
+  needs: [ 'deploy-STAGING' ]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+  variables:
+    LOCUST_ENV: "staging"
+    LOCUST_HOST: "http://ie1-staging-r2d2-api-01.z.sbxtest.net"
+    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
+    LOCUST_FILE: "end2EndTests.py"
+
+'post-health-smoke-test-STAGING':
+  extends: .health-smoke-test
+  stage: Deploy Validation
+  needs: ['deploy-STAGING']
+  variables:
+    CHECK_ENVIRONMENT: http://ie1-staging-r2d2-api-01.z.sbxtest.net/_monitor/health/run
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+# STAGING <<<
+
+# PRE-PROD >>>
+'pre-health-smoke-test-PREPROD':
+  extends: .health-smoke-test
+  stage: Preprod Check
+  needs: [ 'api-tests-DEV-INT', 'api-tests-STAGING', 'locust-DEV-INT', 'locust-STAGING', 'post-health-smoke-test-DEV-INT', 'post-health-smoke-test-STAGING' ]
+  variables:
+    CHECK_ENVIRONMENT: https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+
+locust-PREPROD:
+  <<: *locust
+  stage: Preprod Validation
+  allow_failure: true
+  needs: ['deploy-PREPROD']
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+  variables:
+    LOCUST_ENV: "preprod"
+    LOCUST_HOST: "https://r2-d2-api-preprod.sbxtest.net"
+    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
+    LOCUST_FILE: "end2EndTests.py"
+
+'post-health-smoke-test-PREPROD':
+  extends: .health-smoke-test
+  stage: Preprod Validation
+  needs: ['deploy-PREPROD']
+  variables:
+    CHECK_ENVIRONMENT: https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+# PRE-PROD <<<
+
+# PRODUCTION >>>
+locust-PROD:
+  <<: *locust
+  stage: Production Validation
+  allow_failure: true
+  needs: ['deploy-PROD']
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+  variables:
+    LOCUST_ENV: "prod"
+    LOCUST_HOST: "https://r2-d2-api.production.smartbox.com"
+    LOCUST_OPTS: "--headless -u 50 -r 5 --run-time 1m"
+    LOCUST_FILE: "end2EndTests.py"
+    EXTRA_PARAMETERS: "QuickData"
+
+
+'pre-health-smoke-test-PROD':
+  extends: .health-smoke-test
+  stage: Production Check
+  needs: ['post-health-smoke-test-PREPROD', 'locust-PREPROD']
+  variables:
+    CHECK_ENVIRONMENT: https://r2-d2-api.production.smartbox.com/_monitor/health/run
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+
+'post-health-smoke-test-PROD':
+  extends: .health-smoke-test
+  stage: Production Validation
+  needs: ['deploy-PROD']
+  variables:
+    CHECK_ENVIRONMENT: https://r2-d2-api.production.smartbox.com/_monitor/health/run
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
+    - when: never
+# PRODUCTION <<<
