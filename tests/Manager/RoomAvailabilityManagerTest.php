@@ -196,7 +196,7 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
     public function testGetRoomAvailabilitiesByBoxId()
     {
         $boxId = '1234';
-        $this->repository->findAvailableRoomsByBoxId($boxId, Argument::any(), Argument::any())
+        $this->repository->findAvailableRoomsByBoxId($boxId, Argument::type(\DateTime::class))
             ->willReturn(
                 [
                     [

@@ -71,18 +71,8 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
 
     public function findAvailableRoomsByBoxId(
         string $boxId,
-        \DateTimeInterface $startDate,
-        bool $disableTest = false
+        \DateTimeInterface $startDate
     ): array {
-        if (false === $disableTest) {
-            switch (random_int(1, 2)) {
-//                case 1:
-//                    return $this->findAvailableRoomsByBoxIdProcessingOnPHP($boxId, $startDate);
-                case 2:
-                    return $this->findAvailableRoomsByBoxIdWithFirstQuery($boxId, $startDate);
-            }
-        }
-
         return $this->findAvailableRoomsByBoxIdWithUpdatedQuery($boxId, $startDate);
     }
 
