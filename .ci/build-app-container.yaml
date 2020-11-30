@@ -1,47 +1,34 @@
 build-base-image:
   stage: Build Base Image
-  image: docker:dind
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_BRANCH'
     - when: never
   script:
-    - docker pull ${BASE_IMAGE}
-    - docker build --tag ${BASE_IMAGE} .ci/docker/base
-    - docker push ${BASE_IMAGE}
-
-build-base-image-php8.0:
-  stage: Build Base Image
-  image: docker:dind
-  script:
-    - docker pull ${BASE_IMAGE_PHP8}
-    - docker build --tag ${BASE_IMAGE_PHP8} .ci/docker/base8.0
-    - docker push ${BASE_IMAGE_PHP8}
-  rules:
-    - if: '$BUILD_IMAGES == "1"'
-      when: always
-    - when: never
+    - /kaniko/executor --context .ci/docker/base --destination ${BASE_IMAGE}
 
 build-validation-image:
   stage: Build Validation Image
-  image: docker:dind
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
   rules:
       - if: '$CI_COMMIT_BRANCH == $CI_BRANCH'
       - when: never
   script:
-    - docker pull ${BASE_IMAGE}
-    - docker pull ${VALIDATION_IMAGE}
-    - docker build --tag ${VALIDATION_IMAGE} .ci/docker/validation
-    - docker push ${VALIDATION_IMAGE}
+    - /kaniko/executor --context .ci/docker/validation --destination ${VALIDATION_IMAGE}
 
 build-app-container:
   stage: Deploy Setup
-  image: docker:dind
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
   dependencies:
     - composer
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
     - when: never
   script:
-    - docker pull ${BASE_IMAGE}
-    - docker build -f .ci/docker/app/Dockerfile --tag "$APP_IMAGE" .
-    - docker push $APP_IMAGE
+    - /kaniko/executor --context ${CI_PROJECT_DIR} --dockerfile .ci/docker/app/Dockerfile --destination ${APP_IMAGE}

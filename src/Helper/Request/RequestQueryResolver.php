@@ -47,7 +47,7 @@ class RequestQueryResolver implements ArgumentValueResolverInterface
             $query = $request->query->all();
             $argumentType = $argument->getType();
 
-            if (null === $argumentType || !class_exists($argumentType) || !is_array($query)) {
+            if (null === $argumentType || !class_exists($argumentType)) {
                 throw new \Exception();
             }
 

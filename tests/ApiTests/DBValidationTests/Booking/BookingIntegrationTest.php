@@ -773,7 +773,7 @@ class BookingIntegrationTest extends IntegrationTestCase
             $this->defaultPayload(),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals(
-                    '{"error":{"message":"The experience price must be a number greater than zero","code":1300006}}',
+                    '{"error":{"message":"Misconfigured experience price","code":1300006}}',
                     $response->getContent()
                 );
                 $test->assertEquals(422, $response->getStatusCode());

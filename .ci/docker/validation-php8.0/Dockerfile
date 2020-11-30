@@ -1,4 +1,4 @@
-FROM php:8.0.0rc1-fpm-alpine
+FROM docker-registry.production.smartbox.com/millenium-falcon/r2d2-base8.0:latest
 
 RUN apk --no-cache add \
     openjdk8-jre \

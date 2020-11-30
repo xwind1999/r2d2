@@ -1,8 +1,7 @@
-FROM php:rc-fpm-alpine
+FROM php:8.0-fpm-alpine
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_HOME /composer
-ENV COMPOSER_VERSION 1.10.13
 
 RUN apk add nginx; mkdir -p /run/nginx
 
@@ -59,7 +58,7 @@ RUN curl -s -f -L -o /tmp/composer-setup.php https://getcomposer.org/installer \
         echo 'Integrity check failed, installer is either corrupt or worse.' . PHP_EOL; \
         exit(1); \
     }" \
- && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/bin --filename=composer --version=${COMPOSER_VERSION} \
+ && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/bin --filename=composer \
  && composer --ansi --version --no-interaction \
  && rm -rf /tmp/* /tmp/.htaccess
 
