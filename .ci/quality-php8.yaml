@@ -1,4 +1,5 @@
 stages:
+  - Base image
   - Dependencies
   - Test
   - Static Analysis
@@ -8,12 +9,21 @@ default:
   tags:
     - k8s
 
+build-base-image-php8.0:
+  stage: Base image
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
+  script:
+    - /kaniko/executor --context .ci/docker/base8.0 --destination ${BASE_IMAGE_PHP8}
+
 build-validation-image-php8.0:
   stage: Dependencies
-  image: docker:dind
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
   script:
-    - docker build --tag ${VALIDATION_IMAGE_PHP8} .ci/docker/validation
-    - docker push ${VALIDATION_IMAGE_PHP8}
+    - /kaniko/executor --context .ci/docker/validation --destination ${VALIDATION_IMAGE_PHP8}
 
 composer:
   stage: Dependencies
