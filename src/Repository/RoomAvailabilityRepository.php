@@ -423,13 +423,7 @@ SQL;
                 LIMIT 1) fmc ON fmc.component_uuid = ra.component_uuid
             LEFT JOIN room_price rp ON rp.component_uuid = ra.component_uuid AND rp.date = ra.date
             WHERE
-                ra.is_stop_sale = false AND
-                (
-                    (fmc.room_stock_type = :onRequestType)
-                    OR
-                    (fmc.room_stock_type in (:stockType,:allotmentType) AND ra.stock > 0)
-                )
-                AND (fmc.last_bookable_date IS NULL
+                (fmc.last_bookable_date IS NULL
                 OR fmc.last_bookable_date >= ra.date)
                 AND (ra.date BETWEEN :startDate AND :endDate)
             ;

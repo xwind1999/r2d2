@@ -101,7 +101,7 @@ class LegacyAvailabilityProvider
             return $this->serializer->fromArray($returnArray, GetPackageResponse::class);
         }
 
-        $roomStockType = $this->availabilityHelper->getRoomStockShortType($roomAvailabilities[0]['roomStockType']);
+        $roomStockType = $roomAvailabilities[0]['roomStockType'];
         $duration = (int) $roomAvailabilities[0]['duration'];
         $partnerCode = (string) $roomAvailabilities[0]['partnerGoldenId'];
         $isSellable = (bool) $roomAvailabilities[0]['isSellable'];
