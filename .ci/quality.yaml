@@ -150,9 +150,9 @@ php-cs-fixer:
 api-tests-DEV-INT:
   stage: Deploy Validation
   image: ${BASE_IMAGE}
-  needs: [ 'composer', 'build-app-container', 'deploy-DEV-INT' ]
+  needs: [ 'composer', 'deploy-DEV-INT' ]
   dependencies:
-    - composer
+    - 'composer'
   variables:
     API_TEST_BASE_URL: "http://ie1-devint-r2d2-api-01.z.sbxtest.net"
   script:
@@ -198,9 +198,9 @@ locust-DEV-INT:
 api-tests-STAGING:
   stage: Deploy Validation
   image: ${BASE_IMAGE}
-  needs: [ 'composer', 'build-app-container', 'deploy-STAGING' ]
+  needs: [ 'composer',  'deploy-STAGING' ]
   dependencies:
-    - composer
+    - 'composer'
   variables:
     API_TEST_BASE_URL: "http://ie1-staging-r2d2-api-01.z.sbxtest.net"
   script:
@@ -225,7 +225,7 @@ locust-STAGING:
 'post-health-smoke-test-STAGING':
   extends: .health-smoke-test
   stage: Deploy Validation
-  needs: ['deploy-STAGING']
+  needs: [ 'deploy-STAGING' ]
   variables:
     CHECK_ENVIRONMENT: http://ie1-staging-r2d2-api-01.z.sbxtest.net/_monitor/health/run
   rules:
