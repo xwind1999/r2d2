@@ -97,6 +97,7 @@ class AvailabilityHelper
         \DateTimeInterface $dateTo
     ): array {
         $isAvailabilityMissing = $this->validateMissingAvailability($availabilities, $dateFrom, $dateTo);
+        $shortAvailabilities = [];
         if (true === $isAvailabilityMissing) {
             $datePeriod = new \DatePeriod(
                 (new \DateTime($dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT))),
@@ -106,17 +107,15 @@ class AvailabilityHelper
 
             foreach ($datePeriod as $date) {
                 $date = $date->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
-                $availabilities['stock'][] = isset($availabilities[$date]) ?
-                    $this->validateStockType($availabilities[$date]['stock'], $roomStockType)
-                    : (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType ? AvailabilityConstants::AVAILABILITY_SHORTEN_ON_REQUEST : '0');
+                $shortAvailabilities[] = $this->validateStockType($availabilities[$date] ?? [], $roomStockType);
             }
         } else {
             foreach ($availabilities as $availability) {
-                $availabilities['stock'][] = $this->validateStockType($availability['stock'], $roomStockType);
+                $shortAvailabilities[] = $this->validateStockType($availability, $roomStockType);
             }
         }
 
-        return $this->buildDataForGetPackage($availabilities['stock'], $duration, $partnerCode, $isSellable);
+        return $this->buildDataForGetPackage($shortAvailabilities, $duration, $partnerCode, $isSellable);
     }
 
     public function buildDataForGetRange(array $availabilities): array
@@ -202,8 +201,24 @@ class AvailabilityHelper
         return $numberOfNights !== count($availabilities);
     }
 
-    private function validateStockType(string $stock, string $roomStockType): string
+    private function validateStockType(array $availability, string $roomStockType): string
     {
-        return 0 < ((int) $stock) ? $roomStockType : AvailabilityConstants::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
+        if (empty($availability) && RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType) {
+            return AvailabilityConstants::AVAILABILITY_SHORTEN_ON_REQUEST;
+        }
+
+        if (empty($availability) || true === (bool) $availability['isStopSale']) {
+            return AvailabilityConstants::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
+        }
+
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType) {
+            return AvailabilityConstants::AVAILABILITY_SHORTEN_ON_REQUEST;
+        }
+
+        if (0 < (int) $availability['stock']) {
+            return AvailabilityConstants::AVAILABILITY_SHORTEN_INSTANT;
+        }
+
+        return AvailabilityConstants::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
     }
 }

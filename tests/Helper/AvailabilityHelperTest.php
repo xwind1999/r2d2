@@ -143,8 +143,8 @@ class AvailabilityHelperTest extends ProphecyTestCase
         $availabilityHelper = new AvailabilityHelper();
 
         $dateFrom = new \DateTime('2020-10-01');
-        $dateTo = new \DateTime('2020-10-02');
-        $roomStockType = '1';
+        $dateTo = new \DateTime('2020-10-03');
+        $roomStockType = 'stock';
         $duration = 1;
         $partnerCode = '1234';
         $isSellable = false;
@@ -167,10 +167,80 @@ class AvailabilityHelperTest extends ProphecyTestCase
                 'isSellable' => '0',
                 'partnerGoldenId' => '1234',
             ],
+            '2020-10-03' => [
+                'date' => '2020-10-03',
+                'roomStockType' => 'stock',
+                'stock' => '0',
+                'isStopSale' => 0,
+                'duration' => '1',
+                'isSellable' => '0',
+                'partnerGoldenId' => '1234',
+            ],
         ];
 
         $returnArray = [
-            'Availabilities' => ['1', '1'],
+            'Availabilities' => ['1', '1', '0'],
+            'PrestId' => 1,
+            'Duration' => 1,
+            'LiheId' => 1,
+            'PartnerCode' => '1234',
+            'ExtraNight' => false,
+            'ExtraRoom' => false,
+        ];
+
+        $this->assertEquals(
+            $returnArray,
+            $availabilityHelper->fillMissingAvailabilityForGetPackage(
+                $availabilities,
+                $roomStockType,
+                $duration,
+                $partnerCode,
+                $isSellable,
+                $dateFrom,
+                $dateTo
+            )
+        );
+    }
+
+    /**
+     * @covers ::fillMissingAvailabilityForGetPackage
+     * @covers ::getRoomStockShortType
+     * @covers ::validateStockType
+     * @covers ::validateMissingAvailability
+     */
+    public function testBuildDataForGetPackageWithMissingAvailabilitiesOnRequest(): void
+    {
+        $availabilityHelper = new AvailabilityHelper();
+
+        $dateFrom = new \DateTime('2020-10-01');
+        $dateTo = new \DateTime('2020-10-03');
+        $roomStockType = 'on_request';
+        $duration = 1;
+        $partnerCode = '1234';
+        $isSellable = false;
+        $availabilities = [
+            '2020-10-01' => [
+                'date' => '2020-10-01',
+                'type' => 'on_request',
+                'stock' => '1',
+                'isStopSale' => 1,
+                'duration' => '1',
+                'isSellable' => '0',
+                'partnerGoldenId' => '1234',
+            ],
+            '2020-10-03' => [
+                'date' => '2020-10-03',
+                'type' => 'on_request',
+                'stock' => '1',
+                'isStopSale' => 0,
+                'duration' => '1',
+                'isSellable' => '0',
+                'partnerGoldenId' => '1234',
+            ],
+        ];
+
+        $returnArray = [
+            'Availabilities' => ['0', 'r', 'r'],
             'PrestId' => 1,
             'Duration' => 1,
             'LiheId' => 1,
@@ -205,7 +275,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
         $dateFrom = new \DateTime('2020-10-01');
         $dateTo = new \DateTime('2020-10-02');
-        $roomStockType = '1';
+        $roomStockType = 'stock';
         $duration = 1;
         $partnerCode = '1234';
         $isSellable = false;
