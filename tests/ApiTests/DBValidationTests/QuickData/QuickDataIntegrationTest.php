@@ -621,6 +621,125 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function testAvailabilityPricePeriodForRequestWithPricesAndNoAvailability(): void
+    {
+        static::cleanUp();
+
+        $experienceId = '70373';
+        $componentId = '322730';
+
+        $dateFrom = (new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month'))))
+            ->modify('+5 month');
+        $dateTo = (clone $dateFrom)->modify('+5 day');
+        $datePeriod = new \DatePeriod($dateFrom, new \DateInterval('P1D'), (clone $dateTo)->modify('+1 day'));
+        $payload = [
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'price' => [
+                    'amount' => 21.34,
+                    'currencyCode' => 'EUR',
+                ],
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+2 day')->modify('+1 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'price' => [
+                    'amount' => 21.34,
+                    'currencyCode' => 'EUR',
+                ],
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+2 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+3 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'price' => [
+                    'amount' => 21.34,
+                    'currencyCode' => 'EUR',
+                ],
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+3 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+4 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'price' => [
+                    'amount' => 21.34,
+                    'currencyCode' => 'EUR',
+                ],
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+4 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+5 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'price' => [
+                    'amount' => 21.34,
+                    'currencyCode' => 'EUR',
+                ],
+            ],
+            [
+                'product' => [
+                    'id' => $componentId,
+                ],
+                'dateFrom' => (clone $dateFrom)->modify('+5 day')->format('Y-m-d\TH:i:s.uP'),
+                'dateTo' => (clone $dateFrom)->modify('+6 day')->format('Y-m-d\TH:i:s.uP'),
+                'updatedAt' => (new \DateTime())->format('Y-m-d\TH:i:s.uP'),
+                'price' => [
+                    'amount' => 21.34,
+                    'currencyCode' => 'EUR',
+                ],
+            ],
+        ];
+
+        $response = self::$broadcastListenerHelper->testRoomPrice($payload);
+        $this->assertEquals(202, $response->getStatusCode());
+
+        $this->consume('listener-room-price-list', 30);
+        $this->consume('listener-room-price', 30);
+
+        $resultArray = [];
+        foreach ($datePeriod as $date) {
+            $resultArray[] = [
+                'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST,
+                'Date' => $date->format(DateTimeConstants::PRICE_PERIOD_DATE_TIME_FORMAT),
+                'AvailabilityValue' => '1',
+                'SellingPrice' => '21.34',
+                'BuyingPrice' => '21.34',
+            ];
+        }
+
+        $expectedResult = [
+            'DaysAvailabilityPrice' => $resultArray,
+        ];
+
+        $response = self::$quickDataHelper->availabilityPricePeriod(
+            $experienceId,
+            $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        );
+
+        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+    }
+
     public function testGetRangeV2()
     {
         static::cleanUp();

@@ -392,23 +392,22 @@ SQL;
     ): array {
         $sql =
         <<<SQL
-            SELECT 
-                ra.date,
-                IF(fmc.room_stock_type = :onRequestType,1,ra.stock) as stock,
-                ra.component_golden_id AS componentGoldenId,
-                ra.is_stop_sale AS isStopSale,
+            SELECT
+                cal.date,
+                COALESCE(IF(fmc.room_stock_type = :onRequestType,1,ra.stock), 0) as stock,
+                COALESCE(ra.is_stop_sale, false) AS isStopSale,
+                COALESCE(rp.price, 0) as price,
                 fmc.duration,
-                rp.price,
-                last_bookable_date AS lastBookableDate,
+                fmc.component_golden_id AS componentGoldenId,
+                fmc.last_bookable_date AS lastBookableDate,
                 fmc.experience_golden_id AS experienceGoldenId,
                 fmc.partner_golden_id AS partnerGoldenId,
                 fmc.is_sellable AS isSellable,
                 fmc.room_stock_type AS roomStockType
             FROM
-                room_availability ra
-            JOIN 
                 (SELECT
                     experience_golden_id,
+                    component_golden_id,
                     partner_golden_id,
                     duration,
                     is_sellable,
@@ -420,13 +419,12 @@ SQL;
                 WHERE
                     experience_golden_id = :experienceId AND
                     room_stock_type in (:stockType,:allotmentType,:onRequestType)
-                LIMIT 1) fmc ON fmc.component_uuid = ra.component_uuid
-            LEFT JOIN room_price rp ON rp.component_uuid = ra.component_uuid AND rp.date = ra.date
-            WHERE
-                (fmc.last_bookable_date IS NULL
-                OR fmc.last_bookable_date >= ra.date)
-                AND (ra.date BETWEEN :startDate AND :endDate)
-            ;
+                LIMIT 1) fmc
+            JOIN calendar cal on cal.date BETWEEN :startDate AND :endDate AND (fmc.last_bookable_date IS NULL OR fmc.last_bookable_date >= cal.date)
+            LEFT JOIN
+                room_availability ra ON fmc.component_uuid = ra.component_uuid AND ra.date = cal.date
+            LEFT JOIN
+                room_price rp ON fmc.component_uuid = rp.component_uuid AND rp.date = cal.date;
         SQL;
 
         $statement = $this->getAvailabilityReadOnlyConnection()->prepare($sql);
