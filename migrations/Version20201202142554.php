@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
-use App\DataFixtures\CalendarFixture;
+use App\DataFixtures\CalendarFixtureHelper;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -19,7 +19,7 @@ final class Version20201202142554 extends AbstractMigration
     {
         $this->addSql('CREATE TABLE calendar (date DATE NOT NULL, PRIMARY KEY(date)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
 
-        $dates = CalendarFixture::generateDates();
+        $dates = CalendarFixtureHelper::generateDates();
 
         foreach ($dates as $dateQuery) {
             $this->addSql(...$dateQuery);
