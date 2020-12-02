@@ -28,4 +28,37 @@ class CalendarFixtureHelper
 
         return $calendar;
     }
+
+    public static function generateDates(): array
+    {
+        $startDate = new \DateTime('2020-12-01');
+        $endDate = new \DateTime('2040-12-31');
+        $period = new \DatePeriod($startDate, new \DateInterval('P1D'), $endDate);
+
+        $dates = [];
+        $queries = [['DELETE FROM calendar', []]];
+        foreach ($period as $date) {
+            $dates[] = $date->format('Y-m-d');
+            if (count($dates) > 365) {
+                $queries[] = static::insertDates($dates);
+                $dates = [];
+            }
+        }
+        if (count($dates) > 0) {
+            $queries[] = static::insertDates($dates);
+        }
+
+        return $queries;
+    }
+
+    public static function insertDates(array $dates): array
+    {
+        $params = [];
+        $countDates = count($dates);
+        for ($i = 0; $i < $countDates; ++$i) {
+            $params[] = '(?)';
+        }
+
+        return [sprintf('INSERT INTO calendar VALUES %s', implode(',', $params)), $dates];
+    }
 }
