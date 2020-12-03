@@ -10,7 +10,7 @@ use App\Tests\ApiTests\IntegrationTestCase;
 
 class RoomPriceBroadcastTest extends IntegrationTestCase
 {
-    public function testCreateRoomPrice()
+    public function testCreateRoomPrice(): void
     {
         static::cleanUp();
 
@@ -65,7 +65,6 @@ class RoomPriceBroadcastTest extends IntegrationTestCase
         $this->consume('listener-room-price-list');
         $this->consume('listener-room-price');
 
-        /** @var RoomPriceRepository $roomPriceRepository */
         $roomPriceRepository = self::$container->get(RoomPriceRepository::class);
         $roomPrice = $roomPriceRepository->findByComponentAndDateRange($componentEntity, new \DateTime($payload[0]['dateFrom']), new \DateTime($payload[0]['dateTo']));
         $this->assertEquals($payload[0]['product']['id'], $roomPrice[$date1->format('Y-m-d')]->componentGoldenId);

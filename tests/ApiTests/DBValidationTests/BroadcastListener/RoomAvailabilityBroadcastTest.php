@@ -14,7 +14,7 @@ use App\Tests\ApiTests\IntegrationTestCase;
  */
 class RoomAvailabilityBroadcastTest extends IntegrationTestCase
 {
-    public function testCreateRoomAvailability()
+    public function testCreateRoomAvailability(): void
     {
         static::cleanUp();
 
@@ -116,7 +116,6 @@ class RoomAvailabilityBroadcastTest extends IntegrationTestCase
         $this->consume('listener-room-availability-list', count($payload));
         $this->consume('listener-room-availability', count($payload));
 
-        /** @var RoomAvailabilityRepository $roomAvailabilityRepository */
         $componentRepository = self::$container->get(ComponentRepository::class);
         $component1 = $componentRepository->findOneByGoldenId($payload[0]['product']['id']);
         $roomAvailabilityRepository = self::$container->get(RoomAvailabilityRepository::class);

@@ -265,6 +265,37 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
+    public function testGetPackageWithOnRequestDefaultAvailability()
+    {
+        static::cleanUp();
+
+        $experienceId = '78034';
+        $componentId = '249910';
+        $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
+        $dateTo = (clone $dateFrom)->modify('+2 day');
+
+        $component = self::$container->get(ComponentRepository::class)->findOneByGoldenId($componentId);
+
+        $expectedResult = [
+            'ListPrestation' => [[
+                'Availabilities' => ['r', 'r', 'r'],
+                'PrestId' => 1,
+                'Duration' => $component->duration,
+                'LiheId' => 1,
+                'PartnerCode' => '00142022',
+                'ExtraNight' => false,
+                'ExtraRoom' => false,
+            ]],
+        ];
+
+        $response = self::$quickDataHelper->getPackage(
+            $experienceId,
+            $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        );
+        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+    }
+
     public function testGetPackageWithInactiveRelationshipBetweenComponents()
     {
         static::cleanUp();
