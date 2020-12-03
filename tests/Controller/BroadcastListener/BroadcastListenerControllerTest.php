@@ -72,6 +72,39 @@ class BroadcastListenerControllerTest extends ProphecyTestCase
     }
 
     /**
+     * @covers ::productListener
+     * @covers ::getBroadcastDateTimeFromRequest
+     */
+    public function testHandleProductsWithEaiTimeStampSuccessfully()
+    {
+        $universe = Universe::create('product universe');
+        $partner = Partner::create('123456');
+        $productRequest = new ProductRequest();
+        $productRequest->id = '123456';
+        $productRequest->name = 'product name';
+        $productRequest->description = 'product description';
+        $productRequest->universe = $universe;
+        $productRequest->isReservable = true;
+        $productRequest->isSellable = true;
+        $productRequest->partner = $partner;
+
+        $this->messageBus->expects($this->once())
+            ->method('dispatch')
+            ->willReturn($this->envelope);
+
+        $request = new Request();
+        $headers = new HeaderBag();
+        $date = new \DateTime();
+        $headers->set('x-eai-timestamp', (string) $date->getTimestamp());
+        $request->headers = $headers;
+
+        $controller = new BroadcastListenerController();
+        $response = $controller->productListener($request, $productRequest, $this->messageBus);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(202, $response->getStatusCode());
+    }
+
+    /**
      * @covers ::partnerListener
      */
     public function testHandlePartnersSuccessfully()

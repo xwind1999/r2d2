@@ -248,16 +248,18 @@ class BroadcastListenerHelper
     /**
      * @return JsonResponse|object
      */
-    public function testPartners(array $payload = [])
+    public function testPartners(array $payload = [], $headers = [])
     {
         if (empty($payload)) {
             $payload = $this->getDefaultPartner();
         }
-        $this->client->request('POST',
+
+        $this->client->request(
+            'POST',
             $this->baseUrl.self::API_PARTNER_BASE_URL,
             [],
             [],
-            [],
+            $headers,
             $this->serializer->serialize($payload, 'json')
         );
 
