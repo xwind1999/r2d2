@@ -11,7 +11,7 @@ use App\Tests\ApiTests\IntegrationTestCase;
 
 class ExperienceComponentBroadcastTest extends IntegrationTestCase
 {
-    public function testCreateExperienceComponent()
+    public function testCreateExperienceComponent(): array
     {
         static :: cleanUp();
 
@@ -76,7 +76,39 @@ class ExperienceComponentBroadcastTest extends IntegrationTestCase
 
         $this->consume('listener-product-relationship');
 
-        /** @var ExperienceComponentRepository $experienceComponentRepository */
+        $experienceComponentRepository = self::$container->get(ExperienceComponentRepository::class);
+        $experienceComponent = $experienceComponentRepository->findOneByExperienceComponent($experienceEntity, $componentEntity);
+        $this->assertEquals($payload['parentProduct'], $experienceComponent->experienceGoldenId);
+        $this->assertEquals($payload['childProduct'], $experienceComponent->componentGoldenId);
+        $this->assertEquals($payload['isEnabled'], $experienceComponent->isEnabled);
+
+        $componentID = $experienceComponent->componentGoldenId;
+        $experienceID = $experienceComponent->experienceGoldenId;
+
+        return [$experienceID, $componentID];
+    }
+
+    /**
+     * @depends testCreateExperienceComponent
+     */
+    public function testUpdateExperienceComponentToDisable(array $params): void
+    {
+        self::bootKernel();
+        $componentEntity = self::$container->get(ComponentRepository::class)->findOneByGoldenId($params[1]);
+        $experienceEntity = self::$container->get(ExperienceRepository::class)->findOneByGoldenId($params[0]);
+
+        $payload = [
+            'parentProduct' => $params[0],
+            'childProduct' => $params[1],
+            'relationshipType' => 'Experience-Component',
+            'isEnabled' => false,
+        ];
+
+        $response = self::$broadcastListenerHelper->testExperienceComponentRelationship($payload);
+        $this->assertEquals(202, $response->getStatusCode());
+
+        $this->consume('listener-product-relationship');
+
         $experienceComponentRepository = self::$container->get(ExperienceComponentRepository::class);
         $experienceComponent = $experienceComponentRepository->findOneByExperienceComponent($experienceEntity, $componentEntity);
         $this->assertEquals($payload['parentProduct'], $experienceComponent->experienceGoldenId);

@@ -51,8 +51,6 @@ class BroadcastListenerHelper
             'status' => 'active',
             'type' => 'mev',
             'productPeopleNumber' => '2',
-            'roomStockType' => 'on_request',
-            'stockAllotment' => 5,
         ];
 
         return $overrides + $payload;
@@ -79,7 +77,6 @@ class BroadcastListenerHelper
             'type' => 'experience',
             'productDuration' => 2,
             'productDurationUnit' => 'Nights',
-            'roomStockType' => 'stock',
             'listPrice' => [
                 'currencyCode' => 'EUR',
                 'amount' => 100,
@@ -93,8 +90,8 @@ class BroadcastListenerHelper
     {
         $payload = [
             'id' => bin2hex(random_bytes(12)),
-            'name' => 'Test Component',
-            'description' => 'Test Component Description',
+            'name' => 'Test Component 1',
+            'description' => 'Test Component Description 1',
             'isSellable' => true,
             'isReservable' => true,
             'partner' => [
@@ -125,9 +122,7 @@ class BroadcastListenerHelper
         $payload = [
             'id' => bin2hex(random_bytes(12)),
             'status' => 'new partner',
-            'currencyCode' => 'USD',
-            'isChannelManagerEnabled' => true,
-            'partnerCeaseDate' => '2015-10-12T23:03:09.000000+0000',
+            'currencyCode' => 'EUR',
         ];
 
         return $overrides + $payload;
@@ -310,7 +305,7 @@ class BroadcastListenerHelper
     /**
      * @return JsonResponse|object
      */
-    public function testPriceInformations(array $payload = [])
+    public function testPriceInformation(array $payload = [])
     {
         if (empty($payload)) {
             $payload = $this->getDefaultPriceInformation();
