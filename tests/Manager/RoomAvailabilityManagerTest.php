@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Manager;
 
 use App\Constants\DateTimeConstants;
+use App\Constraint\RoomStockTypeConstraint;
 use App\Contract\Request\BroadcastListener\Product\Product;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
@@ -452,9 +453,10 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
     public function testUpdateStockBookingConfirmation(
         Booking $booking,
         RoomAvailability $availability,
-        callable $prophecies
+        callable $prophecies,
+        ?int $numberOfRooms = 1
     ) {
-        $prophecies($this, $availability, 1);
+        $prophecies($this, $availability, $numberOfRooms);
 
         $response = $this->manager->updateStockBookingConfirmation($booking);
         $this->assertNull($response);
@@ -468,245 +470,7 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
             for ($i = 0; $i < $rooms; ++$i) {
                 foreach ($period as $date) {
                     $bookingDate = new BookingDate();
-                    $bookingDate->componentGoldenId = $i.'5464';
-                    $bookingDate->date = $date;
-                    $bookingDate->price = 1212;
-                    $booking->bookingDate->add($bookingDate);
-                }
-            }
-        };
-
-        $booking = new Booking();
-        $booking->voucher = '198257918';
-        $booking->goldenId = '12345';
-        $dateTime = new \DateTime('2020-10-01');
-        $booking->startDate = new \DateTime('2020-10-01');
-        $booking->createdAt = $dateTime;
-        $booking->updatedAt = $dateTime;
-        $booking->expiredAt = (new $dateTime())->modify('+15 minutes');
-        $booking->voucher = '1234154';
-        $booking->partnerGoldenId = '1234154';
-        $booking->experienceGoldenId = '1234154';
-        $booking->components = [
-            'name' => 'name',
-        ];
-
-        $experienceComponent = $this->prophesize(ExperienceComponent::class);
-        $component = $this->prophesize(Component::class);
-        $component->goldenId = '5464';
-        $component->name = 'component name';
-        $experienceComponent->component = $component->reveal();
-
-        $boxExperience = $this->prophesize(BoxExperience::class);
-        $box = $this->prophesize(Box::class);
-        $box->country = 'FR';
-        $boxExperience->box = $box->reveal();
-
-        $experience = $this->prophesize(Experience::class);
-        $experience->price = 125;
-        $experience->experienceComponent = new ArrayCollection([$experienceComponent->reveal()]);
-        $experience->boxExperience = new ArrayCollection([$boxExperience->reveal()]);
-        $booking->experience = $experience->reveal();
-
-        $partner = $this->prophesize(Partner::class);
-        $partner->currency = 'EUR';
-        $booking->partner = $partner->reveal();
-
-        $guest = $this->prophesize(Guest::class);
-        $guest->firstName = 'First Name';
-        $guest->lastName = 'Last Name';
-        $guest->phone = '089 585 5555';
-        $guest->email = 'teste@teste.com';
-        $booking->guest = new ArrayCollection([$guest->reveal()]);
-
-        $availability = new RoomAvailability();
-        $availability->componentGoldenId = '111111';
-        $availability->date = $dateTime;
-        $availability->stock = 10;
-
-        yield 'update-booking-with-success' => [
-            (function ($booking) use ($populateBookingDates) {
-                $booking->startDate = new \DateTime('2020-10-01');
-                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
-                $populateBookingDates($booking);
-
-                return $booking;
-            })(clone $booking),
-            $availability,
-            (function ($test, $availability, $increment) {
-                $availability->stock = 10;
-                $test->repository
-                    ->findOneByComponentGoldenIdAndDate(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class)
-                    )->willReturn($availability);
-                $test->repository
-                    ->updateStockForAvailability(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class),
-                        $increment
-                    )->shouldBeCalledTimes(1)
-                    ->willReturn(1);
-            }),
-        ];
-
-        yield 'update-bookings-big-range' => [
-            (function ($booking) use ($populateBookingDates) {
-                $booking->endDate = (clone $booking->startDate)->modify('+10 day');
-                $populateBookingDates($booking);
-
-                return $booking;
-            })(clone $booking),
-            $availability,
-            (function ($test, $availability, $increment) {
-                $availability->stock = 10;
-                $test->repository
-                    ->findOneByComponentGoldenIdAndDate(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class)
-                    )->willReturn($availability);
-                $test->repository
-                    ->updateStockForAvailability(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class),
-                        $increment)
-                    ->shouldBeCalledTimes(10)
-                    ->willReturn(1);
-            }),
-        ];
-
-        yield 'update-bookings-with-extra-room' => [
-            (function ($booking, $dateTime) use ($populateBookingDates) {
-                $booking->endDate = (clone $booking->startDate)->modify('+10 day');
-                $populateBookingDates($booking, 2);
-
-                return $booking;
-            })(clone $booking, $dateTime),
-            $availability,
-            (function ($test, $availability, $increment) {
-                $availability->stock = 10;
-                $test->repository
-                    ->findOneByComponentGoldenIdAndDate(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class)
-                    )->willReturn($availability);
-                $test->repository
-                    ->updateStockForAvailability(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class),
-                        $increment
-                    )->shouldBeCalledTimes(20)
-                    ->willReturn(1);
-            }),
-        ];
-
-        yield 'update-booking-with-no-room-availability' => [
-            (function ($booking) use ($populateBookingDates) {
-                $booking->startDate = new \DateTime('2020-10-01');
-                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
-                $populateBookingDates($booking);
-
-                return $booking;
-            })(clone $booking),
-            $availability,
-            (function ($test, $availability, $increment) {
-                $test->repository
-                    ->findOneByComponentGoldenIdAndDate(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class)
-                    )->willReturn(null);
-                $test->repository
-                    ->updateStockForAvailability(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class),
-                        $increment
-                    )->shouldNotBeCalled();
-                $test->em->remove($availability)->shouldNotBeCalled();
-                $test->em->flush()->shouldBeCalledTimes(1);
-            }),
-        ];
-
-        yield 'update-booking-with-stock-1' => [
-            (function ($booking) use ($populateBookingDates) {
-                $booking->startDate = new \DateTime('2020-10-01');
-                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
-                $populateBookingDates($booking);
-
-                return $booking;
-            })(clone $booking),
-            $availability,
-            (function ($test, $availability, $increment) {
-                $availability->stock = 1;
-                $test->repository
-                    ->findOneByComponentGoldenIdAndDate(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class)
-                    )->willReturn($availability);
-                $test->repository
-                    ->updateStockForAvailability(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class),
-                        $increment
-                    )->shouldNotBeCalled();
-                $test->em->remove($availability)
-                    ->shouldBeCalledTimes(1);
-                $test->em->flush()->shouldBeCalledTimes(1);
-            }),
-        ];
-
-        yield 'update-booking-with-stock-0' => [
-            (function ($booking) use ($populateBookingDates) {
-                $booking->startDate = new \DateTime('2020-10-01');
-                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
-                $populateBookingDates($booking);
-
-                return $booking;
-            })(clone $booking),
-            $availability,
-            (function ($test, $availability, $increment) {
-                $availability->stock = 0;
-                $test->repository
-                    ->findOneByComponentGoldenIdAndDate(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class)
-                    )->willReturn($availability);
-                $test->repository
-                    ->updateStockForAvailability(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class),
-                        $increment
-                    )->shouldNotBeCalled();
-                $test->em->remove($availability)
-                    ->shouldBeCalledTimes(1);
-                $test->em->flush()->shouldBeCalledTimes(1);
-            }),
-        ];
-    }
-
-    /**
-     * @dataProvider calcellationBookingProvider
-     */
-    public function testUpdateStockBookingCancellation(
-        Booking $booking,
-        RoomAvailability $availability,
-        Component $component,
-        callable $prophecies
-    ) {
-        $prophecies($this, $availability, $component, -1);
-
-        $response = $this->manager->updateStockBookingCancellation($booking);
-        $this->assertNull($response);
-    }
-
-    public function calcellationBookingProvider()
-    {
-        $populateBookingDates = function (Booking $booking, int $rooms = 1) {
-            $period = new \DatePeriod($booking->startDate, new \DateInterval('P1D'), $booking->endDate);
-            $booking->bookingDate = new ArrayCollection();
-            for ($i = 0; $i < $rooms; ++$i) {
-                foreach ($period as $date) {
-                    $bookingDate = new BookingDate();
-                    $bookingDate->componentGoldenId = $i.'5464';
+                    $bookingDate->componentGoldenId = '5464';
                     $bookingDate->date = $date;
                     $bookingDate->price = 1212;
                     $booking->bookingDate->add($bookingDate);
@@ -733,6 +497,7 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
         $component = new Component();
         $component->goldenId = '5464';
         $component->name = 'component name';
+        $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
         $experienceComponent->component = $component;
 
         $boxExperience = $this->prophesize(BoxExperience::class);
@@ -758,9 +523,10 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
         $booking->guest = new ArrayCollection([$guest->reveal()]);
 
         $availability = new RoomAvailability();
-        $availability->componentGoldenId = $component->goldenId;
+        $availability->componentGoldenId = '5464';
         $availability->date = $dateTime;
         $availability->stock = 10;
+        $availability->component = $component;
 
         yield 'update-booking-with-success' => [
             (function ($booking) use ($populateBookingDates) {
@@ -771,21 +537,58 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
                 return $booking;
             })(clone $booking),
             $availability,
-            $component,
-            (function ($test, $availability, $component, $increment) {
+            (function ($test, $availability, $increment) {
                 $availability->stock = 10;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
                 $test->repository
-                    ->findOneByComponentGoldenIdAndDate(
+                    ->findAllByComponentGoldenIdAndDates(
                         Argument::type('string'),
-                        Argument::type(\DateTime::class)
-                    )->willReturn($availability);
+                        Argument::type('array')
+                    )->willReturn([
+                        '2020-10-01' => $availability,
+                    ]);
                 $test->repository
-                    ->updateStockForAvailability(
+                    ->updateStocksForAvailability(
                         Argument::type('string'),
-                        Argument::type(\DateTime::class),
+                        Argument::type('array'),
                         $increment
-                    )->shouldBeCalledTimes(1)
-                    ->willReturn(1);
+                    )->shouldBeCalledTimes(1);
+            }),
+        ];
+
+        yield 'update-booking-with-on-request-booking' => [
+            (function ($booking) use ($populateBookingDates) {
+                $booking->startDate = new \DateTime('2020-10-01');
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
+                $populateBookingDates($booking);
+
+                return $booking;
+            })(clone $booking),
+            $availability,
+            (function ($test, $availability, $increment) {
+                $availability->stock = 10;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+                $test->repository
+                    ->findAllByComponentGoldenIdAndDates(
+                        Argument::type('string'),
+                        Argument::type('array')
+                    )->shouldNotBeCalled();
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
+                        $increment
+                    )->shouldNotBeCalled();
             }),
         ];
 
@@ -797,48 +600,71 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
                 return $booking;
             })(clone $booking),
             $availability,
-            $component,
-            (function ($test, $availability, $component, $increment) {
+            (function ($test, $availability, $increment) {
                 $availability->stock = 10;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+
                 $test->repository
-                    ->findOneByComponentGoldenIdAndDate(
+                    ->findAllByComponentGoldenIdAndDates(
                         Argument::type('string'),
-                        Argument::type(\DateTime::class)
-                    )->willReturn($availability);
+                        Argument::type('array')
+                    )->willReturn([
+                        '2020-10-01' => $availability,
+                        '2020-10-02' => $availability,
+                        '2020-10-03' => $availability,
+                        '2020-10-04' => $availability,
+                        '2020-10-05' => $availability,
+                        '2020-10-06' => $availability,
+                        '2020-10-07' => $availability,
+                        '2020-10-08' => $availability,
+                        '2020-10-09' => $availability,
+                        '2020-10-10' => $availability,
+                    ]);
                 $test->repository
-                    ->updateStockForAvailability(
+                    ->updateStocksForAvailability(
                         Argument::type('string'),
-                        Argument::type(\DateTime::class),
-                        $increment)
-                    ->shouldBeCalledTimes(10)
-                    ->willReturn(1);
+                        Argument::type('array'),
+                        $increment
+                    )->shouldBeCalledTimes(1);
             }),
         ];
 
         yield 'update-bookings-with-extra-room' => [
             (function ($booking, $dateTime) use ($populateBookingDates) {
-                $booking->endDate = (clone $booking->startDate)->modify('+10 day');
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
                 $populateBookingDates($booking, 2);
 
                 return $booking;
             })(clone $booking, $dateTime),
             $availability,
-            $component,
-            (function ($test, $availability, $component, $increment) {
+            (function ($test, $availability, $increment) {
                 $availability->stock = 10;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
                 $test->repository
-                    ->findOneByComponentGoldenIdAndDate(
+                    ->findAllByComponentGoldenIdAndDates(
                         Argument::type('string'),
-                        Argument::type(\DateTime::class)
-                    )->willReturn($availability);
+                        Argument::type('array')
+                    )->willReturn([
+                        '2020-10-01' => $availability,
+                    ]);
                 $test->repository
-                    ->updateStockForAvailability(
+                    ->updateStocksForAvailability(
                         Argument::type('string'),
-                        Argument::type(\DateTime::class),
+                        Argument::type('array'),
                         $increment
-                    )->shouldBeCalledTimes(20)
-                    ->willReturn(1);
+                    )->shouldBeCalledTimes(1);
             }),
+            2,
         ];
 
         yield 'update-booking-with-no-room-availability' => [
@@ -850,25 +676,447 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
                 return $booking;
             })(clone $booking),
             $availability,
-            $component,
-            (function ($test, $availability, $component, $increment) {
-                $availability->stock = 1;
-                $availability->component = $component;
-                $availability->componentGoldenId = '05464';
-                $test->repository
-                    ->findOneByComponentGoldenIdAndDate(
-                        Argument::type('string'),
-                        Argument::type(\DateTime::class)
-                    )->willReturn(null);
+            (function ($test, $availability, $increment) {
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
                 $test->componentRepository
-                    ->findOneByGoldenId(Argument::type('string'))->willReturn($component);
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
                 $test->repository
-                    ->updateStockForAvailability(
+                    ->findAllByComponentGoldenIdAndDates(
                         Argument::type('string'),
-                        Argument::type(\DateTime::class),
+                        Argument::type('array')
+                    )->willReturn([]);
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
                         $increment
                     )->shouldNotBeCalled();
-                $test->em->persist($availability)->shouldBeCalledTimes(1);
+                $test->em->remove($availability)->shouldNotBeCalled();
+                $test->em->flush()->shouldNotBeCalled();
+            }),
+        ];
+
+        yield 'update-booking-with-no-exist-date-room-availability' => [
+            (function ($booking) use ($populateBookingDates) {
+                $booking->startDate = new \DateTime('2020-10-01');
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
+                $populateBookingDates($booking);
+
+                return $booking;
+            })(clone $booking),
+            $availability,
+            (function ($test, $availability, $increment) {
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+                $test->repository
+                    ->findAllByComponentGoldenIdAndDates(
+                        Argument::type('string'),
+                        Argument::type('array')
+                    )->willReturn([
+                        '11-11-2099' => $availability,
+                    ]);
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
+                        $increment
+                    )->shouldNotBeCalled();
+                $test->em->remove($availability)->shouldNotBeCalled();
+                $test->em->flush()->shouldBeCalledTimes(1);
+            }),
+        ];
+
+        yield 'update-booking-with-stock-1' => [
+            (function ($booking) use ($populateBookingDates) {
+                $booking->startDate = new \DateTime('2020-10-01');
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
+                $populateBookingDates($booking);
+
+                return $booking;
+            })(clone $booking),
+            $availability,
+            (function ($test, $availability, $increment) {
+                $availability->stock = 1;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+                $test->repository
+                    ->findAllByComponentGoldenIdAndDates(
+                        Argument::type('string'),
+                        Argument::type('array')
+                    )->willReturn([
+                        '2020-10-01' => $availability,
+                    ]);
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
+                        $increment
+                    )->shouldNotBeCalled();
+                $test->em->remove($availability)
+                    ->shouldBeCalledTimes(1);
+                $test->em->flush()->shouldBeCalledTimes(1);
+            }),
+        ];
+
+        yield 'update-booking-with-stock-0' => [
+            (function ($booking) use ($populateBookingDates) {
+                $booking->startDate = new \DateTime('2020-10-01');
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
+                $populateBookingDates($booking);
+
+                return $booking;
+            })(clone $booking),
+            $availability,
+            (function ($test, $availability, $increment) {
+                $availability->stock = 0;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+                $test->repository
+                    ->findAllByComponentGoldenIdAndDates(
+                        Argument::type('string'),
+                        Argument::type('array')
+                    )->willReturn([
+                        '2020-10-01' => $availability,
+                    ]);
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
+                        $increment
+                    )->shouldNotBeCalled();
+                $test->em->remove($availability)
+                    ->shouldBeCalledTimes(1);
+                $test->em->flush()->shouldBeCalledTimes(1);
+            }),
+        ];
+    }
+
+    /**
+     * @dataProvider cancellationBookingProvider
+     */
+    public function testUpdateStockBookingCancellation(
+        Booking $booking,
+        RoomAvailability $availability,
+        callable $prophecies,
+        ?int $numberOfRooms = 1
+    ) {
+        $prophecies($this, $availability, -$numberOfRooms);
+
+        $response = $this->manager->updateStockBookingCancellation($booking);
+        $this->assertNull($response);
+    }
+
+    public function cancellationBookingProvider()
+    {
+        $populateBookingDates = function (Booking $booking, int $rooms = 1) {
+            $period = new \DatePeriod($booking->startDate, new \DateInterval('P1D'), $booking->endDate);
+            $booking->bookingDate = new ArrayCollection();
+            for ($i = 0; $i < $rooms; ++$i) {
+                foreach ($period as $date) {
+                    $bookingDate = new BookingDate();
+                    $bookingDate->componentGoldenId = '5464';
+                    $bookingDate->date = $date;
+                    $bookingDate->price = 1212;
+                    $booking->bookingDate->add($bookingDate);
+                }
+            }
+        };
+
+        $booking = new Booking();
+        $booking->voucher = '198257918';
+        $booking->goldenId = '12345';
+        $dateTime = new \DateTime('2020-10-01');
+        $booking->startDate = new \DateTime('2020-10-01');
+        $booking->createdAt = $dateTime;
+        $booking->updatedAt = $dateTime;
+        $booking->expiredAt = (new $dateTime())->modify('+15 minutes');
+        $booking->voucher = '1234154';
+        $booking->partnerGoldenId = '1234154';
+        $booking->experienceGoldenId = '1234154';
+        $booking->components = [
+            'name' => 'name',
+        ];
+
+        $experienceComponent = $this->prophesize(ExperienceComponent::class);
+        $component = new Component();
+        $component->goldenId = '5464';
+        $component->name = 'component name';
+        $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+        $experienceComponent->component = $component;
+
+        $boxExperience = $this->prophesize(BoxExperience::class);
+        $box = $this->prophesize(Box::class);
+        $box->country = 'FR';
+        $boxExperience->box = $box->reveal();
+
+        $experience = $this->prophesize(Experience::class);
+        $experience->price = 125;
+        $experience->experienceComponent = new ArrayCollection([$experienceComponent->reveal()]);
+        $experience->boxExperience = new ArrayCollection([$boxExperience->reveal()]);
+        $booking->experience = $experience->reveal();
+
+        $partner = $this->prophesize(Partner::class);
+        $partner->currency = 'EUR';
+        $booking->partner = $partner->reveal();
+
+        $guest = $this->prophesize(Guest::class);
+        $guest->firstName = 'First Name';
+        $guest->lastName = 'Last Name';
+        $guest->phone = '089 585 5555';
+        $guest->email = 'teste@teste.com';
+        $booking->guest = new ArrayCollection([$guest->reveal()]);
+
+        $availability = new RoomAvailability();
+        $availability->componentGoldenId = '5464';
+        $availability->date = $dateTime;
+        $availability->stock = 10;
+        $availability->component = $component;
+
+        yield 'update-booking-with-success' => [
+            (function ($booking) use ($populateBookingDates) {
+                $booking->startDate = new \DateTime('2020-10-01');
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
+                $populateBookingDates($booking);
+
+                return $booking;
+            })(clone $booking),
+            $availability,
+            (function ($test, $availability, $increment) {
+                $availability->stock = 10;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+                $test->repository
+                    ->findAllByComponentGoldenIdAndDates(
+                        Argument::type('string'),
+                        Argument::type('array')
+                    )->willReturn([
+                        '2020-10-01' => $availability,
+                    ]);
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
+                        $increment
+                    )->shouldBeCalledTimes(1);
+            }),
+        ];
+
+        yield 'update-booking-with-on-request-booking' => [
+            (function ($booking) use ($populateBookingDates) {
+                $booking->startDate = new \DateTime('2020-10-01');
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
+                $populateBookingDates($booking);
+
+                return $booking;
+            })(clone $booking),
+            $availability,
+            (function ($test, $availability, $increment) {
+                $availability->stock = 10;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+                $test->repository
+                    ->findAllByComponentGoldenIdAndDates(
+                        Argument::type('string'),
+                        Argument::type('array')
+                    )->shouldNotBeCalled();
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
+                        $increment
+                    )->shouldNotBeCalled();
+            }),
+        ];
+
+        yield 'update-bookings-big-range' => [
+            (function ($booking) use ($populateBookingDates) {
+                $booking->endDate = (clone $booking->startDate)->modify('+10 day');
+                $populateBookingDates($booking);
+
+                return $booking;
+            })(clone $booking),
+            $availability,
+            (function ($test, $availability, $increment) {
+                $availability->stock = 10;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+                $test->repository
+                    ->findAllByComponentGoldenIdAndDates(
+                        Argument::type('string'),
+                        Argument::type('array')
+                    )->willReturn([
+                        '2020-10-01' => $availability,
+                    ]);
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
+                        $increment
+                    )->shouldBeCalledTimes(1);
+            }),
+        ];
+
+        yield 'update-bookings-with-extra-room' => [
+            (function ($booking, $dateTime) use ($populateBookingDates) {
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
+                $populateBookingDates($booking, 2);
+
+                return $booking;
+            })(clone $booking, $dateTime),
+            $availability,
+            (function ($test, $availability, $increment) {
+                $availability->stock = 10;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+                $test->repository
+                    ->findAllByComponentGoldenIdAndDates(
+                        Argument::type('string'),
+                        Argument::type('array')
+                    )->willReturn([
+                        '2020-10-01' => $availability,
+                    ]);
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
+                        $increment
+                    )->shouldBeCalledTimes(1);
+            }),
+            2,
+        ];
+
+        yield 'update-booking-with-no-room-availability' => [
+            (function ($booking) use ($populateBookingDates) {
+                $booking->startDate = new \DateTime('2020-10-01');
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
+                $populateBookingDates($booking);
+
+                return $booking;
+            })(clone $booking),
+            $availability,
+            (function ($test, $availability, $increment) {
+                $availability->stock = 1;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+                $test->repository
+                    ->findAllByComponentGoldenIdAndDates(
+                        Argument::type('string'),
+                        Argument::type('array')
+                    )->willReturn([]);
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
+                        $increment
+                    )->shouldNotBeCalled();
+                $test->em->persist(Argument::any())->shouldBeCalledTimes(1);
+                $test->em->flush()->shouldBeCalledTimes(1);
+            }),
+        ];
+
+        yield 'update-booking-with-stock-1' => [
+            (function ($booking) use ($populateBookingDates) {
+                $booking->startDate = new \DateTime('2020-10-01');
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
+                $populateBookingDates($booking);
+
+                return $booking;
+            })(clone $booking),
+            $availability,
+            (function ($test, $availability, $increment) {
+                $availability->stock = 1;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+                $test->repository
+                    ->findAllByComponentGoldenIdAndDates(
+                        Argument::type('string'),
+                        Argument::type('array')
+                    )->willReturn([
+                        '2020-10-01' => $availability,
+                    ]);
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
+                        $increment
+                    )->shouldBeCalledTimes(1);
+                $test->em->persist($availability)
+                    ->shouldNotBeCalled();
+                $test->em->flush()->shouldBeCalledTimes(1);
+            }),
+        ];
+
+        yield 'update-booking-with-stock-0' => [
+            (function ($booking) use ($populateBookingDates) {
+                $booking->startDate = new \DateTime('2020-10-01');
+                $booking->endDate = (clone $booking->startDate)->modify('+1 day');
+                $populateBookingDates($booking);
+
+                return $booking;
+            })(clone $booking),
+            $availability,
+            (function ($test, $availability, $increment) {
+                $availability->stock = 1;
+                $component = $availability->component;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK;
+                $test->componentRepository
+                    ->findOneByGoldenId(
+                        Argument::type('string')
+                    )->willReturn($component);
+                $test->repository
+                    ->findAllByComponentGoldenIdAndDates(
+                        Argument::type('string'),
+                        Argument::type('array')
+                    )->willReturn([
+                        '2020-10-01' => $availability,
+                    ]);
+                $test->repository
+                    ->updateStocksForAvailability(
+                        Argument::type('string'),
+                        Argument::type('array'),
+                        $increment
+                    )->shouldBeCalledTimes(1);
+                $test->em->persist($availability)
+                    ->shouldNotBeCalled();
                 $test->em->flush()->shouldBeCalledTimes(1);
             }),
         ];

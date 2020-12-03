@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Constants\DateTimeConstants;
+use App\Constraint\RoomStockTypeConstraint;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequest;
 use App\Contract\Request\BroadcastListener\RoomAvailabilityRequestList;
 use App\Entity\Booking;
@@ -167,57 +168,96 @@ class RoomAvailabilityManager
     public function updateStockBookingConfirmation(Booking $booking): void
     {
         $bookingDates = $booking->bookingDate->getValues();
+        $componentId = $bookingDates[0]->componentGoldenId;
+        $component = $this->componentRepository->findOneByGoldenId($componentId);
+
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $component->roomStockType) {
+            return;
+        }
+        $dates = [];
 
         foreach ($bookingDates as $bookingDate) {
-            $roomAvailability = $this->repository->findOneByComponentGoldenIdAndDate(
-                $bookingDate->componentGoldenId,
-                $bookingDate->date
-            );
+            $dates[] = $bookingDate->date->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+        }
+        $stockCounts = array_count_values($dates);
+        $dates = array_unique($dates);
+        $bookedRoomsTotal = $stockCounts[$dates[0]];
 
-            if (null === $roomAvailability) {
+        $roomAvailabilities = $this->repository->findAllByComponentGoldenIdAndDates(
+            $componentId,
+            $dates
+        );
+
+        if (empty($roomAvailabilities)) {
+            return;
+        }
+
+        foreach ($dates as $key => $date) {
+            if (!isset($roomAvailabilities[$date])) {
+                unset($dates[$key]);
                 continue;
             }
-
-            if (1 >= $roomAvailability->stock) {
+            $roomAvailability = $roomAvailabilities[$date];
+            if ($bookedRoomsTotal >= $roomAvailability->stock) {
                 $this->entityManager->remove($roomAvailability);
-            } else {
-                $this->repository->updateStockForAvailability(
-                    $bookingDate->componentGoldenId,
-                    $bookingDate->date,
-                    1
-                );
+                unset($dates[$key]);
             }
         }
         $this->entityManager->flush();
+
+        if (!empty($dates)) {
+            $this->repository->updateStocksForAvailability(
+                $componentId,
+                $dates,
+                $bookedRoomsTotal
+            );
+        }
     }
 
     public function updateStockBookingCancellation(Booking $booking): void
     {
         $bookingDates = $booking->bookingDate->getValues();
+        $componentId = $bookingDates[0]->componentGoldenId;
+        $component = $this->componentRepository->findOneByGoldenId($componentId);
+
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $component->roomStockType) {
+            return;
+        }
+        $dates = [];
 
         foreach ($bookingDates as $bookingDate) {
-            $roomAvailability = $this->repository->findOneByComponentGoldenIdAndDate(
-                $bookingDate->componentGoldenId,
-                $bookingDate->date
-            );
+            $dates[] = $bookingDate->date->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+        }
 
-            if (null === $roomAvailability) {
-                $component = $this->componentRepository->findOneByGoldenId($bookingDate->componentGoldenId);
+        $stockCounts = array_count_values($dates);
+        $dates = array_unique($dates);
+        $bookedRoomsTotal = $stockCounts[$dates[0]];
+
+        $roomAvailabilities = $this->repository->findAllByComponentGoldenIdAndDates(
+            $componentId,
+            $dates
+        );
+
+        foreach ($dates as $key => $date) {
+            if (!isset($roomAvailabilities[$date])) {
                 $roomAvailability = new RoomAvailability();
-                $roomAvailability->stock = 1;
-                $roomAvailability->componentGoldenId = $bookingDate->componentGoldenId;
-                $roomAvailability->date = $bookingDate->date;
+                $roomAvailability->stock = $bookedRoomsTotal;
+                $roomAvailability->componentGoldenId = $componentId;
+                $roomAvailability->date = new \DateTime($date);
                 $roomAvailability->component = $component;
                 $this->entityManager->persist($roomAvailability);
-            } else {
-                $this->repository->updateStockForAvailability(
-                    $bookingDate->componentGoldenId,
-                    $bookingDate->date,
-                    -1
-                );
+                unset($dates[$key]);
             }
         }
         $this->entityManager->flush();
+
+        if (!empty($dates)) {
+            $this->repository->updateStocksForAvailability(
+                $componentId,
+                $dates,
+                -$bookedRoomsTotal
+            );
+        }
     }
 
     public function getRoomAndPriceAvailabilitiesByExperienceIdAndDates(
