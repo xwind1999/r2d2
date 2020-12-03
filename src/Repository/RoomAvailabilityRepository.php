@@ -69,6 +69,22 @@ class RoomAvailabilityRepository extends ServiceEntityRepository
         ]);
     }
 
+    public function findAllByComponentGoldenIdAndDates(
+        string $componentGoldenId,
+        array $dates
+    ): array {
+        $qb = $this->createQueryBuilder('ra');
+        $qb
+            ->where('ra.componentGoldenId = :componentId')
+            ->andWhere('ra.date IN (:dates)')
+            ->setParameter('componentId', $componentGoldenId)
+            ->setParameter('dates', $dates, Connection::PARAM_STR_ARRAY)
+            ->indexBy('ra', 'ra.date')
+        ;
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function findAvailableRoomsByBoxId(
         string $boxId,
         \DateTimeInterface $startDate
@@ -383,6 +399,39 @@ SQL;
         ];
 
         return $this->_em->getConnection()->executeStatement($sql, $params);
+    }
+
+    public function updateStocksForAvailability(
+        string $componentGoldenId,
+        array $dates,
+        int $decrement
+    ): void {
+        $sql = <<<SQL
+    UPDATE 
+        room_availability ra
+        JOIN flat_manageable_component fmc ON fmc.component_uuid = ra.component_uuid
+    SET
+        stock = stock - :decrement,
+        updated_at = now() 
+    WHERE ra.component_golden_id = :componentGoldenId 
+    AND ra.date IN (:dates)
+    AND fmc.room_stock_type != :requestType
+SQL;
+
+        $values = [
+            'componentGoldenId' => $componentGoldenId,
+            'decrement' => $decrement,
+            'dates' => $dates,
+            'requestType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST,
+        ];
+        $types = [
+            'componentGoldenId' => \PDO::PARAM_STR,
+            'decrement' => \PDO::PARAM_INT,
+            'dates' => Connection::PARAM_STR_ARRAY,
+            'requestType' => \PDO::PARAM_STR,
+        ];
+
+        $this->getEntityManager()->getConnection()->executeQuery($sql, $values, $types);
     }
 
     public function findAvailableRoomsAndPricesByExperienceIdAndDates(
