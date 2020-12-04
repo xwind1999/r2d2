@@ -169,9 +169,13 @@ class BroadcastListenerController
 
     private function getBroadcastDateTimeFromRequest(Request $request): ?\DateTime
     {
-        $timestamp = (int) $request->headers->get(self::EAI_TIMESTAMP_HEADER, '0') / self::EAI_TIMESTAMP_DIVISOR;
-        $dateTime = \DateTime::createFromFormat('U.u', (string) $timestamp);
+        $eaiTimeStampHeader = (int) $request->headers->get(self::EAI_TIMESTAMP_HEADER, '0');
+        $eaiTimeStampHeader = (int) ($eaiTimeStampHeader / self::EAI_TIMESTAMP_DIVISOR);
 
-        return $dateTime ?: null;
+        if (empty($eaiTimeStampHeader)) {
+            return null;
+        }
+
+        return new \DateTime('@'.$eaiTimeStampHeader);
     }
 }
