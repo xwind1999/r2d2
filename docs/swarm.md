@@ -18,7 +18,7 @@ we may need to add more managers, but _we must always keep it an odd number_.
 
 ##### Setting up the manager
 On the manager node (any node), you need to run
-```shell script
+```shell
 $ docker swarm init
 ```
 
@@ -65,7 +65,7 @@ For API (public-facing) containers, you need to spin up a number of replicas equ
 
 This needs to be run in a manager node:
 
-```shell script
+```shell
 $ docker service scale r2d2_worker-broadcast-listeners-price-information=4
 ``` 
 ``` 
@@ -84,7 +84,7 @@ Replicas will be spread across the swarm cluster.
 
 You can see all the services deployed in a swarm, with the amount of live replicas by issuing the following command:
 
-```shell script
+```shell
 $ docker service ls
 ```
 ```
@@ -101,7 +101,7 @@ n3pu2quwjv17        r2d2_worker-push-room-information                      repli
 
 Also, you can see exactly where each service is with the following command:
 
-```shell script
+```shell
 $ docker stack ps r2d2
 ```
 ```
@@ -178,7 +178,7 @@ Please note we won't pull any files from vault, only the keys and values.
 
 Deploy to a swarm uses the docker CLI connecting to a remote host, defined by the DOCKER_HOST environment variable.
 
-```shell script
+```shell
 DOCKER_HOST=ssh://my-production-node.smartbox.com docker stack deploy --compose-file my-docker-compose-file.yaml my-service
 ```
 The variable `DOCKER_HOST` must point to a swarm manager node, and it will flow to the other nodes from there.
@@ -188,7 +188,7 @@ There's no need to deploy to any other node.
 
 If everything goes wrong, we can always rebuild the entire swarm, and redeploy the application.
 For that, please make sure no nodes are present on the swarm, by making each of them leave it:
-```shell script
+```shell
 $ docker swarm leave --force
 ```
 Then, setting up following the steps on [Setting up the Swarm](#setting-up-the-swarm).
@@ -202,7 +202,7 @@ After it's rebuild, you can run the deploy again.
 
     You can re-add the node to the swarm by running the swarm join command. To retrieve it, go to the swarm master
     and run the following command:
-    ```shell script
+    ```shell
     $ docker swarm join-token worker
     ```
    
@@ -213,7 +213,7 @@ After it's rebuild, you can run the deploy again.
 
    Check if the API containers are up, and with the port 80 exposed:
    
-    ```shell script
+    ```shell
     $ docker stack ps r2d2
     ```
    ```
