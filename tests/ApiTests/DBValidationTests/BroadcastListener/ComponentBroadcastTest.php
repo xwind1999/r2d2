@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\ApiTests\DBValidationTests;
 
+use App\Helper\MoneyHelper;
 use App\Repository\ComponentRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
 
@@ -180,5 +181,50 @@ class ComponentBroadcastTest extends IntegrationTestCase
         $this->assertEquals($payload['isReservable'], $component->isReservable);
         $this->assertEquals($payload['roomStockType'], $component->roomStockType);
         $this->assertEquals($payload['productDuration'], $component->duration);
+    }
+
+    public function testCreateComponentWithListComponentPrice(): void
+    {
+        static::cleanUp();
+
+        $payload = [
+            'id' => bin2hex(random_bytes(12)),
+            'name' => 'Test component 5',
+            'description' => 'Test component with component price with dot',
+            'sellableBrand' => [
+                'code' => 'SBX',
+            ],
+            'partner' => [
+                'id' => '12345678',
+            ],
+            'roomStockType' => 'stock',
+            'productDuration' => 2,
+            'status' => 'active',
+            'type' => 'component',
+            'isSellable' => true,
+            'isReservable' => false,
+            'listPrice' => [
+                'currencyCode' => 'EUR',
+                'amount' => 100.20,
+            ],
+        ];
+
+        $response = self::$broadcastListenerHelper->testComponentProduct($payload);
+        $this->assertEquals(202, $response->getStatusCode());
+
+        $this->consume('listener-product');
+
+        $moneyHelper = new MoneyHelper();
+        /** @var ComponentRepository $componentRepository */
+        $componentRepository = self::$container->get(ComponentRepository::class);
+        $component = $componentRepository->findOneByGoldenId($payload['id']);
+        $this->assertEquals($payload['id'], $component->goldenId);
+        $this->assertEquals($payload['partner']['id'], $component->partnerGoldenId);
+        $this->assertEquals($payload['isSellable'], $component->isSellable);
+        $this->assertEquals($payload['isReservable'], $component->isReservable);
+        $this->assertEquals($payload['roomStockType'], $component->roomStockType);
+        $this->assertEquals($payload['productDuration'], $component->duration);
+        $this->assertEquals($payload['listPrice']['currencyCode'], $component->currency);
+        $this->assertEquals($moneyHelper->convertToInteger('100.20', 'EUR'), $component->price);
     }
 }

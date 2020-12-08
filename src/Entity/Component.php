@@ -109,6 +109,16 @@ class Component
      */
     public bool $isManageable = false;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true, options={"unsigned"=true})
+     */
+    public ?int $price = null;
+
+    /**
+     * @ORM\Column(type="string", length=3, nullable=true)
+     */
+    public ?string $currency = null;
+
     public function __construct()
     {
         $this->experienceComponent = new ArrayCollection();
