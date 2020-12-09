@@ -6,6 +6,7 @@ namespace App\Tests\Provider;
 
 use App\Cache\QuickDataCache;
 use App\Contract\Response\QuickData\AvailabilityPricePeriodResponse;
+use App\Contract\Response\QuickData\Error\ResponseStatus;
 use App\Contract\Response\QuickData\GetPackageResponse;
 use App\Contract\Response\QuickData\GetPackageV2Response;
 use App\Contract\Response\QuickData\GetRangeResponse;
@@ -22,6 +23,7 @@ use App\Tests\ProphecyTestCase;
 use JMS\Serializer\ArrayTransformerInterface;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -143,29 +145,36 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
      */
     public function testGetAvailabilityForExperienceWithNoAvailabilities()
     {
+        $experienceId = '31209470194830912';
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-01');
 
-        $result = $this->prophesize(QuickDataErrorResponse::class);
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $result = new QuickDataErrorResponse();
+        $responseStatus = new ResponseStatus();
+        $responseStatus->errorCode = 'NotFoundException';
+        $responseStatus->message = 'Resource not found';
+        $result->responseStatus = $responseStatus;
+
+        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result);
 
         $this->availabilityProvider
             ->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
-                Argument::any(),
-                Argument::any(),
-                Argument::any())
+                $experienceId,
+                $dateFrom,
+                $dateTo)
             ->willReturn([])
         ;
         $this->availabilityProvider
-            ->getManageableComponentForGetPackage(Argument::any())
+            ->getManageableComponentForGetPackage($experienceId)
             ->shouldBeCalled()
             ->willReturn([])
         ;
+        $result = $this->legacyAvailabilityProvider->getAvailabilityForExperience($experienceId, $dateFrom, $dateTo);
 
-        $this->assertInstanceOf(
-            QuickDataErrorResponse::class,
-            $this->legacyAvailabilityProvider->getAvailabilityForExperience('31209470194830912', $dateFrom, $dateTo)
-        );
+        $this->assertInstanceOf(QuickDataErrorResponse::class, $result);
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $result->getHttpCode());
+        $this->assertEquals('NotFoundException', $result->responseStatus->errorCode);
+        $this->assertEquals('Resource not found', $result->responseStatus->message);
     }
 
     /**

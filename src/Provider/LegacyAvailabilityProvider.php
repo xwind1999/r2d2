@@ -70,15 +70,15 @@ class LegacyAvailabilityProvider
                 $response = $this->serializer->fromArray(
                     [
                         'ResponseStatus' => [
-                            'ErrorCode' => 'ArgumentException',
-                            'Message' => 'Invalid Request',
+                            'ErrorCode' => 'NotFoundException',
+                            'Message' => 'Resource not found',
                             'StackTrace' => '',
                             'Errors' => [],
                         ],
                     ],
                     QuickDataErrorResponse::class
                 );
-                $response->httpCode = Response::HTTP_BAD_REQUEST;
+                $response->httpCode = Response::HTTP_NOT_FOUND;
 
                 return $response;
             }
