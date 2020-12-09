@@ -25,7 +25,7 @@ class QuickDataApiTest extends ApiTestCase
             date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')),
             date('Y-m-\0\5', strtotime('first day of next month'))
         );
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     public function testGetPackageV2(): void

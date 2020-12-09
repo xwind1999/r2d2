@@ -475,8 +475,8 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
         $expectedResult = [
             'ResponseStatus' => [
-                'ErrorCode' => 'ArgumentException',
-                'Message' => 'Invalid Request',
+                'ErrorCode' => 'NotFoundException',
+                'Message' => 'Resource not found',
                 'StackTrace' => '',
                 'Errors' => [],
             ],
