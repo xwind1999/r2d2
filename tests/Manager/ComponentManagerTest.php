@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Manager;
 
 use App\Contract\Message\CalculateFlatManageableComponent;
+use App\Contract\Request\BroadcastListener\Common\Price;
 use App\Contract\Request\BroadcastListener\Product\Partner as PartnerDTO;
 use App\Contract\Request\BroadcastListener\ProductRequest;
 use App\Contract\Request\EAI\RoomRequest;
@@ -205,6 +206,10 @@ class ComponentManagerTest extends ProphecyTestCase
         $productRequest->isReservable = true;
         $productRequest->status = 'test Status';
         $productRequest->roomStockType = 'on_request';
+        $price = $this->prophesize(Price::class);
+        $price->amount = 80;
+        $price->currencyCode = 'EUR';
+        $productRequest->listPrice = $price;
         $component = $this->prophesize(Component::class);
         $component->status = 'active';
         $component->isReservable = true;
@@ -242,6 +247,10 @@ class ComponentManagerTest extends ProphecyTestCase
         $productRequest->isReservable = true;
         $productRequest->status = 'test Status';
         $productRequest->roomStockType = 'on_request';
+        $price = $this->prophesize(Price::class);
+        $price->amount = 80;
+        $price->currencyCode = 'EUR';
+        $productRequest->listPrice = $price;
         $component = $this->prophesize(Component::class);
         $component->status = 'active';
         $component->isReservable = true;

@@ -146,6 +146,8 @@ class ComponentManager
         $component->externalUpdatedAt = $productRequest->updatedAt;
         $component->duration = $productRequest->productDuration;
         $component->durationUnit = $productRequest->productDurationUnit;
+        $component->price = $productRequest->listPrice->amount ?? null;
+        $component->currency = $productRequest->listPrice->currencyCode ?? null;
 
         $this->repository->save($component);
         $this->messageBus->dispatch(RoomRequest::transformFromComponent($component));

@@ -36,8 +36,11 @@ class BroadcastListenerController
      * )
      * @Security(name="basic")
      */
-    public function productListener(Request $request, ProductRequest $productRequest, MessageBusInterface $messageBus): Response
-    {
+    public function productListener(
+        Request $request,
+        ProductRequest $productRequest,
+        MessageBusInterface $messageBus
+    ): Response {
         $productRequest->updatedAt = $this->getBroadcastDateTimeFromRequest($request);
 
         $messageBus->dispatch($productRequest);
