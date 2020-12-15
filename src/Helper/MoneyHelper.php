@@ -22,4 +22,13 @@ class MoneyHelper
 
         return (int) $parser->parse($amount, new Currency($currency))->getAmount();
     }
+
+    public static function divideToInt(int $amount, string $currency, int $divisor): int
+    {
+        $money = new Money($amount, new Currency($currency));
+        $money = $money->divide($divisor, Money::ROUND_UP);
+        $parser = new DecimalMoneyParser(new ISOCurrencies());
+
+        return (int) $parser->parse($money->getAmount());
+    }
 }

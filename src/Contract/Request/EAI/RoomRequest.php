@@ -6,6 +6,8 @@ namespace App\Contract\Request\EAI;
 
 use App\Entity\Component;
 use App\Event\NamedEventInterface;
+use App\Helper\MoneyHelper;
+use Smartbox\CDM\Entity\Common\Price;
 use Smartbox\CDM\Entity\Partner\Partner;
 use Smartbox\CDM\Entity\Product\Product;
 use Smartbox\CDM\Entity\Product\RoomTypeProduct;
@@ -24,6 +26,19 @@ class RoomRequest extends RoomTypeProduct implements NamedEventInterface
         $partner = new Partner();
         $partner->setId($component->partner->goldenId);
         $product->setPartner($partner);
+
+        if (!empty($component->price) && !empty($component->currency)) {
+            $price = new Price();
+            $price->setAmount(
+                MoneyHelper::divideToInt(
+                    $component->price,
+                    $component->currency,
+                    $component->duration ?? 1
+                )
+            );
+            $price->setCurrencyCode($component->currency);
+            $product->setListPrice($price);
+        }
 
         $roomTypeProduct = new self();
         $roomTypeProduct->setIsActive($component->isManageable);
