@@ -32,4 +32,20 @@ class MoneyHelperTest extends ProphecyTestCase
         $integer = $this->moneyHelper->convertToInteger($amount, $currency);
         $this->assertSame(3099, $integer);
     }
+
+    public function testDivideToInt()
+    {
+        $amount = 300;
+        $currency = 'EUR';
+        $integer = MoneyHelper::divideToInt($amount, $currency, 3);
+        $this->assertSame(10000, $integer);
+    }
+
+    public function testDivideToIntNotEven()
+    {
+        $amount = 301;
+        $currency = 'EUR';
+        $integer = MoneyHelper::divideToInt($amount, $currency, 3);
+        $this->assertSame(10100, $integer);
+    }
 }
