@@ -71,6 +71,7 @@ class RoomRequestTest extends ProphecyTestCase
                 $component = clone $component;
                 $component->price = 300;
                 $component->duration = 3;
+
                 return $component;
             })($component),
             $context,
@@ -92,6 +93,7 @@ class RoomRequestTest extends ProphecyTestCase
                 $component = clone $component;
                 $component->price = 301;
                 $component->duration = 3;
+
                 return $component;
             })($component),
             $context,
