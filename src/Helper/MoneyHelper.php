@@ -29,6 +29,6 @@ class MoneyHelper
         $money = $money->divide($divisor, Money::ROUND_UP);
         $parser = new DecimalMoneyParser(new ISOCurrencies());
 
-        return (int) $parser->parse($money->getAmount());
+        return (int) $parser->parse($money->getAmount(), new Currency($currency))->getAmount();
     }
 }
