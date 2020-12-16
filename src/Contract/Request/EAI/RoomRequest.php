@@ -57,6 +57,8 @@ class RoomRequest extends RoomTypeProduct implements NamedEventInterface
 
     public function getContext(): array
     {
+        $listPrice = $this->getProduct()->getListPrice();
+
         return [
             'product_id' => $this->getProduct()->getId(),
             'product_name' => $this->getProduct()->getName(),
@@ -65,6 +67,8 @@ class RoomRequest extends RoomTypeProduct implements NamedEventInterface
             'component_is_manageable' => $this->getIsActive(),
             'component_description' => $this->getProduct()->getDescription() ?? '',
             'component_room_stock_type' => $this->getProduct()->getRoomStockType() ?? '',
+            'product_price' => $listPrice ? $listPrice->getAmount() : 0.0, // @phpstan-ignore-line
+            'product_currency_code' => $listPrice ? $listPrice->getCurrencyCode() : '', // @phpstan-ignore-line
         ];
     }
 

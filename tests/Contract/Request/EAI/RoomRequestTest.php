@@ -38,6 +38,8 @@ class RoomRequestTest extends ProphecyTestCase
             'component_is_manageable' => true,
             'component_description' => 'test desc',
             'component_room_stock_type' => '2',
+            'product_price' => 0.0,
+            'product_currency_code' => '',
         ];
 
         $component = new Component();
@@ -49,7 +51,7 @@ class RoomRequestTest extends ProphecyTestCase
         $component->isManageable = $context['component_is_manageable'];
         $component->description = $context['component_description'];
         $component->roomStockType = $context['component_room_stock_type'];
-        $component->currency = 'USD';
+        $component->currency = $context['product_currency_code'];
 
         yield 'happy-component' => [
             $component,
@@ -71,10 +73,16 @@ class RoomRequestTest extends ProphecyTestCase
                 $component = clone $component;
                 $component->price = 300;
                 $component->duration = 3;
+                $component->currency = 'EUR';
 
                 return $component;
             })($component),
-            $context,
+            (function ($context) {
+                $context['product_price'] = 10000;
+                $context['product_currency_code'] = 'EUR';
+
+                return $context;
+            })($context),
             (function (RoomRequestTest $test, RoomRequest $result, array $context) {
                 $test->assertEquals($result->getProduct()->getName(), $context['product_name']);
                 $test->assertEquals($result->getProduct()->getId(), $context['product_id']);
@@ -83,7 +91,8 @@ class RoomRequestTest extends ProphecyTestCase
                 $test->assertEquals($result->getIsActive(), $context['component_is_manageable']);
                 $test->assertEquals($result->getProduct()->getDescription(), $context['component_description']);
                 $test->assertEquals($result->getProduct()->getRoomStockType(), $context['component_room_stock_type']);
-                $test->assertEquals($result->getProduct()->getListPrice()->getAmount(), 10000);
+                $test->assertEquals($result->getProduct()->getListPrice()->getAmount(), $context['product_price']);
+                $test->assertEquals($result->getProduct()->getListPrice()->getCurrencyCode(), $context['product_currency_code']);
                 $test->assertEquals($result->getContext(), $context);
             }),
         ];
@@ -93,10 +102,16 @@ class RoomRequestTest extends ProphecyTestCase
                 $component = clone $component;
                 $component->price = 301;
                 $component->duration = 3;
+                $component->currency = 'EUR';
 
                 return $component;
             })($component),
-            $context,
+            (function ($context) {
+                $context['product_price'] = 10100;
+                $context['product_currency_code'] = 'EUR';
+
+                return $context;
+            })($context),
             (function (RoomRequestTest $test, RoomRequest $result, array $context) {
                 $test->assertEquals($result->getProduct()->getName(), $context['product_name']);
                 $test->assertEquals($result->getProduct()->getId(), $context['product_id']);
@@ -105,7 +120,8 @@ class RoomRequestTest extends ProphecyTestCase
                 $test->assertEquals($result->getIsActive(), $context['component_is_manageable']);
                 $test->assertEquals($result->getProduct()->getDescription(), $context['component_description']);
                 $test->assertEquals($result->getProduct()->getRoomStockType(), $context['component_room_stock_type']);
-                $test->assertEquals($result->getProduct()->getListPrice()->getAmount(), 10100);
+                $test->assertEquals($result->getProduct()->getListPrice()->getAmount(), $context['product_price']);
+                $test->assertEquals($result->getProduct()->getListPrice()->getCurrencyCode(), $context['product_currency_code']);
                 $test->assertEquals($result->getContext(), $context);
             }),
         ];
