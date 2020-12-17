@@ -4,6 +4,3 @@ parameters:
         -
             message: '/Parameter #3 \$object of method Smartbox\\ApiRestClient\\ApiRestInternalClient::request\(\) expects null, Smartbox\\CDM\\Entity\\Booking\\ChannelManagerBooking given\./'
             path: src/EAI/EAI.php
-        -
-            message: "#^Ternary operator condition is always true\\.$#"
-            path: src/Contract/Request/EAI/RoomRequest.php

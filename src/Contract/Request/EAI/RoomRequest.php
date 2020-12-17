@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contract\Request\EAI;
 
+use App\Constraint\ProductDurationUnitConstraint;
 use App\Entity\Component;
 use App\Event\NamedEventInterface;
 use App\Helper\MoneyHelper;
@@ -32,7 +33,7 @@ class RoomRequest extends RoomTypeProduct implements NamedEventInterface
             $dividedPrice = MoneyHelper::divideToInt(
                 $component->price,
                 $component->currency,
-                $component->duration ?? 1
+                $component->duration ?? ProductDurationUnitConstraint::MINIMUM_DURATION
             );
             $price->setAmount(MoneyHelper::convertToDecimal($dividedPrice, $component->currency));
             $price->setCurrencyCode($component->currency);
@@ -58,7 +59,7 @@ class RoomRequest extends RoomTypeProduct implements NamedEventInterface
     {
         $listPrice = $this->getProduct()->getListPrice();
 
-        return [
+        $context = [
             'product_id' => $this->getProduct()->getId(),
             'product_name' => $this->getProduct()->getName(),
             'product_is_sellable' => $this->getProduct()->getIsSellable(),
@@ -66,9 +67,16 @@ class RoomRequest extends RoomTypeProduct implements NamedEventInterface
             'component_is_manageable' => $this->getIsActive(),
             'component_description' => $this->getProduct()->getDescription() ?? '',
             'component_room_stock_type' => $this->getProduct()->getRoomStockType() ?? '',
-            'product_price' => $listPrice ? $listPrice->getAmount() : 0.0, // @phpstan-ignore-line
-            'product_currency_code' => $listPrice ? $listPrice->getCurrencyCode() : '', // @phpstan-ignore-line
+            'product_price' => 0.0,
+            'product_currency_code' => '',
         ];
+
+        if (null !== $listPrice) {
+            $context['product_price'] = $listPrice->getAmount();
+            $context['product_currency_code'] = $listPrice->getCurrencyCode();
+        }
+
+        return $context;
     }
 
     public function getEventName(): string
