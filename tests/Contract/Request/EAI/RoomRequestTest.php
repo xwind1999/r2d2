@@ -78,7 +78,7 @@ class RoomRequestTest extends ProphecyTestCase
                 return $component;
             })($component),
             (function ($context) {
-                $context['product_price'] = 10000;
+                $context['product_price'] = 1.00;
                 $context['product_currency_code'] = 'EUR';
 
                 return $context;
@@ -107,7 +107,7 @@ class RoomRequestTest extends ProphecyTestCase
                 return $component;
             })($component),
             (function ($context) {
-                $context['product_price'] = 10100;
+                $context['product_price'] = 1.01;
                 $context['product_currency_code'] = 'EUR';
 
                 return $context;

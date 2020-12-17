@@ -29,13 +29,12 @@ class RoomRequest extends RoomTypeProduct implements NamedEventInterface
 
         if (!empty($component->price) && !empty($component->currency)) {
             $price = new Price();
-            $price->setAmount(
-                MoneyHelper::divideToInt(
-                    $component->price,
-                    $component->currency,
-                    $component->duration ?? 1
-                )
+            $dividedPrice = MoneyHelper::divideToInt(
+                $component->price,
+                $component->currency,
+                $component->duration ?? 1
             );
+            $price->setAmount(MoneyHelper::convertToDecimal($dividedPrice, $component->currency));
             $price->setCurrencyCode($component->currency);
             $product->setListPrice($price);
         }
