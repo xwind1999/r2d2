@@ -32,6 +32,6 @@ class CleanupRoomAvailabilityEventSubscriberTest extends ProphecyTestCase
     public function testHandleMessage(): void
     {
         $this->roomAvailabilityRepository->cleanUp()->shouldBeCalled();
-        $this->eventSubscriber->handleMessage(new AvailabilityCleanupEvent());
+        $this->eventSubscriber->handleMessage();
     }
 }

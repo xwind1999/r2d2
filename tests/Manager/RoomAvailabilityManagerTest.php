@@ -19,7 +19,6 @@ use App\Entity\ExperienceComponent;
 use App\Entity\Guest;
 use App\Entity\Partner;
 use App\Entity\RoomAvailability;
-use App\Event\Product\AvailabilityUpdatedEvent;
 use App\Exception\Manager\RoomAvailability\OutdatedRoomAvailabilityInformationException;
 use App\Exception\Repository\ComponentNotFoundException;
 use App\Manager\RoomAvailabilityManager;
@@ -38,6 +37,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @coversDefaultClass \App\Manager\RoomAvailabilityManager
+ * @group room-availability-manager
  */
 class RoomAvailabilityManagerTest extends ProphecyTestCase
 {
@@ -178,14 +178,30 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
     {
         $experienceGoldenIds = ['1234', '5678'];
         $startDate = new \DateTime('2020-10-01');
+
+        $result = [
+            '1234' => [
+                'experience_golden_id' => '1234',
+                'partner_golden_id' => '147852',
+                'duration' => '1',
+                'is_sellable' => '1',
+            ],
+            '5678' => [
+                'experience_golden_id' => '5678',
+                'partner_golden_id' => '147852',
+                'duration' => '1',
+                'is_sellable' => '1',
+            ],
+        ];
+
         $this
             ->repository
             ->findAvailableRoomsByMultipleExperienceIds($experienceGoldenIds, $startDate)
             ->shouldBeCalled()
-            ->willReturn(['results']);
+            ->willReturn($result);
 
         $this->assertEquals(
-            ['results'],
+            $result,
             $this->manager->getRoomAvailabilitiesByMultipleExperienceGoldenIds($experienceGoldenIds, $startDate)
         );
     }
@@ -241,11 +257,6 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
         if ($exceptionClass) {
             $this->expectException($exceptionClass);
         }
-//
-//        $this
-//            ->eventDispatcher
-//            ->dispatch(Argument::type(AvailabilityUpdatedEvent::class))
-//            ->willReturn(new \stdClass());
 
         $this->assertNull($this->manager->replace($roomAvailabilityRequest));
     }
@@ -253,8 +264,8 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
     public function roomAvailabilityRequestProvider()
     {
         $component = new Component();
-        $component->goldenId = '218439';
-        $component->roomStockType = 'on_request';
+        $component->goldenId = '238506';
+        $component->roomStockType = 'stock';
 
         $roomAvailabilityRequest = new RoomAvailabilityRequest();
         $roomAvailabilityRequest->product = new Product();
@@ -299,16 +310,24 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
         yield 'room-availability-update-with-no-meaningful-change' => [
             $component,
             (function ($test, $roomAvailabilityList, $component) {
-                $test->repository->findByComponentAndDateRange(Argument::cetera())->willReturn($roomAvailabilityList);
-
-                $test->em->flush()->shouldBeCalledTimes(1);
-                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(3);
-                $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
+                $test->repository->deleteByComponentIdAndDateRange(
+                    Argument::type(Component::class),
+                    Argument::type(\DateTime::class),
+                    Argument::type(\DateTime::class)
+                )->shouldBeCalledOnce();
+                $test->repository->findByComponentAndDateRange(
+                    Argument::type(Component::class),
+                    Argument::type(\DateTime::class),
+                    Argument::type(\DateTime::class)
+                )->shouldNotBeCalled();
+                $test->em->flush()->shouldBeCalledTimes(0);
+                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(0);
+                $test->componentRepository->findOneByGoldenId(Argument::type('string'))->willReturn($component);
             }),
             (function ($roomAvailabilityRequest) {
-                $roomAvailabilityRequest->quantity = random_int(0, 9) < 2 ? 0 : 1;
+                $roomAvailabilityRequest->quantity = 0;
                 $roomAvailabilityRequest->updatedAt->modify('now');
-                $roomAvailabilityRequest->isStopSale = true;
+                $roomAvailabilityRequest->isStopSale = false;
 
                 return $roomAvailabilityRequest;
             })(clone $roomAvailabilityRequest),
@@ -324,10 +343,14 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
         yield 'room-availability-update-request-with-meaningful-changes' => [
             $component,
             (function ($test, $roomAvailabilityList, $component) {
-                $test->repository->findByComponentAndDateRange(Argument::cetera())->willReturn($roomAvailabilityList);
+                $test->repository->findByComponentAndDateRange(
+                    Argument::type(Component::class),
+                    Argument::type(\DateTime::class),
+                    Argument::type(\DateTime::class)
+                )->willReturn($roomAvailabilityList);
                 $test->em->flush()->shouldBeCalledTimes(1);
                 $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(3);
-                $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
+                $test->componentRepository->findOneByGoldenId(Argument::type('string'))->willReturn($component);
             }),
             (function ($roomAvailabilityRequest) {
                 //zeroing the stock, so we may need to recalculate some stuff
@@ -349,10 +372,14 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
         yield 'room-availability-already-updated' => [
             $component,
             (function ($test, $roomAvailabilityList, $component) {
-                $test->repository->findByComponentAndDateRange(Argument::cetera())->willReturn($roomAvailabilityList);
+                $test->repository->findByComponentAndDateRange(
+                    Argument::type(Component::class),
+                    Argument::type(\DateTime::class),
+                    Argument::type(\DateTime::class)
+                )->willReturn($roomAvailabilityList);
                 $test->em->flush()->shouldBeCalledTimes(1);
                 $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(3);
-                $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
+                $test->componentRepository->findOneByGoldenId(Argument::type('string'))->willReturn($component);
             }),
             (function ($roomAvailabilityRequest, $roomAvailabilityExistent) {
                 $roomAvailabilityRequest = clone $roomAvailabilityRequest;
@@ -367,10 +394,15 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
         yield 'component-not-found-exception' => [
             $component,
             (function ($test) {
-                $test->repository->findByComponentAndDateRange(Argument::any())->shouldNotBeCalled();
+                $test->repository->findByComponentAndDateRange(
+                    Argument::type(Component::class),
+                    Argument::type(\DateTime::class),
+                    Argument::type(\DateTime::class)
+                )->shouldNotBeCalled();
                 $test->em->flush()->shouldNotBeCalled();
                 $test->em->persist()->shouldNotBeCalled();
-                $test->componentRepository->findOneByGoldenId(Argument::any())->willThrow(ComponentNotFoundException::class);
+                $test->componentRepository->findOneByGoldenId(Argument::type('string'))
+                    ->willThrow(ComponentNotFoundException::class);
             }),
             (function ($roomAvailabilityRequest) {
                 $roomAvailabilityRequest->product->id = '998877665';
@@ -387,8 +419,12 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
                 $diffDate = $roomAvailabilityRequest->dateTo->diff($roomAvailabilityRequest->dateFrom)->days + 1;
                 $test->em->flush()->shouldBeCalledTimes(1);
                 $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes($diffDate);
-                $test->repository->findByComponentAndDateRange(Argument::cetera())->shouldBeCalled();
-                $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
+                $test->repository->findByComponentAndDateRange(
+                    Argument::type(Component::class),
+                    Argument::type(\DateTime::class),
+                    Argument::type(\DateTime::class)
+                )->shouldBeCalled();
+                $test->componentRepository->findOneByGoldenId(Argument::type('string'))->willReturn($component);
             }),
             (function ($roomAvailabilityRequest) {
                 $roomAvailabilityRequest->product->id = '999';
@@ -402,10 +438,14 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
         yield 'outdated-room-availability-exception' => [
             $component,
             (function ($test, $roomAvailabilityList, $component, $roomAvailabilityRequest, $logger) {
-                $test->repository->findByComponentAndDateRange(Argument::cetera())->willReturn($roomAvailabilityList);
+                $test->repository->findByComponentAndDateRange(
+                    Argument::type(Component::class),
+                    Argument::type(\DateTime::class),
+                    Argument::type(\DateTime::class)
+                )->willReturn($roomAvailabilityList);
                 $test->em->flush()->shouldBeCalledTimes(1);
                 $test->em->persist(Argument::type(RoomAvailability::class))->shouldNotBeCalled();
-                $test->componentRepository->findOneByGoldenId(Argument::any())->willReturn($component);
+                $test->componentRepository->findOneByGoldenId(Argument::type('string'))->willReturn($component);
                 $logger->warning(
                     Argument::containingString(OutdatedRoomAvailabilityInformationException::class),
                     Argument::type('array'))
@@ -427,17 +467,54 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
             null,
         ];
 
-        yield 'room-availability-update-request-with-stock-zero-stop-sale-false' => [
-            $component,
-            (function ($test, $roomAvailabilityList, $component) {
-                $test->repository->deleteByComponentIdAndDateRange(Argument::cetera(), Argument::cetera(), Argument::cetera())->shouldBeCalledOnce();
-                $test->repository->findByComponentAndDateRange(Argument::cetera(), Argument::cetera(), Argument::cetera())->shouldNotBeCalled()->willReturn($roomAvailabilityList);
-                $test->em->flush()->shouldNotBeCalled();
-                $test->em->persist(Argument::type(RoomAvailability::class))->shouldNotBeCalled();
-                $test->componentRepository->findOneByGoldenId(Argument::any())->shouldBeCalledOnce()->willReturn($component);
+        yield 'room-availability-create-request-with-on-request-component' => [
+            (function (Component $component) {
+                $component->goldenId = '218439';
+                $component->roomStockType = 'on_request';
+
+                return $component;
+            })(clone $component),
+            (function ($test, $roomAvailabilityList, $component, $roomAvailabilityRequest) {
+                $diffDate = $roomAvailabilityRequest->dateTo->diff($roomAvailabilityRequest->dateFrom)->days + 1;
+                $test->em->flush()->shouldBeCalledTimes(1);
+                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes($diffDate);
+                $test->repository->findByComponentAndDateRange(
+                    Argument::type(Component::class),
+                    Argument::type(\DateTime::class),
+                    Argument::type(\DateTime::class)
+                )->shouldBeCalled();
+                $test->componentRepository->findOneByGoldenId(Argument::type('string'))->willReturn($component);
             }),
             (function ($roomAvailabilityRequest) {
-                $roomAvailabilityRequest->quantity = 0;
+                $roomAvailabilityRequest->product->id = '999';
+                $roomAvailabilityRequest->dateFrom = new \DateTime('tomorrow');
+                $roomAvailabilityRequest->dateTo = new \DateTime('+ 3 days');
+
+                return $roomAvailabilityRequest;
+            })(clone $roomAvailabilityRequest),
+        ];
+
+        yield 'room-availability-update-request-with-on-request-component' => [
+            (function (Component $component) {
+                $component->goldenId = '218439';
+                $component->roomStockType = 'on_request';
+
+                return $component;
+            })(clone $component),
+            (function ($test, $roomAvailabilityList, $component) {
+                $test->repository->findByComponentAndDateRange(
+                    Argument::type(Component::class),
+                    Argument::type(\DateTime::class),
+                    Argument::type(\DateTime::class)
+                )->shouldBeCalledOnce()->willReturn($roomAvailabilityList);
+                $test->em->flush()->shouldBeCalledOnce();
+                $test->em->persist(Argument::type(RoomAvailability::class))->shouldBeCalledTimes(3);
+                $test->componentRepository->findOneByGoldenId(Argument::type('string'))
+                    ->shouldBeCalledOnce()
+                    ->willReturn($component);
+            }),
+            (function ($roomAvailabilityRequest) {
+                $roomAvailabilityRequest->quantity = 1;
                 $roomAvailabilityRequest->updatedAt->modify('now');
                 $roomAvailabilityRequest->isStopSale = false;
 
@@ -729,6 +806,8 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
                         $increment
                     )->shouldNotBeCalled();
                 $test->em->remove($availability)->shouldNotBeCalled();
+                $test->em->persist(Argument::type(RoomAvailability::class))->shouldNotBeCalled();
+                $test->em->persist(Argument::type(Booking::class))->shouldNotBeCalled();
                 $test->em->flush()->shouldBeCalledTimes(1);
             }),
         ];
@@ -763,8 +842,7 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
                         Argument::type('array'),
                         $increment
                     )->shouldNotBeCalled();
-                $test->em->remove($availability)
-                    ->shouldBeCalledTimes(1);
+                $test->em->remove($availability)->shouldBeCalledTimes(1);
                 $test->em->flush()->shouldBeCalledTimes(1);
             }),
         ];
@@ -799,8 +877,7 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
                         Argument::type('array'),
                         $increment
                     )->shouldNotBeCalled();
-                $test->em->remove($availability)
-                    ->shouldBeCalledTimes(1);
+                $test->em->remove($availability)->shouldBeCalledTimes(1);
                 $test->em->flush()->shouldBeCalledTimes(1);
             }),
         ];

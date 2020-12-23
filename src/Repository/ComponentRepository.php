@@ -227,6 +227,6 @@ class ComponentRepository extends ServiceEntityRepository
             ->setMaxResults(1)
         ;
 
-        return  $qb->getQuery()->getScalarResult();
+        return $qb->getQuery()->getScalarResult();
     }
 }

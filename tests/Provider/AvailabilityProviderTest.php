@@ -99,24 +99,24 @@ class AvailabilityProviderTest extends ProphecyTestCase
         $expectedArray = [
             [
                 'Package' => '1234',
-                'Stock' => 3,
+                'Stock' => 1,
                 'Request' => 0,
             ],
             [
                 'Package' => '1235',
                 'Stock' => 0,
-                'Request' => 3,
+                'Request' => 1,
             ],
             [
                 'Package' => '1236',
-                'Stock' => 2,
-                'Request' => 1,
+                'Stock' => 1,
+                'Request' => 0,
             ],
         ];
 
         $this->roomAvailabilityManager->getRoomAvailabilitiesByBoxId(
             $boxId,
-            Argument::any(),
+            $dateFrom
         )->willReturn($expectedArray);
 
         $this->assertEquals(
@@ -137,37 +137,53 @@ class AvailabilityProviderTest extends ProphecyTestCase
 
         $expectedArray = [
             [
-                'stock' => '0',
-                'experienceGoldenId' => '1234',
-                'duration' => '1',
                 'date' => '2020-06-20',
+                'stock' => '2',
+                'componentGoldenId' => '4321',
+                'isStopSale' => '0',
+                'duration' => '1',
+                'price' => '7500',
+                'lastBookableDate' => null,
+                'experienceGoldenId' => '1234',
                 'partnerGoldenId' => '4321',
                 'isSellable' => '1',
                 'roomStockType' => 'stock',
             ],
             [
-                'stock' => '0',
-                'experienceGoldenId' => '1234',
-                'duration' => '1',
                 'date' => '2020-06-21',
+                'stock' => '2',
+                'componentGoldenId' => '4321',
+                'isStopSale' => '0',
+                'duration' => '1',
+                'price' => '7500',
+                'lastBookableDate' => null,
+                'experienceGoldenId' => '1234',
                 'partnerGoldenId' => '4321',
-                'isSellable' => '1',
+                'isSellable' => '0',
                 'roomStockType' => 'stock',
             ],
             [
-                'stock' => '1',
-                'experienceGoldenId' => '1234',
-                'duration' => '1',
                 'date' => '2020-06-22',
+                'stock' => '1',
+                'componentGoldenId' => '4321',
+                'isStopSale' => '0',
+                'duration' => '1',
+                'price' => '7500',
+                'lastBookableDate' => null,
+                'experienceGoldenId' => '1234',
                 'partnerGoldenId' => '4321',
                 'isSellable' => '1',
                 'roomStockType' => 'stock',
             ],
             [
-                'stock' => '1',
-                'experienceGoldenId' => '1234',
-                'duration' => '1',
                 'date' => '2020-06-23',
+                'stock' => '1',
+                'componentGoldenId' => '4321',
+                'isStopSale' => '0',
+                'duration' => '1',
+                'price' => '7500',
+                'lastBookableDate' => null,
+                'experienceGoldenId' => '1234',
                 'partnerGoldenId' => '4321',
                 'isSellable' => '1',
                 'roomStockType' => 'stock',
@@ -176,8 +192,8 @@ class AvailabilityProviderTest extends ProphecyTestCase
 
         $this->roomAvailabilityManager->getRoomAndPriceAvailabilitiesByExperienceIdAndDates(
             $expId,
-            Argument::any(),
-            Argument::any(),
+            $dateFrom,
+            $dateTo
             )->willReturn($expectedArray);
 
         $expectedBookingDates = [
@@ -201,98 +217,22 @@ class AvailabilityProviderTest extends ProphecyTestCase
             Argument::type(\DateTimeInterface::class)
         )->willReturn($expectedBookingDates);
 
+        $expectedRealStockResult = $expectedArray;
+        foreach ($expectedArray as $key => $item) {
+            if (isset($expectedBookingDates[$key]) && $item['date'] === $expectedBookingDates[$key]['date']) {
+                $item['stock'] -= $expectedBookingDates[$key]['usedStock'];
+                $expectedRealStockResult[$key] = $item;
+            }
+        }
+
         $this->availabilityHelper->getRealStock(
             $expectedArray,
             $expectedBookingDates
-        )->willReturn($expectedArray);
+        )->willReturn($expectedRealStockResult);
 
         $this->assertEquals(
-            $expectedArray,
+            $expectedRealStockResult,
             $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates($expId, $dateFrom, $dateTo)
-        );
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::getRoomAndPricesAvailabilitiesByExperienceIdAndDates
-     */
-    public function testGetRoomAndPriceAvailabilitiesListByExperienceIdAndDates()
-    {
-        $dateFrom = new \DateTime('2020-06-20');
-        $dateTo = new \DateTime('2020-06-26');
-
-        $expectedArray = [
-            0 => [
-                'Date' => '2020-06-20T00:00:00.000000',
-                'AvailabilityValue' => 0,
-                'AvailabilityStatus' => 'Available',
-                'SellingPrice' => 86.45,
-                'BuyingPrice' => 86.45,
-            ],
-            1 => [
-                'Date' => '2020-06-21T00:00:00.000000',
-                'AvailabilityValue' => 0,
-                'AvailabilityStatus' => 'Available',
-                'SellingPrice' => 86.45,
-                'BuyingPrice' => 86.45,
-            ],
-            2 => [
-                'Date' => '2020-06-22T00:00:00.000000',
-                'AvailabilityValue' => 1,
-                'AvailabilityStatus' => 'Available',
-                'SellingPrice' => 86.45,
-                'BuyingPrice' => 86.45,
-            ],
-            3 => [
-                'Date' => '2020-06-23T00:00:00.000000',
-                'AvailabilityValue' => 1,
-                'AvailabilityStatus' => 'Available',
-                'SellingPrice' => 86.45,
-                'BuyingPrice' => 86.45,
-            ],
-        ];
-
-        $this->roomAvailabilityManager->getRoomAndPriceAvailabilitiesByExperienceIdAndDates(
-            Argument::any(),
-            Argument::any(),
-            Argument::any()
-            )->shouldBeCalledOnce()
-            ->willReturn($expectedArray);
-
-        $expectedBookingDates = [
-            [
-                'experienceGoldenId' => '1234',
-                'componentGoldenId' => '4321',
-                'date' => '2020-06-20',
-                'realStock' => '0',
-                'usedStock' => '1',
-                'stock' => '1',
-            ],
-            [
-                'experienceGoldenId' => '1234',
-                'componentGoldenId' => '4321',
-                'date' => '2020-06-21',
-                'realStock' => '0',
-                'usedStock' => '1',
-                'stock' => '1',
-            ],
-        ];
-
-        $this->bookingDateRepository->findBookingDatesByExperiencesAndDates(
-            Argument::type('array'),
-            Argument::type(\DateTimeInterface::class),
-            Argument::type(\DateTimeInterface::class)
-        )->willReturn($expectedBookingDates);
-
-        $this->availabilityHelper->getRealStock(
-            $expectedArray,
-            $expectedBookingDates
-        )->willReturn($expectedArray);
-
-        $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
-            '1234',
-            $dateFrom,
-            $dateTo
         );
     }
 
@@ -312,11 +252,9 @@ class AvailabilityProviderTest extends ProphecyTestCase
             [
                 [
                     'experience_golden_id' => '1234',
-                    'duration' => '1',
                     'partner_golden_id' => '00112233',
                     'is_sellable' => '1',
-                    'date' => new \DateTime('2020-06-20'),
-                    'stock' => 10,
+                    'duration' => '1',
                 ],
             ]
         );
@@ -343,7 +281,7 @@ class AvailabilityProviderTest extends ProphecyTestCase
     public function testGetManageableComponentForGetPackage(): void
     {
         $expected = [
-            0 => [
+            [
                 'goldenId' => '227914',
                 'duration' => '1',
                 'partnerGoldenId' => '00037411',

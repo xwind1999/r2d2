@@ -50,7 +50,7 @@ class RetryCustomStrategy implements RetryStrategyInterface
         switch ($retryCount) {
             case 0: case 1: return self::TEN_SECONDS_TIME_DELAY;
             case 2: return self::THIRTY_SECONDS_TIME_DELAY;
-            case 3: case 4: case 5: case 6: return  self::SIXTY_SECONDS_TIME_DELAY;
+            case 3: case 4: case 5: case 6: return self::SIXTY_SECONDS_TIME_DELAY;
             case 7: case 8: case 9: case 10: return self::TEN_MINUTES_TIME_DELAY;
             default: return self::THIRTY_MINUTES_TIME_DELAY;
         }
