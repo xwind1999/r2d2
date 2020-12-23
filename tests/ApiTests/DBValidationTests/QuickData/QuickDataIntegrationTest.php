@@ -89,7 +89,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                 'dateFrom' => (clone $dateFrom)->modify('+1 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                 'dateTo' => (clone $dateFrom)->modify('+2 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                 'updatedAt' => (new \DateTime())->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
-                'isStopSale' => false,
+                'isStopSale' => true,
                 'quantity' => '1',
             ],
             [
@@ -109,7 +109,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                 'dateFrom' => (clone $dateFrom)->modify('+3 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                 'dateTo' => (clone $dateFrom)->modify('+4 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                 'updatedAt' => (new \DateTime())->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
-                'isStopSale' => true,
+                'isStopSale' => false,
                 'quantity' => '1',
             ],
             [
@@ -147,7 +147,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
                 $expectedResult = [
                     'ListPrestation' => [[
-                        'Availabilities' => ['1', '1', '1', '0', '0', '1'],
+                        'Availabilities' => ['1', '0', '1', '1', '0', '1'],
                         'PrestId' => 1,
                         'Duration' => $component->duration,
                         'LiheId' => 1,
@@ -159,45 +159,6 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
                 for ($i = 0; $i < 350; ++$i) {
                     $expectedResult['ListPrestation'][0]['Availabilities'][] = '0';
-                }
-
-                return $expectedResult;
-            })($componentId),
-        ];
-
-        yield 'get-package-with-on-request' => [
-            '225702',
-            '45618',
-            $dateFrom,
-            (function ($dateTo) {
-                return $dateTo->modify('+350 day');
-            })(clone $dateTo),
-            (function ($payload) {
-                $newPayload = [];
-                foreach ($payload as $item) {
-                    $newPayload[] = array_replace_recursive($item, ['product' => ['id' => '225702']]);
-                }
-                $newPayload[1]['isStopSale'] = true;
-
-                return $newPayload;
-            })($payload),
-            (function ($componentId) {
-                $component = self::$container->get(ComponentRepository::class)->findOneByGoldenId($componentId);
-
-                $expectedResult = [
-                    'ListPrestation' => [[
-                        'Availabilities' => ['r', '0', 'r', '0', 'r', 'r'],
-                        'PrestId' => 1,
-                        'Duration' => $component->duration,
-                        'LiheId' => 1,
-                        'PartnerCode' => '00040406',
-                        'ExtraNight' => true,
-                        'ExtraRoom' => true,
-                    ]],
-                ];
-
-                for ($i = 0; $i < 350; ++$i) {
-                    $expectedResult['ListPrestation'][0]['Availabilities'][] = 'r';
                 }
 
                 return $expectedResult;
@@ -222,7 +183,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
                 $expectedResult = [
                     'ListPrestation' => [[
-                        'Availabilities' => ['0', '1', '1', '0', '0', '1'],
+                        'Availabilities' => ['0', '0', '1', '1', '0', '1'],
                         'PrestId' => 1,
                         'Duration' => $component->duration,
                         'LiheId' => 1,
@@ -370,7 +331,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
         $expectedResult = [
             'ListPrestation' => [[
-                'Availabilities' => ['r', '0', 'r', '0'],
+                'Availabilities' => ['r', '0', 'r'],
                 'PrestId' => 1,
                 'Duration' => $component->duration,
                 'LiheId' => 1,
@@ -380,7 +341,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             ]],
         ];
 
-        for ($i = 0; $i < 350; ++$i) {
+        for ($i = 0; $i < 351; ++$i) {
             $expectedResult['ListPrestation'][0]['Availabilities'][] = 'r';
         }
 
