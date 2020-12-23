@@ -53,6 +53,13 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
         $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+
+        static::cleanUp();
+        self::$bookingHelper->cleanUpBooking(
+            [$componentGoldenId],
+            [$experienceGoldenId],
+            self::$container->get('doctrine.orm.entity_manager')
+        );
     }
 
     public function getPackageProvider()
@@ -1048,6 +1055,11 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         );
 
         $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+
+        self::$bookingHelper->cleanUpBooking(
+            ['213072'],
+            [$experienceId],
+            self::$container->get('doctrine.orm.entity_manager'));
     }
 
     /**
