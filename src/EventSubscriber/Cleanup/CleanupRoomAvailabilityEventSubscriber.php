@@ -24,7 +24,7 @@ class CleanupRoomAvailabilityEventSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function handleMessage(AvailabilityCleanupEvent $event): void
+    public function handleMessage(): void
     {
         $this->roomAvailabilityRepository->cleanUp();
     }

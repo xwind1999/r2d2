@@ -6,6 +6,7 @@ namespace App\Tests\Helper;
 
 use App\Constants\AvailabilityConstants;
 use App\Constants\DateTimeConstants;
+use App\Constraint\RoomStockTypeConstraint;
 use App\Helper\AvailabilityHelper;
 use App\Tests\ProphecyTestCase;
 
@@ -88,18 +89,6 @@ class AvailabilityHelperTest extends ProphecyTestCase
     }
 
     /**
-     * @covers ::getRoomStockShortType
-     *
-     * @dataProvider roomStockType
-     */
-    public function testGetRoomStockShortType(string $inputString, string $expectedString): void
-    {
-        $availabilityHelper = new AvailabilityHelper();
-
-        $this->assertEquals($expectedString, $availabilityHelper->getRoomStockShortType($inputString));
-    }
-
-    /**
      * @covers ::buildDataForGetPackage
      */
     public function testBuildDataForGetPackageV2(): void
@@ -134,7 +123,6 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
     /**
      * @covers ::fillMissingAvailabilityForGetPackage
-     * @covers ::getRoomStockShortType
      * @covers ::validateStockType
      * @covers ::validateMissingAvailability
      */
@@ -204,7 +192,6 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
     /**
      * @covers ::fillMissingAvailabilityForGetPackage
-     * @covers ::getRoomStockShortType
      * @covers ::validateStockType
      * @covers ::validateMissingAvailability
      */
@@ -265,7 +252,6 @@ class AvailabilityHelperTest extends ProphecyTestCase
 
     /**
      * @covers ::fillMissingAvailabilityForGetPackage
-     * @covers ::getRoomStockShortType
      * @covers ::validateStockType
      * @covers ::validateMissingAvailability
      */
@@ -362,78 +348,32 @@ class AvailabilityHelperTest extends ProphecyTestCase
     }
 
     /**
-     * @covers ::convertToShortType
-     */
-    public function testConvertToShortTypeInstant(): void
-    {
-        $availabilityHelper = new AvailabilityHelper();
-
-        $stockList = ['1', '2', '3', '0', '1', '0', '5', '1'];
-        $returnArray = ['1', '1', '1', '0', '1', '0', '1', '1'];
-
-        $this->assertEquals(
-            $returnArray,
-            $availabilityHelper->convertToShortType(
-                $stockList,
-                '1'
-            )
-        );
-    }
-
-    /**
-     * @covers ::convertToShortType
-     */
-    public function testConvertToShortTypeOnRequest(): void
-    {
-        $availabilityHelper = new AvailabilityHelper();
-
-        $stockList = ['1', '2', '3', '0', '1', '0', '5', '1'];
-        $returnArray = ['r', 'r', 'r', '0', 'r', '0', 'r', 'r'];
-
-        $this->assertEquals(
-            $returnArray,
-            $availabilityHelper->convertToShortType(
-                $stockList,
-                'r'
-            )
-        );
-    }
-
-    /**
      * @covers ::fillMissingAvailabilitiesForAvailabilityPrice
+     * @covers ::validateMissingAvailability
+     * @dataProvider fillMissingAvailabilityDataProvider
      */
-    public function testFillMissingAvailabilities(): void
-    {
+    public function testFillMissingAvailabilities(
+        $availabilities,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        callable $asserts,
+        ?string $roomStockType = null
+    ): void {
         $availabilityHelper = new AvailabilityHelper();
 
+        $result = $availabilityHelper->fillMissingAvailabilitiesForAvailabilityPrice(
+            $availabilities,
+            $dateFrom,
+            $dateTo,
+            $roomStockType
+        );
+
+        $asserts($this, $result);
+    }
+
+    public function fillMissingAvailabilityDataProvider()
+    {
         $availabilities = [
-            '2020-06-20T00:00:00.000000' => [
-                'Date' => '2020-06-20T00:00:00.000000',
-                'AvailabilityValue' => 1,
-                'AvailabilityStatus' => 'Available',
-                'SellingPrice' => 86.45,
-                'BuyingPrice' => 86.45,
-            ],
-            '2020-06-21T00:00:00.000000' => [
-                'Date' => '2020-06-21T00:00:00.000000',
-                'AvailabilityValue' => 1,
-                'AvailabilityStatus' => 'Available',
-                'SellingPrice' => 86.45,
-                'BuyingPrice' => 86.45,
-            ],
-            '2020-06-23T00:00:00.000000' => [
-                'Date' => '2020-06-23T00:00:00.000000',
-                'AvailabilityValue' => 1,
-                'AvailabilityStatus' => 'Available',
-                'SellingPrice' => 86.45,
-                'BuyingPrice' => 86.45,
-            ],
-        ];
-
-        $dateFrom = new \DateTime('2020-06-20');
-        $dateTo = new \DateTime('2020-06-25');
-
-        $returnArray = [
             '2020-06-20T00:00:00.000000' => [
                 'Date' => '2020-06-20T00:00:00.000000',
                 'AvailabilityValue' => 1,
@@ -450,17 +390,44 @@ class AvailabilityHelperTest extends ProphecyTestCase
             ],
             '2020-06-22T00:00:00.000000' => [
                 'Date' => '2020-06-22T00:00:00.000000',
-                'AvailabilityValue' => 0,
-                'AvailabilityStatus' => 'Unavailable',
-                'SellingPrice' => 0.00,
-                'BuyingPrice' => 0.00,
-            ],
-            '2020-06-23T00:00:00.000000' => [
-                'Date' => '2020-06-23T00:00:00.000000',
                 'AvailabilityValue' => 1,
                 'AvailabilityStatus' => 'Available',
                 'SellingPrice' => 86.45,
                 'BuyingPrice' => 86.45,
+            ],
+        ];
+
+        $dateFrom = new \DateTime('2020-06-20');
+        $dateTo = new \DateTime('2020-06-25');
+
+        $expectedResult = [
+            '2020-06-20T00:00:00.000000' => [
+                'Date' => '2020-06-20T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
+            ],
+            '2020-06-21T00:00:00.000000' => [
+                'Date' => '2020-06-21T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
+            ],
+            '2020-06-22T00:00:00.000000' => [
+                'Date' => '2020-06-22T00:00:00.000000',
+                'AvailabilityValue' => 1,
+                'AvailabilityStatus' => 'Available',
+                'SellingPrice' => 86.45,
+                'BuyingPrice' => 86.45,
+            ],
+            '2020-06-23T00:00:00.000000' => [
+                'Date' => '2020-06-23T00:00:00.000000',
+                'AvailabilityValue' => 0,
+                'AvailabilityStatus' => 'Unavailable',
+                'SellingPrice' => 00.00,
+                'BuyingPrice' => 00.00,
             ],
             '2020-06-24T00:00:00.000000' => [
                 'Date' => '2020-06-24T00:00:00.000000',
@@ -478,87 +445,97 @@ class AvailabilityHelperTest extends ProphecyTestCase
             ],
         ];
 
-        $this->assertEquals(
-            $returnArray,
-            $availabilityHelper->fillMissingAvailabilitiesForAvailabilityPrice(
-                $availabilities,
-                $dateFrom,
-                $dateTo,
-                null
-            )
-        );
-    }
-
-    /**
-     * @covers ::fillMissingAvailabilitiesForAvailabilityPrice
-     */
-    public function testFillMissingAvailabilitiesWithEnoughDate(): void
-    {
-        $availabilityHelper = new AvailabilityHelper();
-
-        $availabilities = [
-            '2020-06-20T00:00:00.000000' => [
-                'Date' => '2020-06-20T00:00:00.000000',
-                'AvailabilityValue' => 1,
-                'AvailabilityStatus' => 'Available',
-                'SellingPrice' => 86.45,
-                'BuyingPrice' => 86.45,
-            ],
-            '2020-06-21T00:00:00.000000' => [
-                'Date' => '2020-06-21T00:00:00.000000',
-                'AvailabilityValue' => 1,
-                'AvailabilityStatus' => 'Available',
-                'SellingPrice' => 86.45,
-                'BuyingPrice' => 86.45,
-            ],
-            '2020-06-22T00:00:00.000000' => [
-                'Date' => '2020-06-22T00:00:00.000000',
-                'AvailabilityValue' => 1,
-                'AvailabilityStatus' => 'Available',
-                'SellingPrice' => 86.45,
-                'BuyingPrice' => 86.45,
-            ],
+        yield 'fill-missing-availabilities-standard' => [
+            $availabilities,
+            $dateFrom,
+            $dateTo,
+            (function ($test, $result) use ($expectedResult) {
+                $test->assertEquals($expectedResult, $result);
+            }),
+            null,
         ];
 
-        $dateFrom = new \DateTime('2020-06-20');
-        $dateTo = new \DateTime('2020-06-22');
-
-        $this->assertEquals(
+        yield 'fill-missing-availabilities-with-enough-date' => [
             $availabilities,
-            $availabilityHelper->fillMissingAvailabilitiesForAvailabilityPrice(
-                $availabilities,
-                $dateFrom,
-                $dateTo,
-                null
-            )
-        );
-    }
+            $dateFrom,
+            (clone $dateTo)->modify('-3 day'),
+            (function ($test, $result) use ($expectedResult) {
+                $test->assertEquals(
+                    array_slice($expectedResult, 0, 3, true),
+                    $result
+                );
+            }),
+            null,
+        ];
 
-    public function roomStockType(): array
-    {
-        return [
-            [
-                'inputString' => 'allotment',
-                'expectedString' => '1',
-            ],
-            [
-                'inputString' => 'stock',
-                'expectedString' => '1',
-            ],
-            [
-                'inputString' => 'on_request',
-                'expectedString' => 'r',
-            ],
-            [
-                'inputString' => 'any-thing-else',
-                'expectedString' => '0',
-            ],
+        yield 'fill-missing-availabilities-with-on-request-type' => [
+            $availabilities,
+            $dateFrom,
+            $dateTo,
+            (function ($test, $result) use ($expectedResult, $availabilities) {
+                $statusArray = array_column(array_diff_key($result, $availabilities), 'AvailabilityStatus', 'Date');
+
+                foreach ($statusArray as $key => $status) {
+                    $this->assertEquals(AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST, $status);
+                    if (!array_key_exists($key, $availabilities)) {
+                        $expectedResult[$key]['AvailabilityStatus'] = AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST;
+                    }
+                }
+
+                $test->assertCount(6, $result);
+                $test->assertCount(3, $statusArray);
+                $test->assertEquals($expectedResult, $result);
+            }),
+            RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST,
+        ];
+
+        yield 'fill-missing-availabilities-with-stock-type' => [
+            $availabilities,
+            $dateFrom,
+            $dateTo,
+            (function ($test, $result) use ($expectedResult, $availabilities) {
+                $statusArray = array_column(array_diff_key($result, $availabilities), 'AvailabilityStatus', 'Date');
+
+                foreach ($statusArray as $key => $status) {
+                    $this->assertEquals(AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE, $status);
+                    if (!array_key_exists($key, $availabilities)) {
+                        $expectedResult[$key]['AvailabilityStatus'] = AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE;
+                    }
+                }
+
+                $test->assertCount(6, $result);
+                $test->assertCount(3, $statusArray);
+                $test->assertEquals($expectedResult, $result);
+            }),
+            RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK,
+        ];
+
+        yield 'fill-missing-availabilities-with-allotment-type' => [
+            $availabilities,
+            $dateFrom,
+            $dateTo,
+            (function ($test, $result) use ($expectedResult, $availabilities) {
+                $statusArray = array_column(array_diff_key($result, $availabilities), 'AvailabilityStatus', 'Date');
+
+                foreach ($statusArray as $key => $status) {
+                    $this->assertEquals(AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE, $status);
+                    if (!array_key_exists($key, $availabilities)) {
+                        $expectedResult[$key]['AvailabilityStatus'] = AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE;
+                    }
+                }
+
+                $test->assertCount(6, $result);
+                $test->assertCount(3, $statusArray);
+                $test->assertEquals($expectedResult, $result);
+            }),
+            RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT,
         ];
     }
 
     /**
      * @dataProvider bookingAvailabilityProvider
      * @covers ::getRealStock
+     * @group test
      */
     public function testGetRoomAvailabilityRealStock(array $availabilities, array $bookingStockDate, callable $asserts)
     {

@@ -12,38 +12,13 @@ class AvailabilityHelper
 {
     private const DEFAULT_DATE_DIFF_VALUE = 0;
 
-    public function convertToShortType(array $stocksList, string $roomStockType): array
-    {
-        $availabilityValues = [];
-        foreach ($stocksList as $stock) {
-            $availabilityValues[] = (0 < (int) $stock) ? $roomStockType : AvailabilityConstants::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
-        }
-
-        return $availabilityValues;
-    }
-
-    public function getRoomStockShortType(string $roomStockType): string
-    {
-        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT === $roomStockType ||
-            RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK === $roomStockType) {
-            return AvailabilityConstants::AVAILABILITY_SHORTEN_INSTANT;
-        }
-
-        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType) {
-            return AvailabilityConstants::AVAILABILITY_SHORTEN_ON_REQUEST;
-        }
-
-        return AvailabilityConstants::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
-    }
-
     public function fillMissingAvailabilitiesForAvailabilityPrice(
         array $availabilities,
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo,
         ?string $roomStockType
     ): array {
-        $isAvailabilityMissing = $this->validateMissingAvailability($availabilities, $dateFrom, $dateTo);
-        if (false === $isAvailabilityMissing) {
+        if (false === $this->validateMissingAvailability($availabilities, $dateFrom, $dateTo)) {
             return $availabilities;
         }
         $returnAvailabilities = [];
@@ -58,7 +33,9 @@ class AvailabilityHelper
                 $returnAvailabilities[$date] = [
                     'Date' => $date,
                     'AvailabilityValue' => 0,
-                    'AvailabilityStatus' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType ? AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST : AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
+                    'AvailabilityStatus' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType ?
+                        AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST :
+                        AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
                     'SellingPrice' => 0.00,
                     'BuyingPrice' => 0.00,
                 ];
@@ -164,9 +141,16 @@ class AvailabilityHelper
         array $bookingDateStock
     ): array {
         foreach ($bookingDateStock as $booking) {
+            $booking['date'] = is_string($booking['date']) ? $booking['date'] :
+                $booking['date']->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
             foreach ($roomAvailabilities as $key => $availability) {
-                if (isset($availability['date'], $availability['stock']) &&
-                    $availability['date'] === $booking['date'] && (
+                if (!isset($availability['date'], $availability['stock'])) {
+                    continue;
+                }
+
+                $availability['date'] = is_string($availability['date']) ? $availability['date'] :
+                    $availability['date']->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+                if ($availability['date'] === $booking['date'] && (
                         (
                             isset($availability['componentGoldenId']) &&
                             $availability['componentGoldenId'] === $booking['componentGoldenId']

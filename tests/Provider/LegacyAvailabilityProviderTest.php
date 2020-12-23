@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Provider;
 
 use App\Cache\QuickDataCache;
+use App\Constants\DateTimeConstants;
 use App\Contract\Response\QuickData\AvailabilityPricePeriodResponse;
 use App\Contract\Response\QuickData\Error\ResponseStatus;
 use App\Contract\Response\QuickData\GetPackageResponse;
@@ -89,49 +90,56 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
     public function testGetAvailabilityForExperience()
     {
         $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-02');
 
         $result = $this->prophesize(GetPackageResponse::class);
 
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $this->serializer->fromArray(Argument::type('array'), Argument::type('string'))->willReturn($result->reveal());
 
-        $returnArray = [
+        $availabilities = [
             [
+                'date' => '20201001',
                 'stock' => '1',
+                'componentGoldenId' => '4321',
+                'isStopSale' => '0',
+                'lastBookableDate' => null,
+                'duration' => 1,
+                'price' => '7500',
                 'experienceGoldenId' => '1',
-                'date' => '2020-10-01',
                 'partnerGoldenId' => '1',
                 'isSellable' => '1',
                 'roomStockType' => 'stock',
-                'duration' => 1,
             ],
             [
+                'date' => '20201002',
                 'stock' => '1',
+                'componentGoldenId' => '4321',
+                'isStopSale' => 0,
+                'lastBookableDate' => null,
+                'price' => '7500',
+                'duration' => 1,
                 'experienceGoldenId' => '1',
-                'date' => '2020-10-02',
                 'partnerGoldenId' => '1',
                 'isSellable' => '1',
                 'roomStockType' => 'stock',
-                'duration' => 1,
             ],
         ];
 
         $this->availabilityProvider->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
-            Argument::any(),
-            Argument::any(),
-            Argument::any()
-        )->willReturn($returnArray);
+            Argument::type('string'),
+            Argument::type(\DateTimeInterface::class),
+            Argument::type(\DateTimeInterface::class)
+        )->willReturn($availabilities);
 
-        $this->availabilityHelper->getRoomStockShortType('stock')->willReturn('1');
         $this->availabilityHelper->fillMissingAvailabilityForGetPackage(
-            Argument::any(),
-            Argument::any(),
-            Argument::any(),
-            Argument::any(),
-            Argument::any(),
-            Argument::any(),
-            Argument::any()
-        )->willReturn($returnArray);
+            Argument::type('array'),
+            Argument::type('string'),
+            Argument::type('int'),
+            Argument::type('string'),
+            Argument::type('bool'),
+            Argument::type(\DateTimeInterface::class),
+            Argument::type(\DateTimeInterface::class)
+        )->willReturn($availabilities);
 
         $this->assertInstanceOf(
             GetPackageResponse::class,
@@ -155,7 +163,7 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $responseStatus->message = 'Resource not found';
         $result->responseStatus = $responseStatus;
 
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result);
+        $this->serializer->fromArray(Argument::type('array'), Argument::type('string'))->willReturn($result);
 
         $this->availabilityProvider
             ->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
@@ -184,28 +192,28 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
     public function testGetAvailabilityForExperienceWithNoAvailabilitiesAndValidComponent()
     {
         $dateFrom = new \DateTime('2020-01-01');
-        $dateTo = new \DateTime('2020-01-01');
+        $dateTo = new \DateTime('2020-01-02');
 
         $result = $this->prophesize(QuickDataErrorResponse::class);
         $this->serializer
-            ->fromArray(Argument::any(), Argument::any())
+            ->fromArray(Argument::type('array'), Argument::type('string'))
             ->willReturn($result->reveal())
             ->shouldBeCalledOnce()
         ;
 
         $this->availabilityProvider
             ->getRoomAndPricesAvailabilitiesByExperienceIdAndDates(
-                Argument::any(),
-                Argument::any(),
-                Argument::any())
+                Argument::type('string'),
+                Argument::type(\DateTimeInterface::class),
+                Argument::type(\DateTimeInterface::class))
             ->willReturn([])
         ;
         $this->availabilityProvider
-            ->getManageableComponentForGetPackage(Argument::any())
+            ->getManageableComponentForGetPackage(Argument::type('string'))
             ->shouldBeCalled()
             ->willReturn(
                 [
-                    0 => [
+                    [
                         'goldenId' => '227914',
                         'duration' => '1',
                         'partnerGoldenId' => '00037411',
@@ -217,13 +225,13 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
 
         $this->availabilityHelper
             ->fillMissingAvailabilityForGetPackage(
-                Argument::any(),
-                Argument::any(),
-                Argument::any(),
-                Argument::any(),
-                Argument::any(),
-                Argument::any(),
-                Argument::any()
+                Argument::type('array'),
+                Argument::type('string'),
+                Argument::type('int'),
+                Argument::type('string'),
+                Argument::type('bool'),
+                Argument::type(\DateTimeInterface::class),
+                Argument::type(\DateTimeInterface::class)
             )->willReturn([]);
 
         $this->assertInstanceOf(
@@ -257,22 +265,29 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         ];
 
         $result = $this->prophesize(GetRangeResponse::class);
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $this->serializer->fromArray(Argument::type('array'), Argument::type('string'))->willReturn($result->reveal());
 
         $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate(
-            Argument::any(),
-            Argument::any(),
-            Argument::any()
+            Argument::type('string'),
+            Argument::type(\DateTimeInterface::class)
         )->willReturn($returnArray);
 
         $expected['PackagesList'] = $returnArray;
 
-        $this->quickDataCache->getBoxDate($boxId, $startDate->format('Y-m-d'))->willThrow(new ResourceNotCachedException());
-        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), Argument::type(GetRangeResponse::class))->shouldBeCalled();
+        $this->quickDataCache->getBoxDate(
+            $boxId,
+            $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        )->willThrow(new ResourceNotCachedException());
+
+        $this->quickDataCache->setBoxDate(
+            $boxId,
+            $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            Argument::type(GetRangeResponse::class)
+        )->shouldBeCalled();
 
         $this
             ->eventDispatcher
-            ->dispatch(new BoxCacheMissEvent($boxId, $startDate->format('Y-m-d')))
+            ->dispatch(new BoxCacheMissEvent($boxId, $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT)))
             ->willReturn(new \stdClass())
             ->shouldBeCalled();
 
@@ -281,7 +296,11 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $result = $this->legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $startDate);
 
         $this->assertInstanceOf(GetRangeResponse::class, $result);
-        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), $result)->shouldHaveBeenCalled();
+        $this->quickDataCache->setBoxDate(
+            $boxId,
+            $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $result
+        )->shouldHaveBeenCalled();
     }
 
     /**
@@ -296,11 +315,14 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $cacheResult = new GetRangeResponse();
         $cacheResult->packagesList = ['1234'];
 
-        $this->quickDataCache->getBoxDate($boxId, $startDate->format('Y-m-d'))->willReturn($cacheResult);
+        $this->quickDataCache->getBoxDate(
+            $boxId,
+            $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        )->willReturn($cacheResult);
 
         $this
             ->eventDispatcher
-            ->dispatch(new BoxCacheHitEvent($boxId, $startDate->format('Y-m-d')))
+            ->dispatch(new BoxCacheHitEvent($boxId, $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT)))
             ->shouldBeCalled();
 
         $result = $this->legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $startDate);
@@ -320,24 +342,41 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $returnArray = [];
 
         $result = $this->prophesize(GetRangeResponse::class);
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $this->serializer->fromArray(Argument::type('array'), Argument::type('string'))->willReturn($result->reveal());
 
         $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate(
-            Argument::any(),
-            Argument::any(),
-            Argument::any()
+            Argument::type('string'),
+            Argument::type(\DateTimeInterface::class)
         )->willReturn($returnArray);
 
         $expected['PackagesList'] = [];
-        $this->quickDataCache->getBoxDate($boxId, $startDate->format('Y-m-d'))->willThrow(new ResourceNotCachedException());
-        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), Argument::type(GetRangeResponse::class))->shouldBeCalled();
-        $this->eventDispatcher->dispatch(new BoxCacheMissEvent($boxId, $startDate->format('Y-m-d')))->shouldBeCalled();
+        $this->quickDataCache->getBoxDate(
+            $boxId,
+            $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        )->willThrow(new ResourceNotCachedException());
+
+        $this->quickDataCache->setBoxDate(
+            $boxId,
+            $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            Argument::type(GetRangeResponse::class)
+        )->shouldBeCalled();
+
+        $this->eventDispatcher->dispatch(
+            new BoxCacheMissEvent(
+                $boxId,
+                $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+            )
+        )->shouldBeCalled();
 
         $this->availabilityHelper->buildDataForGetRange($returnArray)->willReturn([]);
 
         $result = $this->legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $startDate);
         $this->assertInstanceOf(GetRangeResponse::class, $result);
-        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), $result)->shouldHaveBeenCalled();
+        $this->quickDataCache->setBoxDate(
+            $boxId,
+            $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $result
+        )->shouldHaveBeenCalled();
     }
 
     /**
@@ -352,24 +391,42 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $returnArray = [];
 
         $result = $this->prophesize(GetRangeResponse::class);
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $this->serializer->fromArray(Argument::type('array'), Argument::type('string'))->willReturn($result->reveal());
 
         $this->availabilityProvider->getRoomAvailabilitiesByBoxIdAndStartDate(
-            Argument::any(),
-            Argument::any(),
-            Argument::any()
+            Argument::type('string'),
+            Argument::type(\DateTimeInterface::class)
         )->willReturn($returnArray);
 
         $expected['PackagesList'] = [];
         $exception = new \Exception();
-        $this->quickDataCache->getBoxDate($boxId, $startDate->format('Y-m-d'))->willThrow($exception);
-        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), Argument::type(GetRangeResponse::class))->shouldBeCalled();
-        $this->eventDispatcher->dispatch(new BoxCacheErrorEvent($boxId, $startDate->format('Y-m-d'), $exception))->shouldBeCalled();
+        $this->quickDataCache->getBoxDate(
+            $boxId,
+            $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
+        )->willThrow($exception);
+
+        $this->quickDataCache->setBoxDate(
+            $boxId,
+            $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            Argument::type(GetRangeResponse::class)
+        )->shouldBeCalled();
+
+        $this->eventDispatcher->dispatch(
+            new BoxCacheErrorEvent(
+                $boxId,
+                $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                $exception)
+        )->shouldBeCalled();
+
         $this->availabilityHelper->buildDataForGetRange($returnArray)->willReturn($returnArray);
 
         $result = $this->legacyAvailabilityProvider->getAvailabilitiesForBoxAndStartDate($boxId, $startDate);
         $this->assertInstanceOf(GetRangeResponse::class, $result);
-        $this->quickDataCache->setBoxDate($boxId, $startDate->format('Y-m-d'), $result)->shouldHaveBeenCalled();
+        $this->quickDataCache->setBoxDate(
+            $boxId,
+            $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+            $result
+        )->shouldHaveBeenCalled();
     }
 
     /**
@@ -382,7 +439,7 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $startDate = new \DateTime('2020-01-01');
 
         $result = $this->prophesize(GetPackageV2Response::class);
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $this->serializer->fromArray(Argument::type('array'), Argument::type('string'))->willReturn($result->reveal());
 
         $returnArray = [
             '4444' => [
@@ -423,11 +480,12 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList($experienceIds, $startDate)
             ->willReturn($returnArray);
         $this->availabilityHelper->buildDataForGetPackage(
-            Argument::any(),
-            Argument::any(),
-            Argument::any(),
-            Argument::any()
+            Argument::type('array'),
+            Argument::type('int'),
+            Argument::type('string'),
+            Argument::type('bool')
         )->willReturn($returnArray);
+
         $response = $this->legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $startDate);
 
         $this->assertInstanceOf(GetPackageV2Response::class, $response);
@@ -443,12 +501,18 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-05');
 
-        $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList(Argument::any(), Argument::any(), Argument::any())
-            ->willThrow(new \Exception());
-        $result = $this->prophesize(GetPackageV2Response::class);
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $this->availabilityProvider->getRoomAvailabilitiesByExperienceIdsList(
+            Argument::type('array'), Argument::type(\DateTimeInterface::class)
+        )->willThrow(new \Exception());
 
-        $response = $this->legacyAvailabilityProvider->getAvailabilityForMultipleExperiences($experienceIds, $dateFrom, $dateTo);
+        $result = $this->prophesize(GetPackageV2Response::class);
+        $this->serializer->fromArray(Argument::type('array'), Argument::type('string'))->willReturn($result->reveal());
+
+        $response = $this->legacyAvailabilityProvider->getAvailabilityForMultipleExperiences(
+            $experienceIds,
+            $dateFrom,
+            $dateTo
+        );
 
         $this->assertInstanceOf(GetPackageV2Response::class, $response);
     }
@@ -462,10 +526,10 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-02');
         $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $this->serializer->fromArray(Argument::type('array'), Argument::type('string'))->willReturn($result->reveal());
 
         $returnArray = [
-            0 => [
+            [
                 'date' => '2020-06-20T00:00:00.000000',
                 'stock' => '1',
                 'roomStockType' => 'stock',
@@ -474,7 +538,7 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
                 'price' => '86.45',
                 'lastBookableDate' => null,
             ],
-            1 => [
+            [
                 'date' => '2020-06-21T00:00:00.000000',
                 'stock' => '1',
                 'roomStockType' => 'stock',
@@ -483,7 +547,7 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
                 'price' => '86.45',
                 'lastBookableDate' => '2020-06-20T00:00:00.000000',
             ],
-            1 => [
+            [
                 'date' => '2020-06-21T00:00:00.000000',
                 'stock' => '1',
                 'roomStockType' => 'stock',
@@ -498,19 +562,20 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
             ->getRoomAndPricesAvailabilitiesByExperienceIdAndDates('1234', $dateFrom, $dateTo)
             ->willReturn($returnArray);
         $this->availabilityProvider->getManageableComponentForGetPackage('1234')->shouldNotBeCalled();
+
         $this->availabilityHelper
             ->fillMissingAvailabilitiesForAvailabilityPrice(
-                Argument::any(),
+                Argument::type('array'),
                 $dateFrom,
                 $dateTo,
-                Argument::any()
+                null
             )->willReturn($returnArray);
 
         $this->availabilityHelper
             ->convertAvailabilityTypeToExplicitQuickdataValue(
-                Argument::any(),
-                Argument::any(),
-                Argument::any()
+                Argument::type('string'),
+                Argument::type('int'),
+                Argument::type('string')
             )->willReturn('stock');
 
         $this->assertInstanceOf(
@@ -528,25 +593,26 @@ class LegacyAvailabilityProviderTest extends ProphecyTestCase
         $dateFrom = new \DateTime('2020-01-01');
         $dateTo = new \DateTime('2020-01-02');
         $result = $this->prophesize(AvailabilityPricePeriodResponse::class);
-        $this->serializer->fromArray(Argument::any(), Argument::any())->willReturn($result->reveal());
+        $this->serializer->fromArray(Argument::type('array'), Argument::type('string'))->willReturn($result->reveal());
 
         $this->availabilityProvider
             ->getRoomAndPricesAvailabilitiesByExperienceIdAndDates('1234', $dateFrom, $dateTo)
             ->willReturn([]);
-        $this->availabilityProvider->getManageableComponentForGetPackage('1234')->willReturn([0 => ['roomStockType' => 'on_request']]);
+        $this->availabilityProvider->getManageableComponentForGetPackage('1234')
+            ->willReturn([['roomStockType' => 'on_request']]);
         $this->availabilityHelper
             ->fillMissingAvailabilitiesForAvailabilityPrice(
-                Argument::any(),
+                Argument::type('array'),
                 $dateFrom,
                 $dateTo,
-                Argument::any()
+                Argument::type('string')
             )->willReturn([]);
 
         $this->availabilityHelper
             ->convertAvailabilityTypeToExplicitQuickdataValue(
-                Argument::any(),
-                Argument::any(),
-                Argument::any()
+                Argument::type('string'),
+                Argument::type('int'),
+                Argument::type('string')
             )->willReturn('stock');
 
         $this->assertInstanceOf(

@@ -136,7 +136,7 @@ class BookingAvailabilitySubscriberTest extends ProphecyTestCase
                     ->updateStockBookingConfirmation(Argument::type(Booking::class))
                     ->shouldBeCalledOnce()
                     ->willThrow(ExperienceNotFoundException::class);
-                $test->logger->warning(Argument::any(), Argument::any())->shouldBeCalled();
+                $test->logger->warning(Argument::type('string'), Argument::type('array'))->shouldBeCalled();
             }),
         ];
     }

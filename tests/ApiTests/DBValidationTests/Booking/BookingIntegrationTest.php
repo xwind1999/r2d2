@@ -15,14 +15,19 @@ use App\Tests\ApiTests\IntegrationTestCase;
  */
 class BookingIntegrationTest extends IntegrationTestCase
 {
-    private const BOX_GOLDEN_ID = '1796';
-    private const EXPERIENCE_GOLDEN_ID = '59593';
+    public const BOX_GOLDEN_ID = '1796';
+    public const EXPERIENCE_GOLDEN_ID = '59593';
 
     private $entityManager;
     private \DateTime $startDate;
     private string $componentGoldenId;
     private string $componentGoldenIdWithDurationTwo;
+    private array $payload;
 
+    /**
+     * @throws \Exception
+     * @beforeClass
+     */
     public function setup(): void
     {
         $this->componentGoldenId = '213072';
@@ -32,7 +37,17 @@ class BookingIntegrationTest extends IntegrationTestCase
         $this->cleanUpBooking();
         $this->prepareExperience();
         $this->startDate = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
-        $this->fulfillAvailability($this->defaultPayload());
+        $this->payload = self::$bookingHelper->defaultPayload();
+        $this->fulfillAvailability($this->payload);
+    }
+
+    private function cleanUpBooking()
+    {
+        self::$bookingHelper->cleanUpBooking(
+            [$this->componentGoldenId, $this->componentGoldenIdWithDurationTwo],
+            [self::EXPERIENCE_GOLDEN_ID],
+            $this->entityManager
+        );
     }
 
     public function tearDown(): void
@@ -44,23 +59,9 @@ class BookingIntegrationTest extends IntegrationTestCase
     /**
      * @beforeClass
      */
-    public function cleanUpBooking(): void
-    {
-        $this->entityManager->getConnection()->executeStatement('SET foreign_key_checks = 0');
-        $this->entityManager->getConnection()
-            ->executeStatement("DELETE FROM r2d2.booking_date WHERE component_golden_id IN ('".$this->componentGoldenId."', '".$this->componentGoldenIdWithDurationTwo."')");
-        $this->entityManager->getConnection()
-            ->executeStatement('DELETE FROM r2d2.booking WHERE experience_golden_id = \''.self::EXPERIENCE_GOLDEN_ID.'\'');
-        $this->entityManager->getConnection()->executeStatement('SET foreign_key_checks = 1')
-        ;
-    }
-
-    /**
-     * @beforeClass
-     */
     private function fulfillAvailability(array $payload = [])
     {
-        $payload = $this->defaultPayload($payload);
+        $payload = self::$bookingHelper->defaultPayload($payload);
         $this->entityManager
             ->getConnection()
             ->executeStatement("UPDATE room_availability SET stock = 50 
@@ -80,56 +81,16 @@ class BookingIntegrationTest extends IntegrationTestCase
 
     private function setUnavailability(array $payload = [])
     {
-        $payload = $this->defaultPayload($payload);
+        $payload = self::$bookingHelper->defaultPayload($payload);
         $this->entityManager->getConnection()
             ->executeStatement("UPDATE room_availability SET stock = 0 WHERE component_golden_id IN ('".$this->componentGoldenId."', '".$this->componentGoldenIdWithDurationTwo."')
                 AND date = '".$payload['startDate']."'")
         ;
     }
 
-    public function defaultPayload(array $overrides = []): array
-    {
-        return $overrides +
-            [
-                'bookingId' => bin2hex(random_bytes(8)),
-                'box' => self::BOX_GOLDEN_ID,
-                'experience' => [
-                    'id' => self::EXPERIENCE_GOLDEN_ID,
-                    'components' => [
-                        'Three night stay',
-                    ],
-                ],
-                'currency' => 'EUR',
-                'voucher' => '198257918',
-                'startDate' => (clone $this->startDate)->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'endDate' => (clone $this->startDate)->modify('+1 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'customerComment' => 'Clean sheets please',
-                'guests' => [
-                    [
-                        'firstName' => 'Hermano',
-                        'lastName' => 'Guido',
-                        'email' => 'maradona@worldcup.ar',
-                        'phone' => '123 123 123',
-                    ],
-                ],
-                'rooms' => [
-                    [
-                        'extraRoom' => false,
-                        'dates' => [
-                            [
-                                'day' => (clone $this->startDate)->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                                'price' => 0,
-                                'extraNight' => false,
-                            ],
-                        ],
-                    ],
-                ],
-            ];
-    }
-
     public function testBookingCreateUnavailableDatesException()
     {
-        $payload = $this->defaultPayload();
+        $payload = self::$bookingHelper->defaultPayload();
         $this->setUnavailability();
 
         $payload['rooms'] = [
@@ -158,7 +119,7 @@ class BookingIntegrationTest extends IntegrationTestCase
     public function testCreateDuplicateBooking()
     {
         $this->fulfillAvailability();
-        $payload = $this->defaultPayload();
+        $payload = self::$bookingHelper->defaultPayload();
         $payload['bookingId'] = bin2hex(random_bytes(8));
 
         $response = self::$bookingHelper->create($payload);
@@ -208,9 +169,12 @@ class BookingIntegrationTest extends IntegrationTestCase
 
     public function defaultDataForCreate(): iterable
     {
+        self::setUpBeforeClass();
         $this->startDate = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
+        $payload = self::$bookingHelper->defaultPayload();
+
         yield 'happy-path' => [
-            $this->defaultPayload(),
+            $payload,
             function (
                 BookingIntegrationTest $test,
                 $response,
@@ -235,26 +199,28 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'happy-path-with-extra-night' => [
-            $this->defaultPayload([
-                'endDate' => (clone $this->startDate)->modify('+2 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'rooms' => [
-                    [
-                        'extraRoom' => false,
-                        'dates' => [
-                            [
-                                'day' => (clone $this->startDate)->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                                'price' => 0,
-                                'extraNight' => false,
-                            ],
-                            [
-                                'day' => (clone $this->startDate)->modify('+1 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                                'price' => 5500,
-                                'extraNight' => true,
+            (function ($payload) {
+                $payload['endDate'] = (clone $this->startDate)->modify('+2 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+                $payload['rooms'] = [
+                        [
+                            'extraRoom' => false,
+                            'dates' => [
+                                [
+                                    'day' => (clone $this->startDate)->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                                    'price' => 0,
+                                    'extraNight' => false,
+                                ],
+                                [
+                                    'day' => (clone $this->startDate)->modify('+1 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
+                                    'price' => 5500,
+                                    'extraNight' => true,
+                                ],
                             ],
                         ],
-                    ],
-                ],
-            ]),
+                    ];
+
+                return $payload;
+            })($payload),
             function (
                 BookingIntegrationTest $test,
                 $response,
@@ -279,8 +245,9 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'happy-path-with-extra-room' => [
-            $this->defaultPayload([
-                'rooms' => [
+            (function ($payload) {
+                $payload['rooms'] =
+                [
                     [
                         'extraRoom' => false,
                         'dates' => [
@@ -301,8 +268,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (
                 BookingIntegrationTest $test,
                 $response,
@@ -327,9 +296,12 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'happy-path-with-extra-night-and-extra-room' => [
-            $this->defaultPayload([
-                'endDate' => (clone $this->startDate)->modify('+2 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'rooms' => [
+            (function ($payload) {
+                $payload['endDate'] = (clone $this->startDate)
+                    ->modify('+2 days')
+                    ->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+
+                $payload['rooms'] = [
                     [
                         'extraRoom' => false,
                         'dates' => [
@@ -360,8 +332,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (
                 BookingIntegrationTest $test,
                 $response,
@@ -386,8 +360,8 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'date-not-in-range' => [
-            $this->defaultPayload([
-                'rooms' => [
+            (function ($payload) {
+                $payload['rooms'] = [
                     [
                         'extraRoom' => false,
                         'dates' => [
@@ -398,8 +372,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Date out of range","code":1300002}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
@@ -412,8 +388,8 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'bad-price' => [
-            $this->defaultPayload([
-                'rooms' => [
+            (function ($payload) {
+                $payload['rooms'] = [
                     [
                         'extraRoom' => true,
                         'dates' => [
@@ -429,8 +405,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Bad price","code":1300001}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
@@ -443,8 +421,8 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'extra-night-dates-greatest-than-minimum-duration' => [
-            $this->defaultPayload([
-                'rooms' => [
+            (function ($payload) {
+                $payload['rooms'] = [
                     [
                         'extraRoom' => false,
                         'dates' => [
@@ -470,8 +448,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Date out of range","code":1300002}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
@@ -484,9 +464,12 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'numbers-of-nights-with-price-0-greatest-than-duration' => [
-            $this->defaultPayload([
-                'endDate' => (clone $this->startDate)->modify('+2 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'rooms' => [
+            (function ($payload) {
+                $payload['endDate'] = (clone $this->startDate)
+                    ->modify('+2 days')
+                    ->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+
+                $payload['rooms'] = [
                     [
                         'extraRoom' => false,
                         'dates' => [
@@ -517,8 +500,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Bad price","code":1300001}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
@@ -531,9 +516,12 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'dates-past-the-minimum-booking-duration-should-have-extra-night=true' => [
-            $this->defaultPayload([
-                'endDate' => (clone $this->startDate)->modify('+3 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'rooms' => [
+            (function ($payload) {
+                $payload['endDate'] = (clone $this->startDate)
+                    ->modify('+3 days')
+                    ->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+
+                $payload['rooms'] = [
                     [
                         'extraRoom' => false,
                         'dates' => [
@@ -554,8 +542,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (
                 BookingIntegrationTest $test,
                 $response,
@@ -580,9 +570,12 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'more-than-one-extra-room-false' => [
-            $this->defaultPayload([
-                'endDate' => (clone $this->startDate)->modify('+2 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'rooms' => [
+            (function ($payload) {
+                $payload['endDate'] = (clone $this->startDate)
+                    ->modify('+2 days')
+                    ->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+
+                $payload['rooms'] = [
                     [
                         'extraRoom' => false,
                         'dates' => [
@@ -613,8 +606,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"No included room found","code":1300007}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
@@ -627,9 +622,12 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'rooms-with-different-duration' => [
-            $this->defaultPayload([
-                'endDate' => (clone $this->startDate)->modify('+2 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'rooms' => [
+            (function ($payload) {
+                $payload['endDate'] = (clone $this->startDate)
+                    ->modify('+2 days')
+                    ->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+
+                $payload['rooms'] = [
                     [
                         'extraRoom' => false,
                         'dates' => [
@@ -655,8 +653,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Rooms dont have same duration","code":1300004}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
@@ -669,9 +669,12 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'rooms-with-same-date' => [
-            $this->defaultPayload([
-                'endDate' => (clone $this->startDate)->modify('+2 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'rooms' => [
+            (function ($payload) {
+                $payload['endDate'] = (clone $this->startDate)
+                    ->modify('+2 days')
+                    ->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+
+                $payload['rooms'] = [
                     [
                         'extraRoom' => true,
                         'dates' => [
@@ -687,8 +690,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Duplicated dates for same room","code":1300008}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
@@ -701,9 +706,12 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'unallocated-date' => [
-            $this->defaultPayload([
-                'endDate' => (clone $this->startDate)->modify('+3 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'rooms' => [
+            (function ($payload) {
+                $payload['endDate'] = (clone $this->startDate)
+                    ->modify('+3 days')
+                    ->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+
+                $payload['rooms'] = [
                     [
                         'extraRoom' => false,
                         'dates' => [
@@ -719,8 +727,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Unallocated date","code":1300003}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
@@ -733,9 +743,12 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'invalid-extra-night' => [
-            $this->defaultPayload([
-                'endDate' => (clone $this->startDate)->modify('+3 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'rooms' => [
+            (function ($payload) {
+                $payload['endDate'] = (clone $this->startDate)
+                    ->modify('+3 days')
+                    ->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+
+                $payload['rooms'] = [
                     [
                         'extraRoom' => false,
                         'dates' => [
@@ -756,8 +769,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals('{"error":{"message":"Invalid extra night","code":1300005}}', $response->getContent());
                 $test->assertEquals(422, $response->getStatusCode());
@@ -770,7 +785,7 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'experience-without-price-and-currency' => [
-            $this->defaultPayload(),
+            self::$bookingHelper->defaultPayload(),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals(
                     '{"error":{"message":"Misconfigured experience price","code":1300006}}',
@@ -793,10 +808,16 @@ class BookingIntegrationTest extends IntegrationTestCase
         ];
 
         yield 'availability-with-stop-sale-date' => [
-            $this->defaultPayload([
-                'startDate' => (clone $this->startDate)->modify('+12 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'endDate' => (clone $this->startDate)->modify('+15 days')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
-                'rooms' => [
+            (function ($payload) {
+                $payload['startDate'] = (clone $this->startDate)
+                    ->modify('+12 days')
+                    ->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+
+                $payload['endDate'] = (clone $this->startDate)
+                    ->modify('+15 days')
+                    ->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
+
+                $payload['rooms'] = [
                     [
                         'extraRoom' => false,
                         'dates' => [
@@ -817,8 +838,10 @@ class BookingIntegrationTest extends IntegrationTestCase
                             ],
                         ],
                     ],
-                ],
-            ]),
+                ];
+
+                return $payload;
+            })($payload),
             function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
                 $test->assertEquals(
                     '{"error":{"message":"Unavailable date for booking","code":1300016}}',
@@ -848,7 +871,7 @@ class BookingIntegrationTest extends IntegrationTestCase
      */
     public function testUpdate(array $updatePayload, callable $asserts)
     {
-        $payload = $this->defaultPayload();
+        $payload = self::$bookingHelper->defaultPayload();
         $this->fulfillAvailability();
 
         $availabilityBeforeBookingComplete = $this->entityManager->getRepository(RoomAvailability::class)
@@ -959,7 +982,7 @@ class BookingIntegrationTest extends IntegrationTestCase
     public function testUpdateBookingAlreadyExpired(array $updatePayload, callable $asserts, bool $haveAvailability = true)
     {
         $this->fulfillAvailability();
-        $payload = $this->defaultPayload();
+        $payload = self::$bookingHelper->defaultPayload();
         $responseCreate = self::$bookingHelper->create($payload);
 
         $this->assertEquals(201, $responseCreate->getStatusCode());
@@ -1014,7 +1037,7 @@ class BookingIntegrationTest extends IntegrationTestCase
 
     public function testUpdateToSameStatusWillFail()
     {
-        $payload = $this->defaultPayload();
+        $payload = self::$bookingHelper->defaultPayload();
         $this->fulfillAvailability();
 
         $availabilityBeforeComplete = $this->entityManager->getRepository(RoomAvailability::class)

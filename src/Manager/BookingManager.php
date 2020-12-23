@@ -207,10 +207,10 @@ class BookingManager
                 }
 
                 // validating #8
-                if (isset($roomDates[$date->day->format('Y-m-d')])) {
+                if (isset($roomDates[$date->day->format(DateTimeConstants::DEFAULT_DATE_FORMAT)])) {
                     throw new DuplicatedDatesForSameRoomException();
                 }
-                $roomDates[$date->day->format('Y-m-d')] = 1;
+                $roomDates[$date->day->format(DateTimeConstants::DEFAULT_DATE_FORMAT)] = 1;
 
                 $price = $date->price;
                 if (0 === $price) {
@@ -227,7 +227,7 @@ class BookingManager
                     throw new InvalidExtraNightException();
                 }
 
-                $day = $date->day->format('Y-m-d');
+                $day = $date->day->format(DateTimeConstants::DEFAULT_DATE_FORMAT);
 
                 // validation #9
                 if ($isDifferentCurrency && (true === $date->extraNight || true === $room->extraRoom)) {
