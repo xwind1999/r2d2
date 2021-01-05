@@ -14,9 +14,9 @@ use App\Exception\Repository\ComponentNotFoundException;
 use App\Exception\Repository\ManageableProductNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method null|Component find($id, $lockMode = null, $lockVersion = null)

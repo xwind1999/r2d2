@@ -10,9 +10,9 @@ use App\Entity\Booking;
 use App\Entity\BookingDate;
 use App\Exception\Repository\BookingDateNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method BookingDate[]    findAll()

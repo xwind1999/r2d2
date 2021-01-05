@@ -274,6 +274,6 @@ class RoomAvailabilityManager
 
     private function canRoomAvailabilityBeDeleted(RoomAvailabilityRequest $roomAvailabilityRequest): bool
     {
-        return 0 === (int) $roomAvailabilityRequest->quantity && false === (bool) $roomAvailabilityRequest->isStopSale;
+        return 0 === $roomAvailabilityRequest->quantity && false === $roomAvailabilityRequest->isStopSale;
     }
 }

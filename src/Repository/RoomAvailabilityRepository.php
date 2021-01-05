@@ -12,10 +12,10 @@ use App\Entity\Component;
 use App\Entity\RoomAvailability;
 use App\Exception\Repository\RoomAvailabilityNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDO\Statement;
 use Doctrine\ORM\Query\QueryException;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method null|RoomAvailability find($id, $lockMode = null, $lockVersion = null)

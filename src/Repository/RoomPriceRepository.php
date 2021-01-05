@@ -9,7 +9,7 @@ use App\Entity\Component;
 use App\Entity\RoomPrice;
 use App\Exception\Repository\RoomPriceNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method RoomPrice[]    findAll()

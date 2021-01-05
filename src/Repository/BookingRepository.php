@@ -7,7 +7,7 @@ namespace App\Repository;
 use App\Entity\Booking;
 use App\Exception\Repository\BookingNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Booking[]    findAll()

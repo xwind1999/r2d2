@@ -7,7 +7,7 @@ namespace App\Repository;
 use App\Entity\Partner;
 use App\Exception\Repository\PartnerNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method null|Partner find($id, $lockMode = null, $lockVersion = null)

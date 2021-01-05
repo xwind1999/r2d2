@@ -25,7 +25,7 @@ class InvalidRoomAvailabilityCleanupHandler implements MessageHandlerInterface
 
     public function __invoke(InvalidAvailabilityCleanup $invalidAvailabilityCleanup): void
     {
-        if ((int) $this->roomAvailabilityRepository->cleanupInvalid() > 0) {
+        if ($this->roomAvailabilityRepository->cleanupInvalid() > 0) {
             $this->messageBus->dispatch($invalidAvailabilityCleanup);
         }
     }
