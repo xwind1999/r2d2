@@ -9,7 +9,7 @@ use App\Entity\BoxExperience;
 use App\Entity\Experience;
 use App\Exception\Repository\BoxExperienceRelationshipNotFoundException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method null|BoxExperience find($id, $lockMode = null, $lockVersion = null)

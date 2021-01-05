@@ -32,7 +32,7 @@ class RetryCustomStrategy implements RetryStrategyInterface
         if ($throwable instanceof HandlerFailedException) {
             $exceptions = $throwable->getNestedExceptions();
             foreach ($exceptions as $exception) {
-                if (in_array(UnrecoverableExceptionInterface::class, class_implements($exception), true)) {
+                if (in_array(UnrecoverableExceptionInterface::class, class_implements($exception) ?: [], true)) {
                     $this->logger->error($exception->getMessage(), ['context' => $message->getMessage()]);
 
                     return false;

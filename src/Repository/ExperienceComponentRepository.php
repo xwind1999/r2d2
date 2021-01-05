@@ -8,7 +8,7 @@ use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method null|ExperienceComponent find($id, $lockMode = null, $lockVersion = null)

@@ -54,6 +54,8 @@
         <UnresolvableInclude errorLevel="info" />
 
         <RawObjectIteration errorLevel="info" />
+        <LessSpecificImplementedReturnType errorLevel="info" />
+
 
         <UndefinedDocblockClass errorLevel="info" />
     </issueHandlers>

@@ -6,8 +6,8 @@ namespace App\Repository\Flat;
 
 use App\Entity\Flat\FlatManageableComponent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
 
 class FlatManageableComponentRepository extends ServiceEntityRepository
 {
