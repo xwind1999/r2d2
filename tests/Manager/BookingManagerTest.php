@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Constraint\AvailabilityTypeConstraint;
 use App\Constraint\BookingChannelConstraint;
 use App\Constraint\BookingStatusConstraint;
 use App\Constraint\RoomStockTypeConstraint;
@@ -1464,6 +1465,80 @@ class BookingManagerTest extends ProphecyTestCase
                     Argument::type(\DateTimeInterface::class),
                     Argument::type(\DateTimeInterface::class)
                 )->shouldBeCalled();
+            },
+        ];
+
+        yield 'booking with instant availability_type' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingCreateRequest->rooms = [$room];
+                $bookingCreateRequest->availabilityType = AvailabilityTypeConstraint::AVAILABILITY_TYPE_INSTANT;
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
+                    Argument::type('string'),
+                    Argument::type(\DateTimeInterface::class),
+                    Argument::type(\DateTimeInterface::class)
+                )->shouldBeCalledOnce();
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(500, $booking->totalPrice);
+                $test->assertCount(1, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
+        yield 'booking with invalid availability_type' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingCreateRequest->rooms = [$room];
+                $bookingCreateRequest->availabilityType = 'absolutely_not_valid';
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
+                    Argument::type('string'),
+                    Argument::type(\DateTimeInterface::class),
+                    Argument::type(\DateTimeInterface::class)
+                )->shouldBeCalledOnce();
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(500, $booking->totalPrice);
+                $test->assertCount(1, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
             },
         ];
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Constants\DateTimeConstants;
+use App\Constraint\AvailabilityTypeConstraint;
 use App\Constraint\BookingChannelConstraint;
 use App\Constraint\BookingStatusConstraint;
 use App\Constraint\ProductDurationUnitConstraint;
@@ -151,6 +152,12 @@ class BookingManager
         $totalPrice = 0;
         $includedDaysCount = 0;
         $includedLastDate = (clone $booking->startDate)->modify(sprintf('+%s days', $minimumDuration - 1));
+
+        if (isset($bookingCreateRequest->availabilityType) &&
+            AvailabilityTypeConstraint::isValid($bookingCreateRequest->availabilityType)
+        ) {
+            $booking->availabilityType = $bookingCreateRequest->availabilityType;
+        }
 
         $bookedDates = [];
         /*
