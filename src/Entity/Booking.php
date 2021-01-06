@@ -139,6 +139,11 @@ class Booking
      */
     public ?string $lastStatusChannel = null;
 
+    /**
+     * @ORM\Column(name="availability_type", type="string", nullable=true, length=10)
+     */
+    public ?string $availabilityType = null;
+
     public function __construct()
     {
         $this->guest = new ArrayCollection();

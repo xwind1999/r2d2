@@ -98,6 +98,16 @@ class BookingCreateRequest implements RequestBodyInterface, ValidatableRequest
     public ?string $customerComment = null;
 
     /**
+     * @Assert\Type(type="string")
+     * @Assert\Choice(choices=\App\Constraint\AvailabilityTypeConstraint::VALID_VALUES)
+     *
+     * @JMS\Type("string")
+     *
+     * @OA\Property(example="instant")
+     */
+    public ?string $availabilityType = null;
+
+    /**
      * @Assert\Type(type="array")
      * @Assert\NotBlank
      * @Assert\Valid
