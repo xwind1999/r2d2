@@ -43,4 +43,13 @@ class BookingUpdateRequest implements RequestBodyInterface, ValidatableRequest
      * @OA\Property(example="complete")
      */
     public string $status;
+
+    /**
+     * @Assert\Type(type="string")
+     * @Assert\Choice(callback={"\App\Constraint\BookingChannelConstraint","getValidValues"})
+     * @JMS\Type("string")
+     *
+     * @OA\Property(example="jarvis-booking")
+     */
+    public ?string $lastStatusChannel = null;
 }

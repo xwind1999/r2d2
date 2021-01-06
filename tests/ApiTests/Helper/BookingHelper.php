@@ -109,4 +109,18 @@ class BookingHelper
 
         $entityManager->getConnection()->executeStatement('SET foreign_key_checks = 1');
     }
+
+    public function fulfillAvailability(
+        array $componentIdList,
+        EntityManager $entityManager,
+        array $payload = []
+    ): void {
+        $payload = $this->defaultPayload($payload);
+        $entityManager
+            ->getConnection()
+            ->executeStatement("UPDATE room_availability SET stock = 50 
+                    WHERE component_golden_id IN ('".implode("','", $componentIdList)."')
+                     AND date BETWEEN '".$payload['startDate']."' AND '".$payload['endDate']."'")
+        ;
+    }
 }

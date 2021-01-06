@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\EventSubscriber;
+namespace App\Tests\EventSubscriber\Booking;
 
 use App\Constraint\BookingStatusConstraint;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
-use App\Event\BookingStatusEvent;
-use App\EventSubscriber\BookingAvailabilitySubscriber;
+use App\Event\Booking\BookingStatusEvent;
+use App\EventSubscriber\Booking\BookingAvailabilitySubscriber;
 use App\Exception\Repository\ExperienceNotFoundException;
 use App\Manager\RoomAvailabilityManager;
 use App\Tests\ProphecyTestCase;
@@ -18,7 +18,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 
 /**
- * @coversDefaultClass \App\EventSubscriber\BookingAvailabilitySubscriber
+ * @coversDefaultClass \App\EventSubscriber\Booking\BookingAvailabilitySubscriber
  * @group booking-availability
  */
 class BookingAvailabilitySubscriberTest extends ProphecyTestCase

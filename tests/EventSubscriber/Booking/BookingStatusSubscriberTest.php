@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\EventSubscriber;
+namespace App\Tests\EventSubscriber\Booking;
 
 use App\Constraint\BookingStatusConstraint;
 use App\Entity\Booking;
@@ -14,8 +14,8 @@ use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
 use App\Entity\Guest;
 use App\Entity\Partner;
-use App\Event\BookingStatusEvent;
-use App\EventSubscriber\BookingStatusSubscriber;
+use App\Event\Booking\BookingStatusEvent;
+use App\EventSubscriber\Booking\BookingStatusSubscriber;
 use App\Tests\ProphecyTestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Prophecy\Argument;
@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
- * @coversDefaultClass \App\EventSubscriber\BookingStatusSubscriber
+ * @coversDefaultClass \App\EventSubscriber\Booking\BookingStatusSubscriber
  */
 class BookingStatusSubscriberTest extends ProphecyTestCase
 {

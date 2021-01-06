@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Event;
+namespace App\Event\Booking;
 
 use App\Entity\Booking;
 use Symfony\Contracts\EventDispatcher\Event;
