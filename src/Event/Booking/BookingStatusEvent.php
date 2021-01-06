@@ -9,10 +9,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class BookingStatusEvent extends Event
 {
-    public const LOG_MESSAGE_BOOKING_STATUS_CREATED = 'Booking has been created';
-    public const LOG_MESSAGE_BOOKING_STATUS_COMPLETED = 'Booking has been completed';
-    public const LOG_MESSAGE_BOOKING_STATUS_CANCELLED = 'Booking has been cancelled';
-    public const LOG_MESSAGE_BOOKING_STATUS_EXPIRED = 'Booking has been expired';
+    public const CREATED_BOOKING_LOG_MESSAGE = 'Booking has been created';
+    public const COMPLETED_BOOKING_LOG_MESSAGE = 'Booking has been completed';
+    public const CANCELLED_BOOKING_LOG_MESSAGE = 'Booking has been cancelled';
+    public const EXPIRED_BOOKING_LOG_MESSAGE = 'Booking has been expired';
+    public const REJECTED_BOOKING_LOG_MESSAGE = 'Booking has been rejected';
+    public const PENDING_PARTNER_CONFIRMATION_BOOKING_LOG_MESSAGE =
+        'Booking has been set to pending partner confirmation';
 
     private Booking $booking;
     private ?string $previousBookingStatus;

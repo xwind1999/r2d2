@@ -30,22 +30,21 @@ use Symfony\Component\Messenger\MessageBusInterface;
 class BookingStatusSubscriberTest extends ProphecyTestCase
 {
     /**
-     * @var LoggerInterface|ObjectProphecy
+     * @var LoggerInterface
      */
-    private $logger;
+    private ObjectProphecy $logger;
 
     /**
-     * @var BookingStatusEvent|ObjectProphecy
+     * @var BookingStatusEvent
      */
-    private $bookingUpdatedEvent;
+    private ObjectProphecy $bookingUpdatedEvent;
 
     /**
-     * @var MessageBusInterface|ObjectProphecy
+     * @var MessageBusInterface
      */
-    private $messageBus;
+    private ObjectProphecy $messageBus;
 
     private BookingStatusSubscriber $bookingUpdatedSubscriber;
-    private Booking $booking;
 
     public function setUp(): void
     {
@@ -56,60 +55,6 @@ class BookingStatusSubscriberTest extends ProphecyTestCase
             $this->logger->reveal(),
             $this->messageBus->reveal(),
         );
-        $this->booking = new Booking();
-        $this->booking->voucher = '198257918';
-        $this->booking->goldenId = '12345';
-        $dateTime = new \DateTime('2020-08-05 16:58:11.455209');
-        $this->booking->startDate = $dateTime;
-        $this->booking->endDate = $dateTime;
-        $this->booking->createdAt = $dateTime;
-        $this->booking->updatedAt = $dateTime;
-        $this->booking->voucher = '1234154';
-        $this->booking->partnerGoldenId = '1234154';
-        $this->booking->country = 'FR';
-        $this->booking->totalPrice = 1212;
-        $this->booking->experienceGoldenId = '1234154';
-        $this->booking->components = [
-            'name' => 'name',
-        ];
-
-        $experienceComponent = $this->prophesize(ExperienceComponent::class);
-        $component = $this->prophesize(Component::class);
-        $component->goldenId = '5464';
-        $component->name = 'component name';
-        $experienceComponent->component = $component->reveal();
-
-        $boxExperience = $this->prophesize(BoxExperience::class);
-        $box = $this->prophesize(Box::class);
-        $box->country = 'FR';
-        $boxExperience->box = $box->reveal();
-
-        $experience = $this->prophesize(Experience::class);
-        $experience->price = 125;
-        $experience->experienceComponent = new ArrayCollection([$experienceComponent->reveal()]);
-        $experience->boxExperience = new ArrayCollection([$boxExperience->reveal()]);
-        $this->booking->experience = $experience->reveal();
-
-        $partner = $this->prophesize(Partner::class);
-        $partner->currency = 'EUR';
-        $this->booking->partner = $partner->reveal();
-
-        $bookingDateDayOne = $this->prophesize(BookingDate::class);
-        $bookingDateDayOne->componentGoldenId = '5464';
-        $bookingDateDayOne->component = $component;
-        $bookingDateDayOne->date = $dateTime;
-        $bookingDateDayOne->price = 606;
-        $bookingDateDayOne->isExtraNight = true;
-        $bookingDateDayOne->isExtraRoom = true;
-
-        $this->booking->bookingDate = new ArrayCollection([$bookingDateDayOne->reveal()]);
-
-        $guest = $this->prophesize(Guest::class);
-        $guest->firstName = 'First Name';
-        $guest->lastName = 'Last Name';
-        $guest->phone = '089 585 5555';
-        $guest->email = 'teste@teste.com';
-        $this->booking->guest = new ArrayCollection([$guest->reveal()]);
     }
 
     /**
@@ -129,90 +74,197 @@ class BookingStatusSubscriberTest extends ProphecyTestCase
      * @covers ::__construct
      * @covers ::handleBookingStatus
      * @covers ::processLogMessage
-     */
-    public function testHandleCreatedMessage(): void
-    {
-        $this->booking->status = BookingStatusConstraint::BOOKING_STATUS_CREATED;
-        $this->booking->createdAt = new \DateTime();
-        $this->logger
-            ->info(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CREATED, ['booking' => $this->booking])
-            ->shouldBeCalledOnce()
-        ;
-        $this->bookingUpdatedEvent->getBooking()->willReturn($this->booking);
-        $this->messageBus->dispatch(Argument::any())->shouldNotBeCalled();
-        $this->bookingUpdatedSubscriber->handleBookingStatus($this->bookingUpdatedEvent->reveal());
-    }
-
-    /**
-     * @covers ::__construct
-     * @covers ::handleBookingStatus
-     * @covers ::processLogMessage
-     * @covers \App\Contract\Request\EAI\ChannelManagerBookingRequest::fromCompletedBooking
      * @covers \App\Contract\Request\EAI\ChannelManagerBookingRequest::createChannelManagerBookingRequest
+     * @dataProvider handleDataProvider
      */
-    public function testHandleCompletedMessage(): void
+    public function testHandle(Booking $booking, callable $asserts): void
     {
-        $this->booking->status = BookingStatusConstraint::BOOKING_STATUS_COMPLETE;
-        $this->booking->goldenId = '12345';
-        $this->booking->startDate = new \DateTime();
-        $this->booking->endDate = new \DateTime();
-        $this->booking->createdAt = new \DateTime();
-        $this->booking->currency = 'EUR';
-        $this->logger
-            ->info(
-                BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_COMPLETED,
-                ['booking' => $this->booking]
-            )
-            ->shouldBeCalledOnce()
-        ;
-        $this->bookingUpdatedEvent->getBooking()->willReturn($this->booking);
-        $this->messageBus->dispatch(Argument::any())->shouldBeCalledOnce()->willReturn(new Envelope(new \stdClass()));
-        $this->bookingUpdatedSubscriber->handleBookingStatus($this->bookingUpdatedEvent->reveal());
+        $asserts($this, $booking);
     }
 
     /**
-     * @covers ::__construct
-     * @covers ::handleBookingStatus
-     * @covers ::processLogMessage
-     * @covers \App\Contract\Request\EAI\ChannelManagerBookingRequest::fromCancelledBooking
-     * @covers \App\Contract\Request\EAI\ChannelManagerBookingRequest::createChannelManagerBookingRequest
+     * @see testHandle
      */
-    public function testHandleCancelledMessages(): void
+    public function handleDataProvider(): \Generator
     {
-        $this->booking->status = BookingStatusConstraint::BOOKING_STATUS_CANCELLED;
-        $this->booking->currency = 'EUR';
-        $this->booking->createdAt = new \DateTime();
-        $this->logger
-            ->info(BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_CANCELLED, ['booking' => $this->booking])
-            ->shouldBeCalledOnce()
-        ;
-        $this->bookingUpdatedEvent->getBooking()->willReturn($this->booking);
-        $this->bookingUpdatedEvent
-            ->getPreviousBookingStatus()
-            ->willReturn(BookingStatusConstraint::BOOKING_STATUS_COMPLETE)
-        ;
-        $this->messageBus->dispatch(Argument::any())->shouldBeCalledOnce()->willReturn(new Envelope(new \stdClass()));
-        $this->bookingUpdatedSubscriber->handleBookingStatus($this->bookingUpdatedEvent->reveal());
-    }
+        $booking = new Booking();
+        $booking->voucher = '198257918';
+        $booking->goldenId = '12345';
+        $booking->currency = 'EUR';
+        $dateTime = new \DateTime('2020-08-05 16:58:11.455209');
+        $booking->startDate = $dateTime;
+        $booking->endDate = $dateTime;
+        $booking->createdAt = $dateTime;
+        $booking->updatedAt = $dateTime;
+        $booking->voucher = '1234154';
+        $booking->partnerGoldenId = '1234154';
+        $booking->country = 'FR';
+        $booking->totalPrice = 1212;
+        $booking->experienceGoldenId = '1234154';
+        $booking->components = [
+            'name' => 'name',
+        ];
 
-    /**
-     * @covers ::__construct
-     * @covers ::handleBookingStatus
-     * @covers ::processLogMessage
-     */
-    public function testHandleMessageByExpiredAt(): void
-    {
-        $this->booking->status = 'created';
-        $this->booking->expiredAt = new \DateTime('yesterday');
-        $this->logger
-            ->info(
-                BookingStatusEvent::LOG_MESSAGE_BOOKING_STATUS_EXPIRED,
-                ['booking' => $this->booking]
-            )
-            ->shouldBeCalledOnce()
-        ;
-        $this->bookingUpdatedEvent->getBooking()->willReturn($this->booking);
-        $this->messageBus->dispatch(Argument::any())->shouldNotBeCalled();
-        $this->bookingUpdatedSubscriber->handleBookingStatus($this->bookingUpdatedEvent->reveal());
+        $experienceComponent = $this->prophesize(ExperienceComponent::class);
+        $component = $this->prophesize(Component::class);
+        $component->goldenId = '5464';
+        $component->name = 'component name';
+        $experienceComponent->component = $component->reveal();
+
+        $boxExperience = $this->prophesize(BoxExperience::class);
+        $box = $this->prophesize(Box::class);
+        $box->country = 'FR';
+        $boxExperience->box = $box->reveal();
+
+        $experience = $this->prophesize(Experience::class);
+        $experience->price = 125;
+        $experience->experienceComponent = new ArrayCollection([$experienceComponent->reveal()]);
+        $experience->boxExperience = new ArrayCollection([$boxExperience->reveal()]);
+        $booking->experience = $experience->reveal();
+
+        $partner = $this->prophesize(Partner::class);
+        $partner->currency = 'EUR';
+        $booking->partner = $partner->reveal();
+
+        $bookingDateDayOne = $this->prophesize(BookingDate::class);
+        $bookingDateDayOne->componentGoldenId = '5464';
+        $bookingDateDayOne->component = $component;
+        $bookingDateDayOne->date = $dateTime;
+        $bookingDateDayOne->price = 606;
+        $bookingDateDayOne->isExtraNight = true;
+        $bookingDateDayOne->isExtraRoom = true;
+
+        $booking->bookingDate = new ArrayCollection([$bookingDateDayOne->reveal()]);
+
+        $guest = $this->prophesize(Guest::class);
+        $guest->firstName = 'First Name';
+        $guest->lastName = 'Last Name';
+        $guest->phone = '089 585 5555';
+        $guest->email = 'teste@teste.com';
+        $booking->guest = new ArrayCollection([$guest->reveal()]);
+
+        yield 'booking-with-created-status' => [
+            (function ($booking) {
+                $booking->status = BookingStatusConstraint::BOOKING_STATUS_CREATED;
+                $booking->createdAt = new \DateTime();
+
+                return $booking;
+            })(clone $booking),
+            (function ($test, $booking) {
+                $test->logger
+                    ->info(BookingStatusEvent::CREATED_BOOKING_LOG_MESSAGE, ['booking' => $booking])
+                    ->shouldBeCalledOnce()
+                ;
+                $test->bookingUpdatedEvent->getBooking()->willReturn($booking);
+                $test->messageBus->dispatch(Argument::any())->shouldNotBeCalled();
+                $test->bookingUpdatedSubscriber->handleBookingStatus($test->bookingUpdatedEvent->reveal());
+            }),
+        ];
+
+        yield 'booking-with-complete-status' => [
+            (function ($booking) {
+                $booking->status = 'complete';
+                $booking->goldenId = '12345';
+                $booking->startDate = new \DateTime();
+                $booking->endDate = new \DateTime();
+                $booking->createdAt = new \DateTime();
+                $booking->currency = 'EUR';
+
+                return $booking;
+            })(clone $booking),
+            (function ($test, $booking) {
+                $test->logger
+                    ->info(
+                        BookingStatusEvent::COMPLETED_BOOKING_LOG_MESSAGE,
+                        ['booking' => $booking]
+                    )
+                    ->shouldBeCalledOnce()
+                ;
+                $test->bookingUpdatedEvent->getBooking()->willReturn($booking);
+                $test->messageBus->dispatch(Argument::any())->shouldBeCalledOnce()->willReturn(new Envelope(new \stdClass()));
+                $test->bookingUpdatedSubscriber->handleBookingStatus($test->bookingUpdatedEvent->reveal());
+            }),
+        ];
+
+        yield 'booking-with-cancelled-status' => [
+            (function ($booking) {
+                $booking->status = 'cancelled';
+                $booking->currency = 'EUR';
+                $booking->createdAt = new \DateTime();
+
+                return $booking;
+            })(clone $booking),
+            (function ($test, $booking) {
+                $test->logger
+                    ->info(BookingStatusEvent::CANCELLED_BOOKING_LOG_MESSAGE, ['booking' => $booking])
+                    ->shouldBeCalledOnce()
+                ;
+                $test->bookingUpdatedEvent->getBooking()->willReturn($booking);
+                $test->bookingUpdatedEvent
+                    ->getPreviousBookingStatus()
+                    ->willReturn(BookingStatusConstraint::BOOKING_STATUS_COMPLETE)
+                ;
+                $test->messageBus->dispatch(Argument::any())->shouldBeCalledOnce()->willReturn(new Envelope(new \stdClass()));
+                $test->bookingUpdatedSubscriber->handleBookingStatus($test->bookingUpdatedEvent->reveal());
+            }),
+        ];
+
+        yield 'booking-with-expired-date' => [
+            (function ($booking) {
+                $booking->status = 'created';
+                $booking->expiredAt = new \DateTime('yesterday');
+
+                return $booking;
+            })(clone $booking),
+            (function ($test, $booking) {
+                $test->logger->info(
+                    BookingStatusEvent::EXPIRED_BOOKING_LOG_MESSAGE,
+                    ['booking' => $booking]
+                )->shouldBeCalledOnce();
+                $test->bookingUpdatedEvent->getBooking()->willReturn($booking);
+                $test->messageBus->dispatch(Argument::any())->shouldNotBeCalled();
+                $test->bookingUpdatedSubscriber->handleBookingStatus($test->bookingUpdatedEvent->reveal());
+            }),
+        ];
+
+        yield 'booking-with-rejected-status' => [
+            (function ($booking) {
+                $booking->status = 'rejected';
+                $booking->expiredAt = new \DateTime('yesterday');
+
+                return $booking;
+            })(clone $booking),
+            (function ($test, $booking) {
+                $test->logger
+                    ->info(BookingStatusEvent::REJECTED_BOOKING_LOG_MESSAGE, ['booking' => $booking])
+                    ->shouldBeCalledOnce()
+                ;
+                $test->bookingUpdatedEvent->getBooking()->willReturn($booking);
+                $test->messageBus->dispatch(
+                    Argument::any())->shouldBeCalledOnce()->willReturn(new Envelope(new \stdClass())
+                );
+                $test->bookingUpdatedSubscriber->handleBookingStatus($test->bookingUpdatedEvent->reveal());
+            }),
+        ];
+
+        yield 'booking-with-pending-partner-confirmation-status' => [
+            (function ($booking) {
+                $booking->status = 'pending_partner_confirmation';
+
+                return $booking;
+            })(clone $booking),
+            (function ($test, $booking) {
+                $test->logger
+                    ->info(
+                        BookingStatusEvent::PENDING_PARTNER_CONFIRMATION_BOOKING_LOG_MESSAGE,
+                        ['booking' => $booking]
+                    )
+                    ->shouldBeCalledOnce()
+                ;
+                $test->bookingUpdatedEvent->getBooking()->willReturn($booking);
+                $test->messageBus->dispatch(Argument::any())->shouldNotBeCalled();
+                $test->bookingUpdatedSubscriber->handleBookingStatus($test->bookingUpdatedEvent->reveal());
+            }),
+        ];
     }
 }

@@ -6,6 +6,7 @@ namespace App\Tests\Contract\Request\EAI;
 
 use App\Constraint\BookingChannelConstraint;
 use App\Constraint\BookingStatusConstraint;
+use App\Constraint\CMHStatusConstraint;
 use App\Contract\Request\EAI\ChannelManagerBookingRequest;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
@@ -129,24 +130,27 @@ class ChannelManagerBookingRequestTest extends ProphecyTestCase
 
     /**
      * @covers ::fromCompletedBooking
+     * @covers ::fromCancelledBooking
+     * @covers ::fromRejectedBooking
      * @covers ::createChannelManagerBookingRequest
+     * @dataProvider cmhStatusProvider
      */
-    public function testFromCompletedBooking(): void
+    public function testFromBooking(string $cmhStatus): void
     {
-        $result = $this->request::fromCompletedBooking($this->booking);
+        $result = null;
+        switch ($cmhStatus) {
+            case CMHStatusConstraint::BOOKING_STATUS_CONFIRMED:
+                $result = $this->request::fromCompletedBooking($this->booking);
+                break;
 
-        $this->assertEquals('confirmed', $result->getStatus());
-        $this->assertEquals($this->booking->goldenId, $result->getId());
-        $this->assertEquals($this->booking->startDate, $result->getStartDate());
-        $this->assertEquals($this->booking->endDate, $result->getEndDate());
-        $this->assertEquals($this->booking->createdAt, $result->getCreatedAt());
-        $this->assertEquals($this->booking->updatedAt, $result->getUpdatedAt());
-        $this->assertEquals($this->booking->voucher, $result->getVoucher()->getId());
-        $this->assertEquals($this->booking->partnerGoldenId, $result->getPartner()->getId());
-        $this->assertEquals($this->booking->experienceGoldenId, $result->getExperience()->getId());
-        $this->assertEquals($this->booking->experience->price, $result->getExperience()->getPrice()->getAmount());
-        $this->assertEquals($this->booking->totalPrice, $result->getTotalPrice()->getAmount());
-        $this->assertEquals($this->booking->lastStatusChannel, $result->getLastStatusChannel());
+            case CMHStatusConstraint::BOOKING_STATUS_CANCELLED:
+                $result = $this->request::fromCancelledBooking($this->booking);
+                break;
+
+            case CMHStatusConstraint::BOOKING_STATUS_REJECTED:
+                $result = $this->request::fromRejectedBooking($this->booking);
+                break;
+        }
 
         $guests = $result->getRooms()[0]->getGuests();
         $primaryGuest = [];
@@ -156,19 +160,7 @@ class ChannelManagerBookingRequestTest extends ProphecyTestCase
             }
         }
 
-        $this->assertEquals(1, count($primaryGuest));
-        $this->assertEquals($this->booking->experience->peopleNumber, count($result->getRooms()[0]->getGuests()));
-    }
-
-    /**
-     * @covers ::fromCancelledBooking
-     * @covers ::createChannelManagerBookingRequest
-     */
-    public function testFromCancelledBooking(): void
-    {
-        $result = $this->request::fromCancelledBooking($this->booking);
-
-        $this->assertEquals('cancelled', $result->getStatus());
+        $this->assertEquals($cmhStatus, $result->getStatus());
         $this->assertEquals($this->booking->goldenId, $result->getId());
         $this->assertEquals($this->booking->startDate, $result->getStartDate());
         $this->assertEquals($this->booking->endDate, $result->getEndDate());
@@ -179,6 +171,8 @@ class ChannelManagerBookingRequestTest extends ProphecyTestCase
         $this->assertEquals($this->booking->experienceGoldenId, $result->getExperience()->getId());
         $this->assertEquals($this->booking->experience->price, $result->getExperience()->getPrice()->getAmount());
         $this->assertEquals($this->booking->totalPrice, $result->getTotalPrice()->getAmount());
+        $this->assertEquals(1, count($primaryGuest));
+        $this->assertEquals($this->booking->experience->peopleNumber, count($result->getRooms()[0]->getGuests()));
         $this->assertEquals($this->booking->lastStatusChannel, $result->getLastStatusChannel());
     }
 
@@ -217,5 +211,17 @@ class ChannelManagerBookingRequestTest extends ProphecyTestCase
         $request = new ChannelManagerBookingRequest();
         $request->setStatus('complete');
         $this->assertEquals('complete booking pushed to EAI', $request->getEventName());
+    }
+
+    /**
+     * @see testFromBooking
+     */
+    public function cmhStatusProvider(): array
+    {
+        return [
+            ['confirmed'],
+            ['cancelled'],
+            ['rejected'],
+        ];
     }
 }
