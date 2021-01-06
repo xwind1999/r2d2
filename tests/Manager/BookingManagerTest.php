@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Manager;
 
+use App\Constraint\BookingChannelConstraint;
+use App\Constraint\BookingStatusConstraint;
 use App\Constraint\RoomStockTypeConstraint;
 use App\Contract\Request\Booking\BookingCreate\Experience as BookingCreateExperience;
 use App\Contract\Request\Booking\BookingCreate\Guest;
@@ -18,7 +20,7 @@ use App\Entity\BoxExperience;
 use App\Entity\Component;
 use App\Entity\Experience;
 use App\Entity\Partner;
-use App\Event\BookingStatusEvent;
+use App\Event\Booking\BookingStatusEvent;
 use App\Exception\Booking\BadPriceException;
 use App\Exception\Booking\BookingAlreadyInFinalStatusException;
 use App\Exception\Booking\BookingHasExpiredException;
@@ -165,10 +167,12 @@ class BookingManagerTest extends ProphecyTestCase
         $bookingUpdateRequest = new BookingUpdateRequest();
         $bookingUpdateRequest->bookingId = '123123123';
         $bookingUpdateRequest->status = 'complete';
+
         $booking = new Booking();
         $booking->status = 'created';
         $booking->createdAt = new \DateTime('now');
         $booking->expiredAt = (clone $booking->createdAt)->add(new \DateInterval('PT15M'));
+        $booking->lastStatusChannel = null;
 
         yield 'happy path' => [
             $bookingUpdateRequest,
@@ -377,6 +381,63 @@ class BookingManagerTest extends ProphecyTestCase
                     ->willReturn(Argument::type(BookingStatusEvent::class))
                 ;
                 $test->assertEquals('cancelled', $booking->status);
+            },
+            function (BookingManagerTest $test) {
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+            },
+            function (BookingManagerTest $test) {
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class)
+                    )->shouldNotHaveBeenCalled()
+                ;
+            },
+        ];
+
+        yield 'booking with last status channel' => [
+            (function ($bookingUpdateRequest) {
+                $bookingUpdateRequest->lastStatusChannel = BookingChannelConstraint::BOOKING_LAST_STATUS_CHANNEL_JARVIS_BOOKING;
+                $bookingUpdateRequest->status = BookingStatusConstraint::BOOKING_STATUS_COMPLETE;
+
+                return $bookingUpdateRequest;
+            })(clone $bookingUpdateRequest),
+            (function ($booking) {
+                $booking->status = BookingStatusConstraint::BOOKING_STATUS_CREATED;
+
+                return $booking;
+            })(clone $booking),
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist($booking)->shouldHaveBeenCalled();
+                $test->entityManager->flush()->shouldHaveBeenCalled();
+            },
+            function (BookingManagerTest $test) {
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+            },
+        ];
+
+        yield 'booking with invalid last status channel' => [
+            (function ($bookingUpdateRequest) {
+                $bookingUpdateRequest->lastStatusChannel = 'invalid-status';
+                $bookingUpdateRequest->status = BookingStatusConstraint::BOOKING_STATUS_COMPLETE;
+
+                return $bookingUpdateRequest;
+            })(clone $bookingUpdateRequest),
+            (function ($booking) {
+                $booking->status = BookingStatusConstraint::BOOKING_STATUS_CREATED;
+
+                return $booking;
+            })(clone $booking),
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist($booking)->shouldHaveBeenCalled();
+                $test->entityManager->flush()->shouldHaveBeenCalled();
             },
             function (BookingManagerTest $test) {
                 $test->eventDispatcher

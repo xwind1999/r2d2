@@ -924,11 +924,14 @@ class QuickDataIntegrationTest extends IntegrationTestCase
     {
         static::cleanUp();
         $experienceId = '59593';
+        $entityManager = self::$container->get('doctrine.orm.entity_manager');
 
         self::$bookingHelper->cleanUpBooking(
             ['213072'],
             [$experienceId],
-            self::$container->get('doctrine.orm.entity_manager'));
+            $entityManager);
+
+        self::$bookingHelper->fulfillAvailability(['213072'], $entityManager);
 
         $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
         $dateTo = (clone $dateFrom)->modify('+5 day');
@@ -1142,6 +1145,9 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testGetRangeV2()
     {
         static::cleanUp();

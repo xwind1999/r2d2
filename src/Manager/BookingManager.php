@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Manager;
 
 use App\Constants\DateTimeConstants;
+use App\Constraint\BookingChannelConstraint;
 use App\Constraint\BookingStatusConstraint;
 use App\Constraint\ProductDurationUnitConstraint;
 use App\Constraint\RoomStockTypeConstraint;
@@ -14,7 +15,7 @@ use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
 use App\Entity\Guest;
-use App\Event\BookingStatusEvent;
+use App\Event\Booking\BookingStatusEvent;
 use App\Exception\Booking\BadPriceException;
 use App\Exception\Booking\BookingAlreadyInFinalStatusException;
 use App\Exception\Booking\BookingHasExpiredException;
@@ -323,6 +324,12 @@ class BookingManager
 
         $previousBookingStatus = $booking->status;
         $booking->status = $bookingUpdateRequest->status;
+
+        if (null !== $bookingUpdateRequest->lastStatusChannel &&
+            $bookingUpdateRequest->lastStatusChannel !== $booking->lastStatusChannel &&
+            BookingChannelConstraint::isValid($bookingUpdateRequest->lastStatusChannel)) {
+            $booking->lastStatusChannel = $bookingUpdateRequest->lastStatusChannel;
+        }
 
         if (null !== $bookingUpdateRequest->voucher) {
             $booking->voucher = $bookingUpdateRequest->voucher;

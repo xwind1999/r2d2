@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\EventSubscriber;
+namespace App\EventSubscriber\Booking;
 
 use App\Constraint\BookingStatusConstraint;
-use App\Event\BookingStatusEvent;
+use App\Event\Booking\BookingStatusEvent;
 use App\Manager\RoomAvailabilityManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

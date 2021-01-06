@@ -134,6 +134,11 @@ class Booking
      */
     public \DateTime $expiredAt;
 
+    /**
+     * @ORM\Column(name="last_status_channel", type="string", nullable=true, length=15)
+     */
+    public ?string $lastStatusChannel = null;
+
     public function __construct()
     {
         $this->guest = new ArrayCollection();

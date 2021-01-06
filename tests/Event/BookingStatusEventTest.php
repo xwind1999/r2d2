@@ -6,11 +6,11 @@ namespace App\Tests\Event;
 
 use App\Constraint\BookingStatusConstraint;
 use App\Entity\Booking;
-use App\Event\BookingStatusEvent;
+use App\Event\Booking\BookingStatusEvent;
 use App\Tests\ProphecyTestCase;
 
 /**
- * @coversDefaultClass \App\Event\BookingStatusEvent
+ * @coversDefaultClass \App\Event\Booking\BookingStatusEvent
  */
 class BookingStatusEventTest extends ProphecyTestCase
 {

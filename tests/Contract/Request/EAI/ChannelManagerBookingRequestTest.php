@@ -15,7 +15,7 @@ use App\Entity\Experience;
 use App\Entity\ExperienceComponent;
 use App\Entity\Guest;
 use App\Entity\Partner;
-use App\Event\BookingStatusEvent;
+use App\Event\Booking\BookingStatusEvent;
 use App\Tests\ProphecyTestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Messenger\MessageBusInterface;

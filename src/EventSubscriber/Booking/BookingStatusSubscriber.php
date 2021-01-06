@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\EventSubscriber;
+namespace App\EventSubscriber\Booking;
 
 use App\Constraint\BookingStatusConstraint;
 use App\Contract\Request\EAI\ChannelManagerBookingRequest;
 use App\Entity\Booking;
-use App\Event\BookingStatusEvent;
+use App\Event\Booking\BookingStatusEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
