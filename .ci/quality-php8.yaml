@@ -15,7 +15,7 @@ build-base-image-php8.0:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [ "" ]
   script:
-    - /kaniko/executor --context .ci/docker/base8.0 --destination ${BASE_IMAGE_PHP8}
+    - /kaniko/executor --context .ci/docker/base8.0 --cache --destination ${BASE_IMAGE_PHP8}
 
 build-validation-image-php8.0:
   stage: Dependencies
@@ -23,11 +23,10 @@ build-validation-image-php8.0:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [ "" ]
   script:
-    - /kaniko/executor --context .ci/docker/validation --destination ${VALIDATION_IMAGE_PHP8}
+    - /kaniko/executor --context .ci/docker/validation --cache --destination ${VALIDATION_IMAGE_PHP8}
 
 composer:
   stage: Dependencies
-  allow_failure: true
   cache:
     key:
       files:
@@ -40,7 +39,7 @@ composer:
     - .ci/docker/base8.0/load-key.sh "${SSH_KNOWN_HOSTS}" "${SSH_KEY}"
     - COMPOSER_MEMORY_LIMIT=-1 composer config cache-dir cache/composer
     - COMPOSER_MEMORY_LIMIT=-1 composer install -n --no-progress --ignore-platform-reqs
-    - composer check-platform-reqs
+    - composer check-platform-reqs || true
   artifacts:
     expire_in: 1 day
     paths:
@@ -50,7 +49,6 @@ composer:
 
 unit-tests:
   stage: Test
-  allow_failure: true
   script:
     - phpdbg -qrr vendor/bin/phpunit --testsuite=UnitTests --colors=never
   artifacts:
@@ -62,14 +60,13 @@ unit-tests:
   except:
     - tags
 
-# Commented while php-cs-fixer do now allot support to php 8
 php-cs-fixer:
   stage: Test
-  allow_failure: true
   needs:
     - composer
+  variables:
+    PHP_CS_FIXER_IGNORE_ENV: 1
   script:
-    - sed -i 's/70500/90000/g' vendor/bin/php-cs-fixer
     - vendor/bin/php-cs-fixer fix -v --dry-run
   except:
     - tags
@@ -84,7 +81,7 @@ php-cs-fixer:
       alias: mysql
       command:
         - mysqld
-        - --sql-mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION
+        - --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
   variables:
     MYSQL_DATABASE: r2d2
     MYSQL_ROOT_PASSWORD: admin123
@@ -97,14 +94,13 @@ php-cs-fixer:
     - bin/console doctrine:database:import utils/fixtures/dumps/*
     - php -dmemory_limit=-1 bin/console doctrine:fixtures:load --append
     - bin/console -e test messenger:setup-transports
-    - bin/console -e test r2d2:flatten:manageable-components
-    - bin/console -e test messenger:consume event-calculate-flat-manageable-component --time-limit=3 -vvv
   artifacts:
     expire_in: 1 day
     paths:
       - report/html/api-tests/
       - report/html/db
       - report/raw/api-tests/
+      - var/log/test.log
   only:
     - branches
   except:
@@ -112,19 +108,16 @@ php-cs-fixer:
 
 api-tests:
   <<: *apiTests
-  allow_failure: true
   script:
     - phpdbg -qrr vendor/bin/phpunit --testsuite=ApiTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
 
 DB-validation-tests:
   <<: *apiTests
-  allow_failure: true
   script:
     - phpdbg -qrr vendor/bin/phpunit --testsuite=IntegrationTests --colors=never --coverage-html report/html/api-tests/ --log-junit report/raw/api-tests/junit.xml --testdox
 
 phpstan:
   stage: Static Analysis
-  allow_failure: true
   needs:
     - composer
   script:
@@ -134,7 +127,6 @@ phpstan:
 
 psalm:
   stage: Static Analysis
-  allow_failure: true
   needs:
     - composer
   script:
@@ -144,7 +136,6 @@ psalm:
 
 infection:
   stage: Static Analysis
-  allow_failure: true
   dependencies:
     - composer
     - unit-tests

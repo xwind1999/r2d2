@@ -4,10 +4,10 @@ build-base-image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [ "" ]
   rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == $CI_BRANCH || $BUILD_BASE_IMAGES == "1"'
     - when: never
   script:
-    - /kaniko/executor --context .ci/docker/base --destination ${BASE_IMAGE}
+    - /kaniko/executor --context .ci/docker/base --cache --destination ${BASE_IMAGE}
 
 build-validation-image:
   stage: Build Validation Image
@@ -15,10 +15,10 @@ build-validation-image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [ "" ]
   rules:
-      - if: '$CI_COMMIT_BRANCH == $CI_BRANCH'
+      - if: '$CI_COMMIT_BRANCH == $CI_BRANCH || $BUILD_BASE_IMAGES == "1"'
       - when: never
   script:
-    - /kaniko/executor --context .ci/docker/validation --destination ${VALIDATION_IMAGE}
+    - /kaniko/executor --context .ci/docker/validation --cache --destination ${VALIDATION_IMAGE}
 
 build-app-container:
   stage: Deploy Setup
@@ -31,4 +31,4 @@ build-app-container:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
     - when: never
   script:
-    - /kaniko/executor --context ${CI_PROJECT_DIR} --dockerfile .ci/docker/app/Dockerfile --destination ${APP_IMAGE}
+    - /kaniko/executor --context ${CI_PROJECT_DIR} --dockerfile .ci/docker/app/Dockerfile --cache --destination ${APP_IMAGE}
