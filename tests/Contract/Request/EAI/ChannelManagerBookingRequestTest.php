@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Contract\Request\EAI;
 
+use App\Constraint\BookingChannelConstraint;
 use App\Constraint\BookingStatusConstraint;
 use App\Contract\Request\EAI\ChannelManagerBookingRequest;
 use App\Entity\Booking;
@@ -50,6 +51,7 @@ class ChannelManagerBookingRequestTest extends ProphecyTestCase
             'name' => 'name',
         ];
         $this->booking->currency = 'EUR';
+        $this->booking->lastStatusChannel = BookingChannelConstraint::BOOKING_LAST_STATUS_CHANNEL_PARTNER;
 
         $experienceComponent = $this->prophesize(ExperienceComponent::class);
         $component = $this->prophesize(Component::class);
@@ -144,6 +146,7 @@ class ChannelManagerBookingRequestTest extends ProphecyTestCase
         $this->assertEquals($this->booking->experienceGoldenId, $result->getExperience()->getId());
         $this->assertEquals($this->booking->experience->price, $result->getExperience()->getPrice()->getAmount());
         $this->assertEquals($this->booking->totalPrice, $result->getTotalPrice()->getAmount());
+        $this->assertEquals($this->booking->lastStatusChannel, $result->getLastStatusChannel());
 
         $guests = $result->getRooms()[0]->getGuests();
         $primaryGuest = [];
@@ -176,6 +179,7 @@ class ChannelManagerBookingRequestTest extends ProphecyTestCase
         $this->assertEquals($this->booking->experienceGoldenId, $result->getExperience()->getId());
         $this->assertEquals($this->booking->experience->price, $result->getExperience()->getPrice()->getAmount());
         $this->assertEquals($this->booking->totalPrice, $result->getTotalPrice()->getAmount());
+        $this->assertEquals($this->booking->lastStatusChannel, $result->getLastStatusChannel());
     }
 
     /**
@@ -202,6 +206,7 @@ class ChannelManagerBookingRequestTest extends ProphecyTestCase
             'experience_golden_id' => 1234154,
             'experience_total_price' => 125,
             'experience_currency' => 'EUR',
+            'last_status_channel' => 'partner',
         ];
 
         $this->assertEquals($expected, $result->getContext());

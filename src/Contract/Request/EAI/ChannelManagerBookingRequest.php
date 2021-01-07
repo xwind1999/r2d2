@@ -53,6 +53,7 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking implements Cont
             'experience_golden_id' => $this->getExperience()->getId(),
             'experience_total_price' => $this->getExperience()->getPrice()->getAmount(),
             'experience_currency' => $this->getExperience()->getPrice()->getCurrencyCode(),
+            'last_status_channel' => $this->getLastStatusChannel(),
         ];
     }
 
@@ -186,6 +187,10 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking implements Cont
         }
 
         $bookingRequest->setRooms($roomsArray);
+
+        if (null !== $booking->lastStatusChannel) {
+            $bookingRequest->setLastStatusChannel($booking->lastStatusChannel);
+        }
 
         return $bookingRequest;
     }
