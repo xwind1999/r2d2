@@ -34,7 +34,7 @@
         "ramsey/uuid": "^4.0",
         "ramsey/uuid-doctrine": "^1.6",
         "smartbox/api-rest-client": "v13.0.1",
-        "smartbox/canonical-data-model": "v12.1.0",
+        "smartbox/canonical-data-model": "v12.1.1",
         "symfony/asset": "v5.2.*",
         "symfony/console": "5.2.*",
         "symfony/dotenv": "5.2.*",

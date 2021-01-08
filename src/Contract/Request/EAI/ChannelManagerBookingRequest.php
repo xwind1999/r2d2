@@ -37,6 +37,11 @@ class ChannelManagerBookingRequest extends ChannelManagerBooking implements Cont
         return self::createChannelManagerBookingRequest($booking, CMHStatusConstraint::BOOKING_STATUS_CANCELLED);
     }
 
+    public static function fromRejectedBooking(Booking $booking): self
+    {
+        return self::createChannelManagerBookingRequest($booking, CMHStatusConstraint::BOOKING_STATUS_REJECTED);
+    }
+
     public function getContext(): array
     {
         return [

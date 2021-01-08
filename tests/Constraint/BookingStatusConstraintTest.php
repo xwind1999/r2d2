@@ -7,6 +7,9 @@ namespace App\Tests\Constraint;
 use App\Constraint\BookingStatusConstraint;
 use App\Tests\ProphecyTestCase;
 
+/**
+ * @coversDefaultClass \App\Constraint\BookingStatusConstraint
+ */
 class BookingStatusConstraintTest extends ProphecyTestCase
 {
     /**
@@ -27,6 +30,6 @@ class BookingStatusConstraintTest extends ProphecyTestCase
      */
     public function validValues(): array
     {
-        return [['created'], ['complete'], ['cancelled']];
+        return [['created'], ['complete'], ['cancelled'], ['rejected'], ['pending_partner_confirmation']];
     }
 }
