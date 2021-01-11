@@ -35,7 +35,7 @@ class BookingUpdateRequest implements RequestBodyInterface, ValidatableRequest
 
     /**
      * @Assert\Type(type="string")
-     * @Assert\Choice({"complete", "cancelled"})
+     * @Assert\Choice(callback={"\App\Constraint\BookingStatusConstraint","getValidValuesForUpdate"})
      * @Assert\NotNull
      *
      * @JMS\Type("string")

@@ -39,6 +39,7 @@ use App\Exception\Booking\RoomsDontHaveSameDurationException;
 use App\Exception\Booking\UnallocatedDateException;
 use App\Exception\Booking\UnavailableDateException;
 use App\Exception\Http\ResourceConflictException;
+use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\BookingNotFoundException;
 use App\Helper\MoneyHelper;
 use App\Manager\BookingManager;
@@ -432,6 +433,86 @@ class BookingManagerTest extends ProphecyTestCase
             })(clone $bookingUpdateRequest),
             (function ($booking) {
                 $booking->status = BookingStatusConstraint::BOOKING_STATUS_CREATED;
+
+                return $booking;
+            })(clone $booking),
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist($booking)->shouldHaveBeenCalled();
+                $test->entityManager->flush()->shouldHaveBeenCalled();
+            },
+            function (BookingManagerTest $test) {
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+            },
+        ];
+
+        yield 'instant booking with pending partner confirmation status' => [
+            (function ($bookingUpdateRequest) {
+                $bookingUpdateRequest->status = 'pending_partner_confirmation';
+
+                return $bookingUpdateRequest;
+            })(clone $bookingUpdateRequest),
+            (function ($booking) {
+                $booking->availabilityType = 'instant';
+
+                return $booking;
+            })(clone $booking),
+            UnprocessableEntityException::class,
+            null,
+            null,
+        ];
+
+        yield 'instant booking with rejected status' => [
+            (function ($bookingUpdateRequest) {
+                $bookingUpdateRequest->status = 'rejected';
+
+                return $bookingUpdateRequest;
+            })(clone $bookingUpdateRequest),
+            (function ($booking) {
+                $booking->availabilityType = 'instant';
+
+                return $booking;
+            })(clone $booking),
+            UnprocessableEntityException::class,
+            null,
+            null,
+        ];
+
+        yield 'on-request booking with pending_partner_confirmation status' => [
+            (function ($bookingUpdateRequest) {
+                $bookingUpdateRequest->status = 'pending_partner_confirmation';
+
+                return $bookingUpdateRequest;
+            })(clone $bookingUpdateRequest),
+            (function ($booking) {
+                $booking->availabilityType = 'on-request';
+
+                return $booking;
+            })(clone $booking),
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist($booking)->shouldHaveBeenCalled();
+                $test->entityManager->flush()->shouldHaveBeenCalled();
+            },
+            function (BookingManagerTest $test) {
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+            },
+        ];
+
+        yield 'on-request booking with rejected status' => [
+            (function ($bookingUpdateRequest) {
+                $bookingUpdateRequest->status = 'rejected';
+
+                return $bookingUpdateRequest;
+            })(clone $bookingUpdateRequest),
+            (function ($booking) {
+                $booking->availabilityType = 'on-request';
 
                 return $booking;
             })(clone $booking),

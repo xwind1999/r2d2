@@ -73,7 +73,6 @@ class BookingStatusSubscriberTest extends ProphecyTestCase
     /**
      * @covers ::__construct
      * @covers ::handleBookingStatus
-     * @covers ::processLogMessage
      * @covers \App\Contract\Request\EAI\ChannelManagerBookingRequest::createChannelManagerBookingRequest
      * @dataProvider handleDataProvider
      */
