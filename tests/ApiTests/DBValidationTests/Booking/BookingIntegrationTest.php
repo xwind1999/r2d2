@@ -945,9 +945,9 @@ class BookingIntegrationTest extends IntegrationTestCase
      * @dataProvider dataForUpdate
      * @group update-bit
      */
-    public function testUpdate(array $payloadUpdate, callable $asserts)
+    public function testUpdate(array $payloadUpdate, callable $asserts, array $overridePayload = [])
     {
-        $payload = self::$bookingHelper->defaultPayload();
+        $payload = self::$bookingHelper->defaultPayload($overridePayload);
         $componentIdList = [$this->componentGoldenId, $this->componentGoldenIdWithDurationTwo];
         self::$bookingHelper->fulfillAvailability($componentIdList, $this->entityManager, $payload);
 
@@ -1109,6 +1109,62 @@ class BookingIntegrationTest extends IntegrationTestCase
                 $test->assertEquals(422, $response->getStatusCode());
                 $test->assertStringContainsString('lastStatusChannel', $response->getContent());
             }),
+        ];
+
+        yield 'happy-path-rejected-booking' => [
+            ['status' => 'rejected'],
+            (function ($test, $response, $availabilityBeforeComplete, $availabilityAfterComplete) {
+                foreach ($availabilityBeforeComplete as $key => $formerAvailability) {
+                    $this->assertEquals(0, $availabilityAfterComplete[$key]['usedStock']);
+                    $this->assertEquals($formerAvailability['realStock'], $availabilityAfterComplete[$key]['realStock']);
+                    $this->assertEquals($formerAvailability['stock'], $availabilityAfterComplete[$key]['stock']);
+                }
+                $test->assertEquals(204, $response->getStatusCode());
+                $test->assertEmpty($response->getContent());
+            }),
+        ];
+
+        yield 'happy-path-pending-partner-confirmation-booking' => [
+            ['status' => 'pending_partner_confirmation'],
+            (function ($test, $response, $availabilityBeforeComplete, $availabilityAfterComplete) {
+                foreach ($availabilityBeforeComplete as $key => $formerAvailability) {
+                    $this->assertEquals(0, $availabilityAfterComplete[$key]['usedStock']);
+                    $this->assertEquals($formerAvailability['realStock'], $availabilityAfterComplete[$key]['realStock']);
+                    $this->assertEquals($formerAvailability['stock'], $availabilityAfterComplete[$key]['stock']);
+                }
+                $test->assertEquals(204, $response->getStatusCode());
+                $test->assertEmpty($response->getContent());
+            }),
+        ];
+
+        yield 'unhappy-path-rejected-booking' => [
+            ['status' => 'rejected'],
+            (function ($test, $response, $availabilityBeforeComplete, $availabilityAfterComplete) {
+                foreach ($availabilityBeforeComplete as $key => $formerAvailability) {
+                    $this->assertEquals(1, $availabilityAfterComplete[$key]['usedStock']);
+                    $this->assertEquals($formerAvailability['realStock'] - 1, $availabilityAfterComplete[$key]['realStock']);
+                    $this->assertEquals($formerAvailability['stock'], $availabilityAfterComplete[$key]['stock']);
+                }
+                $test->assertEquals(422, $response->getStatusCode());
+                $test->assertStringContainsString('Unprocessable entity', $response->getContent());
+                $test->assertStringContainsString('code":1000002', $response->getContent());
+            }),
+            ['availabilityType' => 'instant'],
+        ];
+
+        yield 'unhappy-path-pending-partner-confirmation-booking' => [
+            ['status' => 'pending_partner_confirmation'],
+            (function ($test, $response, $availabilityBeforeComplete, $availabilityAfterComplete) {
+                foreach ($availabilityBeforeComplete as $key => $formerAvailability) {
+                    $this->assertEquals(1, $availabilityAfterComplete[$key]['usedStock']);
+                    $this->assertEquals($formerAvailability['realStock'] - 1, $availabilityAfterComplete[$key]['realStock']);
+                    $this->assertEquals($formerAvailability['stock'], $availabilityAfterComplete[$key]['stock']);
+                }
+                $test->assertEquals(422, $response->getStatusCode());
+                $test->assertStringContainsString('Unprocessable entity', $response->getContent());
+                $test->assertStringContainsString('code":1000002', $response->getContent());
+            }),
+            ['availabilityType' => 'instant'],
         ];
     }
 

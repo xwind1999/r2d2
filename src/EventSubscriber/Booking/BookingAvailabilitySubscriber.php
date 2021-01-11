@@ -15,10 +15,8 @@ class BookingAvailabilitySubscriber implements EventSubscriberInterface
     private RoomAvailabilityManager $roomAvailabilityManager;
     private LoggerInterface $logger;
 
-    public function __construct(
-        RoomAvailabilityManager $roomAvailabilityManager,
-        LoggerInterface $logger
-    ) {
+    public function __construct(RoomAvailabilityManager $roomAvailabilityManager, LoggerInterface $logger)
+    {
         $this->roomAvailabilityManager = $roomAvailabilityManager;
         $this->logger = $logger;
     }

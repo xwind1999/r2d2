@@ -34,6 +34,7 @@ use App\Exception\Booking\RoomsDontHaveSameDurationException;
 use App\Exception\Booking\UnallocatedDateException;
 use App\Exception\Booking\UnavailableDateException;
 use App\Exception\Http\ResourceConflictException;
+use App\Exception\Http\UnprocessableEntityException;
 use App\Exception\Repository\BookingNotFoundException;
 use App\Helper\MoneyHelper;
 use App\Repository\BookingRepository;
@@ -179,11 +180,17 @@ class BookingManager
             throw new UnallocatedDateException();
         }
 
-        // validation #10 and #11
-        if ((RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType &&
-                true === $this->hasStopSaleOnRequestBookings($booking)) ||
-            (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST !== $roomStockType &&
-                true === $this->isUnavailableForBookings($booking))) {
+        // validation #10
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST !== $roomStockType &&
+            $this->isUnavailableForBookings($booking)
+        ) {
+            throw new UnavailableDateException();
+        }
+
+        // validation #11
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType &&
+            $this->hasStopSaleOnRequestBookings($booking)
+        ) {
             throw new UnavailableDateException();
         }
 
@@ -314,15 +321,19 @@ class BookingManager
             return;
         }
 
-        if (
-            BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $bookingUpdateRequest->status &&
+        if (BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $bookingUpdateRequest->status &&
             BookingStatusConstraint::BOOKING_STATUS_CANCELLED === $booking->status
         ) {
             throw new BookingAlreadyInFinalStatusException();
         }
 
-        if (
-            BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $bookingUpdateRequest->status &&
+        if (BookingStatusConstraint::isAnOnRequestStatus($bookingUpdateRequest->status) &&
+            AvailabilityTypeConstraint::AVAILABILITY_TYPE_INSTANT === $booking->availabilityType
+        ) {
+            throw new UnprocessableEntityException();
+        }
+
+        if (BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $bookingUpdateRequest->status &&
             $booking->expiredAt < new \DateTime('now') &&
             $this->isUnavailableForBookings($booking)
         ) {

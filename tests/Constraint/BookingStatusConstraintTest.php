@@ -13,7 +13,7 @@ use App\Tests\ProphecyTestCase;
 class BookingStatusConstraintTest extends ProphecyTestCase
 {
     /**
-     * @dataProvider validValues
+     * @dataProvider validValuesProvider
      */
     public function testIsValid(string $value): void
     {
@@ -28,8 +28,49 @@ class BookingStatusConstraintTest extends ProphecyTestCase
     /**
      * @see testIsValid
      */
-    public function validValues(): array
+    public function validValuesProvider(): array
     {
-        return [['created'], ['complete'], ['cancelled'], ['rejected'], ['pending_partner_confirmation']];
+        return [
+            ['created'],
+            ['complete'],
+            ['cancelled'],
+            ['rejected'],
+            ['pending_partner_confirmation'],
+        ];
+    }
+
+    /**
+     * @dataProvider validOnRequestValuesProvider
+     */
+    public function testIsAnOnRequestStatus(string $value): void
+    {
+        $this->assertTrue(BookingStatusConstraint::isAnOnRequestStatus($value));
+    }
+
+    public function testIsInvalidOnRequestStatus(): void
+    {
+        $this->assertFalse(BookingStatusConstraint::isAnOnRequestStatus('cancelled'));
+    }
+
+    /**
+     * @see testIsAnOnRequestStatus
+     */
+    public function validOnRequestValuesProvider(): array
+    {
+        return [
+            ['rejected'],
+            ['pending_partner_confirmation'],
+        ];
+    }
+
+    public function testGetValidValuesForUpdate(): void
+    {
+        $expected = [
+            'complete',
+            'cancelled',
+            'rejected',
+            'pending_partner_confirmation',
+        ];
+        $this->assertEquals($expected, BookingStatusConstraint::getValidValuesForUpdate());
     }
 }
