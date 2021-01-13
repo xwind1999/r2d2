@@ -47,7 +47,6 @@ variables:
       - report/html/api-tests/
       - report/html/db
       - report/raw/api-tests/
-      - var/log/test.log
 
 .locust-template: &locust
   image: ${LOCUST_IMAGE}
