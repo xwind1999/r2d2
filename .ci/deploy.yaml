@@ -36,13 +36,11 @@ variables:
     NR_ENABLE: "false"
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
-      when: manual
     - when: never
 
 'deploy-PREPROD':
   extends: .deploy
   stage: Preprod Deploy
-  needs: [ 'build-app-container', 'pre-health-smoke-test-PREPROD' ]
   environment:
     name: ie1-preprod-r2d2
   variables:
@@ -55,7 +53,6 @@ variables:
 'deploy-PROD':
   extends: .deploy
   stage: Production Deploy
-  needs: [ 'build-app-container', 'pre-health-smoke-test-PROD']
   environment:
     name: ie1-prod-r2d2
   variables:

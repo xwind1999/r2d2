@@ -28,7 +28,7 @@ variables:
       alias: mysql
       command:
         - mysqld
-        - --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+        - --sql-mode=NO_ENGINE_SUBSTITUTION
   variables:
     MYSQL_DATABASE: r2d2
     MYSQL_ROOT_PASSWORD: admin123
@@ -47,6 +47,7 @@ variables:
       - report/html/api-tests/
       - report/html/db
       - report/raw/api-tests/
+      - var/log/test.log
 
 .locust-template: &locust
   image: ${LOCUST_IMAGE}
@@ -150,9 +151,9 @@ php-cs-fixer:
 api-tests-DEV-INT:
   stage: Deploy Validation
   image: ${BASE_IMAGE}
-  needs: [ 'composer', 'deploy-DEV-INT' ]
   dependencies:
     - 'composer'
+  needs: [ 'deploy-DEV-INT', 'composer' ]
   variables:
     API_TEST_BASE_URL: "http://ie1-devint-r2d2-api-01.z.sbxtest.net"
   script:
@@ -198,7 +199,7 @@ locust-DEV-INT:
 api-tests-STAGING:
   stage: Deploy Validation
   image: ${BASE_IMAGE}
-  needs: [ 'composer',  'deploy-STAGING' ]
+  needs: [ 'deploy-STAGING', 'composer' ]
   dependencies:
     - 'composer'
   variables:
@@ -237,7 +238,6 @@ locust-STAGING:
 'pre-health-smoke-test-PREPROD':
   extends: .health-smoke-test
   stage: Preprod Check
-  needs: [ 'api-tests-DEV-INT', 'api-tests-STAGING', 'locust-DEV-INT', 'locust-STAGING', 'post-health-smoke-test-DEV-INT', 'post-health-smoke-test-STAGING' ]
   variables:
     CHECK_ENVIRONMENT: https://r2-d2-api-preprod.sbxtest.net/_monitor/health/run
   rules:

@@ -18,11 +18,11 @@ infection:
   stage: Static Analysis
   image: ${BASE_IMAGE}
   dependencies:
-    - composer
     - unit-tests
+    - composer
   needs:
-    - composer
     - unit-tests
+    - composer
   script:
     - vendor/bin/infection --min-covered-msi=78.60 --only-covered --threads=6 --coverage=report/raw/phpunit/coverage --test-framework-options="--testsuite=UnitTests "
   artifacts:
