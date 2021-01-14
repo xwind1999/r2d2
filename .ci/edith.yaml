@@ -4,7 +4,6 @@ variables:
 edith-create-release:
   stage: Preprod Check
   image: ${EDITH_DOCKER_IMAGE}
-  needs: [ 'api-tests-DEV-INT', 'api-tests-STAGING', 'locust-DEV-INT', 'locust-STAGING', 'post-health-smoke-test-DEV-INT', 'post-health-smoke-test-STAGING' ]
   before_script:
     - export RELEASE_DESCRIPTION=$(git log $(curl https://r2-d2-api.production.smartbox.com/version.txt -s -o -)..${CI_COMMIT_SHA} --pretty=format:'%s' --abbrev-commit --no-merges | cat -)
     - export RELEASE_TITLE="R2D2 Release $(date +%F\ %R)"
@@ -46,6 +45,7 @@ edith-preprod-ready:
 edith-preprod-deploy:
   extends: .edith
   stage: Preprod Deploy
+  needs: [ 'edith-create-release' ]
   rules:
     - if: '$CI_COMMIT_BRANCH == $MAIN_BRANCH'
       when: manual
