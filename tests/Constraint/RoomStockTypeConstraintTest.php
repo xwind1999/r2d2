@@ -29,4 +29,45 @@ class RoomStockTypeConstraintTest extends ProphecyTestCase
     {
         return [['allotment'], ['stock'], ['on_request']];
     }
+
+    /**
+     * @dataProvider isInstantTypeProvider
+     */
+    public function testIsInstantType(string $value): void
+    {
+        $this->assertTrue(RoomStockTypeConstraint::isInstantType($value));
+    }
+
+    /**
+     * @see testIsInstantType
+     */
+    public function isInstantTypeProvider(): array
+    {
+        return [['allotment'], ['stock']];
+    }
+
+    public function testIsInstantTypeFalse(): void
+    {
+        $this->assertFalse(RoomStockTypeConstraint::isInstantType('on-request'));
+    }
+
+    public function testIsInstantTypeNull(): void
+    {
+        $this->assertFalse(RoomStockTypeConstraint::isInstantType(null));
+    }
+
+    public function testIsOnRequestType(): void
+    {
+        $this->assertTrue(RoomStockTypeConstraint::isOnRequestType('on_request'));
+    }
+
+    public function testIsOnRequestTypeFalse(): void
+    {
+        $this->assertFalse(RoomStockTypeConstraint::isOnRequestType('instant'));
+    }
+
+    public function testIsOnRequestTypeNull(): void
+    {
+        $this->assertFalse(RoomStockTypeConstraint::isOnRequestType(null));
+    }
 }

@@ -15,6 +15,7 @@ use App\Contract\Request\Booking\BookingImport\BookingImportRequest;
 use App\Contract\Request\Booking\BookingUpdateRequest;
 use App\Entity\Booking;
 use App\Entity\BookingDate;
+use App\Entity\Component;
 use App\Entity\Guest;
 use App\Event\Booking\BookingStatusEvent;
 use App\Exception\Booking\BadPriceException;
@@ -153,11 +154,12 @@ class BookingManager
         $totalPrice = 0;
         $includedDaysCount = 0;
         $includedLastDate = (clone $booking->startDate)->modify(sprintf('+%s days', $minimumDuration - 1));
-
-        if (isset($bookingCreateRequest->availabilityType) &&
-            AvailabilityTypeConstraint::isValid($bookingCreateRequest->availabilityType)
-        ) {
-            $booking->availabilityType = $bookingCreateRequest->availabilityType;
+        if (isset($bookingCreateRequest->availabilityType)) {
+            if ($this->isValidAvailabilityType($bookingCreateRequest->availabilityType, $component)) {
+                $booking->availabilityType = $bookingCreateRequest->availabilityType;
+            } else {
+                throw new UnprocessableEntityException();
+            }
         }
 
         $bookedDates = [];
@@ -181,14 +183,14 @@ class BookingManager
         }
 
         // validation #10
-        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST !== $roomStockType &&
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST !== $roomStockType &&
             $this->isUnavailableForBookings($booking)
         ) {
             throw new UnavailableDateException();
         }
 
         // validation #11
-        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType &&
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $roomStockType &&
             $this->hasStopSaleOnRequestBookings($booking)
         ) {
             throw new UnavailableDateException();
@@ -446,6 +448,18 @@ class BookingManager
         $this->em->flush();
 
         return $booking;
+    }
+
+    protected function isValidAvailabilityType(string $availabilityType, Component $component): bool
+    {
+        if (!AvailabilityTypeConstraint::isValid($availabilityType)) {
+            return false;
+        }
+
+        return (AvailabilityTypeConstraint::AVAILABILITY_TYPE_INSTANT === $availabilityType &&
+                RoomStockTypeConstraint::isInstantType($component->roomStockType)) ||
+            (AvailabilityTypeConstraint::AVAILABILITY_TYPE_ON_REQUEST === $availabilityType &&
+                RoomStockTypeConstraint::isOnRequestType($component->roomStockType));
     }
 
     protected function isUnavailableForBookings(Booking $booking): bool

@@ -24,6 +24,8 @@ class BookingIntegrationTest extends IntegrationTestCase
     private \DateTime $startDate;
     private string $componentGoldenId;
     private string $componentGoldenIdWithDurationTwo;
+    private string $componentGoldenIdInstant;
+    private string $componentGoldenIdOnRequest;
     private array $payload;
 
     /**
@@ -34,13 +36,15 @@ class BookingIntegrationTest extends IntegrationTestCase
     {
         $this->componentGoldenId = '213072';
         $this->componentGoldenIdWithDurationTwo = '1008863';
+        $this->componentGoldenIdInstant = '351306';
+        $this->componentGoldenIdOnRequest = '218642';
         static::cleanUp();
         $this->entityManager = self::$container->get('doctrine.orm.entity_manager');
         $this->cleanUpBooking();
         $this->prepareExperience();
         $this->startDate = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
         $this->payload = self::$bookingHelper->defaultPayload();
-        $componentIdList = [$this->componentGoldenId, $this->componentGoldenIdWithDurationTwo];
+        $componentIdList = [$this->componentGoldenId, $this->componentGoldenIdWithDurationTwo, $this->componentGoldenIdInstant, $this->componentGoldenIdInstant];
         self::$bookingHelper->fulfillAvailability($componentIdList, $this->entityManager, $this->payload);
     }
 
@@ -860,9 +864,37 @@ class BookingIntegrationTest extends IntegrationTestCase
             }),
         ];
 
+        yield 'happy-path with no availability type' => [
+            $payload,
+            function (
+                BookingIntegrationTest $test,
+                $response,
+                $availabilityBeforeBooking,
+                $availabilityAfterBooking,
+                $bookedDates
+            ) {
+                $test->assertEmpty($response->getContent());
+                $test->assertEquals(201, $response->getStatusCode());
+                foreach ($availabilityAfterBooking as $key => $availability) {
+                    if (isset($bookedDates[$key]) && $availability['date'] === $bookedDates[$key]['date']->format(DateTimeConstants::DEFAULT_DATE_FORMAT)) {
+                        $this->assertEquals($availabilityBeforeBooking[$key]['usedStock'] + $bookedDates[$key]['usedStock'], $availability['usedStock']);
+                        $this->assertEquals($availabilityBeforeBooking[$key]['realStock'] - $bookedDates[$key]['usedStock'], $availability['realStock']);
+                        $this->assertEquals($availabilityBeforeBooking[$key]['stock'], $availability['stock']);
+                    } else {
+                        $this->assertEquals($availabilityBeforeBooking[$key]['usedStock'], $availability['usedStock']);
+                        $this->assertEquals($availabilityBeforeBooking[$key]['realStock'], $availability['realStock']);
+                        $this->assertEquals($availabilityBeforeBooking[$key]['stock'], $availability['stock']);
+                    }
+                }
+            },
+        ];
+
         yield 'happy-path with instant availability_type' => [
             (function ($payload) {
+                $payload['bookingId'] = bin2hex(random_bytes(8));
                 $payload['availabilityType'] = 'instant';
+                $payload['box'] = '2143';
+                $payload['experience']['id'] = '179369';
 
                 return $payload;
             })($payload),
@@ -889,9 +921,12 @@ class BookingIntegrationTest extends IntegrationTestCase
             },
         ];
 
-        yield 'happy-path with on_request availability_type' => [
+        yield 'happy-path with on-request availability_type' => [
             (function ($payload) {
+                $payload['bookingId'] = bin2hex(random_bytes(8));
                 $payload['availabilityType'] = 'on-request';
+                $payload['box'] = '2143';
+                $payload['experience']['id'] = '55823';
 
                 return $payload;
             })($payload),
@@ -918,9 +953,9 @@ class BookingIntegrationTest extends IntegrationTestCase
             },
         ];
 
-        yield 'happy-path with other availability_type' => [
+        yield 'not happy-path with other availability_type' => [
             (function ($payload) {
-                $payload['availabilityType'] = 'other';
+                $payload['availabilityType'] = 'on_request';
 
                 return $payload;
             })($payload),
@@ -931,6 +966,28 @@ class BookingIntegrationTest extends IntegrationTestCase
                 $availabilityAfterBooking
             ) {
                 $test->assertEquals('{"error":{"message":"Unprocessable entity","code":1000002,"errors":{"availabilityType":["The value you selected is not a valid choice."]}}}', $response->getContent());
+                $test->assertEquals(422, $response->getStatusCode());
+                foreach ($availabilityAfterBooking as $key => $availability) {
+                    $this->assertEquals($availabilityBeforeBooking[$key]['usedStock'], $availability['usedStock']);
+                    $this->assertEquals($availabilityBeforeBooking[$key]['realStock'], $availability['realStock']);
+                    $this->assertEquals($availabilityBeforeBooking[$key]['stock'], $availability['stock']);
+                }
+            },
+        ];
+
+        yield 'availability types is not fit with component room-stock-type' => [
+            (function ($payload) {
+                $payload['availabilityType'] = 'on-request';
+                $payload['box'] = '2061';
+                $payload['experience']['id'] = '103492';
+
+                return $payload;
+            })($payload),
+            function (BookingIntegrationTest $test, $response, $availabilityBeforeBooking, $availabilityAfterBooking) {
+                $test->assertEquals(
+                    '{"error":{"message":"Unprocessable entity","code":1000002}}',
+                    $response->getContent()
+                );
                 $test->assertEquals(422, $response->getStatusCode());
                 foreach ($availabilityAfterBooking as $key => $availability) {
                     $this->assertEquals($availabilityBeforeBooking[$key]['usedStock'], $availability['usedStock']);

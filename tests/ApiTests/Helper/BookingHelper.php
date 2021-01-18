@@ -65,7 +65,6 @@ class BookingHelper
                     ],
                 ],
                 'currency' => 'EUR',
-                'availabilityType' => 'on-request',
                 'voucher' => '198257918',
                 'startDate' => (clone $this->startDate)->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
                 'endDate' => (clone $this->startDate)->modify('+1 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),

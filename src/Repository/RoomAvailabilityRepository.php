@@ -120,7 +120,7 @@ SQL;
         $statement->bindValue('boxId', $boxId);
         $statement->bindValue('dateFrom', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
         $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
-        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
+        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST);
         $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
         $statement->execute();
 
@@ -168,7 +168,7 @@ SQL;
         $statement->bindValue('boxId', $boxId);
         $statement->bindValue('dateFrom', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
         $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
-        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
+        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST);
         $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
         $statement->execute();
 
@@ -206,7 +206,7 @@ SQL;
         $statement->bindValue('boxId', $boxId);
         $statement->bindValue('dateFrom', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
         $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
-        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
+        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST);
         $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
         $statement->execute();
 
@@ -394,7 +394,7 @@ SQL;
         $params = [
             'componentGoldenId' => $componentGoldenId,
             'decrement' => $decrement,
-            'requestType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST,
+            'requestType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST,
             'date' => $date->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
         ];
 
@@ -422,7 +422,7 @@ SQL;
             'componentGoldenId' => $componentGoldenId,
             'decrement' => $decrement,
             'dates' => $dates,
-            'requestType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST,
+            'requestType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST,
         ];
         $types = [
             'componentGoldenId' => \PDO::PARAM_STR,
@@ -481,7 +481,7 @@ SQL;
         $statement->bindValue('startDate', $startDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
         $statement->bindValue('endDate', $endDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT));
         $statement->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
-        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
+        $statement->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST);
         $statement->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
         $statement->execute();
 
@@ -544,7 +544,7 @@ SQL;
         $dateNow = (new \DateTime('now'))->format(DateTimeConstants::DEFAULT_DATE_TIME_FORMAT);
         $query->bindValue('dateNow', $dateNow);
         $query->bindValue('status', BookingStatusConstraint::BOOKING_STATUS_CREATED);
-        $query->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
+        $query->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST);
         $query->bindValue('stockType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_STOCK);
         $query->bindValue('allotmentType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ALLOTMENT);
         $query->execute();
@@ -585,7 +585,7 @@ SQL;
         new \DateTime($endDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT))
         )->modify('-1 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
-        $query->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST);
+        $query->bindValue('onRequestType', RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST);
         $query->execute();
 
         return $query->fetchAllAssociative();

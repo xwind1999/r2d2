@@ -171,7 +171,7 @@ class RoomAvailabilityManager
         $componentId = $bookingDates[0]->componentGoldenId;
         $component = $this->componentRepository->findOneByGoldenId($componentId);
 
-        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $component->roomStockType) {
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $component->roomStockType) {
             return;
         }
         $dates = [];
@@ -220,7 +220,7 @@ class RoomAvailabilityManager
         $componentId = $bookingDates[0]->componentGoldenId;
         $component = $this->componentRepository->findOneByGoldenId($componentId);
 
-        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $component->roomStockType) {
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $component->roomStockType) {
             return;
         }
         $dates = [];
