@@ -486,7 +486,7 @@ class AvailabilityHelperTest extends ProphecyTestCase
                 $test->assertCount(3, $statusArray);
                 $test->assertEquals($expectedResult, $result);
             }),
-            RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST,
+            RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST,
         ];
 
         yield 'fill-missing-availabilities-with-stock-type' => [

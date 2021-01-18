@@ -534,6 +534,7 @@ class BookingManagerTest extends ProphecyTestCase
      * @covers ::__construct
      * @covers ::create
      * @covers ::isUnavailableForBookings
+     * @covers ::isValidAvailabilityType
      * @covers ::hasStopSaleOnRequestBookings
      * @group create
      *
@@ -730,6 +731,7 @@ class BookingManagerTest extends ProphecyTestCase
                 $room->extraRoom = false;
                 $room->dates = [$roomDate];
                 $bookingCreateRequest->rooms = [$room];
+                $bookingCreateRequest->availabilityType = AvailabilityTypeConstraint::AVAILABILITY_TYPE_ON_REQUEST;
 
                 return $bookingCreateRequest;
             })(clone $baseBookingCreateRequest),
@@ -759,7 +761,7 @@ class BookingManagerTest extends ProphecyTestCase
                 $test->assertCount(1, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
-            ['roomStockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST],
+            ['roomStockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST],
         ];
 
         yield 'on-request with stop sales day' => [
@@ -808,7 +810,7 @@ class BookingManagerTest extends ProphecyTestCase
                 $test->assertCount(1, $booking->bookingDate);
                 $test->assertCount(1, $booking->guest);
             },
-            ['roomStockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST],
+            ['roomStockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST],
         ];
 
         yield 'on-request not so happy days' => [
@@ -854,7 +856,7 @@ class BookingManagerTest extends ProphecyTestCase
             function ($test) {
                 $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
             },
-            ['roomStockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST],
+            ['roomStockType' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST],
         ];
 
         yield 'happy days, null duration (defaulting to one)' => [
@@ -1586,6 +1588,43 @@ class BookingManagerTest extends ProphecyTestCase
             },
         ];
 
+        yield 'booking with null availability_type' => [
+            (function ($bookingCreateRequest) {
+                $roomDate = new RoomDate();
+                $roomDate->day = new \DateTime('2020-01-01');
+                $roomDate->price = 0;
+                $roomDate->extraNight = false;
+                $room = new Room();
+                $room->extraRoom = false;
+                $room->dates = [$roomDate];
+                $bookingCreateRequest->rooms = [$room];
+                $bookingCreateRequest->availabilityType = null;
+
+                return $bookingCreateRequest;
+            })(clone $baseBookingCreateRequest),
+            1,
+            function (BookingManagerTest $test) {
+                $test->repository->findOneByGoldenId(Argument::any())->willThrow(new BookingNotFoundException());
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+                $test->roomAvailabilityRepository->findBookingAvailabilityByExperienceAndDates(
+                    Argument::type('string'),
+                    Argument::type(\DateTimeInterface::class),
+                    Argument::type(\DateTimeInterface::class)
+                )->shouldBeCalledOnce();
+            },
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
+                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
+                $test->assertEquals(500, $booking->totalPrice);
+                $test->assertCount(1, $booking->bookingDate);
+                $test->assertCount(1, $booking->guest);
+            },
+        ];
+
         yield 'booking with invalid availability_type' => [
             (function ($bookingCreateRequest) {
                 $roomDate = new RoomDate();
@@ -1611,15 +1650,12 @@ class BookingManagerTest extends ProphecyTestCase
                     Argument::type('string'),
                     Argument::type(\DateTimeInterface::class),
                     Argument::type(\DateTimeInterface::class)
-                )->shouldBeCalledOnce();
+                )->shouldNotHaveBeenCalled();
             },
-            null,
+            UnprocessableEntityException::class,
             function ($test, $booking) {
-                $test->entityManager->persist(Argument::type(Booking::class))->shouldHaveBeenCalledOnce();
-                $test->entityManager->flush()->shouldHaveBeenCalledOnce();
-                $test->assertEquals(500, $booking->totalPrice);
-                $test->assertCount(1, $booking->bookingDate);
-                $test->assertCount(1, $booking->guest);
+                $test->entityManager->persist(Argument::type(Booking::class))->shouldNotHaveBeenCalled();
+                $test->entityManager->flush()->shouldNotHaveBeenCalled();
             },
         ];
     }

@@ -33,7 +33,7 @@ class AvailabilityHelper
                 $returnAvailabilities[$date] = [
                     'Date' => $date,
                     'AvailabilityValue' => 0,
-                    'AvailabilityStatus' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType ?
+                    'AvailabilityStatus' => RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $roomStockType ?
                         AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST :
                         AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_UNAVAILABLE,
                     'SellingPrice' => 0.00,
@@ -104,7 +104,7 @@ class AvailabilityHelper
                 'Stock' => 0,
                 'Request' => 0,
             ];
-            if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $availability['roomStockType']) {
+            if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $availability['roomStockType']) {
                 $data['Request'] = 1;
             } else {
                 $data['Stock'] = 1;
@@ -129,7 +129,7 @@ class AvailabilityHelper
             return AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_AVAILABLE;
         }
 
-        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $type) {
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $type) {
             return AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST;
         }
 
@@ -187,7 +187,7 @@ class AvailabilityHelper
 
     private function validateStockType(array $availability, string $roomStockType): string
     {
-        if (empty($availability) && RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType) {
+        if (empty($availability) && RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $roomStockType) {
             return AvailabilityConstants::AVAILABILITY_SHORTEN_ON_REQUEST;
         }
 
@@ -195,7 +195,7 @@ class AvailabilityHelper
             return AvailabilityConstants::AVAILABILITY_SHORTEN_NOT_AVAILABLE;
         }
 
-        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST === $roomStockType) {
+        if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $roomStockType) {
             return AvailabilityConstants::AVAILABILITY_SHORTEN_ON_REQUEST;
         }
 

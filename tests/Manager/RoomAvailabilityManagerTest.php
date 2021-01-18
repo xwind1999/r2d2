@@ -650,7 +650,7 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
             (function ($test, $availability, $increment) {
                 $availability->stock = 10;
                 $component = $availability->component;
-                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST;
                 $test->componentRepository
                     ->findOneByGoldenId(
                         Argument::type('string')
@@ -1009,7 +1009,7 @@ class RoomAvailabilityManagerTest extends ProphecyTestCase
             (function ($test, $availability, $increment) {
                 $availability->stock = 10;
                 $component = $availability->component;
-                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_ONREQUEST;
+                $component->roomStockType = RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST;
                 $test->componentRepository
                     ->findOneByGoldenId(
                         Argument::type('string')
