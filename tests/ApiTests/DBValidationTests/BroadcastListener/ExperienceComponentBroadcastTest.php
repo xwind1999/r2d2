@@ -8,6 +8,7 @@ use App\Repository\ComponentRepository;
 use App\Repository\ExperienceComponentRepository;
 use App\Repository\ExperienceRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class ExperienceComponentBroadcastTest extends IntegrationTestCase
 {
@@ -38,7 +39,7 @@ class ExperienceComponentBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testComponentProduct($component);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
 
@@ -58,7 +59,7 @@ class ExperienceComponentBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testExperienceProduct($experience);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
 
@@ -72,15 +73,15 @@ class ExperienceComponentBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testExperienceComponentRelationship($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-product-relationship');
 
         $experienceComponentRepository = self::$container->get(ExperienceComponentRepository::class);
         $experienceComponent = $experienceComponentRepository->findOneByExperienceComponent($experienceEntity, $componentEntity);
-        $this->assertEquals($payload['parentProduct'], $experienceComponent->experienceGoldenId);
-        $this->assertEquals($payload['childProduct'], $experienceComponent->componentGoldenId);
-        $this->assertEquals($payload['isEnabled'], $experienceComponent->isEnabled);
+        self::assertEquals($payload['parentProduct'], $experienceComponent->experienceGoldenId);
+        self::assertEquals($payload['childProduct'], $experienceComponent->componentGoldenId);
+        self::assertEquals($payload['isEnabled'], $experienceComponent->isEnabled);
 
         $componentID = $experienceComponent->componentGoldenId;
         $experienceID = $experienceComponent->experienceGoldenId;
@@ -105,14 +106,14 @@ class ExperienceComponentBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testExperienceComponentRelationship($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-product-relationship');
 
         $experienceComponentRepository = self::$container->get(ExperienceComponentRepository::class);
         $experienceComponent = $experienceComponentRepository->findOneByExperienceComponent($experienceEntity, $componentEntity);
-        $this->assertEquals($payload['parentProduct'], $experienceComponent->experienceGoldenId);
-        $this->assertEquals($payload['childProduct'], $experienceComponent->componentGoldenId);
-        $this->assertEquals($payload['isEnabled'], $experienceComponent->isEnabled);
+        self::assertEquals($payload['parentProduct'], $experienceComponent->experienceGoldenId);
+        self::assertEquals($payload['childProduct'], $experienceComponent->componentGoldenId);
+        self::assertEquals($payload['isEnabled'], $experienceComponent->isEnabled);
     }
 }

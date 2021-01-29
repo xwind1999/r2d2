@@ -6,6 +6,7 @@ namespace App\Tests\ApiTests\DBValidationTests;
 
 use App\Repository\BoxRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class BoxBroadcastTest extends IntegrationTestCase
 {
@@ -29,16 +30,16 @@ class BoxBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testBoxProduct($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-product');
 
         $boxRepository = self::$container->get(BoxRepository::class);
         $box = $boxRepository->findOneByGoldenId($payload['id']);
-        $this->assertEquals($payload['id'], $box->goldenId);
-        $this->assertEquals($payload['status'], $box->status);
-        $this->assertEquals($payload['sellableBrand']['code'], $box->brand);
-        $this->assertEquals($payload['sellableCountry']['code'], $box->country);
+        self::assertEquals($payload['id'], $box->goldenId);
+        self::assertEquals($payload['status'], $box->status);
+        self::assertEquals($payload['sellableBrand']['code'], $box->brand);
+        self::assertEquals($payload['sellableCountry']['code'], $box->country);
 
         return $box->goldenId;
     }
@@ -66,16 +67,16 @@ class BoxBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testBoxProduct($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-product');
 
         $boxRepository = self::$container->get(BoxRepository::class);
         $box = $boxRepository->findOneByGoldenId($payload['id']);
-        $this->assertEquals($payload['id'], $box->goldenId);
-        $this->assertEquals($payload['status'], $box->status);
-        $this->assertEquals($payload['sellableBrand']['code'], $box->brand);
-        $this->assertEquals($payload['sellableCountry']['code'], $box->country);
+        self::assertEquals($payload['id'], $box->goldenId);
+        self::assertEquals($payload['status'], $box->status);
+        self::assertEquals($payload['sellableBrand']['code'], $box->brand);
+        self::assertEquals($payload['sellableCountry']['code'], $box->country);
     }
 
     /**
@@ -101,15 +102,15 @@ class BoxBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testBoxProduct($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-product');
 
         $boxRepository = self::$container->get(BoxRepository::class);
         $box = $boxRepository->findOneByGoldenId($payload['id']);
-        $this->assertEquals($payload['id'], $box->goldenId);
-        $this->assertEquals($payload['status'], $box->status);
-        $this->assertEquals($payload['sellableBrand']['code'], $box->brand);
-        $this->assertEquals($payload['sellableCountry']['code'], $box->country);
+        self::assertEquals($payload['id'], $box->goldenId);
+        self::assertEquals($payload['status'], $box->status);
+        self::assertEquals($payload['sellableBrand']['code'], $box->brand);
+        self::assertEquals($payload['sellableCountry']['code'], $box->country);
     }
 }

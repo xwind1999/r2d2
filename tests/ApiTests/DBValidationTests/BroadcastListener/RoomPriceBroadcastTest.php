@@ -7,6 +7,7 @@ namespace App\Tests\ApiTests\DBValidationTests;
 use App\Repository\ComponentRepository;
 use App\Repository\RoomPriceRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class RoomPriceBroadcastTest extends IntegrationTestCase
 {
@@ -37,7 +38,7 @@ class RoomPriceBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testComponentProduct($component);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
 
@@ -60,14 +61,14 @@ class RoomPriceBroadcastTest extends IntegrationTestCase
         ]];
 
         $response = self::$broadcastListenerHelper->testRoomPrice($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-room-price-list');
         $this->consume('listener-room-price');
 
         $roomPriceRepository = self::$container->get(RoomPriceRepository::class);
         $roomPrice = $roomPriceRepository->findByComponentAndDateRange($componentEntity, new \DateTime($payload[0]['dateFrom']), new \DateTime($payload[0]['dateTo']));
-        $this->assertEquals($payload[0]['product']['id'], $roomPrice[$date1->format('Y-m-d')]->componentGoldenId);
-        $this->assertEquals($payload[0]['price']['amount'], ($roomPrice[$date1->format('Y-m-d')]->price) / 100);
+        self::assertEquals($payload[0]['product']['id'], $roomPrice[$date1->format('Y-m-d')]->componentGoldenId);
+        self::assertEquals($payload[0]['price']['amount'], ($roomPrice[$date1->format('Y-m-d')]->price) / 100);
     }
 }

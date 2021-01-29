@@ -8,6 +8,7 @@ use App\Constants\DateTimeConstants;
 use App\Entity\Partner;
 use App\Repository\PartnerRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class PartnerBroadcastTest extends IntegrationTestCase
 {
@@ -31,15 +32,15 @@ class PartnerBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testPartners($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-partner');
 
         $partnerRepository = self::$container->get(PartnerRepository::class);
         $partner = $partnerRepository->findOneByGoldenId($payload['id']);
-        $this->assertEquals(static::$partnerGoldenId, $partner->goldenId);
-        $this->assertEquals($payload['status'], $partner->status);
-        $this->assertEquals($payload['currencyCode'], $partner->currency);
+        self::assertEquals(static::$partnerGoldenId, $partner->goldenId);
+        self::assertEquals($payload['status'], $partner->status);
+        self::assertEquals($payload['currencyCode'], $partner->currency);
     }
 
     /**
@@ -60,17 +61,17 @@ class PartnerBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testPartners($payload, $header);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-partner');
 
         $partnerRepository = self::$container->get(PartnerRepository::class);
         /** @var Partner $partner */
         $partner = $partnerRepository->findOneByGoldenId($payload['id']);
-        $this->assertEquals(static::$partnerGoldenId, $partner->goldenId);
-        $this->assertEquals($payload['status'], $partner->status);
-        $this->assertEquals($payload['currencyCode'], $partner->currency);
-        $this->assertEquals(
+        self::assertEquals(static::$partnerGoldenId, $partner->goldenId);
+        self::assertEquals($payload['status'], $partner->status);
+        self::assertEquals($payload['currencyCode'], $partner->currency);
+        self::assertEquals(
             (new \DateTime($payload['partnerCeaseDate']))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
             $partner->ceaseDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
@@ -88,7 +89,7 @@ class PartnerBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testPartners($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         try {
             $this->consume('listener-partner');
@@ -98,10 +99,10 @@ class PartnerBroadcastTest extends IntegrationTestCase
         $partnerRepository = self::$container->get(PartnerRepository::class);
         /** @var Partner $partner */
         $partner = $partnerRepository->findOneByGoldenId($payload['id']);
-        $this->assertEquals(static::$partnerGoldenId, $partner->goldenId);
-        $this->assertEquals('ceased', $partner->status);
-        $this->assertEquals($payload['currencyCode'], $partner->currency);
-        $this->assertEquals(
+        self::assertEquals(static::$partnerGoldenId, $partner->goldenId);
+        self::assertEquals('ceased', $partner->status);
+        self::assertEquals($payload['currencyCode'], $partner->currency);
+        self::assertEquals(
             (new \DateTime(static::$partnerCeaseDate))->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
             $partner->ceaseDate->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );

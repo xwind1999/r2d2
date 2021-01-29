@@ -8,6 +8,7 @@ use App\Repository\BoxExperienceRepository;
 use App\Repository\BoxRepository;
 use App\Repository\ExperienceRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class BoxExperienceBroadcastTest extends IntegrationTestCase
 {
@@ -33,7 +34,7 @@ class BoxExperienceBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testBoxProduct($box);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
 
@@ -53,7 +54,7 @@ class BoxExperienceBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testExperienceProduct($experience);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
 
@@ -67,15 +68,15 @@ class BoxExperienceBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testBoxExperienceRelationship($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-product-relationship');
 
         $boxExperienceRepository = self::$container->get(BoxExperienceRepository::class);
         $boxExperience = $boxExperienceRepository->findOneEnabledByBoxExperience($boxEntity, $experienceEntity);
-        $this->assertEquals($payload['parentProduct'], $boxExperience->boxGoldenId);
-        $this->assertEquals($payload['childProduct'], $boxExperience->experienceGoldenId);
-        $this->assertEquals($payload['isEnabled'], $boxExperience->isEnabled);
+        self::assertEquals($payload['parentProduct'], $boxExperience->boxGoldenId);
+        self::assertEquals($payload['childProduct'], $boxExperience->experienceGoldenId);
+        self::assertEquals($payload['isEnabled'], $boxExperience->isEnabled);
 
         $boxID = $boxExperience->boxGoldenId;
         $experienceID = $boxExperience->experienceGoldenId;
@@ -100,14 +101,14 @@ class BoxExperienceBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testBoxExperienceRelationship($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-product-relationship');
 
         $boxExperienceRepository = self::$container->get(BoxExperienceRepository::class);
         $boxExperience = $boxExperienceRepository->findOneByBoxExperience($boxEntity, $experienceEntity);
-        $this->assertEquals($payload['parentProduct'], $boxExperience->boxGoldenId);
-        $this->assertEquals($payload['childProduct'], $boxExperience->experienceGoldenId);
-        $this->assertEquals($payload['isEnabled'], $boxExperience->isEnabled);
+        self::assertEquals($payload['parentProduct'], $boxExperience->boxGoldenId);
+        self::assertEquals($payload['childProduct'], $boxExperience->experienceGoldenId);
+        self::assertEquals($payload['isEnabled'], $boxExperience->isEnabled);
     }
 }
