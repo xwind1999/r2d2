@@ -211,6 +211,7 @@ class ComponentManager
             'experience.status',
             ProductStatusConstraint::PRODUCT_STATUS_ACTIVE
         ));
+        $criteria->andWhere(Criteria::expr()->neq('component.roomStockType', null));
         $criteria->andWhere(Criteria::expr()->eq('component.isReservable', true));
         $criteria->andWhere(Criteria::expr()->eq('boxExperience.isEnabled', true));
         $criteria->andWhere(Criteria::expr()->eq('experienceComponent.isEnabled', true));

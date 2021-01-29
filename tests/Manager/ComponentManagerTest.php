@@ -493,6 +493,48 @@ class ComponentManagerTest extends ProphecyTestCase
 
     /**
      * @covers ::__construct
+     * @covers ::calculateManageableFlag
+     * @covers ::createComponentRequiredCriteria
+     * @covers ::createManageableCriteria
+     */
+    public function testFindAndSetManageableComponentWithEmptyRoomStockWontChangeAnything(): void
+    {
+        $component = $this->prophesize(Component::class);
+        $component->goldenId = '12345';
+        $component->isManageable = false;
+        $component->name = '123';
+        $component->isSellable = false;
+        $partner = new Partner();
+        $partner->goldenId = '1234';
+        $component->partner = $partner;
+        $this->repository
+            ->findComponentWithManageableCriteria(Argument::any())
+            ->shouldBeCalledOnce()
+            ->willThrow(ManageableProductNotFoundException::class)
+        ;
+        $this->repository
+            ->findComponentWithManageableRelationships(Argument::any())
+            ->shouldBeCalledOnce()
+            ->willReturn($component->reveal())
+        ;
+        $this->repository->save(Argument::type(Component::class))->shouldNotBeCalled();
+        $this->messageBus->dispatch(Argument::type(RoomRequest::class))->shouldNotBeCalled();
+        (function ($test, $goldenId) {
+            $this->messageBus->dispatch(Argument::type(CalculateFlatManageableComponent::class))->will(function ($args) use ($test, $goldenId) {
+                $test->assertEquals($goldenId, $args[0]->componentGoldenId);
+
+                return new Envelope(new \stdClass());
+            })
+                ->shouldNotBeCalled();
+        })($this, $component->goldenId);
+
+        $this->manager->calculateManageableFlag($component->goldenId);
+
+        $this->assertFalse($component->isManageable);
+    }
+
+    /**
+     * @covers ::__construct
      * @covers ::getManageableComponentForGetPackage
      */
     public function testGetManageableComponentForGetPackage(): void
