@@ -67,6 +67,7 @@ class BookingHelper
                 ],
                 'currency' => 'EUR',
                 'voucher' => '198257918',
+                'availabilityType' => 'instant',
                 'startDate' => (clone $this->startDate)->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
                 'endDate' => (clone $this->startDate)->modify('+1 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
                 'customerComment' => 'Clean sheets please',

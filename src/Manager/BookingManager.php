@@ -336,6 +336,7 @@ class BookingManager
         }
 
         if (BookingStatusConstraint::BOOKING_STATUS_COMPLETE === $bookingUpdateRequest->status &&
+            RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST !== $booking->availabilityType &&
             $booking->expiredAt < new \DateTime('now') &&
             $this->isUnavailableForBookings($booking)
         ) {
