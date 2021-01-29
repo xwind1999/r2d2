@@ -9,53 +9,61 @@ use App\Repository\ComponentRepository;
 use App\Repository\ExperienceRepository;
 use App\Repository\PartnerRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class IsManageableFlagTest extends IntegrationTestCase
 {
     /**
      * @dataProvider manageableTestCases
      */
-    public function testShouldCalculateComponent(array $box, array $partner, array $experience, array $component, array $boxExperience, array $experienceComponent, bool $expectedToBeManageable): void
-    {
+    public function testShouldCalculateComponent(
+        array $box,
+        array $partner,
+        array $experience,
+        array $component,
+        array $boxExperience,
+        array $experienceComponent,
+        bool $expectedToBeManageable
+    ): void {
         static::cleanUp();
 
         $response = self::$broadcastListenerHelper->testBoxProduct($box);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
 
         self::$container->get(BoxRepository::class)->findOneByGoldenId($box['id']);
 
         $response = self::$broadcastListenerHelper->testPartners($partner);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PARTNER);
         self::$container->get(PartnerRepository::class)->findOneByGoldenId($partner['id']);
 
         $response = self::$broadcastListenerHelper->testExperienceProduct($experience);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
         self::$container->get(ExperienceRepository::class)->findOneByGoldenId($experience['id']);
 
         $response = self::$broadcastListenerHelper->testComponentProduct($component);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_PRODUCT);
         self::$container->get(ComponentRepository::class)->findOneByGoldenId($component['id']);
 
         $response = self::$broadcastListenerHelper->testBoxExperienceRelationship($boxExperience);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
         $this->consume(self::QUEUE_BROADCAST_RELATIONSHIP);
 
         $response = self::$broadcastListenerHelper->testExperienceComponentRelationship($experienceComponent);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume(self::QUEUE_BROADCAST_RELATIONSHIP);
         $this->consume(self::QUEUE_CALCULATE_MANAGEABLE_FLAG, 20);
 
         $component = self::$container->get(ComponentRepository::class)->findOneByGoldenId($component['id']);
-        $this->assertEquals($expectedToBeManageable, $component->isManageable);
+        self::assertEquals($expectedToBeManageable, $component->isManageable);
     }
 
     /**

@@ -6,12 +6,14 @@ namespace App\Tests\ApiTests\QuickData;
 
 use App\Constants\AvailabilityConstants;
 use App\Constants\DateTimeConstants;
+use App\Constraint\RoomStockTypeConstraint;
 use App\Entity\RoomAvailability;
 use App\Helper\AvailabilityHelper;
 use App\Repository\BookingDateRepository;
 use App\Repository\ComponentRepository;
 use App\Repository\RoomAvailabilityRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @group quickdata
@@ -33,12 +35,11 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         static::cleanUp();
         self::$bookingHelper->cleanUpBooking(
             [$componentGoldenId],
-            [$experienceGoldenId],
-            self::$container->get('doctrine.orm.entity_manager')
+            [$experienceGoldenId]
         );
 
         $response = self::$broadcastListenerHelper->testRoomAvailability($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-room-availability-list', 30);
         $this->consume('listener-room-availability', 30);
@@ -52,13 +53,12 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
-        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($response->getContent(), true));
 
         static::cleanUp();
         self::$bookingHelper->cleanUpBooking(
             [$componentGoldenId],
-            [$experienceGoldenId],
-            self::$container->get('doctrine.orm.entity_manager')
+            [$experienceGoldenId]
         );
     }
 
@@ -203,7 +203,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
                 $payloadBooking = self::$bookingHelper->defaultPayload($payloadOverride);
                 $response = self::$bookingHelper->create($payloadBooking);
-                self::assertEquals(201, $response->getStatusCode());
+                self::assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
             }),
         ];
     }
@@ -251,7 +251,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testRoomAvailability($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-room-availability-list', 30);
         $this->consume('listener-room-availability', 30);
@@ -275,7 +275,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
-        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
     public function testGetPackageWithOnRequestStopSale()
@@ -322,7 +322,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testRoomAvailability($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-room-availability-list', 30);
         $this->consume('listener-room-availability', 30);
@@ -350,7 +350,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
             $dateTo->modify('+351 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
-        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
     public function testGetPackageWithOnRequestDefaultAvailability()
@@ -381,7 +381,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
-        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
     public function testGetPackageWithInactiveRelationshipBetweenComponents()
@@ -459,7 +459,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testRoomAvailability($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $componentId = '227915';
         $payload = [
@@ -526,7 +526,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testRoomAvailability($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-room-availability-list', 30);
         $this->consume('listener-room-availability', 30);
@@ -550,7 +550,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
-        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
     public function testGetPackageWithInvalidExperienceId()
@@ -575,7 +575,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
-        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
     public function testGetPackageWithoutAvailability()
@@ -611,7 +611,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
 
-        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
     public function testGetPackageStockZero()
@@ -654,7 +654,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
 
-        $this->assertEquals($expectedResult, json_decode($responseWithStockZero->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($responseWithStockZero->getContent(), true));
     }
 
     public function testGetPackageV2()
@@ -668,7 +668,8 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
         $expectedResults = [];
         /** @var RoomAvailability[] $roomAvailabilities */
-        $roomAvailabilities = self::$container->get(RoomAvailabilityRepository::class)->findAvailableRoomsByMultipleExperienceIds($experienceIds, $dateFrom);
+        $roomAvailabilities = self::$container->get(RoomAvailabilityRepository::class)
+            ->findAvailableRoomsByMultipleExperienceIds($experienceIds, $dateFrom);
         foreach ($roomAvailabilities as $availability) {
             $expectedResults[] = [
                 'PackageCode' => (int) $availability['experience_golden_id'],
@@ -702,17 +703,20 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             return $current['PackageCode'] > $next['PackageCode'];
         });
 
-        $this->assertEquals($expected, $response);
+        self::assertEquals($expected, $response);
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function testGetPackageV2WithStockZero()
     {
         static::cleanUp();
 
-        $experienceId1 = '59593';
-        $componentId1 = '213072';
-        $experienceId2 = '103492';
-        $componentId2 = '282687';
+        $experienceId1 = '100035';
+        $componentId1 = '364670';
+        $experienceId2 = '102296';
+        $componentId2 = '303372';
 
         $this->generateAvailability($componentId1);
         $this->generateAvailability($componentId2);
@@ -764,7 +768,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             return $current['PackageCode'] > $next['PackageCode'];
         });
 
-        $this->assertEquals($expected, $response);
+        self::assertEquals($expected, $response);
     }
 
     /**
@@ -779,11 +783,11 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         $experienceId1 = '55823';
         $componentId1 = '218642';
 
-        $experienceId2 = '70373';
-        $componentId2 = '322730';
+        $experienceId2 = '103127';
+        $componentId2 = '1226716';
 
-        $experienceId3 = '78034';
-        $componentId3 = '249910';
+        $experienceId3 = '103152';
+        $componentId3 = '257164';
 
         $this->generateAvailability($componentId1);
         $this->generateAvailability($componentId2);
@@ -836,7 +840,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             return $current['PackageCode'] > $next['PackageCode'];
         });
 
-        $this->assertEquals($expected, $response);
+        self::assertEquals($expected, $response);
     }
 
     /**
@@ -846,7 +850,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
     {
         static::cleanUp();
 
-        $experienceId = '7307';
+        $experienceId = '105171';
         $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
         $dateTo = (clone $dateFrom)->modify('+5 day');
         $datePeriod = new \DatePeriod($dateFrom, new \DateInterval('P1D'), $dateTo);
@@ -875,7 +879,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                 $result += [
                     'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_AVAILABLE,
                 ];
-            } elseif ('on_request' === $availability['roomStockType']) {
+            } elseif (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $availability['roomStockType']) {
                 $result += [
                     'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST,
                 ];
@@ -914,7 +918,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
 
-        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
     /**
@@ -923,15 +927,11 @@ class QuickDataIntegrationTest extends IntegrationTestCase
     public function testAvailabilityPricePeriodWithBooking(): void
     {
         static::cleanUp();
-        $experienceId = '59593';
-        $entityManager = self::$container->get('doctrine.orm.entity_manager');
+        $experienceGoldenId = '10563';
 
         self::$bookingHelper->cleanUpBooking(
-            ['213072'],
-            [$experienceId],
-            $entityManager);
-
-        self::$bookingHelper->fulfillAvailability(['213072'], $entityManager);
+            ['205224'],
+            [$experienceGoldenId]);
 
         $dateFrom = new \DateTime(date(DateTimeConstants::DEFAULT_DATE_FORMAT, strtotime('first day of next month')));
         $dateTo = (clone $dateFrom)->modify('+5 day');
@@ -939,23 +939,30 @@ class QuickDataIntegrationTest extends IntegrationTestCase
 
         // start booking process
         $payloadOverride = [
+            'experience' => [
+                'id' => $experienceGoldenId,
+                'components' => ['Playground park'],
+            ],
+            'box' => '851518',
             'startDate' => $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
             'endDate' => (clone $dateFrom)->modify('+1 day')->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
         ];
 
         $payloadBooking = self::$bookingHelper->defaultPayload($payloadOverride);
+        self::$bookingHelper->fulfillAvailability(['205224'], $payloadBooking);
+
         $response = self::$bookingHelper->create($payloadBooking);
-        self::assertEquals(201, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
         // ending booking process
 
         /** @var RoomAvailability[] $roomAvailabilities */
         $roomAvailabilities = self::$container
             ->get(RoomAvailabilityRepository::class)
-            ->findAvailableRoomsAndPricesByExperienceIdAndDates($experienceId, $dateFrom, $dateTo);
+            ->findAvailableRoomsAndPricesByExperienceIdAndDates($experienceGoldenId, $dateFrom, $dateTo);
 
         $bookingDates = self::$container
             ->get(BookingDateRepository::class)
-            ->findBookingDatesByExperiencesAndDates([$experienceId], $dateFrom, $dateTo);
+            ->findBookingDatesByExperiencesAndDates([$experienceGoldenId], $dateFrom, $dateTo);
 
         $roomAvailabilities = self::$container
             ->get(AvailabilityHelper::class)
@@ -965,7 +972,8 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         foreach ($roomAvailabilities as $availability) {
             $availability['price'] = !empty($availability['price']) ? (int) $availability['price'] / 100 : 0;
             $result = [
-                'Date' => (new \DateTime($availability['date']))->format(DateTimeConstants::PRICE_PERIOD_DATE_TIME_FORMAT),
+                'Date' => (new \DateTime($availability['date']))
+                    ->format(DateTimeConstants::PRICE_PERIOD_DATE_TIME_FORMAT),
                 'AvailabilityValue' => $availability['stock'],
                 'SellingPrice' => $availability['price'],
                 'BuyingPrice' => $availability['price'],
@@ -979,7 +987,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                 $result += [
                     'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_AVAILABLE,
                 ];
-            } elseif ('on_request' === $availability['roomStockType']) {
+            } elseif (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $availability['roomStockType']) {
                 $result += [
                     'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST,
                 ];
@@ -1013,17 +1021,17 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         ];
 
         $response = self::$quickDataHelper->availabilityPricePeriod(
-            $experienceId,
+            $experienceGoldenId,
             $dateFrom->format(DateTimeConstants::DEFAULT_DATE_FORMAT),
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
 
-        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($response->getContent(), true));
 
         self::$bookingHelper->cleanUpBooking(
-            ['213072'],
-            [$experienceId],
-            self::$container->get('doctrine.orm.entity_manager'));
+            ['205224'],
+            [$experienceGoldenId]
+        );
     }
 
     /**
@@ -1116,7 +1124,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testRoomPrice($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-room-price-list', 30);
         $this->consume('listener-room-price', 30);
@@ -1142,7 +1150,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
 
-        $this->assertEquals($expectedResult, json_decode($response->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($response->getContent(), true));
     }
 
     /**
@@ -1165,7 +1173,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                 'Stock' => 0,
                 'Request' => 0,
             ];
-            if ('on_request' === $avs2['roomStockType']) {
+            if (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $avs2['roomStockType']) {
                 $d['Request'] = 1;
             } else {
                 $d['Stock'] = 1;
@@ -1192,15 +1200,15 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             return $current['Package'] > $next['Package'];
         });
 
-        $this->assertEquals($expectedResult, $response);
+        self::assertEquals($expectedResult, $response);
     }
 
     public function testAvailabilityPricePeriodStockZero(): void
     {
         static::cleanUp();
 
-        $experienceId = '59593';
-        $componentId = '213072';
+        $experienceId = '10700';
+        $componentId = '439443';
 
         $this->generateAvailability($componentId);
 
@@ -1219,7 +1227,8 @@ class QuickDataIntegrationTest extends IntegrationTestCase
         foreach ($roomAvailabilities as $availability) {
             $availability['price'] = !empty($availability['price']) ? (int) $availability['price'] / 100 : 0;
             $result = [
-                'Date' => (new \DateTime($availability['date']))->format(DateTimeConstants::PRICE_PERIOD_DATE_TIME_FORMAT),
+                'Date' => (new \DateTime($availability['date']))
+                    ->format(DateTimeConstants::PRICE_PERIOD_DATE_TIME_FORMAT),
                 'AvailabilityValue' => $availability['stock'],
                 'SellingPrice' => $availability['price'],
                 'BuyingPrice' => $availability['price'],
@@ -1233,7 +1242,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                 $result += [
                     'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_AVAILABLE,
                 ];
-            } elseif ('on_request' === $availability['roomStockType']) {
+            } elseif (RoomStockTypeConstraint::ROOM_STOCK_TYPE_ON_REQUEST === $availability['roomStockType']) {
                 $result += [
                     'AvailabilityStatus' => AvailabilityConstants::AVAILABILITY_PRICE_PERIOD_REQUEST,
                 ];
@@ -1273,7 +1282,7 @@ class QuickDataIntegrationTest extends IntegrationTestCase
             $dateTo->format(DateTimeConstants::DEFAULT_DATE_FORMAT)
         );
 
-        $this->assertEquals($expectedResult, json_decode($responseWithStockZero->getContent(), true));
+        self::assertEquals($expectedResult, json_decode($responseWithStockZero->getContent(), true));
     }
 
     private function generateAvailability(string $componentId)
@@ -1288,7 +1297,9 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                         'id' => $componentId,
                     ],
                     'dateFrom' => (clone $dateFrom)->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
-                    'dateTo' => (clone $dateFrom)->modify('+1 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
+                    'dateTo' => (clone $dateFrom)
+                        ->modify('+1 day')
+                        ->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                     'updatedAt' => (new \DateTime())->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                     'isStopSale' => false,
                     'quantity' => '1',
@@ -1297,8 +1308,12 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                     'product' => [
                         'id' => $componentId,
                     ],
-                    'dateFrom' => (clone $dateFrom)->modify('+1 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
-                    'dateTo' => (clone $dateFrom)->modify('+2 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
+                    'dateFrom' => (clone $dateFrom)
+                        ->modify('+1 day')
+                        ->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
+                    'dateTo' => (clone $dateFrom)
+                        ->modify('+2 day')
+                        ->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                     'updatedAt' => (new \DateTime())->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                     'isStopSale' => false,
                     'quantity' => '2',
@@ -1307,8 +1322,12 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                     'product' => [
                         'id' => $componentId,
                     ],
-                    'dateFrom' => (clone $dateFrom)->modify('+3 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
-                    'dateTo' => (clone $dateFrom)->modify('+4 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
+                    'dateFrom' => (clone $dateFrom)
+                        ->modify('+3 day')
+                        ->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
+                    'dateTo' => (clone $dateFrom)
+                        ->modify('+4 day')
+                        ->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                     'updatedAt' => (new \DateTime())->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                     'isStopSale' => false,
                     'quantity' => '5',
@@ -1317,8 +1336,12 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                     'product' => [
                         'id' => $componentId,
                     ],
-                    'dateFrom' => (clone $dateFrom)->modify('+4 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
-                    'dateTo' => (clone $dateFrom)->modify('+5 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
+                    'dateFrom' => (clone $dateFrom)
+                        ->modify('+4 day')
+                        ->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
+                    'dateTo' => (clone $dateFrom)
+                        ->modify('+5 day')
+                        ->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                     'updatedAt' => (new \DateTime())->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                     'isStopSale' => true,
                     'quantity' => '0',
@@ -1327,8 +1350,11 @@ class QuickDataIntegrationTest extends IntegrationTestCase
                     'product' => [
                         'id' => $componentId,
                     ],
-                    'dateFrom' => (clone $dateFrom)->modify('+5 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
-                    'dateTo' => (clone $dateFrom)->modify('+6 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
+                    'dateFrom' => (clone $dateFrom)
+                        ->modify('+5 day')
+                        ->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
+                    'dateTo' => (clone $dateFrom)
+                        ->modify('+6 day')->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                     'updatedAt' => (new \DateTime())->format(DateTimeConstants::DATE_TIME_MILLISECONDS),
                     'isStopSale' => false,
                     'quantity' => '2',

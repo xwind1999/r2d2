@@ -6,6 +6,7 @@ namespace App\Tests\ApiTests\DBValidationTests;
 
 use App\Repository\ExperienceRepository;
 use App\Tests\ApiTests\IntegrationTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class ExperienceBroadcastTest extends IntegrationTestCase
 {
@@ -25,18 +26,18 @@ class ExperienceBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testExperienceProduct($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-product');
 
         $experienceRepository = self::$container->get(ExperienceRepository::class);
         $experience = $experienceRepository->findOneByGoldenId($payload['id']);
-        $this->assertEquals($payload['id'], $experience->goldenId);
-        $this->assertEquals($payload['partner']['id'], $experience->partnerGoldenId);
-        $this->assertEquals($payload['name'], $experience->name);
-        $this->assertEquals($payload['description'], $experience->description);
-        $this->assertEquals($payload['productPeopleNumber'], $experience->peopleNumber);
-        $this->assertEquals($payload['status'], $experience->status);
+        self::assertEquals($payload['id'], $experience->goldenId);
+        self::assertEquals($payload['partner']['id'], $experience->partnerGoldenId);
+        self::assertEquals($payload['name'], $experience->name);
+        self::assertEquals($payload['description'], $experience->description);
+        self::assertEquals($payload['productPeopleNumber'], $experience->peopleNumber);
+        self::assertEquals($payload['status'], $experience->status);
 
         return $experience->goldenId;
     }
@@ -60,17 +61,17 @@ class ExperienceBroadcastTest extends IntegrationTestCase
         ];
 
         $response = self::$broadcastListenerHelper->testExperienceProduct($payload);
-        $this->assertEquals(202, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_ACCEPTED, $response->getStatusCode());
 
         $this->consume('listener-product');
 
         $experienceRepository = self::$container->get(ExperienceRepository::class);
         $partner = $experienceRepository->findOneByGoldenId($payload['id']);
-        $this->assertEquals($payload['id'], $partner->goldenId);
-        $this->assertEquals($payload['partner']['id'], $partner->partnerGoldenId);
-        $this->assertEquals($payload['name'], $partner->name);
-        $this->assertEquals($payload['description'], $partner->description);
-        $this->assertEquals($payload['productPeopleNumber'], $partner->peopleNumber);
-        $this->assertEquals($payload['status'], $partner->status);
+        self::assertEquals($payload['id'], $partner->goldenId);
+        self::assertEquals($payload['partner']['id'], $partner->partnerGoldenId);
+        self::assertEquals($payload['name'], $partner->name);
+        self::assertEquals($payload['description'], $partner->description);
+        self::assertEquals($payload['productPeopleNumber'], $partner->peopleNumber);
+        self::assertEquals($payload['status'], $partner->status);
     }
 }
