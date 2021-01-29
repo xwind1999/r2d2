@@ -192,6 +192,26 @@ class BookingManagerTest extends ProphecyTestCase
             },
         ];
 
+        yield 'happy path with availabilityType = instant' => [
+            $bookingUpdateRequest,
+            (function ($booking) {
+                $booking->availabilityType = 'instant';
+
+                return $booking;
+            })(clone $booking),
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist($booking)->shouldHaveBeenCalled();
+                $test->entityManager->flush()->shouldHaveBeenCalled();
+            },
+            function (BookingManagerTest $test) {
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+            },
+        ];
+
         yield 'happy path updating voucher' => [
             (function ($bookingUpdateRequest) {
                 $bookingUpdateRequest->voucher = '43214312';
@@ -479,6 +499,31 @@ class BookingManagerTest extends ProphecyTestCase
             UnprocessableEntityException::class,
             null,
             null,
+        ];
+
+        yield 'expired on-request booking with pending_partner_confirmation status' => [
+            (function ($bookingUpdateRequest) {
+                $bookingUpdateRequest->status = 'pending_partner_confirmation';
+
+                return $bookingUpdateRequest;
+            })(clone $bookingUpdateRequest),
+            (function ($booking) {
+                $booking->availabilityType = 'on-request';
+                $booking->expiredAt = clone $booking->createdAt;
+
+                return $booking;
+            })(clone $booking),
+            null,
+            function ($test, $booking) {
+                $test->entityManager->persist($booking)->shouldHaveBeenCalled();
+                $test->entityManager->flush()->shouldHaveBeenCalled();
+            },
+            function (BookingManagerTest $test) {
+                $test->eventDispatcher
+                    ->dispatch(Argument::type(BookingStatusEvent::class))
+                    ->willReturn(Argument::type(BookingStatusEvent::class))
+                ;
+            },
         ];
 
         yield 'on-request booking with pending_partner_confirmation status' => [

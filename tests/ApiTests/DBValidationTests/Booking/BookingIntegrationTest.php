@@ -100,8 +100,8 @@ class BookingIntegrationTest extends IntegrationTestCase
         self::$bookingHelper->setUnavailability($this->componentGoldenIdList, $payload);
 
         $response = self::$bookingHelper->create($payload);
-        self::assertStringContainsString('Unavailable date for booking","code":1300016', $response->getContent());
-        self::assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        $this->assertStringContainsString('Unavailable date for booking","code":1300016', $response->getContent());
+        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
     }
 
     /**
@@ -124,11 +124,11 @@ class BookingIntegrationTest extends IntegrationTestCase
 
         $response = self::$bookingHelper->create($payload);
 
-        self::assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
 
         $response2 = self::$bookingHelper->create($payload);
-        self::assertEquals(Response::HTTP_CONFLICT, $response2->getStatusCode());
-        self::assertStringContainsString('Resource already exists', $response2->getContent());
+        $this->assertEquals(Response::HTTP_CONFLICT, $response2->getStatusCode());
+        $this->assertStringContainsString('Resource already exists', $response2->getContent());
     }
 
     /**
@@ -157,8 +157,8 @@ class BookingIntegrationTest extends IntegrationTestCase
 
         $response = self::$bookingHelper->create($payload);
 
-        self::assertEmpty($response->getContent());
-        self::assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
+        $this->assertEmpty($response->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
 
         $availabilityAfterBooking = self::$entityManager->getRepository(RoomAvailability::class)
             ->findBookingAvailabilityByExperienceAndDates(
@@ -177,21 +177,21 @@ class BookingIntegrationTest extends IntegrationTestCase
         foreach ($availabilityAfterBooking as $key => $availability) {
             if (isset($bookedDates[$key]) &&
                 $availability['date'] === $bookedDates[$key]['date']->format(DateTimeConstants::DEFAULT_DATE_FORMAT)) {
-                self::assertEquals(
+                $this->assertEquals(
                         $availabilityBeforeBooking[$key]['usedStock'] + $bookedDates[$key]['usedStock'],
                         $availability['usedStock']
                     );
 
-                self::assertEquals(
+                $this->assertEquals(
                         $availabilityBeforeBooking[$key]['realStock'] - $bookedDates[$key]['usedStock'],
                         $availability['realStock']
                     );
 
-                self::assertEquals($availabilityBeforeBooking[$key]['stock'], $availability['stock']);
+                $this->assertEquals($availabilityBeforeBooking[$key]['stock'], $availability['stock']);
             } else {
-                self::assertEquals($availabilityBeforeBooking[$key]['usedStock'], $availability['usedStock']);
-                self::assertEquals($availabilityBeforeBooking[$key]['realStock'], $availability['realStock']);
-                self::assertEquals($availabilityBeforeBooking[$key]['stock'], $availability['stock']);
+                $this->assertEquals($availabilityBeforeBooking[$key]['usedStock'], $availability['usedStock']);
+                $this->assertEquals($availabilityBeforeBooking[$key]['realStock'], $availability['realStock']);
+                $this->assertEquals($availabilityBeforeBooking[$key]['stock'], $availability['stock']);
             }
         }
     }
@@ -408,8 +408,8 @@ class BookingIntegrationTest extends IntegrationTestCase
 
         $response = self::$bookingHelper->create($payload);
 
-        self::assertEquals($expectedContent, $response->getContent());
-        self::assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        $this->assertEquals($expectedContent, $response->getContent());
+        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
 
         $availabilityAfterBooking = self::$entityManager->getRepository(RoomAvailability::class)
             ->findBookingAvailabilityByExperienceAndDates(
@@ -419,9 +419,9 @@ class BookingIntegrationTest extends IntegrationTestCase
             );
 
         foreach ($availabilityAfterBooking as $key => $availability) {
-            self::assertEquals($availabilityBeforeBooking[$key]['usedStock'], $availability['usedStock']);
-            self::assertEquals($availabilityBeforeBooking[$key]['realStock'], $availability['realStock']);
-            self::assertEquals($availabilityBeforeBooking[$key]['stock'], $availability['stock']);
+            $this->assertEquals($availabilityBeforeBooking[$key]['usedStock'], $availability['usedStock']);
+            $this->assertEquals($availabilityBeforeBooking[$key]['realStock'], $availability['realStock']);
+            $this->assertEquals($availabilityBeforeBooking[$key]['stock'], $availability['stock']);
         }
     }
 
@@ -870,8 +870,8 @@ class BookingIntegrationTest extends IntegrationTestCase
             );
         $responseCreate = self::$bookingHelper->create($payload);
 
-        self::assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
-        self::assertEmpty($responseCreate->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
+        $this->assertEmpty($responseCreate->getContent());
 
         $patchPayload = $payload;
         $patchPayload['bookingId'] = $payloadUpdate['bookingId'] ?? $payload['bookingId'];
@@ -891,24 +891,24 @@ class BookingIntegrationTest extends IntegrationTestCase
         $endDate = $payload['endDate'];
         foreach ($availabilityBeforeBookingComplete as $key => $formerAvailability) {
             if ($formerAvailability['date'] !== $endDate) {
-                self::assertEquals(0, $availabilityAfterBookingComplete[$key]['usedStock']);
-                self::assertEquals(
+                $this->assertEquals(0, $availabilityAfterBookingComplete[$key]['usedStock']);
+                $this->assertEquals(
                     $formerAvailability['realStock'] - 1,
                     $availabilityAfterBookingComplete[$key]['realStock']
                 );
-                self::assertEquals($formerAvailability['stock'] - 1, $availabilityAfterBookingComplete[$key]['stock']);
+                $this->assertEquals($formerAvailability['stock'] - 1, $availabilityAfterBookingComplete[$key]['stock']);
             } else {
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['usedStock'], $availabilityAfterBookingComplete[$key]['usedStock']);
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['realStock'],
                     $availabilityAfterBookingComplete[$key]['realStock']
                 );
-                self::assertEquals($formerAvailability['stock'], $availabilityAfterBookingComplete[$key]['stock']);
+                $this->assertEquals($formerAvailability['stock'], $availabilityAfterBookingComplete[$key]['stock']);
             }
         }
-        self::assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
-        self::assertEmpty($response->getContent());
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+        $this->assertEmpty($response->getContent());
     }
 
     /**
@@ -934,8 +934,8 @@ class BookingIntegrationTest extends IntegrationTestCase
             );
         $responseCreate = self::$bookingHelper->create($payload);
 
-        self::assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
-        self::assertEmpty($responseCreate->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
+        $this->assertEmpty($responseCreate->getContent());
 
         $patchPayload = $payload;
         $patchPayload['bookingId'] = $payloadUpdate['bookingId'] ?? $payload['bookingId'];
@@ -957,37 +957,37 @@ class BookingIntegrationTest extends IntegrationTestCase
             ->findOneBy(['goldenId' => $payload['bookingId']]);
         foreach ($availabilityBeforeBookingComplete as $key => $formerAvailability) {
             if ($formerAvailability['date'] !== $endDate) {
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['usedStock'],
                     $availabilityAfterBookingComplete[$key]['usedStock']
                 );
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['realStock'] - 1,
                     $availabilityAfterBookingComplete[$key]['realStock']
                 );
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['stock'] - 1,
                     $availabilityAfterBookingComplete[$key]['stock']
                 );
             } else {
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['usedStock'],
                     $availabilityAfterBookingComplete[$key]['usedStock']
                 );
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['realStock'],
                     $availabilityAfterBookingComplete[$key]['realStock']
                 );
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['stock'],
                     $availabilityAfterBookingComplete[$key]['stock']
                 );
             }
         }
-        self::assertEquals($payload['bookingId'], $booking->goldenId);
-        self::assertEquals(BookingChannelConstraint::BOOKING_LAST_STATUS_CHANNEL_PARTNER, $booking->lastStatusChannel);
-        self::assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
-        self::assertEmpty($response->getContent());
+        $this->assertEquals($payload['bookingId'], $booking->goldenId);
+        $this->assertEquals(BookingChannelConstraint::BOOKING_LAST_STATUS_CHANNEL_PARTNER, $booking->lastStatusChannel);
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+        $this->assertEmpty($response->getContent());
     }
 
     /**
@@ -1013,8 +1013,8 @@ class BookingIntegrationTest extends IntegrationTestCase
             );
         $responseCreate = self::$bookingHelper->create($payload);
 
-        self::assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
-        self::assertEmpty($responseCreate->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
+        $this->assertEmpty($responseCreate->getContent());
 
         $patchPayload = $payload;
         $patchPayload['bookingId'] = $payloadUpdate['bookingId'] ?? $payload['bookingId'];
@@ -1036,37 +1036,37 @@ class BookingIntegrationTest extends IntegrationTestCase
             ->findOneBy(['goldenId' => $payload['bookingId']]);
         foreach ($availabilityBeforeBookingComplete as $key => $formerAvailability) {
             if ($formerAvailability['date'] !== $endDate) {
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['usedStock'] + 1,
                     $availabilityAfterBookingComplete[$key]['usedStock']
                 );
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['realStock'] - 1,
                     $availabilityAfterBookingComplete[$key]['realStock']
                 );
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['stock'],
                     $availabilityAfterBookingComplete[$key]['stock']
                 );
             } else {
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['usedStock'],
                     $availabilityAfterBookingComplete[$key]['usedStock']
                 );
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['realStock'],
                     $availabilityAfterBookingComplete[$key]['realStock']
                 );
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['stock'],
                     $availabilityAfterBookingComplete[$key]['stock']
                 );
             }
         }
-        self::assertEquals($payload['bookingId'], $booking->goldenId);
-        self::assertNull($booking->lastStatusChannel);
-        self::assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
-        self::assertStringContainsString('lastStatusChannel', $response->getContent());
+        $this->assertEquals($payload['bookingId'], $booking->goldenId);
+        $this->assertNull($booking->lastStatusChannel);
+        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        $this->assertStringContainsString('lastStatusChannel', $response->getContent());
     }
 
     /**
@@ -1097,8 +1097,8 @@ class BookingIntegrationTest extends IntegrationTestCase
             );
         $responseCreate = self::$bookingHelper->create($payload);
 
-        self::assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
-        self::assertEmpty($responseCreate->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
+        $this->assertEmpty($responseCreate->getContent());
 
         $patchPayload = $payload;
         $patchPayload['bookingId'] = $payloadUpdate['bookingId'] ?? $payload['bookingId'];
@@ -1117,30 +1117,30 @@ class BookingIntegrationTest extends IntegrationTestCase
         $endDate = $payload['endDate'];
         foreach ($availabilityBeforeBookingComplete as $key => $formerAvailability) {
             if ($formerAvailability['date'] !== $endDate) {
-                self::assertEquals(1, $availabilityAfterBookingComplete[$key]['usedStock']);
-                self::assertEquals(
+                $this->assertEquals(1, $availabilityAfterBookingComplete[$key]['usedStock']);
+                $this->assertEquals(
                     $formerAvailability['realStock'] - 1,
                     $availabilityAfterBookingComplete[$key]['realStock']
                 );
-                self::assertEquals($formerAvailability['stock'], $availabilityAfterBookingComplete[$key]['stock']);
+                $this->assertEquals($formerAvailability['stock'], $availabilityAfterBookingComplete[$key]['stock']);
             } else {
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['usedStock'],
                     $availabilityAfterBookingComplete[$key]['usedStock']
                 );
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['realStock'],
                     $availabilityAfterBookingComplete[$key]['realStock']
                 );
-                self::assertEquals(
+                $this->assertEquals(
                     $formerAvailability['stock'],
                     $availabilityAfterBookingComplete[$key]['stock']
                 );
             }
         }
-        self::assertEquals($expectedStatusCode, $response->getStatusCode());
-        self::assertStringContainsString($expectedMessage, $response->getContent());
-        self::assertStringContainsString($expectedErrorCode, $response->getContent());
+        $this->assertEquals($expectedStatusCode, $response->getStatusCode());
+        $this->assertStringContainsString($expectedMessage, $response->getContent());
+        $this->assertStringContainsString($expectedErrorCode, $response->getContent());
     }
 
     public function dataForUpdateBookingUnknownFields()
@@ -1192,8 +1192,8 @@ class BookingIntegrationTest extends IntegrationTestCase
             );
         $responseCreate = self::$bookingHelper->create($payload);
 
-        self::assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
-        self::assertEmpty($responseCreate->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
+        $this->assertEmpty($responseCreate->getContent());
 
         $patchPayload = $payload;
         $patchPayload['status'] = $bookingStatus;
@@ -1208,16 +1208,16 @@ class BookingIntegrationTest extends IntegrationTestCase
             );
 
         foreach ($availabilityBeforeBookingComplete as $key => $formerAvailability) {
-            self::assertEquals(1, $availabilityAfterBookingComplete[$key]['usedStock']);
-            self::assertEquals(
+            $this->assertEquals(1, $availabilityAfterBookingComplete[$key]['usedStock']);
+            $this->assertEquals(
                 $formerAvailability['realStock'] - 1,
                 $availabilityAfterBookingComplete[$key]['realStock']
             );
-            self::assertEquals($formerAvailability['stock'], $availabilityAfterBookingComplete[$key]['stock']);
+            $this->assertEquals($formerAvailability['stock'], $availabilityAfterBookingComplete[$key]['stock']);
         }
-        self::assertEquals($expectedStatusCode, $response->getStatusCode());
-        self::assertStringContainsString($expectedMessage, $response->getContent());
-        self::assertStringContainsString($expectedErrorCode, $response->getContent());
+        $this->assertEquals($expectedStatusCode, $response->getStatusCode());
+        $this->assertStringContainsString($expectedMessage, $response->getContent());
+        $this->assertStringContainsString($expectedErrorCode, $response->getContent());
     }
 
     public function dataForUpdateBookingUnhappyCases()
@@ -1242,64 +1242,83 @@ class BookingIntegrationTest extends IntegrationTestCase
      * @dataProvider dataForUpdateBookingHappyCases
      */
     public function testUpdateBookingHappyCases(
+        string $availabilityType,
         string $bookingStatus,
         int $expectedStatusCode
     ) {
-        $this->experienceGoldenId = '144653';
-        $overridePayload['experience'] = [
-            'id' => $this->experienceGoldenId,
-            'components' => ['Drive a Tesla'],
+        if ('instant' === $availabilityType) {
+            $this->experienceGoldenId = '144653';
+            $this->componentGoldenId = '367395';
+            $boxId = '1796';
+        } else {
+            $this->experienceGoldenId = '45618';
+            $this->componentGoldenId = '225702';
+            $boxId = '2161';
+        }
+        $overridePayload = [
+            'box' => $boxId,
+            'availabilityType' => $availabilityType,
+            'experience' => [
+                'id' => $this->experienceGoldenId,
+                'components' => ['Drive a Tesla'],
+            ],
         ];
+
         $payload = self::$bookingHelper->defaultPayload($overridePayload);
-        $this->componentGoldenId = '367395';
 
-        $this->prepareData($payload);
-
-        $availabilityBeforeBookingComplete = self::$entityManager->getRepository(RoomAvailability::class)
-            ->findBookingAvailabilityByExperienceAndDates(
-                $this->experienceGoldenId,
-                new \DateTime($payload['startDate']),
-                new \DateTime($payload['endDate'])
-            );
+        if ('instant' === $availabilityType) {
+            $this->prepareData($payload);
+            $availabilityBeforeBookingComplete = self::$entityManager->getRepository(RoomAvailability::class)
+                ->findBookingAvailabilityByExperienceAndDates(
+                    $this->experienceGoldenId,
+                    new \DateTime($payload['startDate']),
+                    new \DateTime($payload['endDate'])
+                );
+        }
         $responseCreate = self::$bookingHelper->create($payload);
 
-        self::assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
-        self::assertEmpty($responseCreate->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
+        $this->assertEmpty($responseCreate->getContent());
 
         $patchPayload = $payload;
         $patchPayload['status'] = $bookingStatus;
 
         $response = self::$bookingHelper->update($patchPayload);
 
-        $availabilityAfterBookingComplete = self::$entityManager->getRepository(RoomAvailability::class)
-            ->findBookingAvailabilityByExperienceAndDates(
-                $this->experienceGoldenId,
-                new \DateTime($payload['startDate']),
-                new \DateTime($payload['endDate'])
-            );
-
-        foreach ($availabilityBeforeBookingComplete as $key => $formerAvailability) {
-            self::assertEquals(0, $availabilityAfterBookingComplete[$key]['usedStock']);
-            self::assertEquals($formerAvailability['realStock'], $availabilityAfterBookingComplete[$key]['realStock']);
-            self::assertEquals($formerAvailability['stock'], $availabilityAfterBookingComplete[$key]['stock']);
+        if ('instant' === $availabilityType) {
+            $availabilityAfterBookingComplete = self::$entityManager
+                ->getRepository(RoomAvailability::class)
+                ->findBookingAvailabilityByExperienceAndDates(
+                    $this->experienceGoldenId,
+                    new \DateTime($payload['startDate']),
+                    new \DateTime($payload['endDate'])
+                );
+            foreach ($availabilityBeforeBookingComplete as $key => $formerAvailability) {
+                $this->assertEquals(0, $availabilityAfterBookingComplete[$key]['usedStock']);
+                $this->assertEquals($formerAvailability['realStock'], $availabilityAfterBookingComplete[$key]['realStock']);
+                $this->assertEquals($formerAvailability['stock'], $availabilityAfterBookingComplete[$key]['stock']);
+            }
         }
-        self::assertEquals($expectedStatusCode, $response->getStatusCode());
-        self::assertEmpty($response->getContent());
+        $this->assertEquals($expectedStatusCode, $response->getStatusCode());
+        $this->assertEmpty($response->getContent());
     }
 
     public function dataForUpdateBookingHappyCases()
     {
         yield 'happy-path-rejected-booking' => [
+            'on-request',
             'rejected',
             Response::HTTP_NO_CONTENT,
         ];
 
         yield 'happy-path-pending-partner-confirmation-booking' => [
+            'on-request',
             'pending_partner_confirmation',
             Response::HTTP_NO_CONTENT,
         ];
 
         yield 'happy-path-cancel-booking' => [
+            'instant',
             'cancelled',
             Response::HTTP_NO_CONTENT,
         ];
@@ -1327,8 +1346,8 @@ class BookingIntegrationTest extends IntegrationTestCase
         self::$bookingHelper->fulfillAvailability($componentIdList, $payload);
         $responseCreate = self::$bookingHelper->create($payload);
 
-        self::assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
-        self::assertEmpty($responseCreate->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
+        $this->assertEmpty($responseCreate->getContent());
 
         self::$entityManager
             ->getConnection()
@@ -1386,6 +1405,80 @@ class BookingIntegrationTest extends IntegrationTestCase
 
     /**
      * @group update-bit
+     * @dataProvider dataForUpdateOnRequestBookingExpired
+     */
+    public function testUpdateOnRequestBookingAlreadyExpired(array $updatePayload, callable $asserts)
+    {
+        $this->experienceGoldenId = '45618';
+        $this->componentGoldenId = '225702';
+        $componentIdList = [$this->componentGoldenId, $this->componentGoldenIdWithDuration2];
+
+        $payload['bookingId'] = bin2hex(random_bytes(8));
+        $payload['experience'] = [
+            'id' => $this->experienceGoldenId,
+            'components' => ['Dinner for 2'],
+        ];
+        $payload['box'] = '2161';
+        $payload['availabilityType'] = 'on-request';
+        $payload = self::$bookingHelper->defaultPayload($payload);
+
+        self::$bookingHelper->fulfillAvailability($componentIdList, $payload);
+        $responseCreate = self::$bookingHelper->create($payload);
+
+        $this->assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
+        $this->assertEmpty($responseCreate->getContent());
+
+        $updatePayload['bookingId'] = $payload['bookingId'];
+        $updatePayload['voucher'] = $payload['voucher'];
+
+        $pendingPartnerConfirmationPayload = $updatePayload;
+        $pendingPartnerConfirmationPayload['status'] = 'pending_partner_confirmation';
+        $response = self::$bookingHelper->update($pendingPartnerConfirmationPayload);
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+
+        $response = self::$bookingHelper->update($updatePayload);
+
+        $asserts($this, $response);
+    }
+
+    /**
+     * @see ::testUpdateOnRequestBookingExpired
+     */
+    public function dataForUpdateOnRequestBookingExpired(): iterable
+    {
+        yield 'confirm booking expired with availability' => [
+            ['status' => 'complete'],
+            (function ($test, $response) {
+                $test->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+            }),
+        ];
+
+        yield 'confirm booking expired without availability' => [
+            ['status' => 'complete'],
+            (function ($test, $response) {
+                $test->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+            }),
+        ];
+
+        yield 'cancel booking expired' => [
+            ['status' => 'cancelled'],
+            (function ($test, $response) {
+                $test->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+                $test->assertEmpty($response->getContent());
+            }),
+        ];
+
+        yield 'reject booking expired' => [
+            ['status' => 'rejected'],
+            (function ($test, $response) {
+                $test->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+                $test->assertEmpty($response->getContent());
+            }),
+        ];
+    }
+
+    /**
+     * @group update-bit
      */
     public function testUpdateToSameStatusWillFail()
     {
@@ -1410,18 +1503,18 @@ class BookingIntegrationTest extends IntegrationTestCase
 
         $responseCreate = self::$bookingHelper->create($payload);
 
-        self::assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
-        self::assertEmpty($responseCreate->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $responseCreate->getStatusCode());
+        $this->assertEmpty($responseCreate->getContent());
 
         $updatePayload['bookingId'] = $payload['bookingId'];
         $updatePayload['voucher'] = $payload['voucher'];
         $updatePayload['status'] = BookingStatusConstraint::BOOKING_STATUS_COMPLETE;
 
         $responseUpdate = self::$bookingHelper->update($updatePayload);
-        self::assertEquals(Response::HTTP_NO_CONTENT, $responseUpdate->getStatusCode());
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $responseUpdate->getStatusCode());
 
         $responseUpdate2 = self::$bookingHelper->update($updatePayload);
-        self::assertEquals(Response::HTTP_NO_CONTENT, $responseUpdate2->getStatusCode());
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $responseUpdate2->getStatusCode());
 
         $availabilityAfterComplete = self::$entityManager->getRepository(RoomAvailability::class)
             ->findBookingAvailabilityByExperienceAndDates(
@@ -1432,13 +1525,13 @@ class BookingIntegrationTest extends IntegrationTestCase
 
         foreach ($availabilityBeforeComplete as $key => $formerAvailability) {
             if ($formerAvailability['date'] !== $payload['endDate']) {
-                self::assertEquals(0, $availabilityAfterComplete[$key]['usedStock']);
-                self::assertEquals($formerAvailability['realStock'] - 1, $availabilityAfterComplete[$key]['realStock']);
-                self::assertEquals($formerAvailability['stock'] - 1, $availabilityAfterComplete[$key]['stock']);
+                $this->assertEquals(0, $availabilityAfterComplete[$key]['usedStock']);
+                $this->assertEquals($formerAvailability['realStock'] - 1, $availabilityAfterComplete[$key]['realStock']);
+                $this->assertEquals($formerAvailability['stock'] - 1, $availabilityAfterComplete[$key]['stock']);
             } else {
-                self::assertEquals($formerAvailability['usedStock'], $availabilityAfterComplete[$key]['usedStock']);
-                self::assertEquals($formerAvailability['realStock'], $availabilityAfterComplete[$key]['realStock']);
-                self::assertEquals($formerAvailability['stock'], $availabilityAfterComplete[$key]['stock']);
+                $this->assertEquals($formerAvailability['usedStock'], $availabilityAfterComplete[$key]['usedStock']);
+                $this->assertEquals($formerAvailability['realStock'], $availabilityAfterComplete[$key]['realStock']);
+                $this->assertEquals($formerAvailability['stock'], $availabilityAfterComplete[$key]['stock']);
             }
         }
     }
