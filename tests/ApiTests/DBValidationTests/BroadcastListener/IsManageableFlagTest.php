@@ -238,6 +238,18 @@ class IsManageableFlagTest extends IntegrationTestCase
             ),
             false,
         ];
+
+        yield 'component with room_stock_type empty' => [
+            ...$this->replaceIds(
+                $this->generateDefaultBox(),
+                $this->generateDefaultPartner(),
+                $this->generateDefaultExperience(),
+                $this->generateDefaultComponent(['roomStockType' => null]),
+                $this->generateDefaultBoxExperience(),
+                $this->generateDefaultExperienceComponent()
+            ),
+            false,
+        ];
     }
 
     private function replaceIds($box, $partner, $experience, $component, $boxExperience, $experienceComponent): array
